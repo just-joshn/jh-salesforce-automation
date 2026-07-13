@@ -1,0 +1,159 @@
+- generic [active] [ref=f7e1]:
+    - generic [ref=f7e4]:
+        - link [ref=f7e416] [cursor=pointer]:
+            - /url: '#chakra-skip-nav'
+            - text: Skip to Content
+        - banner [ref=f7e7]:
+            - generic [ref=f7e9]:
+                - button [ref=f7e417] [cursor=pointer]
+                - navigation "Main navigation" [ref=f7e14]:
+                    - generic [ref=f7e16]:
+                        - generic [ref=f7e19]:
+                            - link "New Arrivals" [ref=f7e20] [cursor=pointer]:
+                                - /url: /global/en-US/category/newarrivals
+                            - link [ref=f7e21] [cursor=pointer]:
+                                - /url: /global/en-US
+                                - img "chevron-down" [ref=f7e23]
+                        - generic [ref=f7e26]:
+                            - link "Womens" [ref=f7e27] [cursor=pointer]:
+                                - /url: /global/en-US/category/womens
+                            - link [ref=f7e28] [cursor=pointer]:
+                                - /url: /global/en-US
+                                - img "chevron-down" [ref=f7e30]
+                        - generic [ref=f7e33]:
+                            - link "Mens" [ref=f7e34] [cursor=pointer]:
+                                - /url: /global/en-US/category/mens
+                            - link [ref=f7e35] [cursor=pointer]:
+                                - /url: /global/en-US
+                                - img "chevron-down" [ref=f7e37]
+                        - link "Gift Certificates" [ref=f7e39] [cursor=pointer]:
+                            - /url: /global/en-US/category/gift-certificates
+                        - link "Top Sellers" [ref=f7e41] [cursor=pointer]:
+                            - /url: /global/en-US/category/top-seller
+                - searchbox [ref=f7e418]
+                - button [ref=f7e419] [cursor=pointer]
+                - button [ref=f7e420] [cursor=pointer]
+                - button [ref=f7e421] [cursor=pointer]
+                - button [ref=f7e422] [cursor=pointer]
+        - main [ref=f7e60]:
+            - generic [ref=f7e424]:
+                - heading "Sign In" [level=1] [ref=f7e425]
+                - generic [ref=f7e426]:
+                    - generic [ref=f7e427]:
+                        - img "brand-logo" [ref=f7e428]
+                        - paragraph [ref=f7e429]: Welcome Back
+                    - generic [ref=f7e431]:
+                        - generic [ref=f7e432]:
+                            - group [ref=f7e434]:
+                                - generic [ref=f7e435]: Email
+                                - textbox "Email" [ref=f7e437]:
+                                    - /placeholder: you@email.com
+                            - button "Continue" [ref=f7e438] [cursor=pointer]
+                            - separator [ref=f7e439]
+                            - paragraph [ref=f7e440]: Or Login With
+                            - generic [ref=f7e441]:
+                                - button "Password" [ref=f7e442] [cursor=pointer]
+                                - button [ref=f7e443] [cursor=pointer]:
+                                    - img "google" [ref=f7e444]
+                                    - text: Google
+                                - button [ref=f7e445] [cursor=pointer]:
+                                    - img "apple" [ref=f7e446]
+                                    - text: Apple
+                        - generic [ref=f7e447]:
+                            - paragraph [ref=f7e448]: Don't have an account?
+                            - button "Create account" [ref=f7e449] [cursor=pointer]
+        - contentinfo [ref=f7e318]:
+            - generic [ref=f7e319]:
+                - generic [ref=f7e321]:
+                    - generic [ref=f7e322]:
+                        - heading [level=2] [ref=f7e450]: Customer Support
+                        - list [ref=f7e324]:
+                            - listitem [ref=f7e325]:
+                                - link [ref=f7e451] [cursor=pointer]:
+                                    - /url: /
+                                    - text: Contact Us
+                            - listitem [ref=f7e327]:
+                                - link [ref=f7e452] [cursor=pointer]:
+                                    - /url: /
+                                    - text: Shipping
+                    - generic [ref=f7e329]:
+                        - heading [level=2] [ref=f7e453]: Account
+                        - list [ref=f7e331]:
+                            - listitem [ref=f7e332]:
+                                - link [ref=f7e454] [cursor=pointer]:
+                                    - /url: /
+                                    - text: Order Status
+                            - listitem [ref=f7e334]:
+                                - link [ref=f7e455] [cursor=pointer]:
+                                    - /url: /
+                                    - text: Sign in or create account
+                    - generic [ref=f7e336]:
+                        - heading [level=2] [ref=f7e456]: Our Company
+                        - list [ref=f7e338]:
+                            - listitem [ref=f7e339]:
+                                - link [ref=f7e457] [cursor=pointer]:
+                                    - /url: /global/en-US/store-locator
+                                    - text: Store Locator
+                            - listitem [ref=f7e341]:
+                                - link [ref=f7e458] [cursor=pointer]:
+                                    - /url: /
+                                    - text: About Us
+                    - generic [ref=f7e344]:
+                        - heading [level=2] [ref=f7e459]: Subscribe to Stay Updated
+                        - paragraph [ref=f7e346]: Be the first to know about latest offers, news, tips, and more.
+                        - generic [ref=f7e347]:
+                            - generic [ref=f7e348]:
+                                - textbox [ref=f7e460]:
+                                    - /placeholder: Enter your email address...
+                                - button [ref=f7e461] [cursor=pointer]: Subscribe
+                            - paragraph [ref=f7e351]:
+                                - text: By submitting this, I agree to the
+                                - link [ref=f7e462] [cursor=pointer]:
+                                    - /url: /
+                                    - text: Terms & Conditions
+                                - text: and
+                                - link [ref=f7e463] [cursor=pointer]:
+                                    - /url: /
+                                    - text: Privacy Policy
+                                - text: .
+                        - generic [ref=f7e354]:
+                            - button [ref=f7e464] [cursor=pointer]
+                            - button [ref=f7e465] [cursor=pointer]
+                            - button [ref=f7e466] [cursor=pointer]
+                            - button [ref=f7e467] [cursor=pointer]
+                            - button [ref=f7e468] [cursor=pointer]
+                - group [ref=f7e366]:
+                    - combobox [ref=f7e470]
+                - separator [ref=f7e369]
+                - generic [ref=f7e370]:
+                    - paragraph [ref=f7e371]: © 2026 Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.
+                    - list [ref=f7e374]:
+                        - listitem [ref=f7e375]:
+                            - link [ref=f7e471] [cursor=pointer]:
+                                - /url: /
+                                - text: Terms & Conditions
+                        - listitem [ref=f7e377]:
+                            - link [ref=f7e472] [cursor=pointer]:
+                                - /url: /
+                                - text: Privacy Policy
+                        - listitem [ref=f7e379]:
+                            - link [ref=f7e473] [cursor=pointer]:
+                                - /url: /
+                                - text: Site Map
+    - generic:
+        - region
+        - region
+        - region
+        - region
+        - region
+        - region
+    - dialog [ref=f7e474]:
+        - generic [ref=f7e475]:
+            - button "Close consent tracking form" [ref=f7e476] [cursor=pointer]
+            - generic [ref=f7e479]:
+                - heading "Tracking Consent" [level=3] [ref=f7e480]
+                - generic [ref=f7e482]:
+                    - paragraph [ref=f7e483]: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                    - generic [ref=f7e484]:
+                        - button "Decline tracking" [ref=f7e485] [cursor=pointer]: Decline
+                        - button "Accept tracking" [ref=f7e486] [cursor=pointer]: Accept

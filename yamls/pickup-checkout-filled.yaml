@@ -1,0 +1,214 @@
+- generic [ref=f11e1]:
+    - generic [ref=f11e4]:
+        - link "Skip to Content" [ref=f11e319] [cursor=pointer]:
+            - /url: '#chakra-skip-nav'
+        - generic [ref=f11e470]:
+            - link [ref=f11e471] [cursor=pointer]:
+                - /url: /
+                - img "brand-logo" [ref=f11e472]
+            - 'link "Back to cart, number of items: 1" [ref=f11e473] [cursor=pointer]':
+                - /url: /global/en-US/cart
+                - text: Back to cart
+                - generic [ref=f11e474]: '1'
+        - main [ref=f11e58]:
+            - generic [ref=f11e478]:
+                - heading "Checkout" [level=1] [ref=f11e479]
+                - generic [ref=f11e481]:
+                    - generic [ref=f11e483]:
+                        - generic [ref=f11e485]:
+                            - generic [ref=f11e486]:
+                                - heading "Contact Info" [level=2] [ref=f11e487]
+                                - button "Edit Contact Info" [ref=f11e569] [cursor=pointer]
+                            - paragraph [ref=f11e570]: cuj-pickup-20260826@outlook.com
+                        - generic [ref=f11e508]:
+                            - generic [ref=f11e509]:
+                                - heading "Pickup Address & Information" [level=2] [ref=f11e510]
+                                - button "Show Products" [ref=f11e571] [cursor=pointer]
+                            - generic [ref=f11e572]:
+                                - paragraph [ref=f11e573]: Store Information
+                                - generic [ref=f11e575]:
+                                    - generic [ref=f11e577]:
+                                        - generic [ref=f11e578]: San Francisco Retail Store
+                                        - generic [ref=f11e579]: 151 3rd StSan Francisco, CA 94103
+                                    - generic [ref=f11e580]:
+                                        - button "Store Contact Info" [ref=f11e585] [cursor=pointer]
+                                        - button "Store Hours" [ref=f11e593] [cursor=pointer]
+                        - generic [ref=f11e512]:
+                            - heading "Payment" [active] [level=2] [ref=f11e514]
+                            - generic [ref=f11e597]:
+                                - button [ref=f11e601] [cursor=pointer]
+                                - generic [ref=f11e604]:
+                                    - radiogroup "Payment" [ref=f11e609]:
+                                        - generic [ref=f11e611] [cursor=pointer]:
+                                            - radio "Credit Card Secure $30.00" [checked] [ref=f11e612]
+                                            - generic [ref=f11e615]:
+                                                - generic [ref=f11e616]:
+                                                    - paragraph [ref=f11e617]: Credit Card
+                                                    - img "Secure" [ref=f11e618]
+                                                - paragraph [ref=f11e619]: $30.00
+                                        - generic [ref=f11e623]:
+                                            - generic [ref=f11e624]:
+                                                - group [ref=f11e625]:
+                                                    - generic [ref=f11e626]:
+                                                        - generic [ref=f11e627]: Card Number
+                                                        - generic [ref=f11e628]:
+                                                            - img "cc-visa" [ref=f11e629]
+                                                            - img "cc-mastercard" [ref=f11e630]
+                                                            - img "cc-amex" [ref=f11e631]
+                                                            - img "cc-discover" [ref=f11e632]
+                                                    - textbox "Card Number" [ref=f11e634]
+                                                - group [ref=f11e635]:
+                                                    - generic [ref=f11e636]: Name on Card
+                                                    - textbox "Name on Card" [ref=f11e638]
+                                                - generic [ref=f11e639]:
+                                                    - group [ref=f11e640]:
+                                                        - generic [ref=f11e641]: Expiration Date
+                                                        - textbox "Expiration Date" [ref=f11e643]:
+                                                            - /placeholder: MM/YY
+                                                    - group [ref=f11e644]:
+                                                        - text: Security Code
+                                                        - img "Security code info" [ref=f11e647]
+                                                        - generic [ref=f11e648]:
+                                                            - textbox "Security Code" [ref=f11e649]
+                                                            - button "Show password" [ref=f11e651] [cursor=pointer]
+                                            - group
+                                        - generic [ref=f11e654] [cursor=pointer]:
+                                            - radio "paypal-icon" [ref=f11e655]
+                                            - img "paypal-icon" [ref=f11e659]
+                                    - separator [ref=f11e660]
+                                    - heading "Billing Address" [level=3] [ref=f11e662]
+                                    - generic "Billing Address Form" [ref=f11e668]:
+                                        - generic [ref=f11e669]:
+                                            - group [ref=f11e670]:
+                                                - generic [ref=f11e671]: First Name
+                                                - textbox "First Name" [ref=f11e673]
+                                            - group [ref=f11e674]:
+                                                - generic [ref=f11e675]: Last Name
+                                                - textbox "Last Name" [ref=f11e677]
+                                        - group [ref=f11e678]:
+                                            - generic [ref=f11e679]: Phone
+                                            - textbox "Phone" [ref=f11e681]
+                                        - group [ref=f11e682]:
+                                            - generic [ref=f11e683]: Country
+                                            - combobox "Country" [ref=f11e686]:
+                                                - option "Canada"
+                                                - option "United States" [selected]
+                                        - group [ref=f11e688]:
+                                            - generic [ref=f11e689]: Address
+                                            - textbox "Address" [ref=f11e691]
+                                        - group [ref=f11e692]:
+                                            - generic [ref=f11e693]: City
+                                            - textbox "City" [ref=f11e695]
+                                        - generic [ref=f11e696]:
+                                            - group [ref=f11e698]:
+                                                - generic [ref=f11e699]: State
+                                                - combobox "State" [ref=f11e702]:
+                                                    - option [selected]
+                                                    - option "Alabama"
+                                                    - option "Alaska"
+                                                    - option "Arizona"
+                                                    - option "Arkansas"
+                                                    - option "California"
+                                                    - option "Colorado"
+                                                    - option "Connecticut"
+                                                    - option "Delaware"
+                                                    - option "District Of Columbia"
+                                                    - option "Florida"
+                                                    - option "Georgia"
+                                                    - option "Hawaii"
+                                                    - option "Idaho"
+                                                    - option "Illinois"
+                                                    - option "Indiana"
+                                                    - option "Iowa"
+                                                    - option "Kansas"
+                                                    - option "Kentucky"
+                                                    - option "Louisiana"
+                                                    - option "Maine"
+                                                    - option "Maryland"
+                                                    - option "Massachusetts"
+                                                    - option "Michigan"
+                                                    - option "Minnesota"
+                                                    - option "Mississippi"
+                                                    - option "Missouri"
+                                                    - option "Montana"
+                                                    - option "Nebraska"
+                                                    - option "Nevada"
+                                                    - option "New Hampshire"
+                                                    - option "New Jersey"
+                                                    - option "New Mexico"
+                                                    - option "New York"
+                                                    - option "North Carolina"
+                                                    - option "North Dakota"
+                                                    - option "Ohio"
+                                                    - option "Oklahoma"
+                                                    - option "Oregon"
+                                                    - option "Pennsylvania"
+                                                    - option "Rhode Island"
+                                                    - option "South Carolina"
+                                                    - option "South Dakota"
+                                                    - option "Tennessee"
+                                                    - option "Texas"
+                                                    - option "Utah"
+                                                    - option "Vermont"
+                                                    - option "Virginia"
+                                                    - option "Washington"
+                                                    - option "West Virginia"
+                                                    - option "Wisconsin"
+                                                    - option "Wyoming"
+                                            - group [ref=f11e704]:
+                                                - generic [ref=f11e705]: Zip Code
+                                                - textbox "Zip Code" [ref=f11e707]
+                                    - button "Review Order" [ref=f11e710] [cursor=pointer]
+                    - generic [ref=f11e516]:
+                        - heading "Order Summary" [level=2] [ref=f11e517]
+                        - region "Order Summary" [ref=f11e518]:
+                            - button "1 item in cart" [ref=f11e521] [cursor=pointer]
+                            - generic [ref=f11e526]:
+                                - generic [ref=f11e527]:
+                                    - paragraph [ref=f11e528]: Subtotal
+                                    - paragraph [ref=f11e529]: $30.00
+                                - generic [ref=f11e530]:
+                                    - paragraph [ref=f11e532]: Shipping
+                                    - generic [ref=f11e533]: Free
+                                - generic [ref=f11e534]:
+                                    - paragraph [ref=f11e535]: Tax
+                                    - paragraph [ref=f11e536]: $1.43
+                            - separator [ref=f11e537]
+                            - generic [ref=f11e539]:
+                                - paragraph [ref=f11e540]: Order Total
+                                - paragraph [ref=f11e541]: $30.00
+        - contentinfo [ref=f11e542]:
+            - generic [ref=f11e543]:
+                - list [ref=f11e545]:
+                    - listitem [ref=f11e546]:
+                        - link "Shipping" [ref=f11e547] [cursor=pointer]:
+                            - /url: /
+                    - listitem [ref=f11e548]:
+                        - link "Returns & Exchanges" [ref=f11e549] [cursor=pointer]:
+                            - /url: /
+                - separator [ref=f11e550]
+                - generic [ref=f11e551]:
+                    - paragraph [ref=f11e552]: © 2026 Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.
+                    - generic [ref=f11e554]:
+                        - list [ref=f11e556]:
+                            - listitem [ref=f11e557]:
+                                - link "Terms & Conditions" [ref=f11e558] [cursor=pointer]:
+                                    - /url: /
+                            - listitem [ref=f11e559]:
+                                - link "Privacy Policy" [ref=f11e560] [cursor=pointer]:
+                                    - /url: /
+                            - listitem [ref=f11e561]:
+                                - link "Site Map" [ref=f11e562] [cursor=pointer]:
+                                    - /url: /
+                        - generic [ref=f11e564]:
+                            - img "cc-visa" [ref=f11e565]
+                            - img "cc-mastercard" [ref=f11e566]
+                            - img "cc-amex" [ref=f11e567]
+                            - img "cc-discover" [ref=f11e568]
+    - generic:
+        - region
+        - region
+        - region
+        - region
+        - region
+        - region

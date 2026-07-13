@@ -1,0 +1,227 @@
+- generic [active] [ref=f11e1]:
+    - generic [ref=f11e4]:
+        - link "Skip to Content" [ref=f11e319] [cursor=pointer]:
+            - /url: '#chakra-skip-nav'
+        - banner [ref=f11e736]:
+            - generic [ref=f11e738]:
+                - button "Logo" [ref=f11e739] [cursor=pointer]
+                - navigation "Main navigation" [ref=f11e743]:
+                    - generic [ref=f11e745]:
+                        - generic [ref=f11e748]:
+                            - link "New Arrivals" [ref=f11e749] [cursor=pointer]:
+                                - /url: /global/en-US/category/newarrivals
+                            - link [ref=f11e750] [cursor=pointer]:
+                                - /url: /global/en-US
+                                - img "chevron-down" [ref=f11e752]
+                        - generic [ref=f11e755]:
+                            - link "Womens" [ref=f11e756] [cursor=pointer]:
+                                - /url: /global/en-US/category/womens
+                            - link [ref=f11e757] [cursor=pointer]:
+                                - /url: /global/en-US
+                                - img "chevron-down" [ref=f11e759]
+                        - generic [ref=f11e762]:
+                            - link "Mens" [ref=f11e763] [cursor=pointer]:
+                                - /url: /global/en-US/category/mens
+                            - link [ref=f11e764] [cursor=pointer]:
+                                - /url: /global/en-US
+                                - img "chevron-down" [ref=f11e766]
+                        - link "Gift Certificates" [ref=f11e768] [cursor=pointer]:
+                            - /url: /global/en-US/category/gift-certificates
+                        - link "Top Sellers" [ref=f11e770] [cursor=pointer]:
+                            - /url: /global/en-US/category/top-seller
+                - searchbox "Search for products..." [ref=f11e777]
+                - button "My Account" [ref=f11e778] [cursor=pointer]
+                - button "Wishlist" [ref=f11e780] [cursor=pointer]
+                - button "Store Locator" [ref=f11e782] [cursor=pointer]
+                - 'button "My cart, number of items: 0" [ref=f11e784] [cursor=pointer]':
+                    - img "basket" [ref=f11e785]
+        - main [ref=f11e58]:
+            - generic [ref=f11e788]:
+                - generic [ref=f11e790]:
+                    - heading "Thank you for your order!" [level=1] [ref=f11e791]
+                    - generic [ref=f11e794]:
+                        - paragraph [ref=f11e795]: 'Order Number: 00291252'
+                        - paragraph [ref=f11e796]: We will send an email to cuj-pickup-20260826@outlook.com with your confirmation number and receipt shortly.
+                        - link "Continue Shopping" [ref=f11e797] [cursor=pointer]:
+                            - /url: /
+                - generic [ref=f11e799]:
+                    - heading "Create an account for faster checkout" [level=2] [ref=f11e800]
+                    - generic [ref=f11e802]:
+                        - generic [ref=f11e803]:
+                            - generic [ref=f11e804]:
+                                - group [ref=f11e805]:
+                                    - generic [ref=f11e806]: Email
+                                    - textbox "Email" [ref=f11e808]:
+                                        - /placeholder: you@email.com
+                                        - text: cuj-pickup-20260826@outlook.com
+                                - generic [ref=f11e809]:
+                                    - group [ref=f11e810]:
+                                        - generic [ref=f11e811]: Password
+                                        - generic [ref=f11e812]:
+                                            - textbox "Password" [ref=f11e813]
+                                            - button "Show password" [ref=f11e815] [cursor=pointer]
+                                    - generic [ref=f11e817]:
+                                        - generic [ref=f11e818]:
+                                            - img "check-circle" [ref=f11e819]
+                                            - paragraph [ref=f11e820]: 8 characters minimum
+                                        - generic [ref=f11e821]:
+                                            - img "check-circle" [ref=f11e822]
+                                            - paragraph [ref=f11e823]: 1 uppercase letter
+                                        - generic [ref=f11e824]:
+                                            - img "check-circle" [ref=f11e825]
+                                            - paragraph [ref=f11e826]: 1 lowercase letter
+                                        - generic [ref=f11e827]:
+                                            - img "check-circle" [ref=f11e828]
+                                            - paragraph [ref=f11e829]: 1 number
+                                        - generic [ref=f11e830]:
+                                            - img "check-circle" [ref=f11e831]
+                                            - paragraph [ref=f11e832]: '1 special character (example: , S ! % #)'
+                            - group
+                            - group
+                        - button "Create Account" [ref=f11e833] [cursor=pointer]
+                - generic [ref=f11e837]:
+                    - heading "Pickup Details" [level=2] [ref=f11e838]
+                    - generic [ref=f11e841]:
+                        - heading "Pickup Address" [level=3] [ref=f11e842]
+                        - generic [ref=f11e844]:
+                            - generic [ref=f11e846]:
+                                - generic [ref=f11e847]: San Francisco Retail Store
+                                - generic [ref=f11e848]: 151 3rd StSan Francisco, CA 94103
+                            - generic [ref=f11e849]:
+                                - button "Store Contact Info" [ref=f11e854] [cursor=pointer]
+                                - button "Store Hours" [ref=f11e862] [cursor=pointer]
+                - generic [ref=f11e868]:
+                    - heading "Order Summary" [level=2] [ref=f11e869]
+                    - generic [ref=f11e870]:
+                        - paragraph [ref=f11e871]: 1 item
+                        - generic [ref=f11e872]:
+                            - generic [ref=f11e874]:
+                                - img "Turquoise and Gold Hoop Earring, Gold, small" [ref=f11e985]
+                                - generic [ref=f11e878]:
+                                    - heading [level=2] [ref=f11e879]:
+                                        - link "Turquoise and Gold Hoop Earring" [ref=f11e880] [cursor=pointer]:
+                                            - /url: /global/en-US/product/25720033M
+                                    - generic [ref=f11e881]:
+                                        - generic [ref=f11e882]:
+                                            - paragraph [ref=f11e986]: 'Color: Gold'
+                                            - paragraph [ref=f11e883]: 'Quantity: 1'
+                                        - generic [ref=f11e885]:
+                                            - text: $30.00
+                                            - generic [ref=f11e886]: Turquoise and Gold Hoop Earringcurrent price $30.00
+                            - generic [ref=f11e887]:
+                                - generic [ref=f11e888]:
+                                    - paragraph [ref=f11e889]: Subtotal
+                                    - paragraph [ref=f11e890]: $30.00
+                                - generic [ref=f11e891]:
+                                    - paragraph [ref=f11e893]: Shipping
+                                    - paragraph [ref=f11e894]: $0.00
+                                - generic [ref=f11e895]:
+                                    - paragraph [ref=f11e896]: Tax
+                                    - paragraph [ref=f11e897]: $1.43
+                            - generic [ref=f11e898]:
+                                - paragraph [ref=f11e899]: Order Total
+                                - paragraph [ref=f11e900]: $30.00
+                - generic [ref=f11e903]:
+                    - heading "Payment Details" [level=2] [ref=f11e904]
+                    - generic [ref=f11e905]:
+                        - generic [ref=f11e906]:
+                            - heading "Billing Address" [level=3] [ref=f11e907]
+                            - generic [ref=f11e908]:
+                                - paragraph [ref=f11e909]: Test Pickup
+                                - paragraph [ref=f11e910]: 151 3rd St
+                                - paragraph [ref=f11e911]: San Francisco, CA 94103
+                                - paragraph [ref=f11e912]: US
+                        - generic [ref=f11e913]:
+                            - heading "Credit Card" [level=3] [ref=f11e914]
+                            - generic [ref=f11e915]:
+                                - img "cc-visa" [ref=f11e916]
+                                - generic [ref=f11e917]:
+                                    - paragraph [ref=f11e918]: Visa
+                                    - generic [ref=f11e919]:
+                                        - paragraph [ref=f11e920]: •••• 1111
+                                        - paragraph [ref=f11e921]: 12/2030
+        - contentinfo [ref=f11e922]:
+            - generic [ref=f11e923]:
+                - generic [ref=f11e925]:
+                    - generic [ref=f11e926]:
+                        - heading "Customer Support" [level=2] [ref=f11e927]
+                        - list [ref=f11e928]:
+                            - listitem [ref=f11e929]:
+                                - link "Contact Us" [ref=f11e930] [cursor=pointer]:
+                                    - /url: /
+                            - listitem [ref=f11e931]:
+                                - link "Shipping" [ref=f11e932] [cursor=pointer]:
+                                    - /url: /
+                    - generic [ref=f11e933]:
+                        - heading "Account" [level=2] [ref=f11e934]
+                        - list [ref=f11e935]:
+                            - listitem [ref=f11e936]:
+                                - link "Order Status" [ref=f11e937] [cursor=pointer]:
+                                    - /url: /
+                            - listitem [ref=f11e938]:
+                                - link "Sign in or create account" [ref=f11e939] [cursor=pointer]:
+                                    - /url: /
+                    - generic [ref=f11e940]:
+                        - heading "Our Company" [level=2] [ref=f11e941]
+                        - list [ref=f11e942]:
+                            - listitem [ref=f11e943]:
+                                - link "Store Locator" [ref=f11e944] [cursor=pointer]:
+                                    - /url: /global/en-US/store-locator
+                            - listitem [ref=f11e945]:
+                                - link "About Us" [ref=f11e946] [cursor=pointer]:
+                                    - /url: /
+                    - generic [ref=f11e948]:
+                        - heading "Subscribe to Stay Updated" [level=2] [ref=f11e949]
+                        - paragraph [ref=f11e950]: Be the first to know about latest offers, news, tips, and more.
+                        - generic [ref=f11e951]:
+                            - generic [ref=f11e952]:
+                                - textbox "Email address for newsletter" [ref=f11e953]:
+                                    - /placeholder: Enter your email address...
+                                - button "Subscribe" [ref=f11e954] [cursor=pointer]
+                            - paragraph [ref=f11e955]:
+                                - text: By submitting this, I agree to the
+                                - link "Terms & Conditions" [ref=f11e956] [cursor=pointer]:
+                                    - /url: /
+                                - text: and
+                                - link "Privacy Policy" [ref=f11e957] [cursor=pointer]:
+                                    - /url: /
+                                - text: .
+                        - generic [ref=f11e958]:
+                            - button "YouTube" [ref=f11e959] [cursor=pointer]
+                            - button "Instagram" [ref=f11e961] [cursor=pointer]
+                            - button "Pinterest" [ref=f11e963] [cursor=pointer]
+                            - button "Twitter" [ref=f11e965] [cursor=pointer]
+                            - button "Facebook" [ref=f11e967] [cursor=pointer]
+                - group [ref=f11e970]:
+                    - combobox "Select Language" [ref=f11e972]:
+                        - option "English (United States)" [selected]
+                        - option "English (United Kingdom)"
+                        - option "German (Germany)"
+                        - option "Spanish (Mexico)"
+                        - option "French (France)"
+                        - option "Italian (Italy)"
+                        - option "Japanese (Japan)"
+                        - option "Korean (Republic of Korea)"
+                        - option "Portuguese (Brazil)"
+                        - option "Chinese (China)"
+                        - option "Chinese (Taiwan)"
+                - separator [ref=f11e973]
+                - generic [ref=f11e974]:
+                    - paragraph [ref=f11e975]: © 2026 Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.
+                    - list [ref=f11e978]:
+                        - listitem [ref=f11e979]:
+                            - link "Terms & Conditions" [ref=f11e980] [cursor=pointer]:
+                                - /url: /
+                        - listitem [ref=f11e981]:
+                            - link "Privacy Policy" [ref=f11e982] [cursor=pointer]:
+                                - /url: /
+                        - listitem [ref=f11e983]:
+                            - link "Site Map" [ref=f11e984] [cursor=pointer]:
+                                - /url: /
+    - generic:
+        - region
+        - region
+        - region
+        - region
+        - region
+        - region

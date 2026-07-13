@@ -1,0 +1,175 @@
+- generic [active] [ref=f9e1]:
+    - generic [ref=f9e4]:
+        - link "Skip to Content" [ref=f9e5] [cursor=pointer]:
+            - /url: '#chakra-skip-nav'
+        - banner [ref=f9e7]:
+            - generic [ref=f9e9]:
+                - button "Logo" [ref=f9e10] [cursor=pointer]
+                - navigation "Main navigation" [ref=f9e14]:
+                    - generic [ref=f9e16]:
+                        - generic [ref=f9e19]:
+                            - link "New Arrivals" [ref=f9e20] [cursor=pointer]:
+                                - /url: /global/en-US/category/newarrivals
+                            - link [ref=f9e21] [cursor=pointer]:
+                                - /url: /global/en-US
+                                - img "chevron-down" [ref=f9e23]
+                        - generic [ref=f9e26]:
+                            - link "Womens" [ref=f9e27] [cursor=pointer]:
+                                - /url: /global/en-US/category/womens
+                            - link [ref=f9e28] [cursor=pointer]:
+                                - /url: /global/en-US
+                                - img "chevron-down" [ref=f9e30]
+                        - generic [ref=f9e33]:
+                            - link "Mens" [ref=f9e34] [cursor=pointer]:
+                                - /url: /global/en-US/category/mens
+                            - link [ref=f9e35] [cursor=pointer]:
+                                - /url: /global/en-US
+                                - img "chevron-down" [ref=f9e37]
+                        - link "Gift Certificates" [ref=f9e39] [cursor=pointer]:
+                            - /url: /global/en-US/category/gift-certificates
+                        - link "Top Sellers" [ref=f9e41] [cursor=pointer]:
+                            - /url: /global/en-US/category/top-seller
+                - searchbox "Search for products..." [ref=f9e48]
+                - button "My Account" [ref=f9e49] [cursor=pointer]
+                - button "Wishlist" [ref=f9e51] [cursor=pointer]
+                - button "Store Locator" [ref=f9e53] [cursor=pointer]
+                - 'button "My cart, number of items: 0" [ref=f9e55] [cursor=pointer]':
+                    - img "basket" [ref=f9e56]
+        - main [ref=f9e58]:
+            - generic [ref=f9e60]:
+                - heading "Find a Store" [level=2] [ref=f9e61]
+                - group [ref=f9e63]:
+                    - group [ref=f9e65]:
+                        - combobox [ref=f9e67]:
+                            - option "Select a country"
+                            - option "United States" [selected]
+                            - option "Germany"
+                    - generic [ref=f9e68]:
+                        - group [ref=f9e69]:
+                            - textbox "Enter postal code" [ref=f9e70]: '94103'
+                        - button "Find" [ref=f9e71] [cursor=pointer]
+                    - generic [ref=f9e72]: Or
+                    - button "Use My Location" [ref=f9e73] [cursor=pointer]
+                    - group [ref=f9e74]:
+                        - generic [ref=f9e75]: To use your location, enable location sharing.
+                - generic [ref=f9e76]: Viewing stores within 100 km of 94103 in United States
+                - group [ref=f9e77]:
+                    - radiogroup [ref=f9e143]:
+                        - generic [ref=f9e146]:
+                            - radio [checked] [ref=f9e148]
+                            - generic [ref=f9e152]:
+                                - generic [ref=f9e154]:
+                                    - generic [ref=f9e155]: San Francisco Retail Store
+                                    - generic [ref=f9e156]: 151 3rd StSan Francisco, CA 94103
+                                - generic [ref=f9e157]:
+                                    - button "Store Contact Info" [ref=f9e162] [cursor=pointer]
+                                    - button "Store Hours" [ref=f9e170] [cursor=pointer]
+                        - generic [ref=f9e176]:
+                            - radio [ref=f9e178]
+                            - generic [ref=f9e182]:
+                                - generic [ref=f9e184]:
+                                    - generic [ref=f9e185]: San Mateo Retail Store
+                                    - generic [ref=f9e186]: 320 2nd AveSan Mateo, CA 94401
+                                - generic [ref=f9e187]:
+                                    - generic [ref=f9e189]:
+                                        - img "location" [ref=f9e190]
+                                        - text: 23.83 km away
+                                    - button "Store Contact Info" [ref=f9e195] [cursor=pointer]
+                                    - button "Store Hours" [ref=f9e203] [cursor=pointer]
+                        - generic [ref=f9e209]:
+                            - radio [disabled] [ref=f9e211]
+                            - generic [ref=f9e215]:
+                                - generic [ref=f9e217]:
+                                    - generic [ref=f9e218]: Palo Alto Retail Store
+                                    - generic [ref=f9e219]: 1313 Newell RdPalo Alto, CA 94306
+                                - generic [ref=f9e220]:
+                                    - generic [ref=f9e222]:
+                                        - img "location" [ref=f9e223]
+                                        - text: 90.22 km away
+                                    - button "Store Contact Info" [ref=f9e228] [cursor=pointer]
+                                    - button "Store Hours" [ref=f9e236] [cursor=pointer]
+        - contentinfo [ref=f9e80]:
+            - generic [ref=f9e81]:
+                - generic [ref=f9e83]:
+                    - generic [ref=f9e84]:
+                        - heading "Customer Support" [level=2] [ref=f9e85]
+                        - list [ref=f9e86]:
+                            - listitem [ref=f9e87]:
+                                - link "Contact Us" [ref=f9e88] [cursor=pointer]:
+                                    - /url: /
+                            - listitem [ref=f9e89]:
+                                - link "Shipping" [ref=f9e90] [cursor=pointer]:
+                                    - /url: /
+                    - generic [ref=f9e91]:
+                        - heading "Account" [level=2] [ref=f9e92]
+                        - list [ref=f9e93]:
+                            - listitem [ref=f9e94]:
+                                - link "Order Status" [ref=f9e95] [cursor=pointer]:
+                                    - /url: /
+                            - listitem [ref=f9e96]:
+                                - link "Sign in or create account" [ref=f9e97] [cursor=pointer]:
+                                    - /url: /
+                    - generic [ref=f9e98]:
+                        - heading "Our Company" [level=2] [ref=f9e99]
+                        - list [ref=f9e100]:
+                            - listitem [ref=f9e101]:
+                                - link "Store Locator" [ref=f9e102] [cursor=pointer]:
+                                    - /url: /global/en-US/store-locator
+                            - listitem [ref=f9e103]:
+                                - link "About Us" [ref=f9e104] [cursor=pointer]:
+                                    - /url: /
+                    - generic [ref=f9e106]:
+                        - heading "Subscribe to Stay Updated" [level=2] [ref=f9e107]
+                        - paragraph [ref=f9e108]: Be the first to know about latest offers, news, tips, and more.
+                        - generic [ref=f9e109]:
+                            - generic [ref=f9e110]:
+                                - textbox "Email address for newsletter" [ref=f9e111]:
+                                    - /placeholder: Enter your email address...
+                                - button "Subscribe" [ref=f9e112] [cursor=pointer]
+                            - paragraph [ref=f9e113]:
+                                - text: By submitting this, I agree to the
+                                - link "Terms & Conditions" [ref=f9e114] [cursor=pointer]:
+                                    - /url: /
+                                - text: and
+                                - link "Privacy Policy" [ref=f9e115] [cursor=pointer]:
+                                    - /url: /
+                                - text: .
+                        - generic [ref=f9e116]:
+                            - button "YouTube" [ref=f9e117] [cursor=pointer]
+                            - button "Instagram" [ref=f9e119] [cursor=pointer]
+                            - button "Pinterest" [ref=f9e121] [cursor=pointer]
+                            - button "Twitter" [ref=f9e123] [cursor=pointer]
+                            - button "Facebook" [ref=f9e125] [cursor=pointer]
+                - group [ref=f9e128]:
+                    - combobox "Select Language" [ref=f9e241]:
+                        - option "English (United States)" [selected]
+                        - option "English (United Kingdom)"
+                        - option "German (Germany)"
+                        - option "Spanish (Mexico)"
+                        - option "French (France)"
+                        - option "Italian (Italy)"
+                        - option "Japanese (Japan)"
+                        - option "Korean (Republic of Korea)"
+                        - option "Portuguese (Brazil)"
+                        - option "Chinese (China)"
+                        - option "Chinese (Taiwan)"
+                - separator [ref=f9e131]
+                - generic [ref=f9e132]:
+                    - paragraph [ref=f9e133]: © 2026 Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.
+                    - list [ref=f9e136]:
+                        - listitem [ref=f9e137]:
+                            - link "Terms & Conditions" [ref=f9e138] [cursor=pointer]:
+                                - /url: /
+                        - listitem [ref=f9e139]:
+                            - link "Privacy Policy" [ref=f9e140] [cursor=pointer]:
+                                - /url: /
+                        - listitem [ref=f9e141]:
+                            - link "Site Map" [ref=f9e142] [cursor=pointer]:
+                                - /url: /
+    - generic:
+        - region
+        - region
+        - region
+        - region
+        - region
+        - region

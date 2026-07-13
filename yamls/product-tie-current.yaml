@@ -1,0 +1,197 @@
+- generic [active] [ref=f10e1]:
+    - generic [ref=f10e4]:
+        - link "Skip to Content" [ref=f10e5] [cursor=pointer]:
+            - /url: '#chakra-skip-nav'
+        - banner [ref=f10e7]:
+            - generic [ref=f10e9]:
+                - button "Logo" [ref=f10e10] [cursor=pointer]
+                - navigation "Main navigation" [ref=f10e14]:
+                    - generic [ref=f10e16]:
+                        - generic [ref=f10e19]:
+                            - link "New Arrivals" [ref=f10e20] [cursor=pointer]:
+                                - /url: /global/en-US/category/newarrivals
+                            - link [ref=f10e21] [cursor=pointer]:
+                                - /url: /global/en-US
+                                - img "chevron-down" [ref=f10e23]
+                        - generic [ref=f10e26]:
+                            - link "Womens" [ref=f10e27] [cursor=pointer]:
+                                - /url: /global/en-US/category/womens
+                            - link [ref=f10e28] [cursor=pointer]:
+                                - /url: /global/en-US
+                                - img "chevron-down" [ref=f10e30]
+                        - generic [ref=f10e33]:
+                            - link "Mens" [ref=f10e34] [cursor=pointer]:
+                                - /url: /global/en-US/category/mens
+                            - link [ref=f10e35] [cursor=pointer]:
+                                - /url: /global/en-US
+                                - img "chevron-down" [ref=f10e37]
+                        - link "Gift Certificates" [ref=f10e39] [cursor=pointer]:
+                            - /url: /global/en-US/category/gift-certificates
+                        - link "Top Sellers" [ref=f10e41] [cursor=pointer]:
+                            - /url: /global/en-US/category/top-seller
+                - searchbox "Search for products..." [ref=f10e48]
+                - button "My Account" [ref=f10e49] [cursor=pointer]
+                - button "Wishlist" [ref=f10e51] [cursor=pointer]
+                - button "Store Locator" [ref=f10e53] [cursor=pointer]
+                - 'button "My cart, number of items: 0" [ref=f10e55] [cursor=pointer]':
+                    - img "basket" [ref=f10e56]
+        - main [ref=f10e58]:
+            - generic [ref=f10e59]:
+                - heading "Product Details" [level=1] [ref=f10e60]
+                - generic [ref=f10e61]:
+                    - generic [ref=f10e63]:
+                        - generic [ref=f10e65]:
+                            - img "Checked Silk Tie, Cobalt, large" [ref=f10e70]
+                            - list [ref=f10e71]:
+                                - listitem [ref=f10e72] [cursor=pointer]:
+                                    - button [pressed] [ref=f10e74]:
+                                        - img "Checked Silk Tie, Cobalt, small" [ref=f10e75]
+                                - listitem [ref=f10e76] [cursor=pointer]:
+                                    - button [ref=f10e78]:
+                                        - img "Checked Silk Tie, Cobalt, small" [ref=f10e79]
+                        - generic [ref=f10e80]:
+                            - generic [ref=f10e82]:
+                                - navigation "breadcrumb" [ref=f10e84]:
+                                    - list [ref=f10e231]:
+                                        - listitem [ref=f10e232]:
+                                            - link "Mens" [ref=f10e233] [cursor=pointer]:
+                                                - /url: /category/mens
+                                        - listitem [ref=f10e235]:
+                                            - link "Accessories" [ref=f10e236] [cursor=pointer]:
+                                                - /url: /category/mens-accessories
+                                        - listitem [ref=f10e238]:
+                                            - link "Ties" [ref=f10e239] [cursor=pointer]:
+                                                - /url: /category/mens-accessories-ties
+                                - heading "Checked Silk Tie" [level=2] [ref=f10e86]
+                                - generic [ref=f10e240]:
+                                    - text: $19.99
+                                    - generic [ref=f10e241]: current price $19.99
+                                    - text: $39.50
+                                    - generic [ref=f10e242]: original price $39.50
+                                - generic [ref=f10e90]: $10 off Men's Ties
+                            - generic [ref=f10e92]:
+                                - radiogroup "Color" [ref=f10e94]:
+                                    - generic [ref=f10e95]:
+                                        - generic [ref=f10e96]: 'Color:'
+                                        - generic [ref=f10e97]: Cobalt
+                                    - generic [ref=f10e98]:
+                                        - radio "Cobalt" [checked] [ref=f10e99] [cursor=pointer]
+                                        - radio "Navy" [ref=f10e102] [cursor=pointer]
+                                        - radio "Yellow" [ref=f10e105] [cursor=pointer]
+                                - generic [ref=f10e108]:
+                                    - generic [ref=f10e109]: Quantity
+                                    - generic [ref=f10e110]:
+                                        - button "Decrement Quantity for Checked Silk Tie" [disabled] [ref=f10e111]: −
+                                        - spinbutton "Quantity" [ref=f10e112]: '1'
+                                        - button "Increment Quantity for Checked Silk Tie" [ref=f10e113] [cursor=pointer]: +
+                            - generic [ref=f10e115]:
+                                - generic [ref=f10e116]:
+                                    - paragraph [ref=f10e117]: 'Delivery:'
+                                    - radiogroup [ref=f10e118]:
+                                        - generic [ref=f10e119]:
+                                            - generic [ref=f10e120] [cursor=pointer]:
+                                                - radio "Ship to Address" [checked] [ref=f10e121]
+                                                - generic [ref=f10e123]: Ship to Address
+                                            - generic [ref=f10e124]:
+                                                - radio "Pick Up in Store" [disabled] [ref=f10e125]
+                                                - generic [ref=f10e127]: Pick Up in Store
+                                - paragraph [ref=f10e243]:
+                                    - text: Out of Stock at
+                                    - button "San Francisco Retail Store" [ref=f10e244] [cursor=pointer]
+                                - generic [ref=f10e130]:
+                                    - button "Add to Cart" [ref=f10e245] [cursor=pointer]
+                                    - button "Add to Wishlist" [ref=f10e246] [cursor=pointer]
+                    - generic [ref=f10e142]:
+                        - heading [level=2] [ref=f10e144]:
+                            - button "Product Detail" [ref=f10e145] [cursor=pointer]
+                        - heading [level=2] [ref=f10e150]:
+                            - button "Size & Fit" [ref=f10e151] [cursor=pointer]
+                        - heading [level=2] [ref=f10e156]:
+                            - button "Reviews" [ref=f10e157] [cursor=pointer]
+                        - heading [level=2] [ref=f10e162]:
+                            - button "Questions" [ref=f10e163] [cursor=pointer]
+        - contentinfo [ref=f10e168]:
+            - generic [ref=f10e169]:
+                - generic [ref=f10e171]:
+                    - generic [ref=f10e172]:
+                        - heading "Customer Support" [level=2] [ref=f10e173]
+                        - list [ref=f10e174]:
+                            - listitem [ref=f10e175]:
+                                - link "Contact Us" [ref=f10e176] [cursor=pointer]:
+                                    - /url: /
+                            - listitem [ref=f10e177]:
+                                - link "Shipping" [ref=f10e178] [cursor=pointer]:
+                                    - /url: /
+                    - generic [ref=f10e179]:
+                        - heading "Account" [level=2] [ref=f10e180]
+                        - list [ref=f10e181]:
+                            - listitem [ref=f10e182]:
+                                - link "Order Status" [ref=f10e183] [cursor=pointer]:
+                                    - /url: /
+                            - listitem [ref=f10e184]:
+                                - link "Sign in or create account" [ref=f10e185] [cursor=pointer]:
+                                    - /url: /
+                    - generic [ref=f10e186]:
+                        - heading "Our Company" [level=2] [ref=f10e187]
+                        - list [ref=f10e188]:
+                            - listitem [ref=f10e189]:
+                                - link "Store Locator" [ref=f10e190] [cursor=pointer]:
+                                    - /url: /global/en-US/store-locator
+                            - listitem [ref=f10e191]:
+                                - link "About Us" [ref=f10e192] [cursor=pointer]:
+                                    - /url: /
+                    - generic [ref=f10e194]:
+                        - heading "Subscribe to Stay Updated" [level=2] [ref=f10e195]
+                        - paragraph [ref=f10e196]: Be the first to know about latest offers, news, tips, and more.
+                        - generic [ref=f10e197]:
+                            - generic [ref=f10e198]:
+                                - textbox "Email address for newsletter" [ref=f10e199]:
+                                    - /placeholder: Enter your email address...
+                                - button "Subscribe" [ref=f10e200] [cursor=pointer]
+                            - paragraph [ref=f10e201]:
+                                - text: By submitting this, I agree to the
+                                - link "Terms & Conditions" [ref=f10e202] [cursor=pointer]:
+                                    - /url: /
+                                - text: and
+                                - link "Privacy Policy" [ref=f10e203] [cursor=pointer]:
+                                    - /url: /
+                                - text: .
+                        - generic [ref=f10e204]:
+                            - button "YouTube" [ref=f10e205] [cursor=pointer]
+                            - button "Instagram" [ref=f10e207] [cursor=pointer]
+                            - button "Pinterest" [ref=f10e209] [cursor=pointer]
+                            - button "Twitter" [ref=f10e211] [cursor=pointer]
+                            - button "Facebook" [ref=f10e213] [cursor=pointer]
+                - group [ref=f10e216]:
+                    - combobox "Select Language" [ref=f10e248]:
+                        - option "English (United States)" [selected]
+                        - option "English (United Kingdom)"
+                        - option "German (Germany)"
+                        - option "Spanish (Mexico)"
+                        - option "French (France)"
+                        - option "Italian (Italy)"
+                        - option "Japanese (Japan)"
+                        - option "Korean (Republic of Korea)"
+                        - option "Portuguese (Brazil)"
+                        - option "Chinese (China)"
+                        - option "Chinese (Taiwan)"
+                - separator [ref=f10e219]
+                - generic [ref=f10e220]:
+                    - paragraph [ref=f10e221]: © 2026 Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.
+                    - list [ref=f10e224]:
+                        - listitem [ref=f10e225]:
+                            - link "Terms & Conditions" [ref=f10e226] [cursor=pointer]:
+                                - /url: /
+                        - listitem [ref=f10e227]:
+                            - link "Privacy Policy" [ref=f10e228] [cursor=pointer]:
+                                - /url: /
+                        - listitem [ref=f10e229]:
+                            - link "Site Map" [ref=f10e230] [cursor=pointer]:
+                                - /url: /
+    - generic:
+        - region
+        - region
+        - region
+        - region
+        - region
+        - region

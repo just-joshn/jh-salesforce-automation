@@ -1,0 +1,70 @@
+{
+  "repo": "SalesforceCommerceCloud/commerce-sdk-isomorphic",
+  "ref": "main",
+  "specs": [
+    {
+      "family": "shopper-baskets",
+      "callAs": "checkout/shopper-baskets/v1",
+      "version": "1.12.0",
+      "source": "SalesforceCommerceCloud/commerce-sdk-isomorphic@main:apis/shopper-baskets-oas-1.12.0/shopper-baskets-oas-v1-public.yaml",
+      "sha256": "bb278dde0aaa5e8d7a862c789e0f71d94b0b36e3a02c2cfd6861600c05e6314f",
+      "bytes": 282384
+    },
+    {
+      "family": "shopper-orders",
+      "callAs": "checkout/shopper-orders/v1",
+      "version": "1.20.1",
+      "source": "SalesforceCommerceCloud/commerce-sdk-isomorphic@main:apis/shopper-orders-oas-1.20.1/shopper-orders-oas-v1-public.yaml",
+      "sha256": "3c25ef935045c74c8b2a32e12ba27abbb93ef9ac8be13b12ba8eaed2eb1c2547",
+      "bytes": 202461
+    },
+    {
+      "family": "shopper-customers",
+      "callAs": "customer/shopper-customers/v1",
+      "version": "1.9.0",
+      "source": "SalesforceCommerceCloud/commerce-sdk-isomorphic@main:apis/shopper-customers-oas-1.9.0/shopper-customers-oas-v1-public.yaml",
+      "sha256": "36f9af232d2f008999cab3ae587f071f4bfdba64cfae96f897cfd91f03bf74d1",
+      "bytes": 284783
+    },
+    {
+      "family": "shopper-products",
+      "callAs": "product/shopper-products/v1",
+      "version": "1.12.0",
+      "source": "SalesforceCommerceCloud/commerce-sdk-isomorphic@main:apis/shopper-products-oas-1.12.0/shopper-products-oas-v1-public.yaml",
+      "sha256": "deba5f851349a9904d6a0cc214d657978ecde1fb4f75beb55fbd43babefc508f",
+      "bytes": 115511
+    },
+    {
+      "family": "shopper-search",
+      "callAs": "search/shopper-search/v1",
+      "version": "1.14.0",
+      "source": "SalesforceCommerceCloud/commerce-sdk-isomorphic@main:apis/shopper-search-oas-1.14.0/shopper-search-oas-v1-public.yaml",
+      "sha256": "1c2af9b6b7546992e6be5153fcd8d903b85332b3188cf7d2ea2ea9dd23053616",
+      "bytes": 101441
+    },
+    {
+      "family": "shopper-stores",
+      "callAs": "store/shopper-stores/v1",
+      "version": "1.4.0",
+      "source": "SalesforceCommerceCloud/commerce-sdk-isomorphic@main:apis/shopper-stores-oas-1.4.0/shopper-stores-oas-v1-public.yaml",
+      "sha256": "493a6892c79c2fe86289a1b82f33c9a266b9621c0aee50415d0805af23ec3c16",
+      "bytes": 33501
+    },
+    {
+      "family": "shopper-configurations",
+      "callAs": "configuration/shopper-configurations/v1",
+      "version": "1.4.0",
+      "source": "SalesforceCommerceCloud/commerce-sdk-isomorphic@main:apis/shopper-configurations-oas-1.4.0/shopper-configurations-oas-v1-public.yaml",
+      "sha256": "bab0e6eba71a74ffe17e32202b4cc546a8ad13e2b6bfa15f63c8aa0000b7ed83",
+      "bytes": 18795
+    },
+    {
+      "family": "auth",
+      "callAs": "shopper/auth/v1",
+      "version": "1.50.0",
+      "source": "SalesforceCommerceCloud/commerce-sdk-isomorphic@main:apis/auth-oas-1.50.0/auth-oas-v1-public.yaml",
+      "sha256": "8e0cef67ab190282497e2b70cef32a25ea6ba185b8c56d99a443a38dfaea80a6",
+      "bytes": 252036
+    }
+  ]
+}

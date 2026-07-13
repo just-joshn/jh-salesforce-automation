@@ -1,0 +1,135 @@
+- generic [ref=f8e1]:
+    - generic [ref=f8e4]:
+        - link "Skip to Content" [ref=f8e5] [cursor=pointer]:
+            - /url: '#chakra-skip-nav'
+        - generic [ref=f8e358]:
+            - link [ref=f8e359] [cursor=pointer]:
+                - /url: /
+                - img "brand-logo" [ref=f8e360]
+            - 'link "Back to cart, number of items: 2" [ref=f8e361] [cursor=pointer]':
+                - /url: /global/en-US/cart
+                - text: Back to cart
+                - generic [ref=f8e362]: '2'
+        - main [ref=f8e58]:
+            - generic [ref=f8e366]:
+                - heading "Checkout" [level=1] [ref=f8e367]
+                - generic [ref=f8e369]:
+                    - generic [ref=f8e371]:
+                        - alert [ref=f8e918]: An unexpected error occurred during checkout.
+                        - generic [ref=f8e373]:
+                            - heading "Contact Info" [active] [level=2] [ref=f8e375]
+                            - generic [ref=f8e924]:
+                                - group [ref=f8e926]:
+                                    - generic [ref=f8e927]: Email
+                                    - textbox "Email" [ref=f8e929]:
+                                        - /placeholder: you@email.com
+                                        - text: cuj-discovery@example.com
+                                - generic [ref=f8e930]:
+                                    - button "Checkout as Guest" [ref=f8e931] [cursor=pointer]
+                                    - separator [ref=f8e932]
+                                    - paragraph [ref=f8e933]: Or Login With
+                                    - button "Secure Link" [ref=f8e934] [cursor=pointer]
+                                    - button "Password" [ref=f8e935] [cursor=pointer]
+                                    - button [ref=f8e936] [cursor=pointer]:
+                                        - img "google" [ref=f8e937]
+                                        - text: Google
+                                    - button [ref=f8e938] [cursor=pointer]:
+                                        - img "apple" [ref=f8e939]
+                                        - text: Apple
+                        - generic [ref=f8e380]:
+                            - generic [ref=f8e381]:
+                                - heading "Shipping Address" [level=2] [ref=f8e382]
+                                - button "Edit Shipping Addresses" [ref=f8e702] [cursor=pointer]
+                            - paragraph [ref=f8e703]: Your items will be shipped to multiple addresses.
+                        - generic [ref=f8e391]:
+                            - generic [ref=f8e392]:
+                                - heading "Shipping & Gift Options" [level=2] [ref=f8e393]
+                                - button "Edit Shipping Options" [ref=f8e795] [cursor=pointer]
+                            - generic [ref=f8e796]:
+                                - generic [ref=f8e798]:
+                                    - generic [ref=f8e799]:
+                                        - paragraph [ref=f8e800]: Ground
+                                        - paragraph [ref=f8e801]: Order received within 7-10 business days
+                                    - paragraph [ref=f8e802]: $5.99
+                                - generic [ref=f8e804]:
+                                    - generic [ref=f8e805]:
+                                        - paragraph [ref=f8e806]: Ground
+                                        - paragraph [ref=f8e807]: Order received within 7-10 business days
+                                    - paragraph [ref=f8e808]: $15.99
+                                - generic [ref=f8e810]:
+                                    - paragraph [ref=f8e811]: Total Shipping
+                                    - paragraph [ref=f8e812]: $21.98
+                        - generic [ref=f8e402]:
+                            - generic [ref=f8e403]:
+                                - heading "Payment" [level=2] [ref=f8e404]
+                                - button "Edit Payment Info" [ref=f8e895] [cursor=pointer]
+                            - generic [ref=f8e896]:
+                                - generic [ref=f8e897]:
+                                    - heading "Credit Card" [level=3] [ref=f8e898]
+                                    - generic [ref=f8e899]:
+                                        - img "cc-visa" [ref=f8e900]
+                                        - generic [ref=f8e901]:
+                                            - paragraph [ref=f8e902]: Visa
+                                            - paragraph [ref=f8e903]: •••• 1111
+                                            - paragraph [ref=f8e904]: 12/2030
+                                - separator [ref=f8e905]
+                                - generic [ref=f8e906]:
+                                    - heading "Billing Address" [level=3] [ref=f8e907]
+                                    - generic [ref=f8e908]:
+                                        - paragraph [ref=f8e909]: Test Shopper
+                                        - paragraph [ref=f8e910]: 1 Market Street
+                                        - paragraph [ref=f8e911]: San Francisco, CA 94105
+                                        - paragraph [ref=f8e912]: US
+                    - generic [ref=f8e489]:
+                        - heading "Order Summary" [level=2] [ref=f8e490]
+                        - region "Order Summary" [ref=f8e491]:
+                            - button "2 items in cart" [ref=f8e494] [cursor=pointer]
+                            - generic [ref=f8e499]:
+                                - generic [ref=f8e500]:
+                                    - paragraph [ref=f8e501]: Subtotal
+                                    - paragraph [ref=f8e502]: $49.99
+                                - generic [ref=f8e503]:
+                                    - paragraph [ref=f8e505]: Shipping
+                                    - paragraph [ref=f8e506]: $21.98
+                                - generic [ref=f8e507]:
+                                    - paragraph [ref=f8e508]: Tax
+                                    - paragraph [ref=f8e509]: $3.44
+                            - separator [ref=f8e510]
+                            - generic [ref=f8e512]:
+                                - paragraph [ref=f8e513]: Order Total
+                                - paragraph [ref=f8e514]: $71.97
+        - contentinfo [ref=f8e515]:
+            - generic [ref=f8e516]:
+                - list [ref=f8e518]:
+                    - listitem [ref=f8e519]:
+                        - link "Shipping" [ref=f8e520] [cursor=pointer]:
+                            - /url: /
+                    - listitem [ref=f8e521]:
+                        - link "Returns & Exchanges" [ref=f8e522] [cursor=pointer]:
+                            - /url: /
+                - separator [ref=f8e523]
+                - generic [ref=f8e524]:
+                    - paragraph [ref=f8e525]: © 2026 Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.
+                    - generic [ref=f8e527]:
+                        - list [ref=f8e529]:
+                            - listitem [ref=f8e530]:
+                                - link "Terms & Conditions" [ref=f8e531] [cursor=pointer]:
+                                    - /url: /
+                            - listitem [ref=f8e532]:
+                                - link "Privacy Policy" [ref=f8e533] [cursor=pointer]:
+                                    - /url: /
+                            - listitem [ref=f8e534]:
+                                - link "Site Map" [ref=f8e535] [cursor=pointer]:
+                                    - /url: /
+                        - generic [ref=f8e537]:
+                            - img "cc-visa" [ref=f8e538]
+                            - img "cc-mastercard" [ref=f8e539]
+                            - img "cc-amex" [ref=f8e540]
+                            - img "cc-discover" [ref=f8e541]
+    - generic:
+        - region
+        - region
+        - region
+        - region
+        - region
+        - region

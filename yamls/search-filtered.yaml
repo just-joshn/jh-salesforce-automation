@@ -1,0 +1,600 @@
+- generic [ref=f12e1]:
+    - generic [ref=f12e4]:
+        - link [ref=f12e1104] [cursor=pointer]:
+            - /url: '#chakra-skip-nav'
+            - text: Skip to Content
+        - banner [ref=f12e7]:
+            - generic [ref=f12e9]:
+                - button [ref=f12e1105] [cursor=pointer]
+                - navigation "Main navigation" [ref=f12e14]:
+                    - generic [ref=f12e16]:
+                        - generic [ref=f12e19]:
+                            - link "New Arrivals" [ref=f12e20] [cursor=pointer]:
+                                - /url: /global/en-US/category/newarrivals
+                            - link [ref=f12e21] [cursor=pointer]:
+                                - /url: /global/en-US
+                                - img "chevron-down" [ref=f12e23]
+                        - generic [ref=f12e26]:
+                            - link "Womens" [ref=f12e27] [cursor=pointer]:
+                                - /url: /global/en-US/category/womens
+                            - link [ref=f12e28] [cursor=pointer]:
+                                - /url: /global/en-US
+                                - img "chevron-down" [ref=f12e30]
+                        - generic [ref=f12e33]:
+                            - link "Mens" [ref=f12e34] [cursor=pointer]:
+                                - /url: /global/en-US/category/mens
+                            - link [ref=f12e35] [cursor=pointer]:
+                                - /url: /global/en-US
+                                - img "chevron-down" [ref=f12e37]
+                        - link "Gift Certificates" [ref=f12e39] [cursor=pointer]:
+                            - /url: /global/en-US/category/gift-certificates
+                        - link "Top Sellers" [ref=f12e41] [cursor=pointer]:
+                            - /url: /global/en-US/category/top-seller
+                - searchbox [ref=f12e1106]: shirt
+                - button [ref=f12e1107] [cursor=pointer]
+                - button [ref=f12e1108] [cursor=pointer]
+                - button [ref=f12e1109] [cursor=pointer]
+                - button [ref=f12e1110] [cursor=pointer]
+        - main [ref=f12e58]:
+            - generic [ref=f12e459]:
+                - generic [ref=f12e460]:
+                    - generic [ref=f12e462]:
+                        - paragraph [ref=f12e463]: Search Results for
+                        - generic [ref=f12e464]:
+                            - heading [level=1] [ref=f12e1112]: shirt
+                            - heading [level=1] [ref=f12e1113]:
+                                - generic [ref=f12e467]: (46)
+                    - group [ref=f12e1114]:
+                        - combobox [ref=f12e1115]
+                - generic [ref=f12e473]:
+                    - generic [ref=f12e476]:
+                        - generic [ref=f12e477]:
+                            - heading [level=2] [ref=f12e1116]: Shop by Availability
+                            - generic [ref=f12e479] [cursor=pointer]:
+                                - checkbox [ref=f12e1117]
+                                - generic [ref=f12e482]: In stock at San Francisco Retail Store
+                        - generic [ref=f12e484]:
+                            - heading [level=2] [ref=f12e1118]:
+                                - button [expanded] [ref=f12e1119] [cursor=pointer]:
+                                    - generic [ref=f12e487]: Shop by Color
+                            - region [ref=f12e1120]:
+                                - generic [ref=f12e490]:
+                                    - generic [ref=f12e492] [cursor=pointer]:
+                                        - checkbox [ref=f12e1121]
+                                        - paragraph [ref=f12e496]: Black (2)
+                                    - generic [ref=f12e498] [cursor=pointer]:
+                                        - checkbox [ref=f12e1122]
+                                        - paragraph [ref=f12e502]: Blue (9)
+                                    - generic [ref=f12e504] [cursor=pointer]:
+                                        - checkbox [ref=f12e1123]
+                                        - paragraph [ref=f12e508]: Green (2)
+                                    - generic [ref=f12e510] [cursor=pointer]:
+                                        - checkbox [ref=f12e1124]
+                                        - paragraph [ref=f12e514]: Grey (2)
+                                    - generic [ref=f12e516] [cursor=pointer]:
+                                        - checkbox [ref=f12e1125]
+                                        - paragraph [ref=f12e520]: Orange (1)
+                                    - generic [ref=f12e522] [cursor=pointer]:
+                                        - checkbox [ref=f12e1126]
+                                        - paragraph [ref=f12e526]: Pink (6)
+                                    - generic [ref=f12e528] [cursor=pointer]:
+                                        - checkbox [ref=f12e1127]
+                                        - paragraph [ref=f12e532]: Purple (1)
+                                    - generic [ref=f12e534] [cursor=pointer]:
+                                        - checkbox [ref=f12e1128]
+                                        - paragraph [ref=f12e538]: Red (2)
+                                    - generic [ref=f12e540] [cursor=pointer]:
+                                        - checkbox [ref=f12e1129]
+                                        - paragraph [ref=f12e544]: White (19)
+                                    - generic [ref=f12e546] [cursor=pointer]:
+                                        - checkbox [ref=f12e1130]
+                                        - paragraph [ref=f12e550]: Miscellaneous (7)
+                        - generic [ref=f12e552]:
+                            - heading [level=2] [ref=f12e1131]:
+                                - button [expanded] [ref=f12e1132] [cursor=pointer]:
+                                    - generic [ref=f12e555]: Shop by Price
+                            - region [ref=f12e1133]:
+                                - generic [ref=f12e558]:
+                                    - generic [ref=f12e559]:
+                                        - radio [ref=f12e561]
+                                        - button [ref=f12e1134] [cursor=pointer]: $20 - $49.99
+                                    - generic [ref=f12e564]:
+                                        - radio [ref=f12e566]
+                                        - button [ref=f12e1135] [cursor=pointer]: $50 - $99.99
+                                    - generic [ref=f12e569]:
+                                        - radio [ref=f12e571]
+                                        - button [ref=f12e1136] [cursor=pointer]: $100 - $499.99
+                        - generic [ref=f12e575]:
+                            - heading [level=2] [ref=f12e1137]:
+                                - button [expanded] [ref=f12e1138] [cursor=pointer]:
+                                    - generic [ref=f12e578]: By brand
+                            - region [ref=f12e1139]:
+                                - generic [ref=f12e583] [cursor=pointer]:
+                                    - checkbox [ref=f12e1140]
+                                    - generic [ref=f12e586]: Lacy-S
+                        - generic [ref=f12e588]:
+                            - heading [level=2] [ref=f12e1141]:
+                                - button [expanded] [ref=f12e1142] [cursor=pointer]:
+                                    - generic [ref=f12e591]: Shop by Size
+                            - region [ref=f12e1143]:
+                                - generic [ref=f12e594]:
+                                    - checkbox [ref=f12e1144] [cursor=pointer]:
+                                        - generic [ref=f12e596]: 14 1/2
+                                    - checkbox [ref=f12e1145] [cursor=pointer]:
+                                        - generic [ref=f12e598]: '15'
+                                    - checkbox [ref=f12e1146] [cursor=pointer]:
+                                        - generic [ref=f12e600]: 15 1/2
+                                    - checkbox [ref=f12e1147] [cursor=pointer]:
+                                        - generic [ref=f12e602]: 16 1/2
+                                    - checkbox [ref=f12e1148] [cursor=pointer]:
+                                        - generic [ref=f12e604]: '17'
+                                    - checkbox [ref=f12e1149] [cursor=pointer]:
+                                        - generic [ref=f12e606]: 17 1/2
+                                    - checkbox [ref=f12e1150] [cursor=pointer]:
+                                        - generic [ref=f12e608]: '18'
+                                    - checkbox [ref=f12e1151] [cursor=pointer]:
+                                        - generic [ref=f12e610]: 18 1/2
+                                    - checkbox [ref=f12e1152] [cursor=pointer]:
+                                        - generic [ref=f12e612]: '19'
+                                    - checkbox [ref=f12e1153] [cursor=pointer]:
+                                        - generic [ref=f12e614]: '20'
+                                    - checkbox [ref=f12e1154] [cursor=pointer]:
+                                        - generic [ref=f12e616]: '22'
+                                    - checkbox [ref=f12e1155] [cursor=pointer]:
+                                        - generic [ref=f12e618]: 16R
+                                    - checkbox [ref=f12e1156] [cursor=pointer]:
+                                        - generic [ref=f12e620]: XS
+                                    - checkbox [ref=f12e1157] [cursor=pointer]:
+                                        - generic [ref=f12e622]: 15L
+                                    - checkbox [ref=f12e1158] [cursor=pointer]:
+                                        - generic [ref=f12e624]: 15R
+                                    - checkbox [ref=f12e1159] [cursor=pointer]:
+                                        - generic [ref=f12e626]: 16L
+                                    - checkbox [ref=f12e1160] [cursor=pointer]:
+                                        - generic [ref=f12e628]: '12'
+                                    - checkbox [ref=f12e1161] [cursor=pointer]:
+                                        - generic [ref=f12e630]: '14'
+                                    - checkbox [ref=f12e1162] [cursor=pointer]:
+                                        - generic [ref=f12e632]: '4'
+                                    - checkbox [ref=f12e1163] [cursor=pointer]:
+                                        - generic [ref=f12e634]: '8'
+                                    - checkbox [ref=f12e1164] [cursor=pointer]:
+                                        - generic [ref=f12e636]: '10'
+                                    - checkbox [ref=f12e1165] [cursor=pointer]:
+                                        - generic [ref=f12e638]: '6'
+                                    - checkbox [ref=f12e1166] [cursor=pointer]:
+                                        - generic [ref=f12e640]: '16'
+                                    - checkbox [ref=f12e1167] [cursor=pointer]:
+                                        - generic [ref=f12e642]: XL
+                                    - checkbox [ref=f12e1168] [cursor=pointer]:
+                                        - generic [ref=f12e644]: L
+                                    - checkbox [ref=f12e1169] [cursor=pointer]:
+                                        - generic [ref=f12e646]: M
+                                    - checkbox [ref=f12e1170] [cursor=pointer]:
+                                        - generic [ref=f12e648]: S
+                    - generic [ref=f12e649]:
+                        - generic [ref=f12e650]:
+                            - generic [ref=f12e651]:
+                                - link "From current price $130.00 From current price $130.00 original price $135.00" [ref=f12e1171] [cursor=pointer]:
+                                    - /url: /global/en-US/product/74974310M?color=002
+                                    - radiogroup [ref=f12e1172]:
+                                        - radio [checked] [ref=f12e1173]
+                                    - paragraph [ref=f12e663]: Modern Dress Shirt
+                                    - text: From $130.00
+                                    - generic [ref=f12e664]: From current price $130.00
+                                    - text: $135.00
+                                    - generic [ref=f12e665]: original price $135.00
+                                - button [ref=f12e1174] [cursor=pointer]
+                            - generic [ref=f12e668]:
+                                - link "From current price $43.99 From current price $43.99 original price $64.00" [ref=f12e1175] [cursor=pointer]:
+                                    - /url: /global/en-US/product/25591139M?color=JJ0DDXX
+                                    - radiogroup [ref=f12e1176]:
+                                        - radio [checked] [ref=f12e1177]
+                                    - paragraph [ref=f12e680]: Paisley Shirt
+                                    - text: From $43.99
+                                    - generic [ref=f12e681]: From current price $43.99
+                                    - text: $64.00
+                                    - generic [ref=f12e682]: original price $64.00
+                                    - generic [ref=f12e683]: Buy one Long Center Seam Skirt and get 2 tops
+                                - button [ref=f12e1178] [cursor=pointer]
+                            - generic [ref=f12e686]:
+                                - link "From current price $20.00 From current price $20.00 original price $59.00" [ref=f12e1179] [cursor=pointer]:
+                                    - /url: /global/en-US/product/25518484M?color=JJ9VSA5
+                                    - radiogroup [ref=f12e1180]:
+                                        - radio [checked] [ref=f12e1181]
+                                    - paragraph [ref=f12e698]: Striped Shirt
+                                    - text: From $20.00
+                                    - generic [ref=f12e699]: From current price $20.00
+                                    - text: $59.00
+                                    - generic [ref=f12e700]: original price $59.00
+                                    - generic [ref=f12e701]: Buy one Long Center Seam Skirt and get 2 tops
+                                - button [ref=f12e1182] [cursor=pointer]
+                            - generic [ref=f12e704]:
+                                - link "From current price $40.99 From current price $40.99 original price $59.00" [ref=f12e1183] [cursor=pointer]:
+                                    - /url: /global/en-US/product/25591125M?color=JJK36XX
+                                    - radiogroup [ref=f12e1184]:
+                                        - radio [checked] [ref=f12e1185]
+                                    - paragraph [ref=f12e716]: Striped Shirt
+                                    - text: From $40.99
+                                    - generic [ref=f12e717]: From current price $40.99
+                                    - text: $59.00
+                                    - generic [ref=f12e718]: original price $59.00
+                                    - generic [ref=f12e719]: Buy one Long Center Seam Skirt and get 2 tops
+                                - button [ref=f12e1186] [cursor=pointer]
+                            - generic [ref=f12e722]:
+                                - link "From current price $135.00 From current price $135.00" [ref=f12e1187] [cursor=pointer]:
+                                    - /url: /global/en-US/product/78916783M?color=white
+                                    - radiogroup [ref=f12e1188]:
+                                        - radio [checked] [ref=f12e1189]
+                                    - paragraph [ref=f12e734]: The White Dress Shirt
+                                    - text: From $135.00
+                                    - generic [ref=f12e735]: From current price $135.00
+                                - button [ref=f12e1190] [cursor=pointer]
+                            - generic [ref=f12e738]:
+                                - link "From current price $130.00 From current price $130.00 original price $135.00" [ref=f12e1191] [cursor=pointer]:
+                                    - /url: /global/en-US/product/69309284M?color=blue
+                                    - radiogroup [ref=f12e1192]:
+                                        - radio [checked] [ref=f12e1193]
+                                    - paragraph [ref=f12e750]: Modern Striped Dress Shirt
+                                    - text: From $130.00
+                                    - generic [ref=f12e751]: From current price $130.00
+                                    - text: $135.00
+                                    - generic [ref=f12e752]: original price $135.00
+                                - button [ref=f12e1194] [cursor=pointer]
+                            - generic [ref=f12e755]:
+                                - link "From current price $47.99 From current price $47.99 original price $69.00" [ref=f12e1195] [cursor=pointer]:
+                                    - /url: /global/en-US/product/25564426M?color=JJ975XX
+                                    - radiogroup [ref=f12e1196]:
+                                        - radio [checked] [ref=f12e1197]
+                                    - paragraph [ref=f12e767]: Denim Shirt Jacket
+                                    - text: From $47.99
+                                    - generic [ref=f12e768]: From current price $47.99
+                                    - text: $69.00
+                                    - generic [ref=f12e769]: original price $69.00
+                                    - generic [ref=f12e770]: Buy one Long Center Seam Skirt and get 2 tops
+                                - button [ref=f12e1198] [cursor=pointer]
+                            - generic [ref=f12e773]:
+                                - link "From current price $64.00 From current price $64.00" [ref=f12e1199] [cursor=pointer]:
+                                    - /url: /global/en-US/product/25592653M?color=JJI15XX
+                                    - radiogroup [ref=f12e1200]:
+                                        - generic [ref=f12e781]:
+                                            - radio [checked] [ref=f12e1201]
+                                            - radio [ref=f12e1202]
+                                    - paragraph [ref=f12e788]: Ruffle Sleeveless Shirt
+                                    - text: From $64.00
+                                    - generic [ref=f12e789]: From current price $64.00
+                                    - generic [ref=f12e790]: Buy one Long Center Seam Skirt and get 2 tops
+                                - button [ref=f12e1203] [cursor=pointer]
+                            - generic [ref=f12e793]:
+                                - link "From current price $69.00 From current price $69.00" [ref=f12e1204] [cursor=pointer]:
+                                    - /url: /global/en-US/product/25592403M?color=JJI15XX
+                                    - radiogroup [ref=f12e1205]:
+                                        - radio [checked] [ref=f12e1206]
+                                    - paragraph [ref=f12e805]: Sleeveless Pleated Shirt
+                                    - text: From $69.00
+                                    - generic [ref=f12e806]: From current price $69.00
+                                    - generic [ref=f12e807]: Buy one Long Center Seam Skirt and get 2 tops
+                                - button [ref=f12e1207] [cursor=pointer]
+                            - generic [ref=f12e810]:
+                                - link "From current price $50.99 From current price $50.99 original price $74.00" [ref=f12e1208] [cursor=pointer]:
+                                    - /url: /global/en-US/product/25518360M?color=JJI15XX
+                                    - radiogroup [ref=f12e1209]:
+                                        - radio [checked] [ref=f12e1210]
+                                    - paragraph [ref=f12e822]: Fitted Seamed Shirt
+                                    - text: From $50.99
+                                    - generic [ref=f12e823]: From current price $50.99
+                                    - text: $74.00
+                                    - generic [ref=f12e824]: original price $74.00
+                                    - generic [ref=f12e825]: Buy one Long Center Seam Skirt and get 2 tops
+                                - button [ref=f12e1211] [cursor=pointer]
+                                - generic [ref=f12e828]: Sale
+                            - generic [ref=f12e830]:
+                                - link "From current price $74.00 From current price $74.00" [ref=f12e1212] [cursor=pointer]:
+                                    - /url: /global/en-US/product/25592518M?color=JJI15XX
+                                    - radiogroup [ref=f12e1213]:
+                                        - generic [ref=f12e838]:
+                                            - radio [checked] [ref=f12e1214]
+                                            - radio [ref=f12e1215]
+                                    - paragraph [ref=f12e845]: Button Front Shirt
+                                    - text: From $74.00
+                                    - generic [ref=f12e846]: From current price $74.00
+                                    - generic [ref=f12e847]: Buy one Long Center Seam Skirt and get 2 tops
+                                - button [ref=f12e1216] [cursor=pointer]
+                            - generic [ref=f12e850]:
+                                - link "From current price $59.00 From current price $59.00" [ref=f12e1217] [cursor=pointer]:
+                                    - /url: /global/en-US/product/25565770M?color=JJZ01XX
+                                    - radiogroup [ref=f12e1218]:
+                                        - radio [checked] [ref=f12e1219]
+                                    - paragraph [ref=f12e862]: Button Front Shirt
+                                    - text: From $59.00
+                                    - generic [ref=f12e863]: From current price $59.00
+                                    - generic [ref=f12e864]: Buy one Long Center Seam Skirt and get 2 tops
+                                - button [ref=f12e1220] [cursor=pointer]
+                            - generic [ref=f12e867]:
+                                - link "From current price $69.00 From current price $69.00" [ref=f12e1221] [cursor=pointer]:
+                                    - /url: /global/en-US/product/25518637M?color=JJI15XX
+                                    - radiogroup [ref=f12e1222]:
+                                        - radio [checked] [ref=f12e1223]
+                                    - paragraph [ref=f12e879]: Button Down Shirt
+                                    - text: From $69.00
+                                    - generic [ref=f12e880]: From current price $69.00
+                                    - generic [ref=f12e881]: Buy one Long Center Seam Skirt and get 2 tops
+                                - button [ref=f12e1224] [cursor=pointer]
+                                - generic [ref=f12e884]: Sale
+                            - generic [ref=f12e886]:
+                                - link "From current price $40.99 From current price $40.99 original price $69.00" [ref=f12e1225] [cursor=pointer]:
+                                    - /url: /global/en-US/product/25517958M?color=JJZ01XX
+                                    - radiogroup [ref=f12e1226]:
+                                        - radio [checked] [ref=f12e1227]
+                                    - paragraph [ref=f12e898]: Roll Sleeve Shirt
+                                    - text: From $40.99
+                                    - generic [ref=f12e899]: From current price $40.99
+                                    - text: $69.00
+                                    - generic [ref=f12e900]: original price $69.00
+                                    - generic [ref=f12e901]: Buy one Long Center Seam Skirt and get 2 tops
+                                - button [ref=f12e1228] [cursor=pointer]
+                            - generic [ref=f12e904]:
+                                - link "From current price $69.00 From current price $69.00" [ref=f12e1229] [cursor=pointer]:
+                                    - /url: /global/en-US/product/25518647M?color=JJ3VXXX
+                                    - radiogroup [ref=f12e1230]:
+                                        - radio [checked] [ref=f12e1231]
+                                    - paragraph [ref=f12e916]: Button Down Shirt
+                                    - text: From $69.00
+                                    - generic [ref=f12e917]: From current price $69.00
+                                    - generic [ref=f12e918]: Buy one Long Center Seam Skirt and get 2 tops
+                                - button [ref=f12e1232] [cursor=pointer]
+                            - generic [ref=f12e921]:
+                                - link "From current price $148.00 From current price $148.00" [ref=f12e1233] [cursor=pointer]:
+                                    - /url: /global/en-US/product/25688608M?color=JJ2RRXX
+                                    - radiogroup [ref=f12e1234]:
+                                        - radio [checked] [ref=f12e1235]
+                                    - paragraph [ref=f12e933]: Floral Shirt Dress.
+                                    - text: From $148.00
+                                    - generic [ref=f12e934]: From current price $148.00
+                                    - generic [ref=f12e935]: Bonus Product for Order Amounts Above 250
+                                - button [ref=f12e1236] [cursor=pointer]
+                            - generic [ref=f12e938]:
+                                - link "From current price $89.00 From current price $89.00" [ref=f12e1237] [cursor=pointer]:
+                                    - /url: /global/en-US/product/25565553M?color=JJ2AFXX
+                                    - radiogroup [ref=f12e1238]:
+                                        - radio [checked] [ref=f12e1239]
+                                    - paragraph [ref=f12e950]: Belted Shirt Dress
+                                    - text: From $89.00
+                                    - generic [ref=f12e951]: From current price $89.00
+                                    - generic [ref=f12e952]: Bonus Product for Order Amounts Above 250
+                                - button [ref=f12e1240] [cursor=pointer]
+                            - generic [ref=f12e955]:
+                                - link "From current price $135.00 From current price $135.00" [ref=f12e1241] [cursor=pointer]:
+                                    - /url: /global/en-US/product/25585429M?color=pink
+                                    - radiogroup [ref=f12e1242]:
+                                        - radio [checked] [ref=f12e1243]
+                                    - paragraph [ref=f12e967]: Modern Dress Shirt in Pink
+                                    - text: From $135.00
+                                    - generic [ref=f12e968]: From current price $135.00
+                                - button [ref=f12e1244] [cursor=pointer]
+                            - generic [ref=f12e971]:
+                                - link "From current price $49.99 From current price $49.99 original price $69.50" [ref=f12e1245] [cursor=pointer]:
+                                    - /url: /global/en-US/product/25604455M?color=WHITEFB
+                                    - radiogroup [ref=f12e1246]:
+                                        - generic [ref=f12e979]:
+                                            - radio [ref=f12e1247]
+                                            - radio [checked] [ref=f12e1248]
+                                    - paragraph [ref=f12e986]: No-Iron Textured Dress Shirt
+                                    - text: From $49.99
+                                    - generic [ref=f12e987]: From current price $49.99
+                                    - text: $69.50
+                                    - generic [ref=f12e988]: original price $69.50
+                                - button [ref=f12e1249] [cursor=pointer]
+                            - generic [ref=f12e991]:
+                                - link "From current price $43.99 From current price $43.99 original price $64.00" [ref=f12e1250] [cursor=pointer]:
+                                    - /url: /global/en-US/product/25564740M?color=JJZ01XX
+                                    - radiogroup [ref=f12e1251]:
+                                        - radio [checked] [ref=f12e1252]
+                                    - paragraph [ref=f12e1003]: Roll Sleeve Floral Shirt
+                                    - text: From $43.99
+                                    - generic [ref=f12e1004]: From current price $43.99
+                                    - text: $64.00
+                                    - generic [ref=f12e1005]: original price $64.00
+                                    - generic [ref=f12e1006]: Buy one Long Center Seam Skirt and get 2 tops
+                                - button [ref=f12e1253] [cursor=pointer]
+                            - generic [ref=f12e1009]:
+                                - link "From current price $54.99 From current price $54.99 original price $74.00" [ref=f12e1254] [cursor=pointer]:
+                                    - /url: /global/en-US/product/25589067M?color=JJ2DGXX
+                                    - radiogroup [ref=f12e1256]:
+                                        - radio [checked] [ref=f12e1257]
+                                    - paragraph [ref=f12e1020]: Long Sleeve Seamed Shirt
+                                    - text: From $54.99
+                                    - generic [ref=f12e1021]: From current price $54.99
+                                    - text: $74.00
+                                    - generic [ref=f12e1022]: original price $74.00
+                                    - generic [ref=f12e1023]: Buy one Long Center Seam Skirt and get 2 tops
+                                - button [ref=f12e1258] [cursor=pointer]
+                            - generic [ref=f12e1026]:
+                                - link "From current price $64.00 From current price $64.00" [ref=f12e1259] [cursor=pointer]:
+                                    - /url: /global/en-US/product/25565775M?color=JJZ01XX
+                                    - radiogroup [ref=f12e1261]:
+                                        - radio [checked] [ref=f12e1262]
+                                    - paragraph [ref=f12e1037]: Sleeveless Button Down Shirt
+                                    - text: From $64.00
+                                    - generic [ref=f12e1038]: From current price $64.00
+                                    - generic [ref=f12e1039]: Buy one Long Center Seam Skirt and get 2 tops
+                                - button [ref=f12e1263] [cursor=pointer]
+                            - generic [ref=f12e1042]:
+                                - link "From current price $49.00 From current price $49.00" [ref=f12e1264] [cursor=pointer]:
+                                    - /url: /global/en-US/product/25564680M?color=JJI15XX
+                                    - radiogroup [ref=f12e1266]:
+                                        - radio [checked] [ref=f12e1267]
+                                    - paragraph [ref=f12e1053]: Classic Button Front Shirt
+                                    - text: From $49.00
+                                    - generic [ref=f12e1054]: From current price $49.00
+                                    - generic [ref=f12e1055]: Buy one Long Center Seam Skirt and get 2 tops
+                                - button [ref=f12e1268] [cursor=pointer]
+                            - generic [ref=f12e1058]:
+                                - link "From current price $59.00 From current price $59.00" [ref=f12e1269] [cursor=pointer]:
+                                    - /url: /global/en-US/product/25592547M?color=JJB52A0
+                                    - radiogroup [ref=f12e1271]:
+                                        - radio [checked] [ref=f12e1272]
+                                    - paragraph [ref=f12e1069]: Striped Button Down Shirt
+                                    - text: From $59.00
+                                    - generic [ref=f12e1070]: From current price $59.00
+                                    - generic [ref=f12e1071]: Buy one Long Center Seam Skirt and get 2 tops
+                                - button [ref=f12e1273] [cursor=pointer]
+                            - generic [ref=f12e1074]:
+                                - link "From current price $64.00 From current price $64.00" [ref=f12e1274] [cursor=pointer]:
+                                    - /url: /global/en-US/product/25592386M?color=JJB52A0
+                                    - radiogroup [ref=f12e1276]:
+                                        - radio [checked] [ref=f12e1277]
+                                    - paragraph [ref=f12e1085]: Floral Tie Front Shirt
+                                    - text: From $64.00
+                                    - generic [ref=f12e1086]: From current price $64.00
+                                    - generic [ref=f12e1087]: Buy one Long Center Seam Skirt and get 2 tops
+                                - button [ref=f12e1278] [cursor=pointer]
+                        - generic [ref=f12e1091]:
+                            - link [disabled] [ref=f12e1279]:
+                                - /url: /global/en-US/search?q=shirt
+                                - paragraph [ref=f12e1094]: Prev
+                            - generic [ref=f12e1095]:
+                                - combobox [ref=f12e1281]
+                                - paragraph [ref=f12e1098]: of 2
+                            - link [ref=f12e1282] [cursor=pointer]:
+                                - /url: /global/en-US/search?q=shirt&offset=25
+                                - paragraph [ref=f12e1100]: Next
+        - contentinfo [ref=f12e316]:
+            - generic [ref=f12e317]:
+                - generic [ref=f12e319]:
+                    - generic [ref=f12e320]:
+                        - heading [level=2] [ref=f12e1284]: Customer Support
+                        - list [ref=f12e322]:
+                            - listitem [ref=f12e323]:
+                                - link [ref=f12e1285] [cursor=pointer]:
+                                    - /url: /
+                                    - text: Contact Us
+                            - listitem [ref=f12e325]:
+                                - link [ref=f12e1286] [cursor=pointer]:
+                                    - /url: /
+                                    - text: Shipping
+                    - generic [ref=f12e327]:
+                        - heading [level=2] [ref=f12e1287]: Account
+                        - list [ref=f12e329]:
+                            - listitem [ref=f12e330]:
+                                - link [ref=f12e1288] [cursor=pointer]:
+                                    - /url: /
+                                    - text: Order Status
+                            - listitem [ref=f12e332]:
+                                - link [ref=f12e1289] [cursor=pointer]:
+                                    - /url: /
+                                    - text: Sign in or create account
+                    - generic [ref=f12e334]:
+                        - heading [level=2] [ref=f12e1290]: Our Company
+                        - list [ref=f12e336]:
+                            - listitem [ref=f12e337]:
+                                - link [ref=f12e1291] [cursor=pointer]:
+                                    - /url: /global/en-US/store-locator
+                                    - text: Store Locator
+                            - listitem [ref=f12e339]:
+                                - link [ref=f12e1292] [cursor=pointer]:
+                                    - /url: /
+                                    - text: About Us
+                    - generic [ref=f12e342]:
+                        - heading [level=2] [ref=f12e1293]: Subscribe to Stay Updated
+                        - paragraph [ref=f12e344]: Be the first to know about latest offers, news, tips, and more.
+                        - generic [ref=f12e345]:
+                            - generic [ref=f12e346]:
+                                - textbox [ref=f12e1294]:
+                                    - /placeholder: Enter your email address...
+                                - button [ref=f12e1295] [cursor=pointer]: Subscribe
+                            - paragraph [ref=f12e349]:
+                                - text: By submitting this, I agree to the
+                                - link [ref=f12e1296] [cursor=pointer]:
+                                    - /url: /
+                                    - text: Terms & Conditions
+                                - text: and
+                                - link [ref=f12e1297] [cursor=pointer]:
+                                    - /url: /
+                                    - text: Privacy Policy
+                                - text: .
+                        - generic [ref=f12e352]:
+                            - button [ref=f12e1298] [cursor=pointer]
+                            - button [ref=f12e1299] [cursor=pointer]
+                            - button [ref=f12e1300] [cursor=pointer]
+                            - button [ref=f12e1301] [cursor=pointer]
+                            - button [ref=f12e1302] [cursor=pointer]
+                - group [ref=f12e364]:
+                    - combobox [ref=f12e1304]
+                - separator [ref=f12e367]
+                - generic [ref=f12e368]:
+                    - paragraph [ref=f12e369]: © 2026 Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.
+                    - list [ref=f12e372]:
+                        - listitem [ref=f12e373]:
+                            - link [ref=f12e1305] [cursor=pointer]:
+                                - /url: /
+                                - text: Terms & Conditions
+                        - listitem [ref=f12e375]:
+                            - link [ref=f12e1306] [cursor=pointer]:
+                                - /url: /
+                                - text: Privacy Policy
+                        - listitem [ref=f12e377]:
+                            - link [ref=f12e1307] [cursor=pointer]:
+                                - /url: /
+                                - text: Site Map
+    - generic:
+        - region
+        - region
+        - region
+        - region
+        - region
+        - region
+    - dialog [ref=f12e1309]:
+        - button "Close" [active] [ref=f12e1310] [cursor=pointer]
+        - generic [ref=f12e1313]:
+            - heading "Find a Store" [level=2] [ref=f12e1314]
+            - group [ref=f12e1316]:
+                - group [ref=f12e1318]:
+                    - combobox [ref=f12e1320]:
+                        - option "Select a country"
+                        - option "United States" [selected]
+                        - option "Germany"
+                - generic [ref=f12e1321]:
+                    - group [ref=f12e1322]:
+                        - textbox "Enter postal code" [ref=f12e1323]: '94103'
+                    - button "Find" [ref=f12e1324] [cursor=pointer]
+                - generic [ref=f12e1325]: Or
+                - button "Use My Location" [ref=f12e1326] [cursor=pointer]
+                - group [ref=f12e1327]:
+                    - generic [ref=f12e1328]: To use your location, enable location sharing.
+            - generic [ref=f12e1329]: Viewing stores within 100 km of 94103 in United States
+            - group [ref=f12e1330]:
+                - radiogroup [ref=f12e1333]:
+                    - generic [ref=f12e1336]:
+                        - radio [checked] [ref=f12e1338]
+                        - generic [ref=f12e1342]:
+                            - generic [ref=f12e1344]:
+                                - generic [ref=f12e1345]: San Francisco Retail Store
+                                - generic [ref=f12e1346]: 151 3rd StSan Francisco, CA 94103
+                            - generic [ref=f12e1347]:
+                                - button "Store Contact Info" [ref=f12e1352] [cursor=pointer]
+                                - button "Store Hours" [ref=f12e1360] [cursor=pointer]
+                    - generic [ref=f12e1366]:
+                        - radio [ref=f12e1368]
+                        - generic [ref=f12e1372]:
+                            - generic [ref=f12e1374]:
+                                - generic [ref=f12e1375]: San Mateo Retail Store
+                                - generic [ref=f12e1376]: 320 2nd AveSan Mateo, CA 94401
+                            - generic [ref=f12e1377]:
+                                - generic [ref=f12e1379]:
+                                    - img "location" [ref=f12e1380]
+                                    - text: 23.83 km away
+                                - button "Store Contact Info" [ref=f12e1385] [cursor=pointer]
+                                - button "Store Hours" [ref=f12e1393] [cursor=pointer]
+                    - generic [ref=f12e1399]:
+                        - radio [disabled] [ref=f12e1401]
+                        - generic [ref=f12e1405]:
+                            - generic [ref=f12e1407]:
+                                - generic [ref=f12e1408]: Palo Alto Retail Store
+                                - generic [ref=f12e1409]: 1313 Newell RdPalo Alto, CA 94306
+                            - generic [ref=f12e1410]:
+                                - generic [ref=f12e1412]:
+                                    - img "location" [ref=f12e1413]
+                                    - text: 90.22 km away
+                                - button "Store Contact Info" [ref=f12e1418] [cursor=pointer]
+                                - button "Store Hours" [ref=f12e1426] [cursor=pointer]

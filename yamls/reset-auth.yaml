@@ -1,0 +1,142 @@
+- generic [active] [ref=f6e1]:
+    - generic [ref=f6e4]:
+        - link "Skip to Content" [ref=f6e5] [cursor=pointer]:
+            - /url: '#chakra-skip-nav'
+        - banner [ref=f6e7]:
+            - generic [ref=f6e9]:
+                - button "Logo" [ref=f6e10] [cursor=pointer]
+                - navigation "Main navigation" [ref=f6e14]:
+                    - generic [ref=f6e16]:
+                        - generic [ref=f6e19]:
+                            - link "New Arrivals" [ref=f6e20] [cursor=pointer]:
+                                - /url: /global/en-US/category/newarrivals
+                            - link [ref=f6e21] [cursor=pointer]:
+                                - /url: /global/en-US
+                                - img "chevron-down" [ref=f6e23]
+                        - generic [ref=f6e26]:
+                            - link "Womens" [ref=f6e27] [cursor=pointer]:
+                                - /url: /global/en-US/category/womens
+                            - link [ref=f6e28] [cursor=pointer]:
+                                - /url: /global/en-US
+                                - img "chevron-down" [ref=f6e30]
+                        - generic [ref=f6e33]:
+                            - link "Mens" [ref=f6e34] [cursor=pointer]:
+                                - /url: /global/en-US/category/mens
+                            - link [ref=f6e35] [cursor=pointer]:
+                                - /url: /global/en-US
+                                - img "chevron-down" [ref=f6e37]
+                        - link "Gift Certificates" [ref=f6e39] [cursor=pointer]:
+                            - /url: /global/en-US/category/gift-certificates
+                        - link "Top Sellers" [ref=f6e41] [cursor=pointer]:
+                            - /url: /global/en-US/category/top-seller
+                - searchbox "Search for products..." [ref=f6e48]
+                - button "My Account" [ref=f6e49] [cursor=pointer]
+                - button "Open account menu" [ref=f6e51] [cursor=pointer]
+                - button "Wishlist" [ref=f6e53] [cursor=pointer]
+                - button "Store Locator" [ref=f6e55] [cursor=pointer]
+                - 'button "My cart, number of items: 0" [ref=f6e57] [cursor=pointer]':
+                    - img "basket" [ref=f6e58]
+        - main [ref=f6e60]:
+            - generic [ref=f6e292]:
+                - heading "Reset Password" [level=1] [ref=f6e293]
+                - generic [ref=f6e294]:
+                    - generic [ref=f6e295]:
+                        - img "brand-logo" [ref=f6e296]
+                        - generic [ref=f6e297]:
+                            - paragraph [ref=f6e298]: Reset Password
+                            - paragraph [ref=f6e299]: Enter your email to receive instructions on how to reset your password
+                    - generic [ref=f6e301]:
+                        - group [ref=f6e303]:
+                            - generic [ref=f6e304]: Email
+                            - textbox "Email" [ref=f6e306]:
+                                - /placeholder: you@email.com
+                        - generic [ref=f6e307]:
+                            - button "Reset Password" [ref=f6e308] [cursor=pointer]
+                            - generic [ref=f6e309]:
+                                - paragraph [ref=f6e310]: Or return to
+                                - button "Sign in" [ref=f6e311] [cursor=pointer]
+        - contentinfo [ref=f6e119]:
+            - generic [ref=f6e120]:
+                - generic [ref=f6e122]:
+                    - generic [ref=f6e123]:
+                        - heading "Customer Support" [level=2] [ref=f6e124]
+                        - list [ref=f6e125]:
+                            - listitem [ref=f6e126]:
+                                - link "Contact Us" [ref=f6e127] [cursor=pointer]:
+                                    - /url: /
+                            - listitem [ref=f6e128]:
+                                - link "Shipping" [ref=f6e129] [cursor=pointer]:
+                                    - /url: /
+                    - generic [ref=f6e130]:
+                        - heading "Account" [level=2] [ref=f6e131]
+                        - list [ref=f6e132]:
+                            - listitem [ref=f6e133]:
+                                - link "Order Status" [ref=f6e134] [cursor=pointer]:
+                                    - /url: /
+                            - listitem [ref=f6e135]:
+                                - link "Sign in or create account" [ref=f6e136] [cursor=pointer]:
+                                    - /url: /
+                    - generic [ref=f6e137]:
+                        - heading "Our Company" [level=2] [ref=f6e138]
+                        - list [ref=f6e139]:
+                            - listitem [ref=f6e140]:
+                                - link "Store Locator" [ref=f6e141] [cursor=pointer]:
+                                    - /url: /global/en-US/store-locator
+                            - listitem [ref=f6e142]:
+                                - link "About Us" [ref=f6e143] [cursor=pointer]:
+                                    - /url: /
+                    - generic [ref=f6e145]:
+                        - heading "Subscribe to Stay Updated" [level=2] [ref=f6e146]
+                        - paragraph [ref=f6e147]: Be the first to know about latest offers, news, tips, and more.
+                        - generic [ref=f6e148]:
+                            - generic [ref=f6e149]:
+                                - textbox "Email address for newsletter" [ref=f6e150]:
+                                    - /placeholder: Enter your email address...
+                                - button "Subscribe" [ref=f6e151] [cursor=pointer]
+                            - paragraph [ref=f6e152]:
+                                - text: By submitting this, I agree to the
+                                - link "Terms & Conditions" [ref=f6e153] [cursor=pointer]:
+                                    - /url: /
+                                - text: and
+                                - link "Privacy Policy" [ref=f6e154] [cursor=pointer]:
+                                    - /url: /
+                                - text: .
+                        - generic [ref=f6e155]:
+                            - button "YouTube" [ref=f6e156] [cursor=pointer]
+                            - button "Instagram" [ref=f6e158] [cursor=pointer]
+                            - button "Pinterest" [ref=f6e160] [cursor=pointer]
+                            - button "Twitter" [ref=f6e162] [cursor=pointer]
+                            - button "Facebook" [ref=f6e164] [cursor=pointer]
+                - group [ref=f6e167]:
+                    - combobox "Select Language" [ref=f6e313]:
+                        - option "English (United States)" [selected]
+                        - option "English (United Kingdom)"
+                        - option "German (Germany)"
+                        - option "Spanish (Mexico)"
+                        - option "French (France)"
+                        - option "Italian (Italy)"
+                        - option "Japanese (Japan)"
+                        - option "Korean (Republic of Korea)"
+                        - option "Portuguese (Brazil)"
+                        - option "Chinese (China)"
+                        - option "Chinese (Taiwan)"
+                - separator [ref=f6e170]
+                - generic [ref=f6e171]:
+                    - paragraph [ref=f6e172]: © 2026 Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.
+                    - list [ref=f6e175]:
+                        - listitem [ref=f6e176]:
+                            - link "Terms & Conditions" [ref=f6e177] [cursor=pointer]:
+                                - /url: /
+                        - listitem [ref=f6e178]:
+                            - link "Privacy Policy" [ref=f6e179] [cursor=pointer]:
+                                - /url: /
+                        - listitem [ref=f6e180]:
+                            - link "Site Map" [ref=f6e181] [cursor=pointer]:
+                                - /url: /
+    - generic:
+        - region
+        - region
+        - region
+        - region
+        - region
+        - region

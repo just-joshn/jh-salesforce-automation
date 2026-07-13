@@ -1,0 +1,22 @@
+version: 2
+updates:
+  # Keeps SHA-pinned actions current. Dependabot updates the pinned commit SHA
+  # and the trailing version comment together, so pinning never goes stale.
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+    groups:
+      github-actions:
+        patterns:
+          - '*'
+
+  # npm/pnpm dependencies (devDependencies only — this repo has no runtime deps).
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+    groups:
+      dev-dependencies:
+        patterns:
+          - '*'

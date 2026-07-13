@@ -1,0 +1,152 @@
+- generic [ref=f8e1]:
+    - generic [ref=f8e4]:
+        - link "Skip to Content" [ref=f8e5] [cursor=pointer]:
+            - /url: '#chakra-skip-nav'
+        - generic [ref=f8e358]:
+            - link [ref=f8e359] [cursor=pointer]:
+                - /url: /
+                - img "brand-logo" [ref=f8e360]
+            - 'link "Back to cart, number of items: 2" [ref=f8e361] [cursor=pointer]':
+                - /url: /global/en-US/cart
+                - text: Back to cart
+                - generic [ref=f8e362]: '2'
+        - main [ref=f8e58]:
+            - generic [ref=f8e366]:
+                - heading "Checkout" [level=1] [ref=f8e367]
+                - generic [ref=f8e369]:
+                    - generic [ref=f8e371]:
+                        - generic [ref=f8e373]:
+                            - generic [ref=f8e374]:
+                                - heading "Contact Info" [level=2] [ref=f8e375]
+                                - button "Edit Contact Info" [ref=f8e376] [cursor=pointer]
+                            - paragraph [ref=f8e378]: cuj-discovery@example.com
+                        - generic [ref=f8e380]:
+                            - generic [ref=f8e381]:
+                                - heading "Shipping Address" [level=2] [ref=f8e382]
+                                - button "Edit Shipping Addresses" [ref=f8e702] [cursor=pointer]
+                            - paragraph [ref=f8e703]: Your items will be shipped to multiple addresses.
+                        - generic [ref=f8e391]:
+                            - generic [ref=f8e392]:
+                                - heading "Shipping & Gift Options" [level=2] [ref=f8e393]
+                                - button "Edit Shipping Options" [ref=f8e795] [cursor=pointer]
+                            - generic [ref=f8e796]:
+                                - generic [ref=f8e798]:
+                                    - generic [ref=f8e799]:
+                                        - paragraph [ref=f8e800]: Ground
+                                        - paragraph [ref=f8e801]: Order received within 7-10 business days
+                                    - paragraph [ref=f8e802]: $5.99
+                                - generic [ref=f8e804]:
+                                    - generic [ref=f8e805]:
+                                        - paragraph [ref=f8e806]: Ground
+                                        - paragraph [ref=f8e807]: Order received within 7-10 business days
+                                    - paragraph [ref=f8e808]: $15.99
+                                - generic [ref=f8e810]:
+                                    - paragraph [ref=f8e811]: Total Shipping
+                                    - paragraph [ref=f8e812]: $21.98
+                        - generic [ref=f8e402]:
+                            - heading "Payment" [active] [level=2] [ref=f8e404]
+                            - generic [ref=f8e405]:
+                                - button [ref=f8e816] [cursor=pointer]
+                                - generic [ref=f8e819]:
+                                    - radiogroup "Payment" [ref=f8e824]:
+                                        - generic [ref=f8e826] [cursor=pointer]:
+                                            - radio "Credit Card Secure $71.97" [checked] [ref=f8e827]
+                                            - generic [ref=f8e830]:
+                                                - generic [ref=f8e831]:
+                                                    - paragraph [ref=f8e832]: Credit Card
+                                                    - img "Secure" [ref=f8e833]
+                                                - paragraph [ref=f8e834]: $71.97
+                                        - generic [ref=f8e838]:
+                                            - generic [ref=f8e839]:
+                                                - group [ref=f8e840]:
+                                                    - generic [ref=f8e841]:
+                                                        - generic [ref=f8e842]: Card Number
+                                                        - generic [ref=f8e843]:
+                                                            - img "cc-visa" [ref=f8e844]
+                                                            - img "cc-mastercard" [ref=f8e845]
+                                                            - img "cc-amex" [ref=f8e846]
+                                                            - img "cc-discover" [ref=f8e847]
+                                                    - textbox "Card Number" [ref=f8e849]
+                                                - group [ref=f8e850]:
+                                                    - generic [ref=f8e851]: Name on Card
+                                                    - textbox "Name on Card" [ref=f8e853]
+                                                - generic [ref=f8e854]:
+                                                    - group [ref=f8e855]:
+                                                        - generic [ref=f8e856]: Expiration Date
+                                                        - textbox "Expiration Date" [ref=f8e858]:
+                                                            - /placeholder: MM/YY
+                                                    - group [ref=f8e859]:
+                                                        - text: Security Code
+                                                        - img "Security code info" [ref=f8e862]
+                                                        - generic [ref=f8e863]:
+                                                            - textbox "Security Code" [ref=f8e864]
+                                                            - button "Show password" [ref=f8e866] [cursor=pointer]
+                                            - group
+                                        - generic [ref=f8e869] [cursor=pointer]:
+                                            - radio "paypal-icon" [ref=f8e870]
+                                            - img "paypal-icon" [ref=f8e874]
+                                    - separator [ref=f8e875]
+                                    - generic [ref=f8e876]:
+                                        - heading "Billing Address" [level=3] [ref=f8e877]
+                                        - generic [ref=f8e878] [cursor=pointer]:
+                                            - checkbox "Same as shipping address" [checked] [ref=f8e879]
+                                            - paragraph [ref=f8e885]: Same as shipping address
+                                        - generic [ref=f8e887]:
+                                            - paragraph [ref=f8e888]: Test Shopper
+                                            - paragraph [ref=f8e889]: 1 Market Street
+                                            - paragraph [ref=f8e890]: San Francisco, CA 94105
+                                            - paragraph [ref=f8e891]: US
+                                    - button "Review Order" [ref=f8e894] [cursor=pointer]
+                    - generic [ref=f8e489]:
+                        - heading "Order Summary" [level=2] [ref=f8e490]
+                        - region "Order Summary" [ref=f8e491]:
+                            - button "2 items in cart" [ref=f8e494] [cursor=pointer]
+                            - generic [ref=f8e499]:
+                                - generic [ref=f8e500]:
+                                    - paragraph [ref=f8e501]: Subtotal
+                                    - paragraph [ref=f8e502]: $49.99
+                                - generic [ref=f8e503]:
+                                    - paragraph [ref=f8e505]: Shipping
+                                    - paragraph [ref=f8e506]: $21.98
+                                - generic [ref=f8e507]:
+                                    - paragraph [ref=f8e508]: Tax
+                                    - paragraph [ref=f8e509]: $3.44
+                            - separator [ref=f8e510]
+                            - generic [ref=f8e512]:
+                                - paragraph [ref=f8e513]: Order Total
+                                - paragraph [ref=f8e514]: $71.97
+        - contentinfo [ref=f8e515]:
+            - generic [ref=f8e516]:
+                - list [ref=f8e518]:
+                    - listitem [ref=f8e519]:
+                        - link "Shipping" [ref=f8e520] [cursor=pointer]:
+                            - /url: /
+                    - listitem [ref=f8e521]:
+                        - link "Returns & Exchanges" [ref=f8e522] [cursor=pointer]:
+                            - /url: /
+                - separator [ref=f8e523]
+                - generic [ref=f8e524]:
+                    - paragraph [ref=f8e525]: © 2026 Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.
+                    - generic [ref=f8e527]:
+                        - list [ref=f8e529]:
+                            - listitem [ref=f8e530]:
+                                - link "Terms & Conditions" [ref=f8e531] [cursor=pointer]:
+                                    - /url: /
+                            - listitem [ref=f8e532]:
+                                - link "Privacy Policy" [ref=f8e533] [cursor=pointer]:
+                                    - /url: /
+                            - listitem [ref=f8e534]:
+                                - link "Site Map" [ref=f8e535] [cursor=pointer]:
+                                    - /url: /
+                        - generic [ref=f8e537]:
+                            - img "cc-visa" [ref=f8e538]
+                            - img "cc-mastercard" [ref=f8e539]
+                            - img "cc-amex" [ref=f8e540]
+                            - img "cc-discover" [ref=f8e541]
+    - generic:
+        - region
+        - region
+        - region
+        - region
+        - region
+        - region

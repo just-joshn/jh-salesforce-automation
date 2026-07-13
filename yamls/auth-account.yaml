@@ -1,0 +1,164 @@
+- generic [ref=e1]:
+    - generic [ref=e4]:
+        - link "Skip to Content" [ref=e685] [cursor=pointer]:
+            - /url: '#chakra-skip-nav'
+        - banner [ref=e7]:
+            - generic [ref=e9]:
+                - button "Logo" [ref=e686] [cursor=pointer]
+                - navigation "Main navigation" [ref=e14]:
+                    - generic [ref=e16]:
+                        - generic [ref=e19]:
+                            - link "New Arrivals" [ref=e20] [cursor=pointer]:
+                                - /url: /global/en-US/category/newarrivals
+                            - link [ref=e21] [cursor=pointer]:
+                                - /url: /global/en-US
+                                - img "chevron-down" [ref=e23]
+                        - generic [ref=e26]:
+                            - link "Womens" [ref=e27] [cursor=pointer]:
+                                - /url: /global/en-US/category/womens
+                            - link [ref=e28] [cursor=pointer]:
+                                - /url: /global/en-US
+                                - img "chevron-down" [ref=e30]
+                        - generic [ref=e33]:
+                            - link "Mens" [ref=e34] [cursor=pointer]:
+                                - /url: /global/en-US/category/mens
+                            - link [ref=e35] [cursor=pointer]:
+                                - /url: /global/en-US
+                                - img "chevron-down" [ref=e37]
+                        - link "Gift Certificates" [ref=e39] [cursor=pointer]:
+                            - /url: /global/en-US/category/gift-certificates
+                        - link "Top Sellers" [ref=e41] [cursor=pointer]:
+                            - /url: /global/en-US/category/top-seller
+                - searchbox "Search for products..." [ref=e687]
+                - button "My Account" [active] [ref=e688] [cursor=pointer]
+                - button "Open account menu" [ref=e689] [cursor=pointer]
+                - button "Wishlist" [ref=e691] [cursor=pointer]
+                - button "Store Locator" [ref=e692] [cursor=pointer]
+                - 'button "My cart, number of items: 0" [ref=e693] [cursor=pointer]':
+                    - img "basket" [ref=e694]
+        - main [ref=e58]:
+            - generic [ref=e695]:
+                - heading "My Account" [level=1] [ref=e696]
+                - generic [ref=e697]:
+                    - generic [ref=e698]:
+                        - heading "My Account" [level=2] [ref=e699]
+                        - navigation [ref=e700]:
+                            - link [ref=e701] [cursor=pointer]:
+                                - /url: /global/en-US/account
+                            - link [ref=e704] [cursor=pointer]:
+                                - /url: /global/en-US/account/wishlist
+                            - link [ref=e707] [cursor=pointer]:
+                                - /url: /global/en-US/account/orders
+                            - link [ref=e710] [cursor=pointer]:
+                                - /url: /global/en-US/account/addresses
+                            - separator [ref=e713]
+                            - button "Log Out" [ref=e714] [cursor=pointer]
+                    - generic [ref=e718]:
+                        - heading "Account Details" [level=1] [ref=e719]
+                        - generic [ref=e720]:
+                            - generic [ref=e722]:
+                                - generic [ref=e723]:
+                                    - heading "My Profile" [level=2] [ref=e724]
+                                    - button "Edit" [ref=e726] [cursor=pointer]
+                                - generic [ref=e728]:
+                                    - generic [ref=e729]:
+                                        - paragraph [ref=e731]: Full Name
+                                        - paragraph [ref=e733]: CUJ Discovery
+                                    - generic [ref=e734]:
+                                        - paragraph [ref=e736]: Email
+                                        - paragraph [ref=e738]: cuj-discovery-20260826@outlook.com
+                                    - generic [ref=e739]:
+                                        - paragraph [ref=e741]: Phone Number
+                                        - paragraph [ref=e743]: Not provided
+                            - generic [ref=e745]:
+                                - generic [ref=e746]:
+                                    - heading "Password" [level=2] [ref=e747]
+                                    - button "Edit" [ref=e749] [cursor=pointer]
+                                - generic [ref=e752]:
+                                    - paragraph [ref=e754]: Password
+                                    - paragraph [ref=e756]: ••••••••
+        - contentinfo [ref=e316]:
+            - generic [ref=e317]:
+                - generic [ref=e319]:
+                    - generic [ref=e320]:
+                        - heading "Customer Support" [level=2] [ref=e757]
+                        - list [ref=e322]:
+                            - listitem [ref=e323]:
+                                - link "Contact Us" [ref=e758] [cursor=pointer]:
+                                    - /url: /
+                            - listitem [ref=e325]:
+                                - link "Shipping" [ref=e759] [cursor=pointer]:
+                                    - /url: /
+                    - generic [ref=e327]:
+                        - heading "Account" [level=2] [ref=e760]
+                        - list [ref=e329]:
+                            - listitem [ref=e330]:
+                                - link "Order Status" [ref=e761] [cursor=pointer]:
+                                    - /url: /
+                            - listitem [ref=e332]:
+                                - link "Sign in or create account" [ref=e762] [cursor=pointer]:
+                                    - /url: /
+                    - generic [ref=e334]:
+                        - heading "Our Company" [level=2] [ref=e763]
+                        - list [ref=e336]:
+                            - listitem [ref=e337]:
+                                - link "Store Locator" [ref=e764] [cursor=pointer]:
+                                    - /url: /global/en-US/store-locator
+                            - listitem [ref=e339]:
+                                - link "About Us" [ref=e765] [cursor=pointer]:
+                                    - /url: /
+                    - generic [ref=e342]:
+                        - heading "Subscribe to Stay Updated" [level=2] [ref=e766]
+                        - paragraph [ref=e344]: Be the first to know about latest offers, news, tips, and more.
+                        - generic [ref=e345]:
+                            - generic [ref=e346]:
+                                - textbox "Email address for newsletter" [ref=e767]:
+                                    - /placeholder: Enter your email address...
+                                - button "Subscribe" [ref=e768] [cursor=pointer]
+                            - paragraph [ref=e349]:
+                                - text: By submitting this, I agree to the
+                                - link "Terms & Conditions" [ref=e769] [cursor=pointer]:
+                                    - /url: /
+                                - text: and
+                                - link "Privacy Policy" [ref=e770] [cursor=pointer]:
+                                    - /url: /
+                                - text: .
+                        - generic [ref=e352]:
+                            - button "YouTube" [ref=e771] [cursor=pointer]
+                            - button "Instagram" [ref=e772] [cursor=pointer]
+                            - button "Pinterest" [ref=e773] [cursor=pointer]
+                            - button "Twitter" [ref=e774] [cursor=pointer]
+                            - button "Facebook" [ref=e775] [cursor=pointer]
+                - group [ref=e364]:
+                    - combobox "Select Language" [ref=e777]:
+                        - option "English (United States)" [selected]
+                        - option "English (United Kingdom)"
+                        - option "German (Germany)"
+                        - option "Spanish (Mexico)"
+                        - option "French (France)"
+                        - option "Italian (Italy)"
+                        - option "Japanese (Japan)"
+                        - option "Korean (Republic of Korea)"
+                        - option "Portuguese (Brazil)"
+                        - option "Chinese (China)"
+                        - option "Chinese (Taiwan)"
+                - separator [ref=e367]
+                - generic [ref=e368]:
+                    - paragraph [ref=e369]: © 2026 Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.
+                    - list [ref=e372]:
+                        - listitem [ref=e373]:
+                            - link "Terms & Conditions" [ref=e778] [cursor=pointer]:
+                                - /url: /
+                        - listitem [ref=e375]:
+                            - link "Privacy Policy" [ref=e779] [cursor=pointer]:
+                                - /url: /
+                        - listitem [ref=e377]:
+                            - link "Site Map" [ref=e780] [cursor=pointer]:
+                                - /url: /
+    - generic:
+        - region
+        - region
+        - region
+        - region
+        - region
+        - region

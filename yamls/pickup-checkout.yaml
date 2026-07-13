@@ -1,0 +1,91 @@
+- generic [ref=f11e1]:
+    - generic [ref=f11e4]:
+        - link "Skip to Content" [ref=f11e319] [cursor=pointer]:
+            - /url: '#chakra-skip-nav'
+        - generic [ref=f11e470]:
+            - link [ref=f11e471] [cursor=pointer]:
+                - /url: /
+                - img "brand-logo" [ref=f11e472]
+            - 'link "Back to cart, number of items: 1" [ref=f11e473] [cursor=pointer]':
+                - /url: /global/en-US/cart
+                - text: Back to cart
+                - generic [ref=f11e474]: '1'
+        - main [ref=f11e58]:
+            - generic [ref=f11e478]:
+                - heading "Checkout" [level=1] [ref=f11e479]
+                - generic [ref=f11e481]:
+                    - generic [ref=f11e483]:
+                        - generic [ref=f11e485]:
+                            - heading "Contact Info" [active] [level=2] [ref=f11e487]
+                            - generic [ref=f11e491]:
+                                - group [ref=f11e493]:
+                                    - generic [ref=f11e494]: Email
+                                    - textbox "Email" [ref=f11e496]:
+                                        - /placeholder: you@email.com
+                                - generic [ref=f11e497]:
+                                    - button "Checkout as Guest" [ref=f11e498] [cursor=pointer]
+                                    - separator [ref=f11e499]
+                                    - paragraph [ref=f11e500]: Or Login With
+                                    - button "Secure Link" [ref=f11e501] [cursor=pointer]
+                                    - button "Password" [ref=f11e502] [cursor=pointer]
+                                    - button [ref=f11e503] [cursor=pointer]:
+                                        - img "google" [ref=f11e504]
+                                        - text: Google
+                                    - button [ref=f11e505] [cursor=pointer]:
+                                        - img "apple" [ref=f11e506]
+                                        - text: Apple
+                        - heading "Pickup Address & Information" [level=2] [ref=f11e510]
+                        - heading "Payment" [level=2] [ref=f11e514]
+                    - generic [ref=f11e516]:
+                        - heading "Order Summary" [level=2] [ref=f11e517]
+                        - region "Order Summary" [ref=f11e518]:
+                            - button "1 item in cart" [ref=f11e521] [cursor=pointer]
+                            - generic [ref=f11e526]:
+                                - generic [ref=f11e527]:
+                                    - paragraph [ref=f11e528]: Subtotal
+                                    - paragraph [ref=f11e529]: $30.00
+                                - generic [ref=f11e530]:
+                                    - paragraph [ref=f11e532]: Shipping
+                                    - generic [ref=f11e533]: Free
+                                - generic [ref=f11e534]:
+                                    - paragraph [ref=f11e535]: Tax
+                                    - paragraph [ref=f11e536]: $1.43
+                            - separator [ref=f11e537]
+                            - generic [ref=f11e539]:
+                                - paragraph [ref=f11e540]: Order Total
+                                - paragraph [ref=f11e541]: $30.00
+        - contentinfo [ref=f11e542]:
+            - generic [ref=f11e543]:
+                - list [ref=f11e545]:
+                    - listitem [ref=f11e546]:
+                        - link "Shipping" [ref=f11e547] [cursor=pointer]:
+                            - /url: /
+                    - listitem [ref=f11e548]:
+                        - link "Returns & Exchanges" [ref=f11e549] [cursor=pointer]:
+                            - /url: /
+                - separator [ref=f11e550]
+                - generic [ref=f11e551]:
+                    - paragraph [ref=f11e552]: © 2026 Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.
+                    - generic [ref=f11e554]:
+                        - list [ref=f11e556]:
+                            - listitem [ref=f11e557]:
+                                - link "Terms & Conditions" [ref=f11e558] [cursor=pointer]:
+                                    - /url: /
+                            - listitem [ref=f11e559]:
+                                - link "Privacy Policy" [ref=f11e560] [cursor=pointer]:
+                                    - /url: /
+                            - listitem [ref=f11e561]:
+                                - link "Site Map" [ref=f11e562] [cursor=pointer]:
+                                    - /url: /
+                        - generic [ref=f11e564]:
+                            - img "cc-visa" [ref=f11e565]
+                            - img "cc-mastercard" [ref=f11e566]
+                            - img "cc-amex" [ref=f11e567]
+                            - img "cc-discover" [ref=f11e568]
+    - generic:
+        - region
+        - region
+        - region
+        - region
+        - region
+        - region

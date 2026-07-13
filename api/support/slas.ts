@@ -1,0 +1,145 @@
+import type { APIRequestContext } from '@playwright/test';
+import { createHash, randomBytes } from 'crypto';
+import { env, scapiBaseUrl } from '../../config/env';
+
+// Get a guest SLAS token (no shopper login).
+// The demo's SLAS client is public (no secret), so the test runs the same PKCE two-step the
+// storefront uses: request a one-time auth code, then exchange it for an access token.
+
+export interface GuestToken {
+  accessToken: string;
+  usid: string;
+  customerId: string;
+  expiresIn: number;
+}
+
+interface TokenResponse {
+  access_token: string;
+  usid: string;
+  customer_id: string;
+  expires_in: number;
+}
+
+function base64url(input: Buffer): string {
+  return input.toString('base64url');
+}
+
+export async function getGuestToken(request: APIRequestContext): Promise<GuestToken> {
+  const codeVerifier = base64url(randomBytes(32));
+  const codeChallenge = base64url(createHash('sha256').update(codeVerifier).digest());
+  const redirectUri = `${env.baseURL}/callback`;
+  const org = env.scapi.organizationId;
+  const authorizeUrl = `${scapiBaseUrl()}/shopper/auth/v1/organizations/${org}/oauth2/authorize`;
+  const tokenUrl = `${scapiBaseUrl()}/shopper/auth/v1/organizations/${org}/oauth2/token`;
+
+  // Step 1: request the auth code. The authorize endpoint returns it in a redirect's Location
+  // header rather than the body, so maxRedirects: 0 leaves the redirect unfollowed and readable.
+  const authorize = await request.get(authorizeUrl, {
+    params: {
+      client_id: env.scapi.clientId,
+      code_challenge: codeChallenge,
+      response_type: 'code',
+      redirect_uri: redirectUri,
+      hint: 'guest',
+      channel_id: env.scapi.siteId,
+    },
+    maxRedirects: 0,
+  });
+
+  const location = authorize.headers().location;
+  if (!location) {
+    throw new Error(
+      `SLAS authorize did not redirect (status ${authorize.status()}): ${await authorize.text()}`,
+    );
+  }
+  const redirect = new URL(location);
+  const code = redirect.searchParams.get('code');
+  const usid = redirect.searchParams.get('usid');
+  if (!code || !usid) {
+    throw new Error(`SLAS authorize redirect missing code/usid: ${location}`);
+  }
+
+  const token = await request.post(tokenUrl, {
+    form: {
+      grant_type: 'authorization_code_pkce',
+      code_verifier: codeVerifier,
+      code,
+      client_id: env.scapi.clientId,
+      redirect_uri: redirectUri,
+      channel_id: env.scapi.siteId,
+      usid,
+    },
+  });
+  if (!token.ok()) {
+    throw new Error(`SLAS token exchange failed (${token.status()}): ${await token.text()}`);
+  }
+
+  const body = (await token.json()) as TokenResponse;
+  return {
+    accessToken: body.access_token,
+    usid: body.usid,
+    customerId: body.customer_id,
+    expiresIn: body.expires_in,
+  };
+}
+
+export interface RegisteredLogin {
+  loginStatus: number;
+  accessToken?: string;
+  customerId?: string;
+}
+
+// Registered login by email/password, mirroring the storefront's SLAS flow.
+// Credentials go to the login endpoint via Basic auth. Success is a 303 whose Location carries
+// the auth code; wrong credentials are a 401. The code is then exchanged for an access token.
+export async function loginRegisteredShopper(
+  request: APIRequestContext,
+  email: string,
+  password: string,
+): Promise<RegisteredLogin> {
+  const codeVerifier = base64url(randomBytes(32));
+  const codeChallenge = base64url(createHash('sha256').update(codeVerifier).digest());
+  const redirectUri = `${env.baseURL}/callback`;
+  const org = env.scapi.organizationId;
+  const loginUrl = `${scapiBaseUrl()}/shopper/auth/v1/organizations/${org}/oauth2/login`;
+  const tokenUrl = `${scapiBaseUrl()}/shopper/auth/v1/organizations/${org}/oauth2/token`;
+  const credentials = Buffer.from(`${email}:${password}`).toString('base64');
+
+  const login = await request.post(loginUrl, {
+    headers: {
+      Authorization: `Basic ${credentials}`,
+      'content-type': 'application/x-www-form-urlencoded',
+    },
+    form: {
+      client_id: env.scapi.clientId,
+      code_challenge: codeChallenge,
+      response_type: 'code',
+      redirect_uri: redirectUri,
+      channel_id: env.scapi.siteId,
+    },
+    maxRedirects: 0,
+  });
+  if (login.status() !== 303) return { loginStatus: login.status() };
+
+  const location = login.headers().location;
+  if (!location) return { loginStatus: login.status() };
+  const redirect = new URL(location);
+  const code = redirect.searchParams.get('code');
+  const usid = redirect.searchParams.get('usid');
+  if (!code || !usid) return { loginStatus: login.status() };
+
+  const token = await request.post(tokenUrl, {
+    form: {
+      grant_type: 'authorization_code_pkce',
+      code_verifier: codeVerifier,
+      code,
+      client_id: env.scapi.clientId,
+      redirect_uri: redirectUri,
+      channel_id: env.scapi.siteId,
+      usid,
+    },
+  });
+  if (!token.ok()) return { loginStatus: login.status() };
+  const body = (await token.json()) as TokenResponse;
+  return { loginStatus: 303, accessToken: body.access_token, customerId: body.customer_id };
+}

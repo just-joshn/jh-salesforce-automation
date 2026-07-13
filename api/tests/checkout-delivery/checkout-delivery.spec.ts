@@ -1,0 +1,78 @@
+import { expect, test } from '@playwright/test';
+import { getGuestToken } from '../../support/slas';
+import * as Actions from './checkout-delivery.actions';
+import type { Basket, Order } from './checkout-delivery.data';
+import { checkout } from './checkout-delivery.data';
+
+// Guest delivery checkout end to end: one order is placed, then the consumed basket can't be reordered.
+test('place a guest delivery order and consume the basket', async ({ request }) => {
+  const { accessToken } = await getGuestToken(request);
+
+  const created = (await (await Actions.createBasket(request, accessToken)).json()) as Basket;
+  expect(created.basketId).toBeTruthy();
+  const id = created.basketId;
+
+  // fill in every checkout step; each must save
+  expect((await Actions.addItem(request, accessToken, id, checkout.variantId, 1)).status()).toBe(
+    200,
+  );
+  expect((await Actions.setCustomer(request, accessToken, id, checkout.email)).status()).toBe(200);
+  expect(
+    (
+      await Actions.setShippingAddress(
+        request,
+        accessToken,
+        id,
+        checkout.shipmentId,
+        checkout.address,
+      )
+    ).status(),
+  ).toBe(200);
+  expect(
+    (
+      await Actions.setShippingMethod(
+        request,
+        accessToken,
+        id,
+        checkout.shipmentId,
+        checkout.shippingMethodId,
+      )
+    ).status(),
+  ).toBe(200);
+  expect(
+    (await Actions.setBillingAddress(request, accessToken, id, checkout.address)).status(),
+  ).toBe(200);
+
+  // pay the exact order total
+  const priced = (await (await Actions.getBasket(request, accessToken, id)).json()) as Basket;
+  expect(typeof priced.orderTotal).toBe('number');
+  const amount = priced.orderTotal ?? 0;
+  expect((await Actions.addPayment(request, accessToken, id, checkout.card, amount)).status()).toBe(
+    200,
+  );
+
+  // place the order
+  const orderResponse = await Actions.createOrder(request, accessToken, id);
+  expect(orderResponse.status()).toBe(200);
+  const order = (await orderResponse.json()) as Order;
+  expect(order.orderNo).toBeTruthy();
+  expect(order.status).toBe('created');
+  expect((order.productItems ?? []).some((item) => item.productId === checkout.variantId)).toBe(
+    true,
+  );
+  const shipment = (order.shipments ?? []).find((s) => s.shipmentId === checkout.shipmentId);
+  expect(shipment?.shippingMethod?.id).toBe(checkout.shippingMethodId);
+  expect((order.paymentInstruments ?? []).length).toBeGreaterThan(0);
+  const orderNo = order.orderNo ?? '';
+
+  // the order can be fetched back afterward
+  const fetched = await Actions.getOrder(request, accessToken, orderNo);
+  expect(fetched.status()).toBe(200);
+  expect(((await fetched.json()) as Order).orderNo).toBe(orderNo);
+
+  // placing the order consumes the basket (now 404)
+  expect((await Actions.getBasket(request, accessToken, id)).status()).toBe(404);
+
+  // re-submitting the consumed basket must not create a second order
+  expect((await Actions.createOrder(request, accessToken, id)).ok()).toBe(false);
+});

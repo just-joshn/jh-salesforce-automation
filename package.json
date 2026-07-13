@@ -1,0 +1,33 @@
+{
+  "name": "jh-salesforce-automation",
+  "version": "1.0.0",
+  "description": "Playwright E2E + API tests for the Salesforce PWA Kit Retail React App storefront",
+  "private": true,
+  "packageManager": "pnpm@11.13.0+sha512.88d94724d8f2e6c186744a5584c6e59ecac869ec7ba15e9cb4cd628e8dc7066820b2481d8ee3b51ea8da323a7378068aa58c556a3720d32b7c20a051d088363a",
+  "scripts": {
+    "test": "playwright test",
+    "test:e2e": "playwright test --project=e2e-chromium",
+    "test:api": "playwright test --project=api",
+    "test:headed": "playwright test --project=e2e-chromium --headed",
+    "test:ui": "playwright test --ui",
+    "report": "playwright show-report",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@eslint/js": "^9.13.0",
+    "@playwright/test": "^1.61.1",
+    "@types/node": "^26.1.1",
+    "dotenv": "^16.4.5",
+    "eslint": "^9.13.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.11.0"
+  }
+}

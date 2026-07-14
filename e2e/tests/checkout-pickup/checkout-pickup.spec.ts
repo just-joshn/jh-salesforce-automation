@@ -22,6 +22,9 @@ test('complete a guest pickup purchase and see order confirmation', async ({ pag
   await Actions.selectFirstStore(page);
   await Actions.closeStoreModal(page);
   await Actions.addToCart(page);
+  // The confirmation dialog renders from the successful basket response; leaving the PDP before it
+  // shows can cancel the in-flight add and land checkout on an empty cart.
+  await expect(Locators.addConfirmation(page).first()).toBeVisible({ timeout: 15000 });
 
   await Actions.openCheckout(page);
   await Actions.fillContact(page, checkout.email);

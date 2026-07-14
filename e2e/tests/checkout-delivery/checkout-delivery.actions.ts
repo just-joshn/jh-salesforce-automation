@@ -20,7 +20,12 @@ export const selectAvailableSize = async (page: Page): Promise<void> => {
   const count = await sizes.count();
   for (let index = 0; index < count; index++) {
     await sizes.nth(index).click();
-    if (!(await Locators.outOfStock(page).first().isVisible())) return;
+    try {
+      await Locators.outOfStock(page).first().waitFor({ state: 'hidden', timeout: 5000 });
+      return;
+    } catch {
+      // this size is out of stock; try the next one
+    }
   }
   throw new Error('every size for this product is out of stock');
 };

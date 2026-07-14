@@ -1,4 +1,4 @@
-import { test as setup } from '@playwright/test';
+import { test as setup } from '../support/fixtures';
 import { hasAccountCredentials } from '../../config/env';
 import { credentialsFromEnv } from '../tests/login/login.data';
 import * as Login from '../tests/login/login.actions';

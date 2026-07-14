@@ -9,6 +9,7 @@ export const openLogin = async (page: Page): Promise<void> => {
 
 export const signIn = async (page: Page, credentials: LoginCredentials): Promise<void> => {
   await Locators.email(page).fill(credentials.email);
+  await Locators.usePasswordMethod(page).click();
   await Locators.password(page).fill(credentials.password);
   await Locators.submit(page).click();
 };

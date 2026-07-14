@@ -2,7 +2,15 @@ import { expect, test } from '@playwright/test';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './checkout-pickup.actions';
 import type { Basket, Order, StoreSearchResult } from './checkout-pickup.data';
-import { checkout, lineItems, orderTotalOf, shipmentById, storesOf } from './checkout-pickup.data';
+import {
+  checkout,
+  lineItems,
+  orderNumber,
+  orderTotalOf,
+  shipmentById,
+  shippingMethodId,
+  storesOf,
+} from './checkout-pickup.data';
 
 // Guest pickup checkout end to end: the order is assigned to the in-stock store, and the basket is consumed.
 test('place a pickup order assigned to the correct store', async ({ request }) => {
@@ -70,11 +78,11 @@ test('place a pickup order assigned to the correct store', async ({ request }) =
   const order = (await orderResponse.json()) as Order;
   expect(order.orderNo).toBeTruthy();
   const shipment = shipmentById(order, checkout.shipmentId);
-  expect(shipment.shippingMethod?.id).toBe(checkout.pickupMethodId);
+  expect(shippingMethodId(shipment)).toBe(checkout.pickupMethodId);
   expect(shipment.c_fromStoreId).toBe(store.id);
   const item = lineItems(order).find((i) => i.productId === checkout.variantId);
   expect(item?.inventoryId).toBe(store.inventoryId);
-  const orderNo = order.orderNo ?? '';
+  const orderNo = orderNumber(order);
 
   // order is fetchable and the basket is consumed (404)
   expect((await Actions.getOrder(request, accessToken, orderNo)).status()).toBe(200);

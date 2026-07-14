@@ -24,6 +24,18 @@ function base64url(input: Buffer): string {
   return input.toString('base64url');
 }
 
+// Pull the one-time auth code (and usid) out of a SLAS redirect's Location header. The guest and
+// registered login flows both read it the same way; returns null when the redirect is missing or
+// doesn't carry both values.
+function authCodeFromRedirect(location: string | undefined): { code: string; usid: string } | null {
+  if (!location) return null;
+  const params = new URL(location).searchParams;
+  const code = params.get('code');
+  const usid = params.get('usid');
+  if (!code || !usid) return null;
+  return { code, usid };
+}
+
 export async function getGuestToken(request: APIRequestContext): Promise<GuestToken> {
   const codeVerifier = base64url(randomBytes(32));
   const codeChallenge = base64url(createHash('sha256').update(codeVerifier).digest());
@@ -52,12 +64,11 @@ export async function getGuestToken(request: APIRequestContext): Promise<GuestTo
       `SLAS authorize did not redirect (status ${authorize.status()}): ${await authorize.text()}`,
     );
   }
-  const redirect = new URL(location);
-  const code = redirect.searchParams.get('code');
-  const usid = redirect.searchParams.get('usid');
-  if (!code || !usid) {
+  const auth = authCodeFromRedirect(location);
+  if (!auth) {
     throw new Error(`SLAS authorize redirect missing code/usid: ${location}`);
   }
+  const { code, usid } = auth;
 
   const token = await request.post(tokenUrl, {
     form: {
@@ -133,12 +144,9 @@ export async function loginRegisteredShopper(
   });
   if (login.status() !== 303) return { loginStatus: login.status() };
 
-  const location = login.headers().location;
-  if (!location) return { loginStatus: login.status() };
-  const redirect = new URL(location);
-  const code = redirect.searchParams.get('code');
-  const usid = redirect.searchParams.get('usid');
-  if (!code || !usid) return { loginStatus: login.status() };
+  const auth = authCodeFromRedirect(login.headers().location);
+  if (!auth) return { loginStatus: login.status() };
+  const { code, usid } = auth;
 
   const token = await request.post(tokenUrl, {
     form: {

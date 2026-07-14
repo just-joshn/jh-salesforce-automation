@@ -68,6 +68,10 @@ export const shipmentById = (basket: Basket, shipmentId: string): Shipment => {
   return shipment;
 };
 
+// The shipping method id assigned to a shipment (e.g. the pickup method), if one is set.
+export const shippingMethodId = (shipment: Shipment): string | undefined =>
+  shipment.shippingMethod?.id;
+
 export interface PickupFixture {
   variantId: string;
   quantity: number;

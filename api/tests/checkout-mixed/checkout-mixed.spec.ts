@@ -2,7 +2,15 @@ import { expect, test } from '@playwright/test';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './checkout-mixed.actions';
 import type { Basket, Order, StoreSearchResult } from './checkout-mixed.data';
-import { checkout, lineItems, orderTotalOf, shipmentById, storesOf } from './checkout-mixed.data';
+import {
+  checkout,
+  lineItems,
+  orderNumber,
+  orderTotalOf,
+  shipmentById,
+  shippingMethodId,
+  storesOf,
+} from './checkout-mixed.data';
 
 // One order that splits into a delivery shipment and a pickup shipment, each item on the right one.
 test('place one order that splits into delivery and pickup shipments', async ({ request }) => {
@@ -96,11 +104,11 @@ test('place one order that splits into delivery and pickup shipments', async ({ 
 
   const deliveryShipment = shipmentById(order, checkout.deliveryShipmentId);
   const pickupShipment = shipmentById(order, checkout.pickupShipmentId);
-  expect(deliveryShipment.shippingMethod?.id).toBe(checkout.deliveryMethodId);
-  expect(pickupShipment.shippingMethod?.id).toBe(checkout.pickupMethodId);
+  expect(shippingMethodId(deliveryShipment)).toBe(checkout.deliveryMethodId);
+  expect(shippingMethodId(pickupShipment)).toBe(checkout.pickupMethodId);
   expect(pickupShipment.c_fromStoreId).toBe(store.id);
 
   // The order saved and can be read back, and the cart is used up.
-  expect((await Actions.getOrder(request, accessToken, order.orderNo ?? '')).status()).toBe(200);
+  expect((await Actions.getOrder(request, accessToken, orderNumber(order))).status()).toBe(200);
   expect((await Actions.getBasket(request, accessToken, id)).status()).toBe(404);
 });

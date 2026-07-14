@@ -5,9 +5,11 @@ import type { Basket, Order } from './checkout-delivery.data';
 import {
   checkout,
   lineItems,
+  orderNumber,
   orderTotalOf,
   paymentInstrumentsOf,
-  shipmentsOf,
+  shipmentById,
+  shippingMethodId,
 } from './checkout-delivery.data';
 
 // Guest delivery checkout end to end: one order is placed, then the consumed basket can't be reordered.
@@ -64,10 +66,10 @@ test('place a guest delivery order and consume the basket', async ({ request }) 
   expect(order.orderNo).toBeTruthy();
   expect(order.status).toBe('created');
   expect(lineItems(order).some((item) => item.productId === checkout.variantId)).toBe(true);
-  const shipment = shipmentsOf(order).find((s) => s.shipmentId === checkout.shipmentId);
-  expect(shipment?.shippingMethod?.id).toBe(checkout.shippingMethodId);
+  const shipment = shipmentById(order, checkout.shipmentId);
+  expect(shippingMethodId(shipment)).toBe(checkout.shippingMethodId);
   expect(paymentInstrumentsOf(order).length).toBeGreaterThan(0);
-  const orderNo = order.orderNo ?? '';
+  const orderNo = orderNumber(order);
 
   // the order can be fetched back afterward
   const fetched = await Actions.getOrder(request, accessToken, orderNo);

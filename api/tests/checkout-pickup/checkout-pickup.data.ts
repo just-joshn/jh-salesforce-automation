@@ -91,6 +91,16 @@ export const shipmentById = (order: Order, shipmentId: string): Shipment => {
   return shipment;
 };
 
+// The shipping method id assigned to a shipment (e.g. the pickup method), if one is set.
+export const shippingMethodId = (shipment: Shipment): string | undefined =>
+  shipment.shippingMethod?.id;
+
+// The order number of a placed order; fails clearly if the order didn't come back with one.
+export const orderNumber = (order: Order): string => {
+  if (!order.orderNo) throw new Error('response has no order number');
+  return order.orderNo;
+};
+
 export interface PickupCheckoutFixture {
   variantId: string;
   email: string;

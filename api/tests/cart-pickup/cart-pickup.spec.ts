@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './cart-pickup.actions';
 import type { Basket, StoreSearchResult } from './cart-pickup.data';
-import { lineItems, pickup, shipmentById, storesOf } from './cart-pickup.data';
+import { lineItems, pickup, shipmentById, shippingMethodId, storesOf } from './cart-pickup.data';
 
 // Add a product for pickup at an in-stock store and confirm it persists; a store-less area returns nothing.
 test('select an in-stock store and add the product to the basket for pickup', async ({
@@ -56,7 +56,7 @@ test('select an in-stock store and add the product to the basket for pickup', as
   expect(refetchResponse.status()).toBe(200);
   const persisted = (await refetchResponse.json()) as Basket;
   const persistedShipment = shipmentById(persisted, pickup.shipmentId);
-  expect(persistedShipment.shippingMethod?.id).toBe(pickup.pickupMethodId);
+  expect(shippingMethodId(persistedShipment)).toBe(pickup.pickupMethodId);
   expect(persistedShipment.c_fromStoreId).toBe(selectedStore.id);
   const persistedItem = lineItems(persisted).find((entry) => entry.productId === pickup.variantId);
   expect(persistedItem?.shipmentId).toBe(pickup.shipmentId);

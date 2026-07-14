@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './checkout-mixed.actions';
 import type { Basket, Order, StoreSearchResult } from './checkout-mixed.data';
-import { checkout } from './checkout-mixed.data';
+import { checkout, lineItems, orderTotalOf, shipmentById, storesOf } from './checkout-mixed.data';
 
 // One order that splits into a delivery shipment and a pickup shipment, each item on the right one.
 test('place one order that splits into delivery and pickup shipments', async ({ request }) => {
@@ -16,7 +16,7 @@ test('place one order that splits into delivery and pickup shipments', async ({ 
     request,
     accessToken,
     checkout.pickupVariantId,
-    stores.data ?? [],
+    storesOf(stores),
   );
   if (!store) throw new Error('expected a store with the pickup item in stock');
 
@@ -75,7 +75,7 @@ test('place one order that splits into delivery and pickup shipments', async ({ 
   const priced = (await (await Actions.getBasket(request, accessToken, id)).json()) as Basket;
   expect(
     (
-      await Actions.addPayment(request, accessToken, id, checkout.card, priced.orderTotal ?? 0)
+      await Actions.addPayment(request, accessToken, id, checkout.card, orderTotalOf(priced))
     ).status(),
   ).toBe(200);
 
@@ -85,7 +85,7 @@ test('place one order that splits into delivery and pickup shipments', async ({ 
   const order = (await orderResponse.json()) as Order;
   expect(order.orderNo).toBeTruthy();
 
-  const items = order.productItems ?? [];
+  const items = lineItems(order);
   expect(items).toHaveLength(2);
   const deliveryItems = items.filter((i) => i.productId === checkout.deliveryVariantId);
   const pickupItems = items.filter((i) => i.productId === checkout.pickupVariantId);
@@ -94,15 +94,11 @@ test('place one order that splits into delivery and pickup shipments', async ({ 
   expect(deliveryItems[0]?.shipmentId).toBe(checkout.deliveryShipmentId);
   expect(pickupItems[0]?.shipmentId).toBe(checkout.pickupShipmentId);
 
-  const deliveryShipment = (order.shipments ?? []).find(
-    (s) => s.shipmentId === checkout.deliveryShipmentId,
-  );
-  const pickupShipment = (order.shipments ?? []).find(
-    (s) => s.shipmentId === checkout.pickupShipmentId,
-  );
-  expect(deliveryShipment?.shippingMethod?.id).toBe(checkout.deliveryMethodId);
-  expect(pickupShipment?.shippingMethod?.id).toBe(checkout.pickupMethodId);
-  expect(pickupShipment?.c_fromStoreId).toBe(store.id);
+  const deliveryShipment = shipmentById(order, checkout.deliveryShipmentId);
+  const pickupShipment = shipmentById(order, checkout.pickupShipmentId);
+  expect(deliveryShipment.shippingMethod?.id).toBe(checkout.deliveryMethodId);
+  expect(pickupShipment.shippingMethod?.id).toBe(checkout.pickupMethodId);
+  expect(pickupShipment.c_fromStoreId).toBe(store.id);
 
   // The order saved and can be read back, and the cart is used up.
   expect((await Actions.getOrder(request, accessToken, order.orderNo ?? '')).status()).toBe(200);

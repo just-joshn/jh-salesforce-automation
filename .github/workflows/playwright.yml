@@ -1,34 +1,48 @@
 name: E2E & API Tests
 
-# Runs against the live storefront, so we don't run on every push/PR.
-# Trigger manually from the Actions tab, or let the nightly schedule pick it up.
+# Full Playwright suite (setup + e2e-chromium + api) against the live Salesforce demo store.
 on:
-  workflow_dispatch:
+  pull_request:
+    branches: [main] # during a PR into main
+  push:
+    branches: [main] # after a PR merge, or a direct push to main
   schedule:
-    - cron: '0 3 * * *' # 03:00 UTC nightly
+    # Nightly 05:00 Pacific. GitHub honours the IANA timezone (GA March 2026) and
+    # handles daylight saving, so it stays 5 AM local across PST and PDT.
+    - cron: '0 5 * * *'
+      timezone: 'America/Los_Angeles'
+  workflow_dispatch: # manual run from the Actions tab
+
+# Least privilege: the job only needs to read the repo to check it out.
+permissions:
+  contents: read
+
+# A new push supersedes an in-flight PR run; post-merge, nightly, and manual runs always finish.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   test:
-    timeout-minutes: 30
+    name: Playwright (setup + e2e-chromium + api)
     runs-on: ubuntu-latest
+    timeout-minutes: 60
+    # The official Playwright image ships the browsers and Node, so there is no
+    # browser-install step. Pin the tag to the @playwright/test version in package.json.
+    container:
+      image: mcr.microsoft.com/playwright:v1.61.1-noble
+      options: --user 1001
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Install Playwright browser
-        run: pnpm exec playwright install --with-deps chromium
-      - name: Run tests
-        run: pnpm test
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6 # pnpm version is read from package.json "packageManager"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test
         env:
-          # Absent secrets simply mean the auth setup skips and only guest journeys run.
+          # Absent account secrets skip auth setup and run guest-only journeys;
+          # all SFCC_* config falls back to public demo defaults, so no secrets are required.
           E2E_ACCOUNT_EMAIL: ${{ secrets.E2E_ACCOUNT_EMAIL }}
           E2E_ACCOUNT_PASSWORD: ${{ secrets.E2E_ACCOUNT_PASSWORD }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}
         with:
           name: playwright-report

@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './cart-pickup.actions';
 import type { Basket, StoreSearchResult } from './cart-pickup.data';
-import { pickup } from './cart-pickup.data';
+import { lineItems, pickup, shipmentById, storesOf } from './cart-pickup.data';
 
 // Add a product for pickup at an in-stock store and confirm it persists; a store-less area returns nothing.
 test('select an in-stock store and add the product to the basket for pickup', async ({
@@ -18,7 +18,7 @@ test('select an in-stock store and add the product to the basket for pickup', as
     request,
     accessToken,
     pickup.variantId,
-    stores.data ?? [],
+    storesOf(stores),
   );
   if (!selectedStore) throw new Error('expected a store with the product in stock');
 
@@ -37,7 +37,7 @@ test('select an in-stock store and add the product to the basket for pickup', as
   );
   expect(addResponse.status()).toBe(200);
   const afterAdd = (await addResponse.json()) as Basket;
-  const item = (afterAdd.productItems ?? [])[0];
+  const item = lineItems(afterAdd)[0];
   expect(item?.inventoryId).toBe(selectedStore.inventoryId);
 
   // switch the shipment to in-store pickup
@@ -55,14 +55,10 @@ test('select an in-stock store and add the product to the basket for pickup', as
   const refetchResponse = await Actions.getBasket(request, accessToken, basket.basketId);
   expect(refetchResponse.status()).toBe(200);
   const persisted = (await refetchResponse.json()) as Basket;
-  const persistedShipment = (persisted.shipments ?? []).find(
-    (entry) => entry.shipmentId === pickup.shipmentId,
-  );
-  expect(persistedShipment?.shippingMethod?.id).toBe(pickup.pickupMethodId);
-  expect(persistedShipment?.c_fromStoreId).toBe(selectedStore.id);
-  const persistedItem = (persisted.productItems ?? []).find(
-    (entry) => entry.productId === pickup.variantId,
-  );
+  const persistedShipment = shipmentById(persisted, pickup.shipmentId);
+  expect(persistedShipment.shippingMethod?.id).toBe(pickup.pickupMethodId);
+  expect(persistedShipment.c_fromStoreId).toBe(selectedStore.id);
+  const persistedItem = lineItems(persisted).find((entry) => entry.productId === pickup.variantId);
   expect(persistedItem?.shipmentId).toBe(pickup.shipmentId);
   expect(persistedItem?.inventoryId).toBe(selectedStore.inventoryId);
 
@@ -71,5 +67,5 @@ test('select an in-stock store and add the product to the basket for pickup', as
   expect(emptyResponse.status()).toBe(200);
   const empty = (await emptyResponse.json()) as StoreSearchResult;
   expect(empty.total).toBe(0);
-  expect(empty.data ?? []).toHaveLength(0);
+  expect(storesOf(empty)).toHaveLength(0);
 });

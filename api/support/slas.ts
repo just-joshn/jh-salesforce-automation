@@ -89,6 +89,18 @@ export interface RegisteredLogin {
   customerId?: string;
 }
 
+// Narrow a login result to a guaranteed session, or fail the test clearly. Centralizes the
+// "did we actually get a token and customer id?" guard that every signed-in spec needs.
+export function requireSession(
+  login: RegisteredLogin,
+  who = 'the shopper',
+): { accessToken: string; customerId: string } {
+  if (!login.accessToken || !login.customerId) {
+    throw new Error(`expected an authenticated session for ${who}`);
+  }
+  return { accessToken: login.accessToken, customerId: login.customerId };
+}
+
 // Registered login by email/password, mirroring the storefront's SLAS flow.
 // Credentials go to the login endpoint via Basic auth. Success is a 303 whose Location carries
 // the auth code; wrong credentials are a 401. The code is then exchanged for an access token.

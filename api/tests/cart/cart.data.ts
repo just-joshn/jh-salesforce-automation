@@ -37,6 +37,19 @@ export const cart: CartFixture = {
   overQuantity: 999999,
 };
 
+// Normalized line items: an empty basket omits the array, so callers get [] instead of undefined.
+export const lineItems = (basket: Basket): ProductItem[] => basket.productItems ?? [];
+
+// The one line item a step expects to find; fails clearly if the basket is unexpectedly empty.
+export const firstLineItem = (basket: Basket): ProductItem => {
+  const [item] = lineItems(basket);
+  if (!item) throw new Error('expected at least one product item in the basket');
+  return item;
+};
+
+// Basket subtotal; the -1 fallback forces a mismatch if the field is ever absent.
+export const subtotal = (basket: Basket): number => basket.productSubTotal ?? -1;
+
 // sum of line prices, for comparing against the basket subtotal
 export const lineItemsTotal = (items: ProductItem[]): number =>
   items.reduce((sum, item) => sum + (item.price ?? 0), 0);

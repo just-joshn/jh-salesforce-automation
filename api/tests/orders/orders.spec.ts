@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test';
-import { getGuestToken } from '../../support/slas';
+import { getGuestToken, requireSession } from '../../support/slas';
 import * as Actions from './orders.actions';
 import type { OrderDetail, OrderHistory } from './orders.data';
-import { password, uniqueEmail, unknownOrderNo } from './orders.data';
+import { ordersOf, password, uniqueEmail, unknownOrderNo } from './orders.data';
 
 // Order history and detail stay consistent, and one shopper can't read another's orders.
 test('order history and detail are correct, consistent, and access-controlled', async ({
@@ -14,8 +14,7 @@ test('order history and detail are correct, consistent, and access-controlled', 
   expect((await Actions.registerCustomer(request, guestA, accountA)).status()).toBe(200);
   const loginA = await Actions.signIn(request, accountA.email, accountA.password);
   expect(loginA.loginStatus).toBe(303);
-  const { accessToken: tokenA, customerId: customerIdA } = loginA;
-  if (!tokenA || !customerIdA) throw new Error('expected an authenticated session for customer A');
+  const { accessToken: tokenA, customerId: customerIdA } = requireSession(loginA, 'customer A');
   const orderNo = await Actions.placeOrder(request, tokenA, accountA.email);
   expect(orderNo).toBeTruthy();
 
@@ -24,7 +23,7 @@ test('order history and detail are correct, consistent, and access-controlled', 
   expect(historyResponse.status()).toBe(200);
   const history = (await historyResponse.json()) as OrderHistory;
   expect(history.total).toBeGreaterThan(0);
-  const summary = (history.data ?? []).find((entry) => entry.orderNo === orderNo);
+  const summary = ordersOf(history).find((entry) => entry.orderNo === orderNo);
   if (!summary) throw new Error('the placed order is missing from the order history');
   expect(summary.status).toBeTruthy();
   expect(typeof summary.orderTotal).toBe('number');
@@ -41,8 +40,7 @@ test('order history and detail are correct, consistent, and access-controlled', 
   const { accessToken: guestB } = await getGuestToken(request);
   expect((await Actions.registerCustomer(request, guestB, accountB)).status()).toBe(200);
   const loginB = await Actions.signIn(request, accountB.email, accountB.password);
-  const { accessToken: tokenB, customerId: customerIdB } = loginB;
-  if (!tokenB || !customerIdB) throw new Error('expected an authenticated session for customer B');
+  const { accessToken: tokenB, customerId: customerIdB } = requireSession(loginB, 'customer B');
   const emptyResponse = await Actions.getCustomerOrders(request, tokenB, customerIdB);
   expect(emptyResponse.status()).toBe(200);
   expect(((await emptyResponse.json()) as OrderHistory).total).toBe(0);

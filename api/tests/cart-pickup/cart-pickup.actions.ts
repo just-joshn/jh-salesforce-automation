@@ -1,6 +1,7 @@
 import type { APIRequestContext, APIResponse } from '@playwright/test';
 import { bearer, withSite } from '../../support/scapi';
 import type { Product, Store, StoreSearchQuery } from './cart-pickup.data';
+import { orderableInStore } from './cart-pickup.data';
 import * as Endpoints from './cart-pickup.endpoints';
 
 export const searchStores = (
@@ -33,12 +34,12 @@ export const findStoreWithStock = async (
 ): Promise<Store | undefined> => {
   for (const store of stores) {
     const response = await getProductAtStore(request, accessToken, variantId, store.inventoryId);
-    if (response.status() !== 200) continue;
-    const product = (await response.json()) as Product;
-    const inventory =
-      (product.inventories ?? []).find((entry) => entry.id === store.inventoryId) ??
-      product.inventory;
-    if (inventory?.orderable) return store;
+    if (
+      response.status() === 200 &&
+      orderableInStore((await response.json()) as Product, store.inventoryId)
+    ) {
+      return store;
+    }
   }
   return undefined;
 };

@@ -2,7 +2,13 @@ import { expect, test } from '@playwright/test';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './cart-delivery.actions';
 import type { Basket, Fault, Product } from './cart-delivery.data';
-import { deliveryProduct } from './cart-delivery.data';
+import {
+  deliveryProduct,
+  firstLineItem,
+  lineItems,
+  variantsOf,
+  variationCount,
+} from './cart-delivery.data';
 
 // Pick an orderable variant, add it to a fresh basket for delivery, and reject an over-stock quantity.
 test('configure a variant and add it to the basket for delivery', async ({ request }) => {
@@ -12,9 +18,9 @@ test('configure a variant and add it to the basket for delivery', async ({ reque
   const productResponse = await Actions.getProduct(request, accessToken, deliveryProduct.masterId);
   expect(productResponse.status()).toBe(200);
   const product = (await productResponse.json()) as Product;
-  const variant = (product.variants ?? []).find((candidate) => candidate.orderable);
+  const variant = variantsOf(product).find((candidate) => candidate.orderable);
   if (!variant) throw new Error('expected an orderable variant');
-  expect(Object.keys(variant.variationValues ?? {}).length).toBeGreaterThan(0);
+  expect(variationCount(variant)).toBeGreaterThan(0);
   expect(typeof variant.price).toBe('number');
 
   // a new basket defaults to delivery
@@ -32,8 +38,7 @@ test('configure a variant and add it to the basket for delivery', async ({ reque
   );
   expect(addResponse.status()).toBe(200);
   const afterAdd = (await addResponse.json()) as Basket;
-  const item = (afterAdd.productItems ?? [])[0];
-  if (!item) throw new Error('expected the added product item');
+  const item = firstLineItem(afterAdd);
   expect(item.productId).toBe(variant.productId);
   expect(item.quantity).toBe(deliveryProduct.quantity);
   expect(typeof item.price).toBe('number');
@@ -43,7 +48,7 @@ test('configure a variant and add it to the basket for delivery', async ({ reque
   const refetchResponse = await Actions.getBasket(request, accessToken, basket.basketId);
   expect(refetchResponse.status()).toBe(200);
   const persisted = (await refetchResponse.json()) as Basket;
-  const persistedItem = (persisted.productItems ?? []).find(
+  const persistedItem = lineItems(persisted).find(
     (candidate) => candidate.productId === variant.productId,
   );
   expect(persistedItem?.quantity).toBe(deliveryProduct.quantity);

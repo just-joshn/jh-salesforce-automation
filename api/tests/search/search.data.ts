@@ -20,6 +20,9 @@ export interface SearchQuery {
   term: string;
 }
 
+// Search hits; the response omits the array entirely when nothing matches.
+export const hitsOf = (result: ProductSearchResult): ProductSearchHit[] => result.hits ?? [];
+
 // a common term expected to return results
 export const commonQuery: SearchQuery = { term: 'dress' };
 

@@ -45,6 +45,12 @@ export interface Basket {
   productItems?: ProductItem[];
 }
 
+export const lineItems = (order: Order): ProductItem[] => order.productItems ?? [];
+export const shipmentsOf = (order: Order): Shipment[] => order.shipments ?? [];
+export const paymentInstrumentsOf = (order: Order): { paymentMethodId?: string }[] =>
+  order.paymentInstruments ?? [];
+export const orderTotalOf = (basket: Basket): number => basket.orderTotal ?? 0;
+
 export interface CheckoutFixture {
   variantId: string;
   email: string;

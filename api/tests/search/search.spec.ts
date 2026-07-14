@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './search.actions';
 import type { ProductDetail, ProductSearchResult } from './search.data';
-import { commonQuery, noMatchQuery } from './search.data';
+import { commonQuery, hitsOf, noMatchQuery } from './search.data';
 
 // Search returns matching products that open to the same item; a no-match query returns empty, not an error.
 test('search returns matching products that open correctly; a no-match search is empty', async ({
@@ -15,7 +15,7 @@ test('search returns matching products that open correctly; a no-match search is
   expect(response.status()).toBe(200);
   const result = (await response.json()) as ProductSearchResult;
   expect(result.total).toBeGreaterThan(0);
-  const hits = result.hits ?? [];
+  const hits = hitsOf(result);
   expect(hits.length).toBeGreaterThan(0);
 
   // each hit has an id, a name, a price, and a stock flag
@@ -40,5 +40,5 @@ test('search returns matching products that open correctly; a no-match search is
   expect(emptyResponse.status()).toBe(200);
   const empty = (await emptyResponse.json()) as ProductSearchResult;
   expect(empty.total).toBe(0);
-  expect(empty.hits ?? []).toHaveLength(0);
+  expect(hitsOf(empty)).toHaveLength(0);
 });

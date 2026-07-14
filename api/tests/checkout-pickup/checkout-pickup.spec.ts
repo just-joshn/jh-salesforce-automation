@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './checkout-pickup.actions';
 import type { Basket, Order, StoreSearchResult } from './checkout-pickup.data';
-import { checkout } from './checkout-pickup.data';
+import { checkout, lineItems, orderTotalOf, shipmentById, storesOf } from './checkout-pickup.data';
 
 // Guest pickup checkout end to end: the order is assigned to the in-stock store, and the basket is consumed.
 test('place a pickup order assigned to the correct store', async ({ request }) => {
@@ -17,7 +17,7 @@ test('place a pickup order assigned to the correct store', async ({ request }) =
     request,
     accessToken,
     checkout.variantId,
-    stores.data ?? [],
+    storesOf(stores),
   );
   if (!store) throw new Error('expected a store with the item in stock');
 
@@ -59,7 +59,7 @@ test('place a pickup order assigned to the correct store', async ({ request }) =
   ).toBe(200);
 
   const priced = (await (await Actions.getBasket(request, accessToken, id)).json()) as Basket;
-  const amount = priced.orderTotal ?? 0;
+  const amount = orderTotalOf(priced);
   expect((await Actions.addPayment(request, accessToken, id, checkout.card, amount)).status()).toBe(
     200,
   );
@@ -69,10 +69,10 @@ test('place a pickup order assigned to the correct store', async ({ request }) =
   expect(orderResponse.status()).toBe(200);
   const order = (await orderResponse.json()) as Order;
   expect(order.orderNo).toBeTruthy();
-  const shipment = (order.shipments ?? []).find((s) => s.shipmentId === checkout.shipmentId);
-  expect(shipment?.shippingMethod?.id).toBe(checkout.pickupMethodId);
-  expect(shipment?.c_fromStoreId).toBe(store.id);
-  const item = (order.productItems ?? []).find((i) => i.productId === checkout.variantId);
+  const shipment = shipmentById(order, checkout.shipmentId);
+  expect(shipment.shippingMethod?.id).toBe(checkout.pickupMethodId);
+  expect(shipment.c_fromStoreId).toBe(store.id);
+  const item = lineItems(order).find((i) => i.productId === checkout.variantId);
   expect(item?.inventoryId).toBe(store.inventoryId);
   const orderNo = order.orderNo ?? '';
 

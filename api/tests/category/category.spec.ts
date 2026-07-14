@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './category.actions';
 import type { CategoryDetail, ProductDetail, ProductSearchResult } from './category.data';
-import { invalidCategory, validCategory } from './category.data';
+import { hitsOf, invalidCategory, validCategory } from './category.data';
 
 // Browse a category, list its products, open one, and 404 on a category that doesn't exist.
 test('a category returns its details and product list; an unknown category is not found', async ({
@@ -21,7 +21,7 @@ test('a category returns its details and product list; an unknown category is no
   expect(searchResponse.status()).toBe(200);
   const result = (await searchResponse.json()) as ProductSearchResult;
   expect(result.total).toBeGreaterThan(0);
-  const hits = result.hits ?? [];
+  const hits = hitsOf(result);
   expect(hits.length).toBeGreaterThan(0);
 
   // every hit has an id and name; at least one has a real price; each has a boolean stock flag

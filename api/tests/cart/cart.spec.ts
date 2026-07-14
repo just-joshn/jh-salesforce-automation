@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './cart.actions';
 import type { Basket, Fault } from './cart.data';
-import { cart, lineItemsTotal } from './cart.data';
+import { cart, firstLineItem, lineItems, lineItemsTotal, subtotal } from './cart.data';
 
 // Add, update, and remove basket items; totals stay consistent and persist, and over-stock is rejected.
 test('reconcile a basket (update quantity, remove) with consistent, persisted totals', async ({
@@ -19,13 +19,14 @@ test('reconcile a basket (update quantity, remove) with consistent, persisted to
     { productId: cart.variantB, quantity: 1 },
   ]);
   expect(addResponse.status()).toBe(200);
-  let basket = (await addResponse.json()) as Basket;
-  expect(basket.productItems ?? []).toHaveLength(2);
+  const afterAdd = (await addResponse.json()) as Basket;
+  const added = lineItems(afterAdd);
+  expect(added).toHaveLength(2);
   // line items should sum to the subtotal
-  expect(lineItemsTotal(basket.productItems ?? [])).toBeCloseTo(basket.productSubTotal ?? -1, 2);
+  expect(lineItemsTotal(added)).toBeCloseTo(subtotal(afterAdd), 2);
 
-  const itemA = (basket.productItems ?? []).find((item) => item.productId === cart.variantA);
-  const itemB = (basket.productItems ?? []).find((item) => item.productId === cart.variantB);
+  const itemA = added.find((item) => item.productId === cart.variantA);
+  const itemB = added.find((item) => item.productId === cart.variantB);
   if (!itemA || !itemB) throw new Error('expected both items in the basket');
 
   // update a line's quantity
@@ -37,10 +38,11 @@ test('reconcile a basket (update quantity, remove) with consistent, persisted to
     cart.updatedQuantity,
   );
   expect(updateResponse.status()).toBe(200);
-  basket = (await updateResponse.json()) as Basket;
-  const updatedA = (basket.productItems ?? []).find((item) => item.itemId === itemA.itemId);
+  const afterUpdate = (await updateResponse.json()) as Basket;
+  const updatedItems = lineItems(afterUpdate);
+  const updatedA = updatedItems.find((item) => item.itemId === itemA.itemId);
   expect(updatedA?.quantity).toBe(cart.updatedQuantity);
-  expect(lineItemsTotal(basket.productItems ?? [])).toBeCloseTo(basket.productSubTotal ?? -1, 2);
+  expect(lineItemsTotal(updatedItems)).toBeCloseTo(subtotal(afterUpdate), 2);
 
   // remove the other line
   const removeResponse = await Actions.removeItem(
@@ -50,23 +52,22 @@ test('reconcile a basket (update quantity, remove) with consistent, persisted to
     itemB.itemId,
   );
   expect(removeResponse.status()).toBe(200);
-  basket = (await removeResponse.json()) as Basket;
-  expect(basket.productItems ?? []).toHaveLength(1);
-  expect((basket.productItems ?? [])[0]?.productId).toBe(cart.variantA);
-  expect(lineItemsTotal(basket.productItems ?? [])).toBeCloseTo(basket.productSubTotal ?? -1, 2);
+  const afterRemove = (await removeResponse.json()) as Basket;
+  const remaining = lineItems(afterRemove);
+  expect(remaining).toHaveLength(1);
+  expect(firstLineItem(afterRemove).productId).toBe(cart.variantA);
+  expect(lineItemsTotal(remaining)).toBeCloseTo(subtotal(afterRemove), 2);
 
   // re-fetch to confirm the changes persisted
   const refetchResponse = await Actions.getBasket(request, accessToken, created.basketId);
   expect(refetchResponse.status()).toBe(200);
   const persisted = (await refetchResponse.json()) as Basket;
-  expect(persisted.productItems ?? []).toHaveLength(1);
-  const persistedA = (persisted.productItems ?? [])[0];
-  expect(persistedA?.productId).toBe(cart.variantA);
-  expect(persistedA?.quantity).toBe(cart.updatedQuantity);
-  expect(lineItemsTotal(persisted.productItems ?? [])).toBeCloseTo(
-    persisted.productSubTotal ?? -1,
-    2,
-  );
+  const persistedItems = lineItems(persisted);
+  expect(persistedItems).toHaveLength(1);
+  const persistedA = firstLineItem(persisted);
+  expect(persistedA.productId).toBe(cart.variantA);
+  expect(persistedA.quantity).toBe(cart.updatedQuantity);
+  expect(lineItemsTotal(persistedItems)).toBeCloseTo(subtotal(persisted), 2);
 
   // an over-stock quantity must be rejected
   const overResponse = await Actions.updateItemQuantity(
@@ -89,6 +90,6 @@ test('reconcile a basket (update quantity, remove) with consistent, persisted to
   );
   expect(emptyResponse.status()).toBe(200);
   const empty = (await emptyResponse.json()) as Basket;
-  expect(empty.productItems ?? []).toHaveLength(0);
+  expect(lineItems(empty)).toHaveLength(0);
   expect(empty.productSubTotal).toBe(0);
 });

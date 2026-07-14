@@ -80,6 +80,27 @@ export interface MixedCheckoutFixture {
   card: Card;
 }
 
+// Stores from a search; the demo omits the array for an area with none nearby.
+export const storesOf = (result: StoreSearchResult): Store[] => result.data ?? [];
+
+// True when the variant is orderable in this store's own stock (per-store inventory, else the default).
+export const orderableInStore = (product: Product, inventoryId: string): boolean => {
+  const stock =
+    (product.inventories ?? []).find((entry) => entry.id === inventoryId) ?? product.inventory;
+  return Boolean(stock?.orderable);
+};
+
+export const lineItems = (order: Order): ProductItem[] => order.productItems ?? [];
+export const shipmentsOf = (order: Order): Shipment[] => order.shipments ?? [];
+export const orderTotalOf = (basket: Basket): number => basket.orderTotal ?? 0;
+
+// The shipment a step expects on the order; fails clearly if it is missing.
+export const shipmentById = (order: Order, shipmentId: string): Shipment => {
+  const shipment = shipmentsOf(order).find((s) => s.shipmentId === shipmentId);
+  if (!shipment) throw new Error(`order has no shipment ${shipmentId}`);
+  return shipment;
+};
+
 // one shirt variant for delivery, one for pickup
 export const checkout: MixedCheckoutFixture = {
   deliveryVariantId: '78916783M-1',

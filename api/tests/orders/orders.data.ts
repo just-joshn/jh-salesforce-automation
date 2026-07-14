@@ -40,6 +40,9 @@ export interface OrderDetail {
   orderTotal?: number;
 }
 
+// Order summaries from a history response; an account with no orders omits the array.
+export const ordersOf = (history: OrderHistory): OrderSummary[] => history.data ?? [];
+
 export const password = 'Test1234!';
 export const variantId = '78916783M-1';
 export const shippingMethodId = 'GBP001';

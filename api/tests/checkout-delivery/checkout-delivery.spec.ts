@@ -2,7 +2,13 @@ import { expect, test } from '@playwright/test';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './checkout-delivery.actions';
 import type { Basket, Order } from './checkout-delivery.data';
-import { checkout } from './checkout-delivery.data';
+import {
+  checkout,
+  lineItems,
+  orderTotalOf,
+  paymentInstrumentsOf,
+  shipmentsOf,
+} from './checkout-delivery.data';
 
 // Guest delivery checkout end to end: one order is placed, then the consumed basket can't be reordered.
 test('place a guest delivery order and consume the basket', async ({ request }) => {
@@ -46,7 +52,7 @@ test('place a guest delivery order and consume the basket', async ({ request }) 
   // pay the exact order total
   const priced = (await (await Actions.getBasket(request, accessToken, id)).json()) as Basket;
   expect(typeof priced.orderTotal).toBe('number');
-  const amount = priced.orderTotal ?? 0;
+  const amount = orderTotalOf(priced);
   expect((await Actions.addPayment(request, accessToken, id, checkout.card, amount)).status()).toBe(
     200,
   );
@@ -57,12 +63,10 @@ test('place a guest delivery order and consume the basket', async ({ request }) 
   const order = (await orderResponse.json()) as Order;
   expect(order.orderNo).toBeTruthy();
   expect(order.status).toBe('created');
-  expect((order.productItems ?? []).some((item) => item.productId === checkout.variantId)).toBe(
-    true,
-  );
-  const shipment = (order.shipments ?? []).find((s) => s.shipmentId === checkout.shipmentId);
+  expect(lineItems(order).some((item) => item.productId === checkout.variantId)).toBe(true);
+  const shipment = shipmentsOf(order).find((s) => s.shipmentId === checkout.shipmentId);
   expect(shipment?.shippingMethod?.id).toBe(checkout.shippingMethodId);
-  expect((order.paymentInstruments ?? []).length).toBeGreaterThan(0);
+  expect(paymentInstrumentsOf(order).length).toBeGreaterThan(0);
   const orderNo = order.orderNo ?? '';
 
   // the order can be fetched back afterward

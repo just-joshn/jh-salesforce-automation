@@ -21,6 +21,9 @@ export interface ProductDetail {
   name?: string;
 }
 
+// Search hits; the response omits the array entirely when nothing matches.
+export const hitsOf = (result: ProductSearchResult): ProductSearchHit[] => result.hits ?? [];
+
 export interface CategoryFixture {
   id: string;
   name: string;

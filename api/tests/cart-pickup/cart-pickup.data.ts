@@ -48,6 +48,26 @@ export interface Basket {
   shipments?: Shipment[];
 }
 
+// Stores from a search; the demo omits the array for an area with none nearby.
+export const storesOf = (result: StoreSearchResult): Store[] => result.data ?? [];
+
+// True when the variant is orderable in this store's own stock (per-store inventory, else the default).
+export const orderableInStore = (product: Product, inventoryId: string): boolean => {
+  const stock =
+    (product.inventories ?? []).find((entry) => entry.id === inventoryId) ?? product.inventory;
+  return Boolean(stock?.orderable);
+};
+
+export const lineItems = (basket: Basket): ProductItem[] => basket.productItems ?? [];
+export const shipmentsOf = (basket: Basket): Shipment[] => basket.shipments ?? [];
+
+// The shipment a step expects on the basket; fails clearly if it is missing.
+export const shipmentById = (basket: Basket, shipmentId: string): Shipment => {
+  const shipment = shipmentsOf(basket).find((entry) => entry.shipmentId === shipmentId);
+  if (!shipment) throw new Error(`basket has no shipment ${shipmentId}`);
+  return shipment;
+};
+
 export interface PickupFixture {
   variantId: string;
   quantity: number;

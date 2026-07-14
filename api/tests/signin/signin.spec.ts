@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { getGuestToken } from '../../support/slas';
+import { getGuestToken, requireSession } from '../../support/slas';
 import * as Actions from './signin.actions';
 import type { Customer } from './signin.data';
 import { registrant, uniqueEmail, wrongPassword } from './signin.data';
@@ -12,8 +12,7 @@ test('sign in the correct shopper and reject a wrong password', async ({ request
 
   const login = await Actions.signIn(request, account.email, account.password);
   expect(login.loginStatus).toBe(303);
-  const { accessToken, customerId } = login;
-  if (!accessToken || !customerId) throw new Error('expected an authenticated session');
+  const { accessToken, customerId } = requireSession(login);
 
   // the session belongs to the shopper who signed in
   const profileResponse = await Actions.getCustomer(request, accessToken, customerId);

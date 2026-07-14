@@ -29,6 +29,22 @@ export interface Fault {
   title?: string;
 }
 
+// Variants of a master product; absent when the product has none.
+export const variantsOf = (product: Product): Variant[] => product.variants ?? [];
+
+// How many variation axes (color, size, ...) a variant resolves.
+export const variationCount = (variant: Variant): number =>
+  Object.keys(variant.variationValues ?? {}).length;
+
+export const lineItems = (basket: Basket): ProductItem[] => basket.productItems ?? [];
+
+// The one line item the add step expects; fails clearly if the basket is unexpectedly empty.
+export const firstLineItem = (basket: Basket): ProductItem => {
+  const [item] = lineItems(basket);
+  if (!item) throw new Error('expected the added product item');
+  return item;
+};
+
 export interface DeliveryFixture {
   masterId: string;
   quantity: number;

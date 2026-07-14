@@ -3,6 +3,7 @@
 export {
   openProduct,
   selectVariation,
+  selectAvailableSize,
   openStoreSelection,
   searchStore,
   selectFirstStore,

@@ -10,7 +10,7 @@ test('complete a guest delivery purchase and see order confirmation', async ({ p
 
   await Actions.openProduct(page, checkout.masterId);
   await Actions.selectVariation(page, 'Color');
-  await Actions.selectVariation(page, 'size');
+  await Actions.selectAvailableSize(page);
   await Actions.addToCart(page);
 
   await Actions.openCheckout(page);

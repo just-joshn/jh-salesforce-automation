@@ -9,6 +9,9 @@ export const addToCartButton = (page: Page): Locator =>
 export const addConfirmation = (page: Page): Locator =>
   page.getByRole('dialog').filter({ hasText: /added to cart/i });
 
+// Shown in the buy box when the selected variant can't be ordered.
+export const outOfStock = (page: Page): Locator => page.getByText(/out of stock/i);
+
 export const checkoutContainer = (page: Page): Locator => page.getByTestId('sf-checkout-container');
 
 // Contact step: email plus the guest-checkout button.

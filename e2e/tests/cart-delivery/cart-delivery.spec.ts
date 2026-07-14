@@ -10,7 +10,7 @@ test('configure a variant and add it to the cart for delivery', async ({ page })
   await Actions.openProduct(page, deliveryProduct.masterId);
 
   await Actions.selectVariation(page, 'Color');
-  await Actions.selectVariation(page, 'size');
+  await Actions.selectAvailableSize(page);
 
   await Actions.addToCart(page);
 

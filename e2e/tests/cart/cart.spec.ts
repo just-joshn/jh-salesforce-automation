@@ -11,7 +11,7 @@ test('review a cart, update quantity, and proceed to checkout', async ({ page })
 
   await Actions.openProduct(page, cartProduct.masterId);
   await Actions.selectVariation(page, 'Color');
-  await Actions.selectVariation(page, 'size');
+  await Actions.selectAvailableSize(page);
   await Actions.addToCart(page);
   await expect(Locators.addConfirmation(page).first()).toBeVisible({ timeout: 15000 });
 

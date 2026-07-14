@@ -10,7 +10,7 @@ test('select a pickup store and add the product to the cart for pickup', async (
   await Actions.openProduct(page, pickupProduct.masterId);
 
   await Actions.selectVariation(page, 'Color');
-  await Actions.selectVariation(page, 'size');
+  await Actions.selectAvailableSize(page);
 
   await Actions.openStoreSelection(page);
   await expect(Locators.storeModal(page)).toBeVisible();

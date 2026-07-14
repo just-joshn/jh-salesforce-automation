@@ -7,6 +7,9 @@ export const addToCartButton = (page: Page): Locator =>
 export const addConfirmation = (page: Page): Locator =>
   page.getByRole('dialog').filter({ hasText: /added to cart/i });
 
+// Shown in the buy box when the selected variant can't be ordered.
+export const outOfStock = (page: Page): Locator => page.getByText(/out of stock/i);
+
 // Sign-in form, scoped so it ignores the newsletter fields lower on the page. Login is two steps:
 // enter email, click Password, then the password field and Sign In appear.
 const authForm = (page: Page): Locator => page.getByTestId('sf-auth-modal-form');

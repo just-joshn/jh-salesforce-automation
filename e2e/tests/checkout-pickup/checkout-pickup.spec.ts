@@ -10,7 +10,7 @@ test('complete a guest pickup purchase and see order confirmation', async ({ pag
 
   await Actions.openProduct(page, pickupProduct.masterId);
   await Actions.selectVariation(page, 'Color');
-  await Actions.selectVariation(page, 'size');
+  await Actions.selectAvailableSize(page);
   await Actions.openStoreSelection(page);
   await Actions.searchStore(page, pickupProduct.storeCountry, pickupProduct.storePostalCode);
   await Actions.selectFirstStore(page);

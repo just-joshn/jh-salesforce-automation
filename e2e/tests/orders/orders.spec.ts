@@ -3,7 +3,7 @@ import * as Actions from './orders.actions';
 import { password, uniqueEmail } from './orders.data';
 import * as Locators from './orders.locators';
 
-// Order history is gated behind auth; once signed in, a shopper sees only their own order.
+// Order history requires sign-in; once signed in, a shopper sees only their own order.
 test('an authenticated shopper views their order history and detail; a guest is redirected', async ({
   page,
   request,

@@ -9,8 +9,8 @@ import * as Locators from './orders.locators';
 
 const BASKETS = 'checkout/shopper-baskets/v1';
 
-// Create a shopper with exactly one past order straight through the data API and return its order
-// number, leaving the browser test free to focus on the signed-in "view my orders" journey.
+// Create a shopper with exactly one past order, entirely through the API, and return the
+// order number. The browser test can then focus on the signed-in "view my orders" journey.
 export const provisionCustomerWithOrder = async (
   request: APIRequestContext,
   credentials: Credentials,
@@ -38,7 +38,7 @@ export const provisionCustomerWithOrder = async (
   if (!accessToken) throw new Error('registered login failed while provisioning the order');
   const authed = { params: withSite(), headers: bearer(accessToken) };
 
-  // Order a variant that is in stock right now; a hardcoded variant goes stale as stock drains.
+  // Order a variant that is in stock right now; a hardcoded one would go stale as stock sells out.
   const [variant] = await findOrderableVariants(request, accessToken, {
     masterId: orderMasterId,
     minCount: 1,

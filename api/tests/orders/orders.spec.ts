@@ -16,7 +16,7 @@ test('order history and detail are correct, consistent, and access-controlled', 
   const loginA = await Actions.signIn(request, accountA.email, accountA.password);
   expect(loginA.loginStatus).toBe(303);
   const { accessToken: tokenA, customerId: customerIdA } = requireSession(loginA, 'customer A');
-  // Order a variant that is in stock right now; a hardcoded variant goes stale as stock drains.
+  // Order a variant that is in stock right now; a hardcoded one would go stale as stock sells out.
   const [variant] = await findOrderableVariants(request, tokenA, { masterId, minCount: 1 });
   if (!variant) throw new Error('expected an orderable variant');
   const orderNo = await Actions.placeOrder(request, tokenA, accountA.email, variant.variantId);

@@ -8,7 +8,7 @@ export const password = 'Test1234!';
 export const uniqueEmail = (): string =>
   `qa.portfolio.${Date.now()}${Math.floor(Math.random() * 100000)}@gmail.com`;
 
-// Address for the order provisioned ahead of time via the data API.
+// Address for the order the test creates up front through the API.
 export const orderAddress = {
   firstName: 'Test',
   lastName: 'Portfolio',
@@ -20,6 +20,6 @@ export const orderAddress = {
   phone: '4155551234',
 };
 
-// Master the provisioning step resolves an in-stock variant of at runtime; a hardcoded variant
-// goes stale as the shared demo store's stock drains.
+// Master product the setup step picks an in-stock variant of at runtime; a hardcoded
+// variant would go stale as the demo store's stock sells out.
 export const orderMasterId = '78916783M';

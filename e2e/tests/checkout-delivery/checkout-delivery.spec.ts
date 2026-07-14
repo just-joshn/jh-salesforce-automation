@@ -10,7 +10,7 @@ test('complete a guest delivery purchase and see order confirmation', async ({ p
   // Guest checkout is a long flow on the shared demo store.
   test.setTimeout(120000);
 
-  // Resolve a variant that is in stock right now; hardcoded variants go stale as stock drains.
+  // Look up a variant that is in stock right now; hardcoded ones go stale as stock sells out.
   const { accessToken } = await getGuestToken(request);
   const variant = await findUiOrderableVariant(request, accessToken, checkout.masterId);
 

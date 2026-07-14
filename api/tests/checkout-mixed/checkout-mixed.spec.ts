@@ -18,8 +18,8 @@ import {
 test('place one order that splits into delivery and pickup shipments', async ({ request }) => {
   const { accessToken } = await getGuestToken(request);
 
-  // Resolve two variants that are in stock right now (hardcoded ones go stale as stock drains):
-  // the best-stocked for delivery, and another that some store also stocks for pickup.
+  // Look up two variants that are in stock right now (hardcoded ones go stale): the
+  // best-stocked for delivery, and another that some store also stocks for pickup.
   const variants = await findOrderableVariants(request, accessToken, {
     masterId: checkout.masterId,
     minCount: 2,

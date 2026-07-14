@@ -1,8 +1,8 @@
-// Central place for env-driven config.
+// Every setting read from the environment lives here.
 //
-// Non-secret defaults point at the public demo store, so guest browsing and public SCAPI
-// calls run without a .env file. Secrets (the shopper password) have no default; they come
-// from .env locally or the CI secret store.
+// The non-secret defaults point at the public demo store, so guest browsing and public
+// SCAPI calls run without any .env file. Secrets (the shopper password) have no default;
+// they come from .env locally or the CI secret store.
 
 export const env = {
   /** Storefront URL. buildPath() prepends the site/locale prefix (see support/site.ts). */

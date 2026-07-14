@@ -6,11 +6,12 @@ import { checkout, pickupProduct } from './checkout-pickup.data';
 import * as Locators from './checkout-pickup.locators';
 
 // Guest completes a store-pickup purchase through to the order confirmation.
-// Pickup, store, and stock detail is left to the checkout-pickup API test; this proves a finished order from a pickup cart.
+// Store and stock details are covered by the checkout-pickup API test; this proves a
+// pickup cart can finish as a real order.
 test('complete a guest pickup purchase and see order confirmation', async ({ page, request }) => {
   test.setTimeout(150000);
 
-  // Resolve a variant that is in stock right now; hardcoded variants go stale as stock drains.
+  // Look up a variant that is in stock right now; hardcoded ones go stale as stock sells out.
   const { accessToken } = await getGuestToken(request);
   const variant = await findUiOrderableVariant(request, accessToken, pickupProduct.masterId);
 
@@ -22,8 +23,8 @@ test('complete a guest pickup purchase and see order confirmation', async ({ pag
   await Actions.selectFirstStore(page);
   await Actions.closeStoreModal(page);
   await Actions.addToCart(page);
-  // The confirmation dialog renders from the successful basket response; leaving the PDP before it
-  // shows can cancel the in-flight add and land checkout on an empty cart.
+  // The confirmation dialog only shows once the add-to-cart call succeeds. Leaving the
+  // product page before then can cancel that call and leave checkout with an empty cart.
   await expect(Locators.addConfirmation(page).first()).toBeVisible({ timeout: 15000 });
 
   await Actions.openCheckout(page);

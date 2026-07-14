@@ -78,7 +78,7 @@ export interface CheckoutFixture {
 }
 
 // Guest checkout fixture; the email avoids example.com, which the store rejects. The spec
-// resolves an in-stock variant of the master at runtime, since hardcoded variants go stale.
+// picks an in-stock variant of the master at runtime, since hardcoded variants go stale.
 export const checkout: CheckoutFixture = {
   masterId: '78916783M',
   email: 'test.shopper@gmail.com',

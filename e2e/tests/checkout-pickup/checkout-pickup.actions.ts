@@ -1,5 +1,5 @@
-// Pickup checkout is composed from existing steps: the pickup-cart build (pick a store on the PDP)
-// and the shared guest delivery-checkout steps.
+// Pickup checkout is built from existing steps: pick a store on the product page (from
+// cart-pickup) plus the shared guest checkout steps (from checkout-delivery).
 export {
   openProduct,
   selectVariation,

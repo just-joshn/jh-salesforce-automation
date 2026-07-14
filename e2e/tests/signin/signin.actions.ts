@@ -5,8 +5,8 @@ import { buildPath } from '../../support/site';
 import type { Credentials } from './signin.data';
 import * as Locators from './signin.locators';
 
-// Create the sign-in account over the data API so the browser stays a fresh guest; that way the
-// guest cart merging into the account cart at sign-in exercises the real flow.
+// Create the account through the API so the browser stays a fresh guest. That way signing
+// in really merges the guest cart into the account cart, and the test proves it.
 export const provisionViaApi = async (
   request: APIRequestContext,
   credentials: Credentials,
@@ -27,13 +27,13 @@ export const provisionViaApi = async (
   });
 };
 
-// Selecting a color re-renders the size buttons, so the click waits out that flicker with a long timeout.
+// Picking a color redraws the size buttons, so the click gets extra time to wait out the flicker.
 const selectVariation = async (page: Page, attribute: string): Promise<void> => {
   await Locators.variationOption(page, attribute).first().click({ timeout: 30000 });
 };
 
-// The spec discovers an in-stock size through the API first, so the click is deterministic
-// instead of probing sizes until one isn't flagged out of stock.
+// The spec already found an in-stock size through the API, so this clicks one known-good
+// size instead of trying sizes until one isn't marked out of stock.
 const selectSize = async (page: Page, size: string): Promise<void> => {
   await Locators.sizeOption(page, size).click({ timeout: 30000 });
 };

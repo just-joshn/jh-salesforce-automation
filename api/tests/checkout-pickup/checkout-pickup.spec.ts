@@ -13,11 +13,12 @@ import {
   storesOf,
 } from './checkout-pickup.data';
 
-// Guest pickup checkout end to end: the order is assigned to the in-stock store, and the basket is consumed.
+// Guest pickup checkout end to end: the order is assigned to the in-stock store, and the
+// basket is used up afterwards.
 test('place a pickup order assigned to the correct store', async ({ request }) => {
   const { accessToken } = await getGuestToken(request);
 
-  // Resolve the variants that are in stock right now; hardcoded variants go stale as stock drains.
+  // Look up variants that are in stock right now; hardcoded ones go stale as stock sells out.
   const variants = await findOrderableVariants(request, accessToken, {
     masterId: checkout.masterId,
     minCount: 1,
@@ -97,7 +98,7 @@ test('place a pickup order assigned to the correct store', async ({ request }) =
   expect(item?.inventoryId).toBe(store.inventoryId);
   const orderNo = orderNumber(order);
 
-  // order is fetchable and the basket is consumed (404)
+  // the order can be read back, and the basket is gone (404)
   expect((await Actions.getOrder(request, accessToken, orderNo)).status()).toBe(200);
   expect((await Actions.getBasket(request, accessToken, id)).status()).toBe(404);
 });

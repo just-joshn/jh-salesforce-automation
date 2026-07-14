@@ -2,7 +2,7 @@ export interface ProductItem {
   itemId: string;
   productId: string;
   quantity: number;
-  // extended price for the line (unit price times quantity)
+  // price for the whole line (unit price times quantity)
   price?: number;
 }
 
@@ -28,8 +28,8 @@ export interface CartFixture {
   overQuantity: number;
 }
 
-// A shirt master the spec resolves two in-stock variants of at runtime (hardcoded variants go
-// stale as the shared demo store's stock drains), plus a quantity too large to ever be in stock.
+// A shirt master product; the spec picks two in-stock variants of it at runtime (hardcoded
+// variants go stale as stock sells out), plus a quantity too large to ever be in stock.
 export const cart: CartFixture = {
   masterId: '78916783M',
   updatedQuantity: 3,

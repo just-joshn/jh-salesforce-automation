@@ -82,7 +82,7 @@ export interface MixedCheckoutFixture {
 // Stores from a search; the demo omits the array for an area with none nearby.
 export const storesOf = (result: StoreSearchResult): Store[] => result.data ?? [];
 
-// True when the variant is orderable in this store's own stock (per-store inventory, else the default).
+// True when the store can sell the variant (its own inventory if it has one, else the default).
 export const orderableInStore = (product: Product, inventoryId: string): boolean => {
   const stock =
     (product.inventories ?? []).find((entry) => entry.id === inventoryId) ?? product.inventory;
@@ -110,8 +110,8 @@ export const orderNumber = (order: Order): string => {
   return order.orderNo;
 };
 
-// One shirt master; the spec resolves two in-stock variants of it at runtime (one for delivery,
-// one for pickup), since hardcoded variants go stale as the demo store's stock drains.
+// One shirt master product; the spec picks two in-stock variants of it at runtime (one for
+// delivery, one for pickup), since hardcoded variants go stale as stock sells out.
 export const checkout: MixedCheckoutFixture = {
   masterId: '78916783M',
   deliveryShipmentId: 'me',

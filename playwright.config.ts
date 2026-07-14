@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 import dotenv from 'dotenv';
 import path from 'path';
 
-// Load .env locally; CI provides these vars directly.
+// Load .env locally; CI sets these variables itself.
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 const baseURL = process.env.E2E_BASE_URL ?? 'https://pwa-kit.mobify-storefront.com';

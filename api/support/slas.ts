@@ -2,9 +2,9 @@ import type { APIRequestContext } from '@playwright/test';
 import { createHash, randomBytes } from 'crypto';
 import { env, scapiBaseUrl } from '../../config/env';
 
-// Get a guest SLAS token (no shopper login).
-// The demo's SLAS client is public (no secret), so the test runs the same PKCE two-step the
-// storefront uses: request a one-time auth code, then exchange it for an access token.
+// Sign-in helpers for SLAS, Salesforce's shopper login API.
+// The demo's login client is public (it has no secret), so tests can run the same two-step
+// PKCE flow the storefront uses: ask for a one-time code, then trade it for an access token.
 
 export interface GuestToken {
   accessToken: string;
@@ -24,9 +24,8 @@ function base64url(input: Buffer): string {
   return input.toString('base64url');
 }
 
-// Pull the one-time auth code (and usid) out of a SLAS redirect's Location header. The guest and
-// registered login flows both read it the same way; returns null when the redirect is missing or
-// doesn't carry both values.
+// Read the one-time code and usid out of a SLAS redirect's Location header. Guest and
+// registered login both use this; returns null when either value is missing.
 function authCodeFromRedirect(location: string | undefined): { code: string; usid: string } | null {
   if (!location) return null;
   const params = new URL(location).searchParams;
@@ -44,8 +43,8 @@ export async function getGuestToken(request: APIRequestContext): Promise<GuestTo
   const authorizeUrl = `${scapiBaseUrl()}/shopper/auth/v1/organizations/${org}/oauth2/authorize`;
   const tokenUrl = `${scapiBaseUrl()}/shopper/auth/v1/organizations/${org}/oauth2/token`;
 
-  // Step 1: request the auth code. The authorize endpoint returns it in a redirect's Location
-  // header rather than the body, so maxRedirects: 0 leaves the redirect unfollowed and readable.
+  // Step 1: ask for the one-time code. It arrives in a redirect's Location header, not the
+  // body, so maxRedirects: 0 keeps the redirect unfollowed and readable.
   const authorize = await request.get(authorizeUrl, {
     params: {
       client_id: env.scapi.clientId,
@@ -100,8 +99,8 @@ export interface RegisteredLogin {
   customerId?: string;
 }
 
-// Narrow a login result to a guaranteed session, or fail the test clearly. Centralizes the
-// "did we actually get a token and customer id?" guard that every signed-in spec needs.
+// Return the token and customer id from a login, or fail the test with a clear message.
+// Every signed-in spec needs this "did login really work?" check, so it lives here once.
 export function requireSession(
   login: RegisteredLogin,
   who = 'the shopper',
@@ -112,9 +111,9 @@ export function requireSession(
   return { accessToken: login.accessToken, customerId: login.customerId };
 }
 
-// Registered login by email/password, mirroring the storefront's SLAS flow.
-// Credentials go to the login endpoint via Basic auth. Success is a 303 whose Location carries
-// the auth code; wrong credentials are a 401. The code is then exchanged for an access token.
+// Sign in a registered shopper with email and password, the same way the storefront does.
+// Credentials go to the login endpoint using Basic auth. Success is a 303 redirect carrying
+// the one-time code (a wrong password gets 401); the code is then traded for an access token.
 export async function loginRegisteredShopper(
   request: APIRequestContext,
   email: string,

@@ -17,7 +17,7 @@ test('sign in preserves the guest cart and authenticates the shopper', async ({
   // Create the account over the API so the browser stays a fresh guest and the cart merge runs for real at sign-in.
   await Actions.provisionViaApi(request, credentials);
 
-  // Resolve a variant that is in stock right now; hardcoded variants go stale as stock drains.
+  // Look up a variant that is in stock right now; hardcoded ones go stale as stock sells out.
   const { accessToken } = await getGuestToken(request);
   const variant = await findUiOrderableVariant(request, accessToken, product.masterId);
 

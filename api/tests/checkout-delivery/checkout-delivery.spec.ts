@@ -13,11 +13,12 @@ import {
   shippingMethodId,
 } from './checkout-delivery.data';
 
-// Guest delivery checkout end to end: one order is placed, then the consumed basket can't be reordered.
+// Guest delivery checkout end to end: place one order, then prove the used-up basket
+// cannot become a second order.
 test('place a guest delivery order and consume the basket', async ({ request }) => {
   const { accessToken } = await getGuestToken(request);
 
-  // Order a variant that is in stock right now; a hardcoded variant goes stale as stock drains.
+  // Order a variant that is in stock right now; a hardcoded one would go stale as stock sells out.
   const [variant] = await findOrderableVariants(request, accessToken, {
     masterId: checkout.masterId,
     minCount: 1,
@@ -84,9 +85,9 @@ test('place a guest delivery order and consume the basket', async ({ request }) 
   expect(fetched.status()).toBe(200);
   expect(((await fetched.json()) as Order).orderNo).toBe(orderNo);
 
-  // placing the order consumes the basket (now 404)
+  // placing the order uses up the basket (now 404)
   expect((await Actions.getBasket(request, accessToken, id)).status()).toBe(404);
 
-  // re-submitting the consumed basket must not create a second order
+  // sending the used-up basket again must not create a second order
   expect((await Actions.createOrder(request, accessToken, id)).ok()).toBe(false);
 });

@@ -1,36 +1,33 @@
 # CUJ-IDENTITY-003 — account recovery (password reset) testability
 
-**Verdict: not reliably automatable against the public demo** (`pwa-kit.mobify-storefront.com`,
-`RefArchGlobal`, guest-only, no admin/config/credentials). Documented with evidence, per the rule
-"implement only if it can be tested reliably." The other two identity CUJs are fully covered:
-create-account (`*/tests/register`) and sign-in (`*/tests/signin`).
+**Verdict: cannot be tested reliably against the public demo** (`pwa-kit.mobify-storefront.com`,
+`RefArchGlobal`, guest access only, no admin console, config, or credentials). Documented with
+evidence, following the rule "implement only if it can be tested reliably." The other two identity
+journeys are fully covered: create-account (`*/tests/register`) and sign-in (`*/tests/signin`).
 
-## Why
+## Why not
 
-- **The reset-request API is not permitted on this demo's SLAS client.**
+- **The demo's login client does not allow the reset-request API.**
   `POST /customer/shopper-customers/v1/organizations/{org}/customers/password/actions/create-reset-token`
-  returns **401 "Unauthorized request"** for every credential tried — the guest SLAS token, no auth,
-  and even a registered-customer token. So the reset request itself cannot be exercised at the API
-  layer (nor its anti-enumeration behaviour asserted).
-- **Completion is email-gated.** Even where the request succeeds, the flow's success criterion
-  ("set a new password, old credentials stop working, sign in with the new password") requires the
-  **reset token delivered by email** and opening the configured landing route with it. That needs a
-  controllable mailbox (e.g. Mailosaur / MailSlurp) tied to an account whose email you own — which a
-  public-demo guest does not have. See the sources in
-  `checkout-express-and-one-click-testability.md` (§ Email OTP) — the same mailbox-ownership
-  constraint applies.
-- The storefront `/reset-password` page renders, but submitting a request is gated the same way, and
-  no token can be retrieved to complete the reset.
+  returns **401 "Unauthorized request"** for every credential tried: the guest token, no auth at
+  all, and even a registered shopper's token. So the reset request itself cannot be exercised at
+  the API layer (and we also cannot check that it hides whether an email address exists).
+- **Finishing a reset needs the email.** The success criterion — set a new password, the old one
+  stops working, the new one signs in — requires the reset token that arrives **by email**, plus
+  opening the configured landing page with it. That needs a mailbox the test controls (e.g.
+  Mailosaur or MailSlurp) on an account you own, which a public-demo guest does not have.
+- The storefront's `/reset-password` page renders, but submitting it is blocked the same way, and
+  no token can ever be retrieved to finish the reset.
 
-## What would enable it
+## What would make it testable
 
-An environment you own where: the reset endpoint is permitted on the SLAS client, a registered test
-shopper's email is a controllable mailbox (or a static-token bypass is configured), and the reset
-landing route is wired. Then the full recover-access journey — request → tokenised link → new
-password → sign in — becomes a reliable end-to-end test.
+An environment you own where the reset endpoint is allowed on the login client, a test shopper's
+email is a mailbox you control (or a fixed-token bypass is configured), and the reset landing page
+is wired up. Then the whole journey — request the reset, open the emailed link, set a new password,
+sign in with it — becomes a reliable end-to-end test.
 
 ## Where the surrounding identity logic IS covered
 
 - `api/tests/register` + `e2e/tests/register` — account creation (SLAS + Shopper Customers).
-- `api/tests/signin` + `e2e/tests/signin` — password authentication, correct-shopper session,
-  incorrect-credentials rejection, and guest→customer basket merge (browser).
+- `api/tests/signin` + `e2e/tests/signin` — password sign-in, the session belongs to the right
+  shopper, wrong credentials are rejected, and the guest cart merges into the account (browser).

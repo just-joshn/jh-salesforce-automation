@@ -9,7 +9,7 @@ import * as Locators from './cart-delivery.locators';
 test('configure a variant and add it to the cart for delivery', async ({ page, request }) => {
   test.setTimeout(90000);
 
-  // Resolve a variant that is in stock right now; hardcoded variants go stale as stock drains.
+  // Look up a variant that is in stock right now; hardcoded ones go stale as stock sells out.
   const { accessToken } = await getGuestToken(request);
   const variant = await findUiOrderableVariant(request, accessToken, deliveryProduct.masterId);
 

@@ -15,8 +15,7 @@ Each journey is covered two ways:
 - **API** talks to the commerce API (SCAPI) directly, with no browser. It's faster, and it can check
   things the UI won't easily show, like a shopper being blocked from reading someone else's orders.
 
-Running both means a failure usually points at the cause on its own: broke in the UI only, the API
-only, or both.
+Running both makes a failure easy to place: broken in the UI only, in the API only, or in both.
 
 ## How it's laid out
 
@@ -56,7 +55,7 @@ A few things that aren't obvious from the list:
 
 - Checkout actually places the order. Both layers run all the way to a real confirmation and order
   number, using the demo's throwaway test data (a test card, disposable emails). The API checkout
-  also proves the basket is consumed afterwards and can't be resent into a duplicate order.
+  also proves the basket is used up afterwards and can't be sent again to make a duplicate order.
 - The order-history test is really an access-control test. A shopper sees their own order, a second
   shopper gets an empty list, a missing order number returns 404, and reading the first shopper's
   orders as the second one is refused.
@@ -122,9 +121,9 @@ I name those `*.auth.spec.ts`. A dedicated project for them is stubbed out (comm
 
 ## API sign-in
 
-The demo's login client is public with no secret, so `api/support/slas.ts` runs the same SLAS + PKCE
-flow the browser app uses, straight from Playwright's request context. One token per spec keeps it
-well under the rate limit.
+The demo's login service (SLAS) uses a public client with no secret, so `api/support/slas.ts` can
+sign in the same way the storefront does — the SLAS + PKCE flow — straight from Playwright's
+request context. One token per spec keeps it well under the rate limit.
 
 ## Layout
 
@@ -150,16 +149,15 @@ playwright.config.ts         # projects: setup, e2e-chromium, api
 
 ## CI
 
-`.github/workflows/playwright.yml` runs on manual trigger and a nightly schedule only. It hits the
-live site, so it deliberately doesn't run on every push or PR. Add `E2E_ACCOUNT_EMAIL` and
-`E2E_ACCOUNT_PASSWORD` as repository secrets to include the signed-in journeys; without them the run
-is guest only. Every run uploads its HTML report.
+`.github/workflows/playwright.yml` runs on PRs into main, on pushes to main, nightly, and on manual
+trigger. Add `E2E_ACCOUNT_EMAIL` and `E2E_ACCOUNT_PASSWORD` as repository secrets to include the
+signed-in journeys; without them the run is guest only. Every run uploads its HTML report.
 
 ## Known limitations
 
 It drives a shared, live demo store, so a slow checkout screen or a network blip can flake a run.
-Retries (1 local, 2 in CI) usually absorb that, which is why CI runs nightly rather than on every
-commit. One flaky run is expected; a repeatable failure isn't.
+Retries (1 local, 2 in CI) usually absorb that. One flaky run is expected; a repeatable failure
+isn't.
 
 Store text is `en-US`. Where a label might change with locale I match on a role or a `data-testid`
 rather than the visible words.

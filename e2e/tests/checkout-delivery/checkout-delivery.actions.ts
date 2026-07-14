@@ -7,14 +7,13 @@ export const openProduct = async (page: Page, productId: string): Promise<void> 
   await page.goto(buildPath(`/product/${productId}`));
 };
 
-// A color change redraws the size buttons, so the click gets a long timeout to wait for the button
-// instead of failing during that flicker.
+// Picking a color redraws the size buttons, so the click gets extra time to wait out the flicker.
 export const selectVariation = async (page: Page, attribute: string): Promise<void> => {
   await Locators.variationOption(page, attribute).first().click({ timeout: 30000 });
 };
 
-// The spec discovers an in-stock size through the API first, so the click is deterministic
-// instead of probing sizes until one isn't flagged out of stock.
+// The spec already found an in-stock size through the API, so this clicks one known-good
+// size instead of trying sizes until one isn't marked out of stock.
 export const selectSize = async (page: Page, size: string): Promise<void> => {
   await Locators.sizeOption(page, size).click({ timeout: 30000 });
 };
@@ -47,11 +46,11 @@ export const fillShippingAddress = async (page: Page, address: Address): Promise
   // Continuing auto-selects a default delivery option and advances to Payment.
 };
 
-// A pickup cart already carries the store address and method, so checkout skips shipping and lands
-// on Payment. Only fill the address when the form is the screen that actually appears.
+// A pickup cart already knows its store address and shipping method, so checkout skips the
+// shipping step and lands on Payment. Fill the address only when the form actually appears.
 export const fillShippingAddressIfPresent = async (page: Page, address: Address): Promise<void> => {
-  // Contact can advance to either the address form or straight to payment, so race the two and only
-  // fill when the address form is what won.
+  // After the contact step the page shows either the address form or the payment form.
+  // Wait for whichever appears first, and fill only if it was the address form.
   const addressForm = Locators.shipFirstName(page);
   await Promise.race([
     addressForm.waitFor().catch(() => undefined),

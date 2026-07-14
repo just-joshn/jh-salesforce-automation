@@ -3,7 +3,7 @@ import { hasAccountCredentials } from '../../config/env';
 import { credentialsFromEnv } from '../tests/login/login.data';
 import * as Login from '../tests/login/login.actions';
 
-// Saved signed-in session, reused by the other projects. Gitignored.
+// The signed-in session is saved here for the other projects to reuse. Gitignored.
 const authFile = 'playwright/.auth/user.json';
 
 setup('authenticate registered shopper', async ({ page }) => {

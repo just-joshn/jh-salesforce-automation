@@ -12,7 +12,7 @@ test('select a pickup store and add the product to the cart for pickup', async (
 }) => {
   test.setTimeout(90000);
 
-  // Resolve a variant that is in stock right now; hardcoded variants go stale as stock drains.
+  // Look up a variant that is in stock right now; hardcoded ones go stale as stock sells out.
   const { accessToken } = await getGuestToken(request);
   const variant = await findUiOrderableVariant(request, accessToken, pickupProduct.masterId);
 

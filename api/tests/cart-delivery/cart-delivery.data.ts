@@ -32,7 +32,7 @@ export interface Fault {
 // Variants of a master product; absent when the product has none.
 export const variantsOf = (product: Product): Variant[] => product.variants ?? [];
 
-// How many variation axes (color, size, ...) a variant resolves.
+// How many option types (color, size, ...) the variant has values for.
 export const variationCount = (variant: Variant): number =>
   Object.keys(variant.variationValues ?? {}).length;
 

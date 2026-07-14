@@ -11,7 +11,7 @@ test('reconcile a basket (update quantity, remove) with consistent, persisted to
 }) => {
   const { accessToken } = await getGuestToken(request);
 
-  // Resolve two variants that are in stock right now instead of trusting a hardcoded pair.
+  // Look up two variants that are in stock right now instead of trusting a hardcoded pair.
   const [variantA, variantB] = await findOrderableVariants(request, accessToken, {
     masterId: cart.masterId,
     minCount: 2,

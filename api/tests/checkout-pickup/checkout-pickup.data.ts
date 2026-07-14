@@ -73,7 +73,7 @@ export interface Basket {
 // Stores from a search; the demo omits the array for an area with none nearby.
 export const storesOf = (result: StoreSearchResult): Store[] => result.data ?? [];
 
-// True when the variant is orderable in this store's own stock (per-store inventory, else the default).
+// True when the store can sell the variant (its own inventory if it has one, else the default).
 export const orderableInStore = (product: Product, inventoryId: string): boolean => {
   const stock =
     (product.inventories ?? []).find((entry) => entry.id === inventoryId) ?? product.inventory;
@@ -111,7 +111,7 @@ export interface PickupCheckoutFixture {
   card: Card;
 }
 
-// The spec resolves an in-stock variant of the master at runtime; hardcoded variants go stale.
+// The spec picks an in-stock variant of the master at runtime; hardcoded variants go stale.
 export const checkout: PickupCheckoutFixture = {
   masterId: '78916783M',
   email: 'test.shopper@gmail.com',

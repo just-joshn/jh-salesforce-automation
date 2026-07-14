@@ -8,10 +8,10 @@ import * as Locators from './cart.locators';
 // Review a built cart, bump the quantity, and hand off to checkout.
 // Item removal, the empty-cart state, and total math live in the cart API test.
 test('review a cart, update quantity, and proceed to checkout', async ({ page, request }) => {
-  // Full click-through on the shared demo store, so it needs the headroom.
+  // A full click-through on the shared demo store is slow, so give it extra time.
   test.setTimeout(90000);
 
-  // Resolve a variant that is in stock right now; hardcoded variants go stale as stock drains.
+  // Look up a variant that is in stock right now; hardcoded ones go stale as stock sells out.
   const { accessToken } = await getGuestToken(request);
   const variant = await findUiOrderableVariant(request, accessToken, cartProduct.masterId);
 

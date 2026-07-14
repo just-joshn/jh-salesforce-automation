@@ -1,11 +1,12 @@
 import type { APIRequestContext } from '@playwright/test';
 import { bearer, shopperApiUrl, withSite } from './scapi';
 
-// Runtime discovery of purchasable variants, so tests never pin a hardcoded variant id.
-// The shared demo store's stock drains over time (our own checkout tests consume it), so any
-// fixed variant eventually sells out and every spec that references it starts failing. Specs
-// instead ask for "orderable variants of this master" and assert on what comes back; when the
-// preferred master runs dry entirely, a catalog search hunts for a replacement master.
+// Finds variants that can be bought right now, so tests never hardcode a variant id.
+// (A "master" is the parent product; its "variants" are the buyable color/size versions.)
+// Stock on the shared demo store sells out over time (our own checkout tests buy from it),
+// so any fixed variant would eventually break every spec that uses it. Specs instead ask
+// for "orderable variants of this master" and assert on what comes back. When the preferred
+// master is completely sold out, a catalog search finds a replacement.
 
 interface VariationAttributeValue {
   name?: string;
@@ -50,18 +51,19 @@ export interface OrderableVariant {
   sizeName?: string;
 }
 
-// A variant the PDP reaches by clicking the first colour swatch and then a size button, with the
-// display names the UI renders (so specs can click and assert on them).
+// A variant a UI test can reach on the product page by clicking the first color swatch and
+// then a size button. Carries the display names the page shows, so specs can click and
+// assert on them.
 export interface UiOrderableVariant extends OrderableVariant {
   colorName: string;
   sizeName: string;
 }
 
-// Below this many units a variant is too close to selling out to be safe test data: parallel
-// workers and the checkout specs themselves consume stock while a run is in flight.
+// A variant with fewer units than this is too close to selling out to be safe test data:
+// parallel workers and the checkout specs themselves buy stock while a run is going.
 const MIN_ATS = 10;
 
-// Catalog search used to find a replacement master once the preferred one has no stock left.
+// Catalog search used to find a replacement master once the preferred one is sold out.
 const FALLBACK_SEARCH = 'shirt';
 const FALLBACK_LIMIT = '24';
 
@@ -75,8 +77,8 @@ const displayName = (
   return values.find((candidate) => candidate.value === value)?.name;
 };
 
-// All variants of one master that are orderable with a comfortable stock buffer, best-stocked
-// first. With firstColorOnly, only variants of the first colour swatch (what the UI tests click).
+// All buyable variants of one master with a comfortable stock buffer, best-stocked first.
+// With firstColorOnly, only variants of the first color swatch (what the UI tests click).
 const orderableVariantsOf = async (
   request: APIRequestContext,
   accessToken: string,
@@ -137,7 +139,7 @@ const orderableVariantsOf = async (
     .sort((a, b) => b.ats - a.ats);
 };
 
-// Master ids from a catalog search, deduplicated, the preferred (dry) master excluded.
+// Master ids from a catalog search, minus duplicates and the sold-out preferred master.
 const fallbackMasterIds = async (
   request: APIRequestContext,
   accessToken: string,
@@ -161,9 +163,9 @@ export interface DiscoveryOptions {
   minCount: number;
 }
 
-// At least minCount orderable variants from one master, best-stocked first: the preferred master
-// when it can satisfy the request, otherwise the first catalog-search master that can. Throws a
-// clear error instead of letting stale stock surface later as an opaque 400.
+// At least minCount buyable variants from a single master, best-stocked first: the preferred
+// master when it has enough, otherwise the first catalog-search master that does. Throws a
+// clear error rather than letting sold-out stock show up later as a confusing 400.
 export const findOrderableVariants = async (
   request: APIRequestContext,
   accessToken: string,
@@ -181,9 +183,9 @@ export const findOrderableVariants = async (
   );
 };
 
-// The best-stocked variant a UI test can select on the PDP (first colour swatch, then its size
-// button), falling back to a catalog search like findOrderableVariants. Throws when nothing on
-// the PDP's first colour is orderable anywhere.
+// The best-stocked variant a UI test can pick on the product page (first color swatch, then
+// its size button), falling back to a catalog search like findOrderableVariants. Throws when
+// no product's first color has a buyable variant.
 export const findUiOrderableVariant = async (
   request: APIRequestContext,
   accessToken: string,
@@ -202,7 +204,7 @@ export const findUiOrderableVariant = async (
     if (variant) return variant;
   }
   throw new Error(
-    `no variant reachable from a PDP's first colour swatch is orderable with at least ${MIN_ATS} units ` +
+    `no variant reachable from a product page's first color swatch is orderable with at least ${MIN_ATS} units ` +
       `(preferred master ${masterId}, fallback search "${FALLBACK_SEARCH}"); the demo store's stock has likely changed`,
   );
 };

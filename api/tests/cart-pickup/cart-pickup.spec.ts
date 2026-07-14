@@ -11,7 +11,7 @@ test('select an in-stock store and add the product to the basket for pickup', as
 }) => {
   const { accessToken } = await getGuestToken(request);
 
-  // Resolve the variants that are in stock right now; hardcoded variants go stale as stock drains.
+  // Look up variants that are in stock right now; hardcoded ones go stale as stock sells out.
   const variants = await findOrderableVariants(request, accessToken, {
     masterId: pickup.masterId,
     minCount: 1,

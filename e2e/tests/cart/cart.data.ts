@@ -1,13 +1,9 @@
 export interface CartProductFixture {
   masterId: string;
-  variantId: string;
-  name: string;
 }
 
-// White Dress Shirt. First color (White) + first size (15L) resolve to variant 78916783M-1, the row
-// the test asserts on.
+// The White Dress Shirt master; the spec resolves an in-stock variant of it at runtime, since
+// hardcoded variants go stale as the shared demo store's stock drains.
 export const cartProduct: CartProductFixture = {
   masterId: '78916783M',
-  variantId: '78916783M-1',
-  name: 'The White Dress Shirt',
 };

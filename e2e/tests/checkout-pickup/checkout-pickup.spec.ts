@@ -1,3 +1,5 @@
+import { findUiOrderableVariant } from '../../../api/support/products';
+import { getGuestToken } from '../../../api/support/slas';
 import { expect, test } from '../../support/fixtures';
 import * as Actions from './checkout-pickup.actions';
 import { checkout, pickupProduct } from './checkout-pickup.data';
@@ -5,12 +7,16 @@ import * as Locators from './checkout-pickup.locators';
 
 // Guest completes a store-pickup purchase through to the order confirmation.
 // Pickup, store, and stock detail is left to the checkout-pickup API test; this proves a finished order from a pickup cart.
-test('complete a guest pickup purchase and see order confirmation', async ({ page }) => {
+test('complete a guest pickup purchase and see order confirmation', async ({ page, request }) => {
   test.setTimeout(150000);
 
-  await Actions.openProduct(page, pickupProduct.masterId);
+  // Resolve a variant that is in stock right now; hardcoded variants go stale as stock drains.
+  const { accessToken } = await getGuestToken(request);
+  const variant = await findUiOrderableVariant(request, accessToken, pickupProduct.masterId);
+
+  await Actions.openProduct(page, variant.masterId);
   await Actions.selectVariation(page, 'Color');
-  await Actions.selectAvailableSize(page);
+  await Actions.selectSize(page, variant.sizeName);
   await Actions.openStoreSelection(page);
   await Actions.searchStore(page, pickupProduct.storeCountry, pickupProduct.storePostalCode);
   await Actions.selectFirstStore(page);

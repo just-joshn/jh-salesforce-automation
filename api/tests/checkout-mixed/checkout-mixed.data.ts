@@ -68,8 +68,7 @@ export interface Basket {
 }
 
 export interface MixedCheckoutFixture {
-  deliveryVariantId: string;
-  pickupVariantId: string;
+  masterId: string;
   deliveryShipmentId: string;
   pickupShipmentId: string;
   deliveryMethodId: string;
@@ -111,10 +110,10 @@ export const orderNumber = (order: Order): string => {
   return order.orderNo;
 };
 
-// one shirt variant for delivery, one for pickup
+// One shirt master; the spec resolves two in-stock variants of it at runtime (one for delivery,
+// one for pickup), since hardcoded variants go stale as the demo store's stock drains.
 export const checkout: MixedCheckoutFixture = {
-  deliveryVariantId: '78916783M-1',
-  pickupVariantId: '78916783M-2',
+  masterId: '78916783M',
   deliveryShipmentId: 'me',
   pickupShipmentId: 'pickup',
   deliveryMethodId: 'GBP001',

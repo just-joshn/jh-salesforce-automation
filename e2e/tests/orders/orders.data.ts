@@ -20,4 +20,6 @@ export const orderAddress = {
   phone: '4155551234',
 };
 
-export const orderVariantId = '78916783M-1';
+// Master the provisioning step resolves an in-stock variant of at runtime; a hardcoded variant
+// goes stale as the shared demo store's stock drains.
+export const orderMasterId = '78916783M';

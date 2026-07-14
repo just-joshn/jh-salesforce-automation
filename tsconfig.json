@@ -10,6 +10,10 @@
     "noImplicitOverride": true,
     "noFallthroughCasesInSwitch": true,
     "esModuleInterop": true,
+    // Enforce explicit type-only imports/exports (pairs with the ESLint consistent-type-imports rule)
+    // and guarantee each file transpiles safely on its own, which is how Playwright processes tests.
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,

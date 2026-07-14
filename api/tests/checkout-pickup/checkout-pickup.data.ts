@@ -102,7 +102,7 @@ export const orderNumber = (order: Order): string => {
 };
 
 export interface PickupCheckoutFixture {
-  variantId: string;
+  masterId: string;
   email: string;
   shipmentId: string;
   pickupMethodId: string;
@@ -111,8 +111,9 @@ export interface PickupCheckoutFixture {
   card: Card;
 }
 
+// The spec resolves an in-stock variant of the master at runtime; hardcoded variants go stale.
 export const checkout: PickupCheckoutFixture = {
-  variantId: '78916783M-1',
+  masterId: '78916783M',
   email: 'test.shopper@gmail.com',
   shipmentId: 'me',
   pickupMethodId: 'GBP005',

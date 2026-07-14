@@ -1,16 +1,22 @@
+import { findUiOrderableVariant } from '../../../api/support/products';
+import { getGuestToken } from '../../../api/support/slas';
 import { expect, test } from '../../support/fixtures';
 import * as Actions from './checkout-delivery.actions';
 import { checkout } from './checkout-delivery.data';
 import * as Locators from './checkout-delivery.locators';
 
 // Guest (not signed in) completes a delivery purchase through to the order confirmation.
-test('complete a guest delivery purchase and see order confirmation', async ({ page }) => {
+test('complete a guest delivery purchase and see order confirmation', async ({ page, request }) => {
   // Guest checkout is a long flow on the shared demo store.
   test.setTimeout(120000);
 
-  await Actions.openProduct(page, checkout.masterId);
+  // Resolve a variant that is in stock right now; hardcoded variants go stale as stock drains.
+  const { accessToken } = await getGuestToken(request);
+  const variant = await findUiOrderableVariant(request, accessToken, checkout.masterId);
+
+  await Actions.openProduct(page, variant.masterId);
   await Actions.selectVariation(page, 'Color');
-  await Actions.selectAvailableSize(page);
+  await Actions.selectSize(page, variant.sizeName);
   await Actions.addToCart(page);
 
   await Actions.openCheckout(page);

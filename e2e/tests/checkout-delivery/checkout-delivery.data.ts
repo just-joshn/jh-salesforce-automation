@@ -18,18 +18,15 @@ export interface Card {
 
 export interface CheckoutFixture {
   masterId: string;
-  variantId: string;
-  name: string;
   email: string;
   address: Address;
   card: Card;
 }
 
-// Guest checkout fixture. The store rejects example.com addresses, so this uses a real-looking domain.
+// Guest checkout fixture. The store rejects example.com addresses, so this uses a real-looking
+// domain. The spec resolves an in-stock variant of the master at runtime.
 export const checkout: CheckoutFixture = {
   masterId: '78916783M',
-  variantId: '78916783M-1',
-  name: 'The White Dress Shirt',
   email: 'test.shopper@gmail.com',
   address: {
     firstName: 'Test',

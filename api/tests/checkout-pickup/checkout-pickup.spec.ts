@@ -1,7 +1,8 @@
 import { expect, test } from '@playwright/test';
+import { findOrderableVariants } from '../../support/products';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './checkout-pickup.actions';
-import type { Basket, Order, StoreSearchResult } from './checkout-pickup.data';
+import type { Basket, Order, Store, StoreSearchResult } from './checkout-pickup.data';
 import {
   checkout,
   lineItems,
@@ -16,27 +17,39 @@ import {
 test('place a pickup order assigned to the correct store', async ({ request }) => {
   const { accessToken } = await getGuestToken(request);
 
-  // find a store stocking the item
+  // Resolve the variants that are in stock right now; hardcoded variants go stale as stock drains.
+  const variants = await findOrderableVariants(request, accessToken, {
+    masterId: checkout.masterId,
+    minCount: 1,
+  });
+
+  // find a store stocking one of them (most stores keep their own inventory list)
   const stores = (await (
     await Actions.searchStores(request, accessToken, checkout.storeQuery)
   ).json()) as StoreSearchResult;
   expect(stores.total).toBeGreaterThan(0);
-  const store = await Actions.findStoreWithStock(
-    request,
-    accessToken,
-    checkout.variantId,
-    storesOf(stores),
-  );
-  if (!store) throw new Error('expected a store with the item in stock');
+  let store: Store | undefined;
+  let variantId: string | undefined;
+  for (const candidate of variants) {
+    store = await Actions.findStoreWithStock(
+      request,
+      accessToken,
+      candidate.variantId,
+      storesOf(stores),
+    );
+    if (store) {
+      variantId = candidate.variantId;
+      break;
+    }
+  }
+  if (!store || !variantId) throw new Error('expected a store with an orderable variant in stock');
 
   const created = (await (await Actions.createBasket(request, accessToken)).json()) as Basket;
   const id = created.basketId;
 
   // add against the store's stock, then assign pickup
   expect(
-    (
-      await Actions.addItem(request, accessToken, id, checkout.variantId, 1, store.inventoryId)
-    ).status(),
+    (await Actions.addItem(request, accessToken, id, variantId, 1, store.inventoryId)).status(),
   ).toBe(200);
   expect(
     (
@@ -80,7 +93,7 @@ test('place a pickup order assigned to the correct store', async ({ request }) =
   const shipment = shipmentById(order, checkout.shipmentId);
   expect(shippingMethodId(shipment)).toBe(checkout.pickupMethodId);
   expect(shipment.c_fromStoreId).toBe(store.id);
-  const item = lineItems(order).find((i) => i.productId === checkout.variantId);
+  const item = lineItems(order).find((i) => i.productId === variantId);
   expect(item?.inventoryId).toBe(store.inventoryId);
   const orderNo = orderNumber(order);
 

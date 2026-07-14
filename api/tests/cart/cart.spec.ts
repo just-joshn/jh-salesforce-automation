@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { findOrderableVariants } from '../../support/products';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './cart.actions';
 import type { Basket, Fault } from './cart.data';
@@ -10,13 +11,20 @@ test('reconcile a basket (update quantity, remove) with consistent, persisted to
 }) => {
   const { accessToken } = await getGuestToken(request);
 
+  // Resolve two variants that are in stock right now instead of trusting a hardcoded pair.
+  const [variantA, variantB] = await findOrderableVariants(request, accessToken, {
+    masterId: cart.masterId,
+    minCount: 2,
+  });
+  if (!variantA || !variantB) throw new Error('expected two orderable variants');
+
   const createResponse = await Actions.createBasket(request, accessToken);
   expect(createResponse.status()).toBe(200);
   const created = (await createResponse.json()) as Basket;
 
   const addResponse = await Actions.addItems(request, accessToken, created.basketId, [
-    { productId: cart.variantA, quantity: 1 },
-    { productId: cart.variantB, quantity: 1 },
+    { productId: variantA.variantId, quantity: 1 },
+    { productId: variantB.variantId, quantity: 1 },
   ]);
   expect(addResponse.status()).toBe(200);
   const afterAdd = (await addResponse.json()) as Basket;
@@ -25,8 +33,8 @@ test('reconcile a basket (update quantity, remove) with consistent, persisted to
   // line items should sum to the subtotal
   expect(lineItemsTotal(added)).toBeCloseTo(subtotal(afterAdd), 2);
 
-  const itemA = added.find((item) => item.productId === cart.variantA);
-  const itemB = added.find((item) => item.productId === cart.variantB);
+  const itemA = added.find((item) => item.productId === variantA.variantId);
+  const itemB = added.find((item) => item.productId === variantB.variantId);
   if (!itemA || !itemB) throw new Error('expected both items in the basket');
 
   // update a line's quantity
@@ -55,7 +63,7 @@ test('reconcile a basket (update quantity, remove) with consistent, persisted to
   const afterRemove = (await removeResponse.json()) as Basket;
   const remaining = lineItems(afterRemove);
   expect(remaining).toHaveLength(1);
-  expect(firstLineItem(afterRemove).productId).toBe(cart.variantA);
+  expect(firstLineItem(afterRemove).productId).toBe(variantA.variantId);
   expect(lineItemsTotal(remaining)).toBeCloseTo(subtotal(afterRemove), 2);
 
   // re-fetch to confirm the changes persisted
@@ -65,7 +73,7 @@ test('reconcile a basket (update quantity, remove) with consistent, persisted to
   const persistedItems = lineItems(persisted);
   expect(persistedItems).toHaveLength(1);
   const persistedA = firstLineItem(persisted);
-  expect(persistedA.productId).toBe(cart.variantA);
+  expect(persistedA.productId).toBe(variantA.variantId);
   expect(persistedA.quantity).toBe(cart.updatedQuantity);
   expect(lineItemsTotal(persistedItems)).toBeCloseTo(subtotal(persisted), 2);
 

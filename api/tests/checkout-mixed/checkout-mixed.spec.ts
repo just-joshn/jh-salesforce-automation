@@ -1,7 +1,9 @@
 import { expect, test } from '@playwright/test';
+import type { OrderableVariant } from '../../support/products';
+import { findOrderableVariants } from '../../support/products';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './checkout-mixed.actions';
-import type { Basket, Order, StoreSearchResult } from './checkout-mixed.data';
+import type { Basket, Order, Store, StoreSearchResult } from './checkout-mixed.data';
 import {
   checkout,
   lineItems,
@@ -16,31 +18,47 @@ import {
 test('place one order that splits into delivery and pickup shipments', async ({ request }) => {
   const { accessToken } = await getGuestToken(request);
 
-  // find a store stocking the pickup item
+  // Resolve two variants that are in stock right now (hardcoded ones go stale as stock drains):
+  // the best-stocked for delivery, and another that some store also stocks for pickup.
+  const variants = await findOrderableVariants(request, accessToken, {
+    masterId: checkout.masterId,
+    minCount: 2,
+  });
+  const deliveryVariant = variants[0];
+  if (!deliveryVariant) throw new Error('expected an orderable delivery variant');
+
   const stores = (await (
     await Actions.searchStores(request, accessToken, checkout.storeQuery)
   ).json()) as StoreSearchResult;
-  const store = await Actions.findStoreWithStock(
-    request,
-    accessToken,
-    checkout.pickupVariantId,
-    storesOf(stores),
-  );
-  if (!store) throw new Error('expected a store with the pickup item in stock');
+  let store: Store | undefined;
+  let pickupVariant: OrderableVariant | undefined;
+  for (const candidate of variants.slice(1)) {
+    store = await Actions.findStoreWithStock(
+      request,
+      accessToken,
+      candidate.variantId,
+      storesOf(stores),
+    );
+    if (store) {
+      pickupVariant = candidate;
+      break;
+    }
+  }
+  if (!store || !pickupVariant) throw new Error('expected a store with the pickup item in stock');
 
   const created = (await (await Actions.createBasket(request, accessToken)).json()) as Basket;
   const id = created.basketId;
 
   // delivery item on the default shipment, pickup item on a second shipment
   expect(
-    (await Actions.addItem(request, accessToken, id, checkout.deliveryVariantId, 1)).status(),
+    (await Actions.addItem(request, accessToken, id, deliveryVariant.variantId, 1)).status(),
   ).toBe(200);
   expect(
     (await Actions.createShipment(request, accessToken, id, checkout.pickupShipmentId)).status(),
   ).toBe(200);
   expect(
     (
-      await Actions.addItem(request, accessToken, id, checkout.pickupVariantId, 1, {
+      await Actions.addItem(request, accessToken, id, pickupVariant.variantId, 1, {
         inventoryId: store.inventoryId,
         shipmentId: checkout.pickupShipmentId,
       })
@@ -95,8 +113,8 @@ test('place one order that splits into delivery and pickup shipments', async ({ 
 
   const items = lineItems(order);
   expect(items).toHaveLength(2);
-  const deliveryItems = items.filter((i) => i.productId === checkout.deliveryVariantId);
-  const pickupItems = items.filter((i) => i.productId === checkout.pickupVariantId);
+  const deliveryItems = items.filter((i) => i.productId === deliveryVariant.variantId);
+  const pickupItems = items.filter((i) => i.productId === pickupVariant.variantId);
   expect(deliveryItems).toHaveLength(1);
   expect(pickupItems).toHaveLength(1);
   expect(deliveryItems[0]?.shipmentId).toBe(checkout.deliveryShipmentId);

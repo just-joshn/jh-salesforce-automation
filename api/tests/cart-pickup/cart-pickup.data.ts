@@ -73,7 +73,7 @@ export const shippingMethodId = (shipment: Shipment): string | undefined =>
   shipment.shippingMethod?.id;
 
 export interface PickupFixture {
-  variantId: string;
+  masterId: string;
   quantity: number;
   pickupMethodId: string;
   shipmentId: string;
@@ -81,9 +81,10 @@ export interface PickupFixture {
   empty: StoreSearchQuery;
 }
 
-// pickup fixture: a shirt variant, the in-store pickup method GBP005, and areas with and without nearby stores
+// Pickup fixture: a shirt master (the spec resolves an in-stock variant of it at runtime), the
+// in-store pickup method GBP005, and areas with and without nearby stores.
 export const pickup: PickupFixture = {
-  variantId: '78916783M-1',
+  masterId: '78916783M',
   quantity: 1,
   pickupMethodId: 'GBP005',
   shipmentId: 'me',

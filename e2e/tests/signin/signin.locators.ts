@@ -2,13 +2,12 @@ import type { Locator, Page } from '@playwright/test';
 
 export const variationOption = (page: Page, attribute: string): Locator =>
   page.getByRole('radiogroup', { name: attribute }).getByRole('radio');
+export const sizeOption = (page: Page, size: string): Locator =>
+  page.getByRole('radiogroup', { name: 'size' }).getByRole('radio', { name: size });
 export const addToCartButton = (page: Page): Locator =>
   page.getByRole('button', { name: /^add to cart$/i });
 export const addConfirmation = (page: Page): Locator =>
   page.getByRole('dialog').filter({ hasText: /added to cart/i });
-
-// Shown in the buy box when the selected variant can't be ordered.
-export const outOfStock = (page: Page): Locator => page.getByText(/out of stock/i);
 
 // Sign-in form, scoped so it ignores the newsletter fields lower on the page. Login is two steps:
 // enter email, click Password, then the password field and Sign In appear.

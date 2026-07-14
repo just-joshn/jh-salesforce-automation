@@ -1,9 +1,10 @@
 import type { APIRequestContext, Page } from '@playwright/test';
+import { findOrderableVariants } from '../../../api/support/products';
 import { bearer, shopperApiUrl, withSite } from '../../../api/support/scapi';
 import { getGuestToken, loginRegisteredShopper } from '../../../api/support/slas';
 import { buildPath } from '../../support/site';
 import type { Credentials } from './orders.data';
-import { orderAddress, orderVariantId } from './orders.data';
+import { orderAddress, orderMasterId } from './orders.data';
 import * as Locators from './orders.locators';
 
 const BASKETS = 'checkout/shopper-baskets/v1';
@@ -37,14 +38,26 @@ export const provisionCustomerWithOrder = async (
   if (!accessToken) throw new Error('registered login failed while provisioning the order');
   const authed = { params: withSite(), headers: bearer(accessToken) };
 
+  // Order a variant that is in stock right now; a hardcoded variant goes stale as stock drains.
+  const [variant] = await findOrderableVariants(request, accessToken, {
+    masterId: orderMasterId,
+    minCount: 1,
+  });
+  if (!variant) throw new Error('expected an orderable variant to provision the order with');
+
   const created = (await (
     await request.post(shopperApiUrl(BASKETS, 'baskets'), { ...authed, data: {} })
   ).json()) as { basketId: string };
   const id = created.basketId;
-  await request.post(shopperApiUrl(BASKETS, `baskets/${id}/items`), {
+  const added = await request.post(shopperApiUrl(BASKETS, `baskets/${id}/items`), {
     ...authed,
-    data: [{ productId: orderVariantId, quantity: 1 }],
+    data: [{ productId: variant.variantId, quantity: 1 }],
   });
+  if (!added.ok()) {
+    throw new Error(
+      `adding ${variant.variantId} to the basket failed (${added.status()}): ${await added.text()}`,
+    );
+  }
   await request.put(shopperApiUrl(BASKETS, `baskets/${id}/customer`), {
     ...authed,
     data: { email: credentials.email },
@@ -78,12 +91,17 @@ export const provisionCustomerWithOrder = async (
       amount: priced.orderTotal,
     },
   });
-  const order = (await (
-    await request.post(shopperApiUrl('checkout/shopper-orders/v1', 'orders'), {
-      ...authed,
-      data: { basketId: id },
-    })
-  ).json()) as { orderNo: string };
+  const orderResponse = await request.post(shopperApiUrl('checkout/shopper-orders/v1', 'orders'), {
+    ...authed,
+    data: { basketId: id },
+  });
+  if (!orderResponse.ok()) {
+    throw new Error(
+      `placing the order failed (${orderResponse.status()}): ${await orderResponse.text()}`,
+    );
+  }
+  const order = (await orderResponse.json()) as { orderNo?: string };
+  if (!order.orderNo) throw new Error('the provisioned order came back without an order number');
   return order.orderNo;
 };
 

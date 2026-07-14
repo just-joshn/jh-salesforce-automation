@@ -1,3 +1,5 @@
+import { findUiOrderableVariant } from '../../../api/support/products';
+import { getGuestToken } from '../../../api/support/slas';
 import { expect, test } from '../../support/fixtures';
 import * as Actions from './signin.actions';
 import { password, product, uniqueEmail } from './signin.data';
@@ -15,13 +17,17 @@ test('sign in preserves the guest cart and authenticates the shopper', async ({
   // Create the account over the API so the browser stays a fresh guest and the cart merge runs for real at sign-in.
   await Actions.provisionViaApi(request, credentials);
 
-  await Actions.addProductToCart(page, product.masterId);
+  // Resolve a variant that is in stock right now; hardcoded variants go stale as stock drains.
+  const { accessToken } = await getGuestToken(request);
+  const variant = await findUiOrderableVariant(request, accessToken, product.masterId);
+
+  await Actions.addProductToCart(page, variant.masterId, variant.sizeName);
   await Actions.openCart(page);
-  await expect(Locators.cartItem(page, product.variantId)).toBeVisible({ timeout: 15000 });
+  await expect(Locators.cartItem(page, variant.variantId)).toBeVisible({ timeout: 15000 });
 
   await Actions.signIn(page, credentials);
 
   await expect(Locators.logout(page).first()).toBeAttached();
   await Actions.openCart(page);
-  await expect(Locators.cartItem(page, product.variantId)).toBeVisible({ timeout: 15000 });
+  await expect(Locators.cartItem(page, variant.variantId)).toBeVisible({ timeout: 15000 });
 });

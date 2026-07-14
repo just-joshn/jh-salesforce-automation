@@ -1,7 +1,8 @@
 import { expect, test } from '@playwright/test';
+import { findOrderableVariants } from '../../support/products';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './cart-pickup.actions';
-import type { Basket, StoreSearchResult } from './cart-pickup.data';
+import type { Basket, Store, StoreSearchResult } from './cart-pickup.data';
 import { lineItems, pickup, shipmentById, shippingMethodId, storesOf } from './cart-pickup.data';
 
 // Add a product for pickup at an in-stock store and confirm it persists; a store-less area returns nothing.
@@ -10,17 +11,33 @@ test('select an in-stock store and add the product to the basket for pickup', as
 }) => {
   const { accessToken } = await getGuestToken(request);
 
+  // Resolve the variants that are in stock right now; hardcoded variants go stale as stock drains.
+  const variants = await findOrderableVariants(request, accessToken, {
+    masterId: pickup.masterId,
+    minCount: 1,
+  });
+
   const storeResponse = await Actions.searchStores(request, accessToken, pickup.nearby);
   expect(storeResponse.status()).toBe(200);
   const stores = (await storeResponse.json()) as StoreSearchResult;
   expect(stores.total).toBeGreaterThan(0);
-  const selectedStore = await Actions.findStoreWithStock(
-    request,
-    accessToken,
-    pickup.variantId,
-    storesOf(stores),
-  );
-  if (!selectedStore) throw new Error('expected a store with the product in stock');
+  let selectedStore: Store | undefined;
+  let variantId: string | undefined;
+  for (const candidate of variants) {
+    selectedStore = await Actions.findStoreWithStock(
+      request,
+      accessToken,
+      candidate.variantId,
+      storesOf(stores),
+    );
+    if (selectedStore) {
+      variantId = candidate.variantId;
+      break;
+    }
+  }
+  if (!selectedStore || !variantId) {
+    throw new Error('expected a store with an orderable variant in stock');
+  }
 
   // add the product against the chosen store's stock
   const createResponse = await Actions.createBasket(request, accessToken);
@@ -31,7 +48,7 @@ test('select an in-stock store and add the product to the basket for pickup', as
     request,
     accessToken,
     basket.basketId,
-    pickup.variantId,
+    variantId,
     pickup.quantity,
     selectedStore.inventoryId,
   );
@@ -58,7 +75,7 @@ test('select an in-stock store and add the product to the basket for pickup', as
   const persistedShipment = shipmentById(persisted, pickup.shipmentId);
   expect(shippingMethodId(persistedShipment)).toBe(pickup.pickupMethodId);
   expect(persistedShipment.c_fromStoreId).toBe(selectedStore.id);
-  const persistedItem = lineItems(persisted).find((entry) => entry.productId === pickup.variantId);
+  const persistedItem = lineItems(persisted).find((entry) => entry.productId === variantId);
   expect(persistedItem?.shipmentId).toBe(pickup.shipmentId);
   expect(persistedItem?.inventoryId).toBe(selectedStore.inventoryId);
 

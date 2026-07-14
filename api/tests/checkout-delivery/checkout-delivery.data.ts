@@ -69,7 +69,7 @@ export const orderNumber = (order: Order): string => {
 };
 
 export interface CheckoutFixture {
-  variantId: string;
+  masterId: string;
   email: string;
   shipmentId: string;
   shippingMethodId: string;
@@ -77,9 +77,10 @@ export interface CheckoutFixture {
   card: Card;
 }
 
-// guest checkout fixture; the email avoids example.com, which the store rejects
+// Guest checkout fixture; the email avoids example.com, which the store rejects. The spec
+// resolves an in-stock variant of the master at runtime, since hardcoded variants go stale.
 export const checkout: CheckoutFixture = {
-  variantId: '78916783M-1',
+  masterId: '78916783M',
   email: 'test.shopper@gmail.com',
   shipmentId: 'me',
   shippingMethodId: 'GBP001',

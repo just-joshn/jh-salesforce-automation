@@ -23,16 +23,15 @@ export interface AddItem {
 }
 
 export interface CartFixture {
-  variantA: string;
-  variantB: string;
+  masterId: string;
   updatedQuantity: number;
   overQuantity: number;
 }
 
-// two orderable variants of the same shirt, plus a quantity too large to ever be in stock
+// A shirt master the spec resolves two in-stock variants of at runtime (hardcoded variants go
+// stale as the shared demo store's stock drains), plus a quantity too large to ever be in stock.
 export const cart: CartFixture = {
-  variantA: '78916783M-1',
-  variantB: '78916783M-2',
+  masterId: '78916783M',
   updatedQuantity: 3,
   overQuantity: 999999,
 };

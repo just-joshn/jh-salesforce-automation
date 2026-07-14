@@ -44,7 +44,8 @@ export interface OrderDetail {
 export const ordersOf = (history: OrderHistory): OrderSummary[] => history.data ?? [];
 
 export const password = 'Test1234!';
-export const variantId = '78916783M-1';
+// Master the spec resolves an in-stock variant of at runtime; a hardcoded variant goes stale.
+export const masterId = '78916783M';
 export const shippingMethodId = 'GBP001';
 export const unknownOrderNo = 'BOGUS00000';
 

@@ -1,8 +1,9 @@
 import { expect, test } from '@playwright/test';
+import { findOrderableVariants } from '../../support/products';
 import { getGuestToken, requireSession } from '../../support/slas';
 import * as Actions from './orders.actions';
 import type { OrderDetail, OrderHistory } from './orders.data';
-import { ordersOf, password, uniqueEmail, unknownOrderNo } from './orders.data';
+import { masterId, ordersOf, password, uniqueEmail, unknownOrderNo } from './orders.data';
 
 // Order history and detail stay consistent, and one shopper can't read another's orders.
 test('order history and detail are correct, consistent, and access-controlled', async ({
@@ -15,7 +16,10 @@ test('order history and detail are correct, consistent, and access-controlled', 
   const loginA = await Actions.signIn(request, accountA.email, accountA.password);
   expect(loginA.loginStatus).toBe(303);
   const { accessToken: tokenA, customerId: customerIdA } = requireSession(loginA, 'customer A');
-  const orderNo = await Actions.placeOrder(request, tokenA, accountA.email);
+  // Order a variant that is in stock right now; a hardcoded variant goes stale as stock drains.
+  const [variant] = await findOrderableVariants(request, tokenA, { masterId, minCount: 1 });
+  if (!variant) throw new Error('expected an orderable variant');
+  const orderNo = await Actions.placeOrder(request, tokenA, accountA.email, variant.variantId);
   expect(orderNo).toBeTruthy();
 
   // A's history includes the order, with status and total

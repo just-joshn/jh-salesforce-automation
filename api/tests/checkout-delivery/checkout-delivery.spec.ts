@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { findOrderableVariants } from '../../support/products';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './checkout-delivery.actions';
 import type { Basket, Order } from './checkout-delivery.data';
@@ -16,12 +17,19 @@ import {
 test('place a guest delivery order and consume the basket', async ({ request }) => {
   const { accessToken } = await getGuestToken(request);
 
+  // Order a variant that is in stock right now; a hardcoded variant goes stale as stock drains.
+  const [variant] = await findOrderableVariants(request, accessToken, {
+    masterId: checkout.masterId,
+    minCount: 1,
+  });
+  if (!variant) throw new Error('expected an orderable variant');
+
   const created = (await (await Actions.createBasket(request, accessToken)).json()) as Basket;
   expect(created.basketId).toBeTruthy();
   const id = created.basketId;
 
   // fill in every checkout step; each must save
-  expect((await Actions.addItem(request, accessToken, id, checkout.variantId, 1)).status()).toBe(
+  expect((await Actions.addItem(request, accessToken, id, variant.variantId, 1)).status()).toBe(
     200,
   );
   expect((await Actions.setCustomer(request, accessToken, id, checkout.email)).status()).toBe(200);
@@ -65,7 +73,7 @@ test('place a guest delivery order and consume the basket', async ({ request }) 
   const order = (await orderResponse.json()) as Order;
   expect(order.orderNo).toBeTruthy();
   expect(order.status).toBe('created');
-  expect(lineItems(order).some((item) => item.productId === checkout.variantId)).toBe(true);
+  expect(lineItems(order).some((item) => item.productId === variant.variantId)).toBe(true);
   const shipment = shipmentById(order, checkout.shipmentId);
   expect(shippingMethodId(shipment)).toBe(checkout.shippingMethodId);
   expect(paymentInstrumentsOf(order).length).toBeGreaterThan(0);

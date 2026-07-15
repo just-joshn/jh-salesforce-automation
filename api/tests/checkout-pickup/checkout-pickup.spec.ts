@@ -1,4 +1,6 @@
+import type { APIRequestContext } from '@playwright/test';
 import { expect, test } from '@playwright/test';
+import type { OrderableVariant } from '../../support/products';
 import { findOrderableVariants } from '../../support/products';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './checkout-pickup.actions';
@@ -12,6 +14,24 @@ import {
   shippingMethodId,
   storesOf,
 } from './checkout-pickup.data';
+
+const pickInStockPair = async (
+  request: APIRequestContext,
+  accessToken: string,
+  variants: OrderableVariant[],
+  stores: Store[],
+): Promise<{ store: Store; variantId: string }> => {
+  for (const candidate of variants) {
+    const store = await Actions.findStoreWithStock(
+      request,
+      accessToken,
+      candidate.variantId,
+      stores,
+    );
+    if (store) return { store, variantId: candidate.variantId };
+  }
+  throw new Error('expected a store with an orderable variant in stock');
+};
 
 // Guest pickup checkout end to end: the order is assigned to the in-stock store, and the
 // basket is used up afterwards.
@@ -29,21 +49,12 @@ test('place a pickup order assigned to the correct store', async ({ request }) =
     await Actions.searchStores(request, accessToken, checkout.storeQuery)
   ).json()) as StoreSearchResult;
   expect(stores.total).toBeGreaterThan(0);
-  let store: Store | undefined;
-  let variantId: string | undefined;
-  for (const candidate of variants) {
-    store = await Actions.findStoreWithStock(
-      request,
-      accessToken,
-      candidate.variantId,
-      storesOf(stores),
-    );
-    if (store) {
-      variantId = candidate.variantId;
-      break;
-    }
-  }
-  if (!store || !variantId) throw new Error('expected a store with an orderable variant in stock');
+  const { store, variantId } = await pickInStockPair(
+    request,
+    accessToken,
+    variants,
+    storesOf(stores),
+  );
 
   const created = (await (await Actions.createBasket(request, accessToken)).json()) as Basket;
   const id = created.basketId;

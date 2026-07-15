@@ -1,3 +1,4 @@
+import type { APIRequestContext } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 import type { OrderableVariant } from '../../support/products';
 import { findOrderableVariants } from '../../support/products';
@@ -13,6 +14,24 @@ import {
   shippingMethodId,
   storesOf,
 } from './checkout-mixed.data';
+
+const pickPickupPair = async (
+  request: APIRequestContext,
+  accessToken: string,
+  candidates: OrderableVariant[],
+  stores: Store[],
+): Promise<{ store: Store; pickupVariant: OrderableVariant }> => {
+  for (const candidate of candidates) {
+    const store = await Actions.findStoreWithStock(
+      request,
+      accessToken,
+      candidate.variantId,
+      stores,
+    );
+    if (store) return { store, pickupVariant: candidate };
+  }
+  throw new Error('expected a store with the pickup item in stock');
+};
 
 // One order that splits into a delivery shipment and a pickup shipment, each item on the right one.
 test('place one order that splits into delivery and pickup shipments', async ({ request }) => {
@@ -30,21 +49,12 @@ test('place one order that splits into delivery and pickup shipments', async ({ 
   const stores = (await (
     await Actions.searchStores(request, accessToken, checkout.storeQuery)
   ).json()) as StoreSearchResult;
-  let store: Store | undefined;
-  let pickupVariant: OrderableVariant | undefined;
-  for (const candidate of variants.slice(1)) {
-    store = await Actions.findStoreWithStock(
-      request,
-      accessToken,
-      candidate.variantId,
-      storesOf(stores),
-    );
-    if (store) {
-      pickupVariant = candidate;
-      break;
-    }
-  }
-  if (!store || !pickupVariant) throw new Error('expected a store with the pickup item in stock');
+  const { store, pickupVariant } = await pickPickupPair(
+    request,
+    accessToken,
+    variants.slice(1),
+    storesOf(stores),
+  );
 
   const created = (await (await Actions.createBasket(request, accessToken)).json()) as Basket;
   const id = created.basketId;

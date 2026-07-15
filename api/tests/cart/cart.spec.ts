@@ -5,6 +5,11 @@ import * as Actions from './cart.actions';
 import type { Basket, Fault } from './cart.data';
 import { cart, firstLineItem, lineItems, lineItemsTotal, subtotal } from './cart.data';
 
+const requireDefined = <T>(value: T | undefined, message: string): T => {
+  if (value === undefined) throw new Error(message);
+  return value;
+};
+
 // Add, update, and remove basket items; totals stay consistent and persist, and over-stock is rejected.
 test('reconcile a basket (update quantity, remove) with consistent, persisted totals', async ({
   request,
@@ -12,11 +17,12 @@ test('reconcile a basket (update quantity, remove) with consistent, persisted to
   const { accessToken } = await getGuestToken(request);
 
   // Look up two variants that are in stock right now instead of trusting a hardcoded pair.
-  const [variantA, variantB] = await findOrderableVariants(request, accessToken, {
+  const found = await findOrderableVariants(request, accessToken, {
     masterId: cart.masterId,
     minCount: 2,
   });
-  if (!variantA || !variantB) throw new Error('expected two orderable variants');
+  const variantA = requireDefined(found[0], 'expected two orderable variants');
+  const variantB = requireDefined(found[1], 'expected two orderable variants');
 
   const createResponse = await Actions.createBasket(request, accessToken);
   expect(createResponse.status()).toBe(200);
@@ -33,9 +39,14 @@ test('reconcile a basket (update quantity, remove) with consistent, persisted to
   // line items should sum to the subtotal
   expect(lineItemsTotal(added)).toBeCloseTo(subtotal(afterAdd), 2);
 
-  const itemA = added.find((item) => item.productId === variantA.variantId);
-  const itemB = added.find((item) => item.productId === variantB.variantId);
-  if (!itemA || !itemB) throw new Error('expected both items in the basket');
+  const itemA = requireDefined(
+    added.find((item) => item.productId === variantA.variantId),
+    'expected both items in the basket',
+  );
+  const itemB = requireDefined(
+    added.find((item) => item.productId === variantB.variantId),
+    'expected both items in the basket',
+  );
 
   // update a line's quantity
   const updateResponse = await Actions.updateItemQuantity(

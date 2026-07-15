@@ -1,9 +1,29 @@
+import type { APIRequestContext } from '@playwright/test';
 import { expect, test } from '@playwright/test';
+import type { OrderableVariant } from '../../support/products';
 import { findOrderableVariants } from '../../support/products';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './cart-pickup.actions';
 import type { Basket, Store, StoreSearchResult } from './cart-pickup.data';
 import { lineItems, pickup, shipmentById, shippingMethodId, storesOf } from './cart-pickup.data';
+
+const pickInStockPair = async (
+  request: APIRequestContext,
+  accessToken: string,
+  variants: OrderableVariant[],
+  stores: Store[],
+): Promise<{ store: Store; variantId: string }> => {
+  for (const candidate of variants) {
+    const store = await Actions.findStoreWithStock(
+      request,
+      accessToken,
+      candidate.variantId,
+      stores,
+    );
+    if (store) return { store, variantId: candidate.variantId };
+  }
+  throw new Error('expected a store with an orderable variant in stock');
+};
 
 // Add a product for pickup at an in-stock store and confirm it persists; a store-less area returns nothing.
 test('select an in-stock store and add the product to the basket for pickup', async ({
@@ -21,23 +41,12 @@ test('select an in-stock store and add the product to the basket for pickup', as
   expect(storeResponse.status()).toBe(200);
   const stores = (await storeResponse.json()) as StoreSearchResult;
   expect(stores.total).toBeGreaterThan(0);
-  let selectedStore: Store | undefined;
-  let variantId: string | undefined;
-  for (const candidate of variants) {
-    selectedStore = await Actions.findStoreWithStock(
-      request,
-      accessToken,
-      candidate.variantId,
-      storesOf(stores),
-    );
-    if (selectedStore) {
-      variantId = candidate.variantId;
-      break;
-    }
-  }
-  if (!selectedStore || !variantId) {
-    throw new Error('expected a store with an orderable variant in stock');
-  }
+  const { store: selectedStore, variantId } = await pickInStockPair(
+    request,
+    accessToken,
+    variants,
+    storesOf(stores),
+  );
 
   // add the product against the chosen store's stock
   const createResponse = await Actions.createBasket(request, accessToken);

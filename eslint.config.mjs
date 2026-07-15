@@ -29,6 +29,8 @@ export default tseslint.config(
       // Unawaited Playwright calls make tests pass or fail at random; flag them.
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/consistent-type-imports': 'error',
+      complexity: ['error', { max: 5, variant: 'classic' }],
+      // 'sonarjs/cognitive-complexity': ['error', 10],
     },
   },
   {

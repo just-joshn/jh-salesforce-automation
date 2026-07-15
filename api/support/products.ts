@@ -67,14 +67,144 @@ const MIN_ATS = 10;
 const FALLBACK_SEARCH = 'shirt';
 const FALLBACK_LIMIT = '24';
 
+interface VariantEntry {
+  productId: string;
+  variationValues?: Record<string, string>;
+}
+
 const displayName = (
   attributes: VariationAttribute[],
   attributeId: string,
   value: string | undefined,
 ): string | undefined => {
   if (value === undefined) return undefined;
-  const values = attributes.find((attribute) => attribute.id === attributeId)?.values ?? [];
-  return values.find((candidate) => candidate.value === value)?.name;
+  const attribute = attributes.find((candidate) => candidate.id === attributeId);
+  if (attribute?.values === undefined) return undefined;
+  return attribute.values.find((candidate) => candidate.value === value)?.name;
+};
+
+const matchesColorFilter = (
+  variationValues: Record<string, string> | undefined,
+  firstColorOnly: boolean,
+  firstColor: string | undefined,
+): boolean => {
+  if (!firstColorOnly) return true;
+  if (firstColor === undefined) return true;
+  if (variationValues === undefined) return false;
+  return variationValues.color === firstColor;
+};
+
+const firstColorValue = (attributes: VariationAttribute[]): string | undefined => {
+  const colorAttribute = attributes.find((attribute) => attribute.id === 'color');
+  if (colorAttribute === undefined) return undefined;
+  if (colorAttribute.values === undefined) return undefined;
+  const first = colorAttribute.values[0];
+  if (first === undefined) return undefined;
+  return first.value;
+};
+
+const toVariantEntry = (
+  variant: MasterVariant,
+  firstColorOnly: boolean,
+  firstColor: string | undefined,
+): VariantEntry[] => {
+  if (variant.productId === undefined) return [];
+  if (!matchesColorFilter(variant.variationValues, firstColorOnly, firstColor)) return [];
+  return [{ productId: variant.productId, variationValues: variant.variationValues }];
+};
+
+const variantEntriesOf = (master: MasterProduct, firstColorOnly: boolean): VariantEntry[] => {
+  const attributes = master.variationAttributes ?? [];
+  const firstColor = firstColorValue(attributes);
+  const variants = master.variants ?? [];
+  return variants.flatMap((variant) => toVariantEntry(variant, firstColorOnly, firstColor));
+};
+
+const stockByIdFrom = (
+  details: ProductsResult,
+): Map<string, VariantDetail['inventory']> => {
+  const rows = details.data ?? [];
+  return new Map(
+    rows.flatMap((detail) => {
+      if (detail.id === undefined) return [];
+      return [[detail.id, detail.inventory] as const];
+    }),
+  );
+};
+
+const atsOf = (stock: VariantDetail['inventory'] | undefined): number => {
+  if (stock === undefined) return 0;
+  if (stock.ats === undefined) return 0;
+  return stock.ats;
+};
+
+const isComfortablyOrderable = (stock: VariantDetail['inventory'] | undefined): boolean => {
+  if (stock === undefined) return false;
+  if (stock.orderable !== true) return false;
+  return atsOf(stock) >= MIN_ATS;
+};
+
+const variationValue = (
+  values: Record<string, string> | undefined,
+  key: string,
+): string | undefined => {
+  if (values === undefined) return undefined;
+  return values[key];
+};
+
+const toOrderable = (
+  variant: VariantEntry,
+  stockById: Map<string, VariantDetail['inventory']>,
+  masterId: string,
+  productName: string,
+  attributes: VariationAttribute[],
+): OrderableVariant[] => {
+  const stock = stockById.get(variant.productId);
+  if (!isComfortablyOrderable(stock)) return [];
+  return [
+    {
+      masterId,
+      productName,
+      variantId: variant.productId,
+      ats: atsOf(stock),
+      colorName: displayName(attributes, 'color', variationValue(variant.variationValues, 'color')),
+      sizeName: displayName(attributes, 'size', variationValue(variant.variationValues, 'size')),
+    },
+  ];
+};
+
+const productNameOf = (master: MasterProduct, masterId: string): string => {
+  if (master.name === undefined) return masterId;
+  return master.name;
+};
+
+const fetchMaster = async (
+  request: APIRequestContext,
+  accessToken: string,
+  masterId: string,
+): Promise<MasterProduct | undefined> => {
+  const response = await request.get(
+    shopperApiUrl('product/shopper-products/v1', `products/${encodeURIComponent(masterId)}`),
+    { params: withSite({ allImages: 'false' }), headers: bearer(accessToken) },
+  );
+  if (!response.ok()) return undefined;
+  return (await response.json()) as MasterProduct;
+};
+
+const fetchVariantDetails = async (
+  request: APIRequestContext,
+  accessToken: string,
+  variants: VariantEntry[],
+): Promise<ProductsResult | undefined> => {
+  const response = await request.get(shopperApiUrl('product/shopper-products/v1', 'products'), {
+    params: withSite({
+      ids: variants.map((variant) => variant.productId).join(','),
+      allImages: 'false',
+    }),
+    headers: bearer(accessToken),
+  });
+  if (!response.ok()) return undefined;
+  return (await response.json()) as ProductsResult;
 };
 
 // All buyable variants of one master with a comfortable stock buffer, best-stocked first.
@@ -85,57 +215,19 @@ const orderableVariantsOf = async (
   masterId: string,
   firstColorOnly: boolean,
 ): Promise<OrderableVariant[]> => {
-  const masterResponse = await request.get(
-    shopperApiUrl('product/shopper-products/v1', `products/${encodeURIComponent(masterId)}`),
-    { params: withSite({ allImages: 'false' }), headers: bearer(accessToken) },
-  );
-  if (!masterResponse.ok()) return [];
-  const master = (await masterResponse.json()) as MasterProduct;
+  const master = await fetchMaster(request, accessToken, masterId);
+  if (master === undefined) return [];
   const attributes = master.variationAttributes ?? [];
-  const firstColor = attributes.find((attribute) => attribute.id === 'color')?.values?.[0]?.value;
-
-  const variants = (master.variants ?? []).flatMap((variant) =>
-    variant.productId !== undefined &&
-    (!firstColorOnly || firstColor === undefined || variant.variationValues?.color === firstColor)
-      ? [{ productId: variant.productId, variationValues: variant.variationValues }]
-      : [],
-  );
+  const variants = variantEntriesOf(master, firstColorOnly);
   if (variants.length === 0) return [];
 
-  const detailResponse = await request.get(
-    shopperApiUrl('product/shopper-products/v1', 'products'),
-    {
-      params: withSite({
-        ids: variants.map((variant) => variant.productId).join(','),
-        allImages: 'false',
-      }),
-      headers: bearer(accessToken),
-    },
-  );
-  if (!detailResponse.ok()) return [];
-  const details = (await detailResponse.json()) as ProductsResult;
-  const stockById = new Map(
-    (details.data ?? []).flatMap((detail) =>
-      detail.id !== undefined ? [[detail.id, detail.inventory] as const] : [],
-    ),
-  );
+  const details = await fetchVariantDetails(request, accessToken, variants);
+  if (details === undefined) return [];
+  const stockById = stockByIdFrom(details);
+  const productName = productNameOf(master, masterId);
 
   return variants
-    .flatMap((variant) => {
-      const stock = stockById.get(variant.productId);
-      const ats = stock?.ats ?? 0;
-      if (stock?.orderable !== true || ats < MIN_ATS) return [];
-      return [
-        {
-          masterId,
-          productName: master.name ?? masterId,
-          variantId: variant.productId,
-          ats,
-          colorName: displayName(attributes, 'color', variant.variationValues?.color),
-          sizeName: displayName(attributes, 'size', variant.variationValues?.size),
-        },
-      ];
-    })
+    .flatMap((variant) => toOrderable(variant, stockById, masterId, productName, attributes))
     .sort((a, b) => b.ats - a.ats);
 };
 

@@ -5,7 +5,7 @@ export interface LoginCredentials {
   password: string;
 }
 
-// Reads the shopper account from env; kept here so the specs and the login setup share one source.
+// Login from env (shared by setup + tests).
 export function credentialsFromEnv(): LoginCredentials {
   return { email: env.account.email, password: env.account.password };
 }

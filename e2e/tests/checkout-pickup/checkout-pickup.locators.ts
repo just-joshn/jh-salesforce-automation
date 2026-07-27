@@ -1,5 +1,4 @@
-// Pickup checkout reuses the pickup cart's add-confirmation dialog and the delivery checkout's
-// confirmation locators.
+// Reuse cart and checkout confirmation locators.
 export { addConfirmation } from '../cart-pickup/cart-pickup.locators';
 export {
   confirmationContainer,

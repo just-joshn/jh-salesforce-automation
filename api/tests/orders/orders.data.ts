@@ -40,12 +40,12 @@ export interface OrderDetail {
   orderTotal?: number;
 }
 
-// Order summaries from a history response; an account with no orders omits the array.
+// Order list; no orders → missing array.
 export const ordersOf = (history: OrderHistory): OrderSummary[] => history.data ?? [];
 
 export const password = 'Test1234!';
-// Master product the spec picks an in-stock variant of at runtime; a hardcoded one goes stale.
-export const masterId = '78916783M';
+// Main product id. Spec picks an in-stock size at run time.
+export const masterId = '25591139M';
 export const shippingMethodId = 'GBP001';
 export const unknownOrderNo = 'BOGUS00000';
 

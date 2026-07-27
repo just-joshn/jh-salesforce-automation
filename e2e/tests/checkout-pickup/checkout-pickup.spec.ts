@@ -5,13 +5,12 @@ import * as Actions from './checkout-pickup.actions';
 import { checkout, pickupProduct } from './checkout-pickup.data';
 import * as Locators from './checkout-pickup.locators';
 
-// Guest completes a store-pickup purchase through to the order confirmation.
-// Store and stock details are covered by the checkout-pickup API test; this proves a
-// pickup cart can finish as a real order.
+// Guest pickup buy through order confirmation.
+// API test covers store/stock; this proves a real order.
 test('complete a guest pickup purchase and see order confirmation', async ({ page, request }) => {
   test.setTimeout(150000);
 
-  // Look up a variant that is in stock right now; hardcoded ones go stale as stock sells out.
+  // Pick a size that is in stock right now.
   const { accessToken } = await getGuestToken(request);
   const variant = await findUiOrderableVariant(request, accessToken, pickupProduct.masterId);
 
@@ -23,13 +22,12 @@ test('complete a guest pickup purchase and see order confirmation', async ({ pag
   await Actions.selectFirstStore(page);
   await Actions.closeStoreModal(page);
   await Actions.addToCart(page);
-  // The confirmation dialog only shows once the add-to-cart call succeeds. Leaving the
-  // product page before then can cancel that call and leave checkout with an empty cart.
+  // Wait for "added to cart" before leaving — or the cart may stay empty.
   await expect(Locators.addConfirmation(page).first()).toBeVisible({ timeout: 15000 });
 
   await Actions.openCheckout(page);
   await Actions.fillContact(page, checkout.email);
-  // A pickup cart already carries the store address and method, so checkout skips shipping and lands on Payment.
+  // Pickup skips shipping; goes to payment.
   await Actions.fillShippingAddressIfPresent(page, checkout.address);
   await Actions.fillPayment(page, checkout.card);
   await Actions.placeOrder(page);

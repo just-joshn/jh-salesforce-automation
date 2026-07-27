@@ -10,11 +10,11 @@ import {
   variationCount,
 } from './cart-delivery.data';
 
-// Pick an orderable variant, add it to a fresh basket for delivery, and reject an over-stock quantity.
+// Add in-stock size to cart; reject over-stock.
 test('configure a variant and add it to the basket for delivery', async ({ request }) => {
   const { accessToken } = await getGuestToken(request);
 
-  // pick an orderable variant
+  // Pick an in-stock size.
   const productResponse = await Actions.getProduct(request, accessToken, deliveryProduct.masterId);
   expect(productResponse.status()).toBe(200);
   const product = (await productResponse.json()) as Product;
@@ -23,7 +23,7 @@ test('configure a variant and add it to the basket for delivery', async ({ reque
   expect(variationCount(variant)).toBeGreaterThan(0);
   expect(typeof variant.price).toBe('number');
 
-  // a new basket defaults to delivery
+  // New cart ships by default.
   const createResponse = await Actions.createBasket(request, accessToken);
   expect(createResponse.status()).toBe(200);
   const basket = (await createResponse.json()) as Basket;
@@ -44,7 +44,7 @@ test('configure a variant and add it to the basket for delivery', async ({ reque
   expect(typeof item.price).toBe('number');
   expect(item.shipmentId).toBe('me'); // "me" is the default delivery shipment
 
-  // re-fetch to confirm it persisted
+  // Reload cart — item should stick.
   const refetchResponse = await Actions.getBasket(request, accessToken, basket.basketId);
   expect(refetchResponse.status()).toBe(200);
   const persisted = (await refetchResponse.json()) as Basket;
@@ -53,7 +53,7 @@ test('configure a variant and add it to the basket for delivery', async ({ reque
   );
   expect(persistedItem?.quantity).toBe(deliveryProduct.quantity);
 
-  // an over-stock quantity must be rejected
+  // Too many units → reject.
   const overResponse = await Actions.addItem(
     request,
     accessToken,

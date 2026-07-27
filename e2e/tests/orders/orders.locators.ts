@@ -1,6 +1,6 @@
 import type { Locator, Page } from '@playwright/test';
 
-// Sign-in form, scoped so it ignores other page inputs. Two steps: enter email, click Password, then the password field and Sign In appear.
+// Login form only. Step 1: email. Step 2: password.
 const authForm = (page: Page): Locator => page.getByTestId('sf-auth-modal-form');
 export const signinEmail = (page: Page): Locator => authForm(page).getByLabel('Email');
 export const usePasswordMethod = (page: Page): Locator =>

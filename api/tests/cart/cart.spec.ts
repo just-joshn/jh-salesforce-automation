@@ -10,13 +10,13 @@ const requireDefined = <T>(value: T | undefined, message: string): T => {
   return value;
 };
 
-// Add, update, and remove basket items; totals stay consistent and persist, and over-stock is rejected.
+// Add/update/remove cart; totals stick; over-stock fails.
 test('reconcile a basket (update quantity, remove) with consistent, persisted totals', async ({
   request,
 }) => {
   const { accessToken } = await getGuestToken(request);
 
-  // Look up two variants that are in stock right now instead of trusting a hardcoded pair.
+  // Pick two sizes that are in stock right now.
   const found = await findOrderableVariants(request, accessToken, {
     masterId: cart.masterId,
     minCount: 2,
@@ -36,7 +36,7 @@ test('reconcile a basket (update quantity, remove) with consistent, persisted to
   const afterAdd = (await addResponse.json()) as Basket;
   const added = lineItems(afterAdd);
   expect(added).toHaveLength(2);
-  // line items should sum to the subtotal
+  // Line prices sum to subtotal.
   expect(lineItemsTotal(added)).toBeCloseTo(subtotal(afterAdd), 2);
 
   const itemA = requireDefined(
@@ -48,7 +48,7 @@ test('reconcile a basket (update quantity, remove) with consistent, persisted to
     'expected both items in the basket',
   );
 
-  // update a line's quantity
+  // Change quantity.
   const updateResponse = await Actions.updateItemQuantity(
     request,
     accessToken,
@@ -63,7 +63,7 @@ test('reconcile a basket (update quantity, remove) with consistent, persisted to
   expect(updatedA?.quantity).toBe(cart.updatedQuantity);
   expect(lineItemsTotal(updatedItems)).toBeCloseTo(subtotal(afterUpdate), 2);
 
-  // remove the other line
+  // Remove the other item.
   const removeResponse = await Actions.removeItem(
     request,
     accessToken,
@@ -77,7 +77,7 @@ test('reconcile a basket (update quantity, remove) with consistent, persisted to
   expect(firstLineItem(afterRemove).productId).toBe(variantA.variantId);
   expect(lineItemsTotal(remaining)).toBeCloseTo(subtotal(afterRemove), 2);
 
-  // re-fetch to confirm the changes persisted
+  // Reload cart — changes should stick.
   const refetchResponse = await Actions.getBasket(request, accessToken, created.basketId);
   expect(refetchResponse.status()).toBe(200);
   const persisted = (await refetchResponse.json()) as Basket;
@@ -88,7 +88,7 @@ test('reconcile a basket (update quantity, remove) with consistent, persisted to
   expect(persistedA.quantity).toBe(cart.updatedQuantity);
   expect(lineItemsTotal(persistedItems)).toBeCloseTo(subtotal(persisted), 2);
 
-  // an over-stock quantity must be rejected
+  // Too many units → reject.
   const overResponse = await Actions.updateItemQuantity(
     request,
     accessToken,
@@ -100,7 +100,7 @@ test('reconcile a basket (update quantity, remove) with consistent, persisted to
   const fault = (await overResponse.json()) as Fault;
   expect(fault.type).toContain('product-item-not-available');
 
-  // emptying the cart leaves no items and a zero total
+  // Empty cart → no items, total 0.
   const emptyResponse = await Actions.removeItem(
     request,
     accessToken,

@@ -25,7 +25,7 @@ export const getProductAtStore = (
     headers: bearer(accessToken),
   });
 
-// Return the first candidate store that has the variant orderable in its own stock.
+// First store that has this size in stock.
 export const findStoreWithStock = async (
   request: APIRequestContext,
   accessToken: string,
@@ -50,7 +50,7 @@ export const createBasket = (
 ): Promise<APIResponse> =>
   request.post(Endpoints.baskets(), { params: withSite(), headers: bearer(accessToken), data: {} });
 
-// inventoryId ties the line to the chosen store's stock
+// inventoryId = that store's stock.
 export const addItem = (
   request: APIRequestContext,
   accessToken: string,

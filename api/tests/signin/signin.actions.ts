@@ -24,7 +24,7 @@ export const registerCustomer = (
     },
   });
 
-// sign in a registered shopper through SLAS (the login API)
+// Sign in via shop login API.
 export const signIn = (
   request: APIRequestContext,
   email: string,

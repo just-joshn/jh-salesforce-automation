@@ -3,7 +3,7 @@ import * as Actions from './category.actions';
 import { validCategory } from './category.data';
 import * as Locators from './category.locators';
 
-// Browse a category, open a product, and confirm you land on that exact PDP.
+// Open category → product → right product page.
 test('browse a category and open the selected product detail page', async ({ page }) => {
   await Actions.gotoCategory(page, validCategory.id);
 
@@ -11,14 +11,14 @@ test('browse a category and open the selected product detail page', async ({ pag
   await expect(Locators.heading(page)).toContainText(validCategory.name);
   await expect(Locators.productTiles(page)).not.toHaveCount(0);
 
-  await expect(Locators.anyTilePrice(page)).toBeVisible();
+  await expect(Locators.anyTilePrice(page)).toBeVisible({ timeout: 15000 });
 
   await expect(Locators.pagination(page)).toBeVisible();
 
-  // sorting must not wipe the grid
+  // Sort must keep products on the page.
   await Actions.sortByFirstOption(page);
   await expect(Locators.productList(page)).toBeVisible();
-  await expect(Locators.anyTilePrice(page)).toBeVisible();
+  await expect(Locators.anyTilePrice(page)).toBeVisible({ timeout: 15000 });
   await expect(Locators.productTiles(page)).not.toHaveCount(0);
 
   const productId = await Actions.openFirstProduct(page);

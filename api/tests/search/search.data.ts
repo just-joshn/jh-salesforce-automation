@@ -5,7 +5,7 @@ export interface ProductSearchHit {
   orderable?: boolean;
 }
 
-// search response; when nothing matches there is no hits array
+// Search body; no hits if empty.
 export interface ProductSearchResult {
   total: number;
   hits?: ProductSearchHit[];
@@ -20,11 +20,11 @@ export interface SearchQuery {
   term: string;
 }
 
-// Search hits; the response omits the array entirely when nothing matches.
+// Hit list; missing array means empty.
 export const hitsOf = (result: ProductSearchResult): ProductSearchHit[] => result.hits ?? [];
 
-// a common term expected to return results
+// Search word that finds products.
 export const commonQuery: SearchQuery = { term: 'dress' };
 
-// a valid term that matches nothing, for the empty-result case
+// Search word that finds nothing.
 export const noMatchQuery: SearchQuery = { term: 'zzqqxwvnoexist123' };

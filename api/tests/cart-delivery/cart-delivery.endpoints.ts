@@ -1,6 +1,6 @@
 import { shopperApiUrl } from '../../support/scapi';
 
-// product ids can contain spaces, so encode them into the path
+// Encode product ids (may have spaces).
 export const product = (productId: string): string =>
   shopperApiUrl('product/shopper-products/v1', `products/${encodeURIComponent(productId)}`);
 

@@ -4,7 +4,7 @@ import * as Actions from './register.actions';
 import type { Customer, Fault } from './register.data';
 import { invalidEmail, registrant, uniqueEmail } from './register.data';
 
-// Sign up once, then confirm a duplicate email and a malformed email are both rejected.
+// Sign up once; reject duplicate and bad email.
 test('register a new account, and reject duplicate and invalid emails', async ({ request }) => {
   const { accessToken } = await getGuestToken(request);
   const email = uniqueEmail();
@@ -16,12 +16,12 @@ test('register a new account, and reject duplicate and invalid emails', async ({
   expect(customer.customerNo).toBeTruthy();
   expect(customer.login).toBe(email);
 
-  // same email a second time must be rejected as a duplicate
+  // Same email again → reject.
   const duplicate = await Actions.registerCustomer(request, accessToken, registrant(email));
   expect(duplicate.status()).toBe(400);
   expect(((await duplicate.json()) as Fault).type).toContain('login-already-in-use');
 
-  // a malformed email is rejected the same way
+  // Bad email → reject.
   const invalid = await Actions.registerCustomer(request, accessToken, registrant(invalidEmail));
   expect(invalid.status()).toBe(400);
 });

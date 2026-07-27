@@ -33,12 +33,11 @@ const pickPickupPair = async (
   throw new Error('expected a store with the pickup item in stock');
 };
 
-// One order that splits into a delivery shipment and a pickup shipment, each item on the right one.
+// One order: some items ship, some pick up.
 test('place one order that splits into delivery and pickup shipments', async ({ request }) => {
   const { accessToken } = await getGuestToken(request);
 
-  // Look up two variants that are in stock right now (hardcoded ones go stale): the
-  // best-stocked for delivery, and another that some store also stocks for pickup.
+  // Two in-stock sizes: one to ship, one a store also has for pickup.
   const variants = await findOrderableVariants(request, accessToken, {
     masterId: checkout.masterId,
     minCount: 2,
@@ -59,7 +58,7 @@ test('place one order that splits into delivery and pickup shipments', async ({ 
   const created = (await (await Actions.createBasket(request, accessToken)).json()) as Basket;
   const id = created.basketId;
 
-  // delivery item on the default shipment, pickup item on a second shipment
+  // Ship item on main shipment; pickup on second.
   expect(
     (await Actions.addItem(request, accessToken, id, deliveryVariant.variantId, 1)).status(),
   ).toBe(200);
@@ -75,7 +74,7 @@ test('place one order that splits into delivery and pickup shipments', async ({ 
     ).status(),
   ).toBe(200);
 
-  // address and method for each shipment
+  // Address + method per shipment.
   await Actions.setShippingAddress(
     request,
     accessToken,
@@ -115,7 +114,7 @@ test('place one order that splits into delivery and pickup shipments', async ({ 
     ).status(),
   ).toBe(200);
 
-  // place the order
+  // Place the order.
   const orderResponse = await Actions.createOrder(request, accessToken, id);
   expect(orderResponse.status()).toBe(200);
   const order = (await orderResponse.json()) as Order;
@@ -136,7 +135,7 @@ test('place one order that splits into delivery and pickup shipments', async ({ 
   expect(shippingMethodId(pickupShipment)).toBe(checkout.pickupMethodId);
   expect(pickupShipment.c_fromStoreId).toBe(store.id);
 
-  // The order saved and can be read back, and the cart is used up.
+  // Order loads; cart is used up.
   expect((await Actions.getOrder(request, accessToken, orderNumber(order))).status()).toBe(200);
   expect((await Actions.getBasket(request, accessToken, id)).status()).toBe(404);
 });

@@ -20,7 +20,7 @@ export const shippingAddress = (basketId: string, shipmentId: string): string =>
     BASKETS,
     `baskets/${encodeURIComponent(basketId)}/shipments/${encodeURIComponent(shipmentId)}/shipping-address`,
   );
-// PATCH here to assign the pickup method and store
+// Set pickup method + store.
 export const shipment = (basketId: string, shipmentId: string): string =>
   shopperApiUrl(
     BASKETS,

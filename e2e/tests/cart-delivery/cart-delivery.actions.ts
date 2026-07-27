@@ -6,13 +6,12 @@ export const openProduct = async (page: Page, productId: string): Promise<void> 
   await page.goto(buildPath(`/product/${productId}`));
 };
 
-// Choosing a color rebuilds the size buttons for a beat, so the click uses a generous timeout to wait it out.
+// Color change rebuilds sizes — wait longer for the click.
 export const selectVariation = async (page: Page, attribute: string): Promise<void> => {
   await Locators.variationOption(page, attribute).first().click({ timeout: 30000 });
 };
 
-// The spec discovers an in-stock size through the API first, so the click is deterministic
-// instead of probing sizes until one isn't flagged out of stock.
+// Click the in-stock size we already looked up.
 export const selectSize = async (page: Page, size: string): Promise<void> => {
   await Locators.sizeOption(page, size).click({ timeout: 30000 });
 };

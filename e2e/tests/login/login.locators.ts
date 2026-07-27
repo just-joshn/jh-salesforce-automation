@@ -2,8 +2,7 @@ import type { Page } from '@playwright/test';
 
 export const container = (page: Page) => page.getByTestId('login-page');
 
-// Sign-in form, scoped so it ignores the newsletter fields lower on the page. Login is two steps:
-// enter email, click Password, then the password field and Sign In appear.
+// Login form only (not newsletter). Step 1: email. Step 2: password.
 const authForm = (page: Page) => page.getByTestId('sf-auth-modal-form');
 export const email = (page: Page) => authForm(page).getByLabel('Email');
 export const usePasswordMethod = (page: Page) =>

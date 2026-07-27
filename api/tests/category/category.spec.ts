@@ -4,7 +4,7 @@ import * as Actions from './category.actions';
 import type { CategoryDetail, ProductDetail, ProductSearchResult } from './category.data';
 import { hitsOf, invalidCategory, validCategory } from './category.data';
 
-// Browse a category, list its products, open one, and 404 on a category that doesn't exist.
+// Category list, open product, unknown id → 404.
 test('a category returns its details and product list; an unknown category is not found', async ({
   request,
 }) => {
@@ -16,7 +16,7 @@ test('a category returns its details and product list; an unknown category is no
   expect(category.id).toBe(validCategory.id);
   expect(category.name).toBeTruthy();
 
-  // the category should return products, not an empty list
+  // Category must have products.
   const searchResponse = await Actions.searchByCategory(request, accessToken, validCategory.id);
   expect(searchResponse.status()).toBe(200);
   const result = (await searchResponse.json()) as ProductSearchResult;
@@ -24,7 +24,7 @@ test('a category returns its details and product list; an unknown category is no
   const hits = hitsOf(result);
   expect(hits.length).toBeGreaterThan(0);
 
-  // every hit has an id and name; at least one has a real price; each has a boolean stock flag
+  // Each hit: id, name, stock flag; some have price.
   for (const hit of hits) {
     expect(hit.productId).toBeTruthy();
     expect(hit.productName).toBeTruthy();
@@ -34,13 +34,13 @@ test('a category returns its details and product list; an unknown category is no
   if (!firstHit) throw new Error('expected at least one category hit');
   expect(typeof firstHit.orderable).toBe('boolean');
 
-  // opening a hit returns that same product
+  // Open hit → same product.
   const productResponse = await Actions.getProduct(request, accessToken, firstHit.productId);
   expect(productResponse.status()).toBe(200);
   const product = (await productResponse.json()) as ProductDetail;
   expect(product.id).toBe(firstHit.productId);
 
-  // an unknown category id returns 404
+  // Unknown category → 404.
   const invalidResponse = await Actions.getCategory(request, accessToken, invalidCategory.id);
   expect(invalidResponse.status()).toBe(404);
 });

@@ -29,16 +29,16 @@ export interface Fault {
   title?: string;
 }
 
-// Variants of a master product; absent when the product has none.
+// Color/size list; missing if none.
 export const variantsOf = (product: Product): Variant[] => product.variants ?? [];
 
-// How many option types (color, size, ...) the variant has values for.
+// How many options (color, size, …) are set.
 export const variationCount = (variant: Variant): number =>
   Object.keys(variant.variationValues ?? {}).length;
 
 export const lineItems = (basket: Basket): ProductItem[] => basket.productItems ?? [];
 
-// The one line item the add step expects; fails clearly if the basket is unexpectedly empty.
+// First cart line, or fail clear.
 export const firstLineItem = (basket: Basket): ProductItem => {
   const [item] = lineItems(basket);
   if (!item) throw new Error('expected the added product item');
@@ -51,9 +51,9 @@ export interface DeliveryFixture {
   overQuantity: number;
 }
 
-// master product with color/size variants, known to be shippable
+// Product that can ship.
 export const deliveryProduct: DeliveryFixture = {
-  masterId: '78916783M',
+  masterId: '25591139M',
   quantity: 2,
   overQuantity: 999999,
 };

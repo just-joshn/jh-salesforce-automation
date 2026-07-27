@@ -3,7 +3,7 @@ import * as Actions from './orders.actions';
 import { password, uniqueEmail } from './orders.data';
 import * as Locators from './orders.locators';
 
-// Order history requires sign-in; once signed in, a shopper sees only their own order.
+// Signed-in shopper sees only their orders.
 test('an authenticated shopper views their order history and detail; a guest is redirected', async ({
   page,
   request,
@@ -12,7 +12,7 @@ test('an authenticated shopper views their order history and detail; a guest is 
   const credentials = { email: uniqueEmail(), password };
   const orderNo = await Actions.provisionCustomerWithOrder(request, credentials);
 
-  // Signed-out access to order history should redirect to login.
+  // Guest on order history → login page.
   await Actions.openOrderHistory(page);
   await expect(page).toHaveURL(/\/login/, { timeout: 20000 });
 

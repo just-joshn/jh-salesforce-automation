@@ -5,7 +5,7 @@ export interface RegistrationInput {
   password: string;
 }
 
-// Unique per call so each run registers a fresh account.
+// New email every run.
 export const uniqueEmail = (): string =>
   `qa.portfolio.${Date.now()}${Math.floor(Math.random() * 100000)}@gmail.com`;
 

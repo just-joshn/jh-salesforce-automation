@@ -5,8 +5,7 @@ import * as Actions from './signin.actions';
 import { password, product, uniqueEmail } from './signin.data';
 import * as Locators from './signin.locators';
 
-// Signing in merges the guest cart into the account without losing or duplicating the item.
-// Credential validation and rejection are covered by the sign-in API test.
+// Sign-in keeps the guest cart item. Bad-password checks live in the API test.
 test('sign in preserves the guest cart and authenticates the shopper', async ({
   page,
   request,
@@ -14,10 +13,10 @@ test('sign in preserves the guest cart and authenticates the shopper', async ({
   test.setTimeout(120000);
   const credentials = { email: uniqueEmail(), password };
 
-  // Create the account over the API so the browser stays a fresh guest and the cart merge runs for real at sign-in.
+  // Make account via API; browser stays guest until sign-in.
   await Actions.provisionViaApi(request, credentials);
 
-  // Look up a variant that is in stock right now; hardcoded ones go stale as stock sells out.
+  // Pick a size that is in stock right now.
   const { accessToken } = await getGuestToken(request);
   const variant = await findUiOrderableVariant(request, accessToken, product.masterId);
 

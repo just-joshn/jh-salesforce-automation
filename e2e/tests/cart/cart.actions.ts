@@ -6,13 +6,12 @@ export const openProduct = async (page: Page, productId: string): Promise<void> 
   await page.goto(buildPath(`/product/${productId}`));
 };
 
-// Picking a color redraws the size buttons, so the click gets extra time to wait out the flicker.
+// Color change rebuilds sizes — wait longer for the click.
 export const selectVariation = async (page: Page, attribute: string): Promise<void> => {
   await Locators.variationOption(page, attribute).first().click({ timeout: 30000 });
 };
 
-// The spec already found an in-stock size through the API, so this clicks one known-good
-// size instead of trying sizes until one isn't marked out of stock.
+// Click the in-stock size we already looked up.
 export const selectSize = async (page: Page, size: string): Promise<void> => {
   await Locators.sizeOption(page, size).click({ timeout: 30000 });
 };

@@ -6,13 +6,12 @@ export const openProduct = async (page: Page, productId: string): Promise<void> 
   await page.goto(buildPath(`/product/${productId}`));
 };
 
-// Picking a color redraws the size buttons, so the click gets extra time to wait out the flicker.
+// Color change rebuilds sizes — wait longer for the click.
 export const selectVariation = async (page: Page, attribute: string): Promise<void> => {
   await Locators.variationOption(page, attribute).first().click({ timeout: 30000 });
 };
 
-// The spec already found an in-stock size through the API, so this clicks one known-good
-// size instead of trying sizes until one isn't marked out of stock.
+// Click the in-stock size we already looked up.
 export const selectSize = async (page: Page, size: string): Promise<void> => {
   await Locators.sizeOption(page, size).click({ timeout: 30000 });
 };
@@ -21,7 +20,7 @@ export const openStoreSelection = async (page: Page): Promise<void> => {
   await Locators.selectStoreButton(page).first().click();
 };
 
-// The store finder needs a country selected before it will search on the postal code.
+// Pick country before searching by zip.
 export const searchStore = async (
   page: Page,
   country: string,
@@ -36,11 +35,20 @@ export const selectFirstStore = async (page: Page): Promise<void> => {
   await Locators.storeChoice(page).first().click();
 };
 
+// Close store finder so it doesn't block Add to Cart.
 export const closeStoreModal = async (page: Page): Promise<void> => {
-  const close = Locators.storeModalClose(page).first();
+  const modal = Locators.storeModal(page);
+  if (!(await modal.isVisible().catch(() => false))) return;
+
+  const close = Locators.storeModalClose(page);
   if (await close.isVisible().catch(() => false)) {
-    await close.click();
+    await close.click().catch(() => undefined);
   }
+  if (await modal.isVisible().catch(() => false)) {
+    await page.keyboard.press('Escape');
+  }
+
+  await modal.waitFor({ state: 'hidden', timeout: 10000 });
 };
 
 export const addToCart = async (page: Page): Promise<void> => {

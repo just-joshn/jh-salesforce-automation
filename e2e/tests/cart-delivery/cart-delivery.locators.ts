@@ -6,10 +6,11 @@ export const variationGroup = (page: Page, attribute: string): Locator =>
 export const variationOption = (page: Page, attribute: string): Locator =>
   variationGroup(page, attribute).getByRole('radio');
 
+// exact so "L" does not match "XL"
 export const sizeOption = (page: Page, size: string): Locator =>
-  variationGroup(page, 'size').getByRole('radio', { name: size });
+  variationGroup(page, 'size').getByRole('radio', { name: size, exact: true });
 
-// There's a desktop button and a sticky mobile one, so callers take .first().
+// Desktop + mobile buttons — use .first().
 export const addToCart = (page: Page): Locator =>
   page.getByRole('button', { name: /^add to cart$/i });
 

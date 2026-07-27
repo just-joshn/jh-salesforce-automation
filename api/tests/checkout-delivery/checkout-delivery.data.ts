@@ -9,7 +9,7 @@ export interface Address {
   countryCode: string;
 }
 
-// the test store won't accept a real card number, so this is a safe stand-in
+// Fake card the demo store accepts.
 export interface Card {
   cardType: string;
   expirationMonth: number;
@@ -51,18 +51,18 @@ export const paymentInstrumentsOf = (order: Order): { paymentMethodId?: string }
   order.paymentInstruments ?? [];
 export const orderTotalOf = (basket: Basket): number => basket.orderTotal ?? 0;
 
-// The shipment a step expects on the order; fails clearly if it is missing.
+// Get shipment or fail clear.
 export const shipmentById = (order: Order, shipmentId: string): Shipment => {
   const shipment = shipmentsOf(order).find((s) => s.shipmentId === shipmentId);
   if (!shipment) throw new Error(`order has no shipment ${shipmentId}`);
   return shipment;
 };
 
-// The shipping method id assigned to a shipment (the delivery method), if one is set.
+// Shipping method id on a shipment.
 export const shippingMethodId = (shipment: Shipment): string | undefined =>
   shipment.shippingMethod?.id;
 
-// The order number of a placed order; fails clearly if the order didn't come back with one.
+// Order number or fail clear.
 export const orderNumber = (order: Order): string => {
   if (!order.orderNo) throw new Error('response has no order number');
   return order.orderNo;
@@ -77,10 +77,9 @@ export interface CheckoutFixture {
   card: Card;
 }
 
-// Guest checkout fixture; the email avoids example.com, which the store rejects. The spec
-// picks an in-stock variant of the master at runtime, since hardcoded variants go stale.
+// Guest checkout data. No example.com emails (store rejects them).
 export const checkout: CheckoutFixture = {
-  masterId: '78916783M',
+  masterId: '25591139M',
   email: 'test.shopper@gmail.com',
   shipmentId: 'me',
   shippingMethodId: 'GBP001',

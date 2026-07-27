@@ -1,6 +1,6 @@
 import type { Locator, Page } from '@playwright/test';
 
-// One search box serves both desktop and mobile, so filter to the visible one.
+// Use the search box that is visible.
 export const searchInput = (page: Page): Locator =>
   page.getByPlaceholder('Search for products...').filter({ visible: true }).first();
 
@@ -15,7 +15,7 @@ export const productLinks = (page: Page): Locator => page.locator('a[href*="/pro
 
 export const firstProductLink = (page: Page): Locator => productLinks(page).first();
 
-// Any result tile's first price ($, £, or €); asserts the results show prices at all.
+// Any price on a result tile.
 export const anyTilePrice = (page: Page): Locator => productTiles(page).getByText(/[$£€]/).first();
 
 export const productDetail = (page: Page): Locator => page.getByTestId('product-details-page');

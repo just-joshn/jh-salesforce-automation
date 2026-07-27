@@ -14,7 +14,7 @@ export const search = async (page: Page, term: string): Promise<void> => {
   await input.press('Enter');
 };
 
-// Grabs the product id from the link before clicking so the spec can verify it opened the right one.
+// Read product id from link, then click.
 export const openFirstProduct = async (page: Page): Promise<string> => {
   const link = Locators.firstProductLink(page);
   const productId = Data.extractProductId(await link.getAttribute('href'));

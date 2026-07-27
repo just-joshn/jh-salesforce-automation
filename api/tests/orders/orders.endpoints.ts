@@ -4,12 +4,12 @@ const BASKETS = 'checkout/shopper-baskets/v1';
 const ORDERS = 'checkout/shopper-orders/v1';
 const CUSTOMERS = 'customer/shopper-customers/v1';
 
-// account creation and that shopper's order history
+// Create account + list their orders.
 export const customers = (): string => shopperApiUrl(CUSTOMERS, 'customers');
 export const customerOrders = (customerId: string): string =>
   shopperApiUrl(CUSTOMERS, `customers/${encodeURIComponent(customerId)}/orders`);
 
-// endpoints the placeOrder helper walks through to seed one order
+// Steps to place one order for setup.
 export const baskets = (): string => shopperApiUrl(BASKETS, 'baskets');
 export const basket = (basketId: string): string =>
   shopperApiUrl(BASKETS, `baskets/${encodeURIComponent(basketId)}`);

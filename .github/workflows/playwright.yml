@@ -1,23 +1,22 @@
 name: E2E & API Tests
 
-# Full Playwright suite (setup + e2e-chromium + api) against the live Salesforce demo store.
+# Run all tests against the live demo shop.
 on:
   pull_request:
-    branches: [main] # during a PR into main
+    branches: [main] # PR into main
   push:
-    branches: [main] # after a PR merge, or a direct push to main
+    branches: [main] # push to main
   schedule:
-    # Nightly at 5 AM Pacific. GitHub supports the IANA timezone field (generally
-    # available March 2026) and handles daylight saving, so this stays 5 AM local year round.
+    # Every night at 5 AM Pacific.
     - cron: '0 5 * * *'
       timezone: 'America/Los_Angeles'
-  workflow_dispatch: # manual run from the Actions tab
+  workflow_dispatch: # run by hand
 
-# Least privilege: the job only needs to read the repo to check it out.
+# Job only needs read access to the repo.
 permissions:
   contents: read
 
-# A newer push cancels a PR run still going; post-merge, nightly, and manual runs always finish.
+# New PR push cancels the old run. Other runs always finish.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -27,19 +26,17 @@ jobs:
     name: Playwright (setup + e2e-chromium + api)
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    # The official Playwright image ships the browsers and Node, so there is no
-    # browser-install step. Pin the tag to the @playwright/test version in package.json.
+    # Playwright image has browsers + Node. Tag matches package.json.
     container:
       image: mcr.microsoft.com/playwright:v1.61.1-noble
       options: --user 1001
     steps:
       - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6 # pnpm version is read from package.json "packageManager"
+      - uses: pnpm/action-setup@v6 # pnpm version from package.json
       - run: pnpm install --frozen-lockfile
       - run: pnpm test
         env:
-          # With no account secrets, the auth setup skips itself and the run is guest-only;
-          # all SFCC_* config falls back to the public demo defaults, so no secrets are required.
+          # No login secrets → guest-only. Public demo needs no secrets.
           E2E_ACCOUNT_EMAIL: ${{ secrets.E2E_ACCOUNT_EMAIL }}
           E2E_ACCOUNT_PASSWORD: ${{ secrets.E2E_ACCOUNT_PASSWORD }}
       - uses: actions/upload-artifact@v7

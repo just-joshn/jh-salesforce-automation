@@ -22,7 +22,7 @@ export interface Inventory {
   ats?: number;
 }
 
-// inventories is only populated when stock is requested per store
+// inventories only if we asked per store.
 export interface Product {
   id: string;
   inventory?: Inventory;
@@ -48,10 +48,10 @@ export interface Basket {
   shipments?: Shipment[];
 }
 
-// Stores from a search; the demo omits the array for an area with none nearby.
+// Store list; missing array = no stores.
 export const storesOf = (result: StoreSearchResult): Store[] => result.data ?? [];
 
-// True when the store can sell the variant (its own inventory if it has one, else the default).
+// True if store can sell this size.
 export const orderableInStore = (product: Product, inventoryId: string): boolean => {
   const stock =
     (product.inventories ?? []).find((entry) => entry.id === inventoryId) ?? product.inventory;
@@ -61,14 +61,14 @@ export const orderableInStore = (product: Product, inventoryId: string): boolean
 export const lineItems = (basket: Basket): ProductItem[] => basket.productItems ?? [];
 export const shipmentsOf = (basket: Basket): Shipment[] => basket.shipments ?? [];
 
-// The shipment a step expects on the basket; fails clearly if it is missing.
+// Get cart shipment or fail clear.
 export const shipmentById = (basket: Basket, shipmentId: string): Shipment => {
   const shipment = shipmentsOf(basket).find((entry) => entry.shipmentId === shipmentId);
   if (!shipment) throw new Error(`basket has no shipment ${shipmentId}`);
   return shipment;
 };
 
-// The shipping method id assigned to a shipment (e.g. the pickup method), if one is set.
+// Method id on a shipment (e.g. pickup).
 export const shippingMethodId = (shipment: Shipment): string | undefined =>
   shipment.shippingMethod?.id;
 
@@ -81,10 +81,9 @@ export interface PickupFixture {
   empty: StoreSearchQuery;
 }
 
-// Pickup fixture: a shirt master product (the spec picks an in-stock variant at runtime),
-// the in-store pickup method GBP005, and areas with and without nearby stores.
+// Pickup data: product, pickup method, areas with/without stores.
 export const pickup: PickupFixture = {
-  masterId: '78916783M',
+  masterId: '25591139M',
   quantity: 1,
   pickupMethodId: 'GBP005',
   shipmentId: 'me',

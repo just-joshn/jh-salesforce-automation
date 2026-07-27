@@ -26,7 +26,7 @@ export default tseslint.config(
       },
     },
     rules: {
-      // Unawaited Playwright calls make tests pass or fail at random; flag them.
+      // Catch missing await on Playwright calls.
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/consistent-type-imports': 'error',
       complexity: ['error', { max: 5, variant: 'classic' }],
@@ -34,7 +34,7 @@ export default tseslint.config(
     },
   },
   {
-    // Plain JS/MJS config files sit outside the typed project; drop the type-aware rules here.
+    // JS config files: no TypeScript-only rules.
     files: ['**/*.{js,mjs}'],
     extends: [tseslint.configs.disableTypeChecked],
   },

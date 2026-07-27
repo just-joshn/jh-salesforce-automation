@@ -4,7 +4,7 @@ import * as Actions from './signin.actions';
 import type { Customer } from './signin.data';
 import { registrant, uniqueEmail, wrongPassword } from './signin.data';
 
-// Sign in a registered shopper, confirm the session is theirs, and reject a wrong password.
+// Sign in, check session, reject bad password.
 test('sign in the correct shopper and reject a wrong password', async ({ request }) => {
   const { accessToken: guestToken } = await getGuestToken(request);
   const account = registrant(uniqueEmail());
@@ -14,12 +14,12 @@ test('sign in the correct shopper and reject a wrong password', async ({ request
   expect(login.loginStatus).toBe(303);
   const { accessToken, customerId } = requireSession(login);
 
-  // the session belongs to the shopper who signed in
+  // Session is for that shopper.
   const profileResponse = await Actions.getCustomer(request, accessToken, customerId);
   expect(profileResponse.status()).toBe(200);
   expect(((await profileResponse.json()) as Customer).login).toBe(account.email);
 
-  // a wrong password must not sign the shopper in
+  // Wrong password → no login.
   const guest2 = await getGuestToken(request);
   const account2 = registrant(uniqueEmail());
   expect((await Actions.registerCustomer(request, guest2.accessToken, account2)).status()).toBe(

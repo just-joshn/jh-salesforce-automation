@@ -2,9 +2,8 @@ import type { APIRequestContext } from '@playwright/test';
 import { createHash, randomBytes } from 'crypto';
 import { env, scapiBaseUrl } from '../../config/env';
 
-// Sign-in helpers for SLAS, Salesforce's shopper login API.
-// The demo's login client is public (it has no secret), so tests can run the same two-step
-// PKCE flow the storefront uses: ask for a one-time code, then trade it for an access token.
+// Login helpers (SLAS = shop login API).
+// Demo login is public: get a one-time code, trade it for a token.
 
 export interface GuestToken {
   accessToken: string;
@@ -24,8 +23,7 @@ function base64url(input: Buffer): string {
   return input.toString('base64url');
 }
 
-// Read the one-time code and usid out of a SLAS redirect's Location header. Guest and
-// registered login both use this; returns null when either value is missing.
+// Pull one-time code + usid from redirect URL. Null if missing.
 function authCodeFromRedirect(location: string | undefined): { code: string; usid: string } | null {
   if (!location) return null;
   const params = new URL(location).searchParams;
@@ -43,8 +41,7 @@ export async function getGuestToken(request: APIRequestContext): Promise<GuestTo
   const authorizeUrl = `${scapiBaseUrl()}/shopper/auth/v1/organizations/${org}/oauth2/authorize`;
   const tokenUrl = `${scapiBaseUrl()}/shopper/auth/v1/organizations/${org}/oauth2/token`;
 
-  // Step 1: ask for the one-time code. It arrives in a redirect's Location header, not the
-  // body, so maxRedirects: 0 keeps the redirect unfollowed and readable.
+  // Ask for one-time code (in redirect header; don't follow the redirect).
   const authorize = await request.get(authorizeUrl, {
     params: {
       client_id: env.scapi.clientId,
@@ -99,8 +96,7 @@ export interface RegisteredLogin {
   customerId?: string;
 }
 
-// Return the token and customer id from a login, or fail the test with a clear message.
-// Every signed-in spec needs this "did login really work?" check, so it lives here once.
+// Need a real login token, or fail with a clear error.
 export function requireSession(
   login: RegisteredLogin,
   who = 'the shopper',
@@ -111,9 +107,7 @@ export function requireSession(
   return { accessToken: login.accessToken, customerId: login.customerId };
 }
 
-// Sign in a registered shopper with email and password, the same way the storefront does.
-// Credentials go to the login endpoint using Basic auth. Success is a 303 redirect carrying
-// the one-time code (a wrong password gets 401); the code is then traded for an access token.
+// Sign in with email + password. Good login → code → token. Bad password → 401.
 export async function loginRegisteredShopper(
   request: APIRequestContext,
   email: string,

@@ -25,14 +25,14 @@ export const registerCustomer = (
     },
   });
 
-// sign in a registered shopper through SLAS (the login API)
+// Sign in via shop login API.
 export const signIn = (
   request: APIRequestContext,
   email: string,
   password: string,
 ): Promise<RegisteredLogin> => loginRegisteredShopper(request, email, password);
 
-// run a full delivery checkout for the given variant and return the order number
+// Full delivery checkout → order number.
 export const placeOrder = async (
   request: APIRequestContext,
   accessToken: string,

@@ -33,18 +33,17 @@ const pickInStockPair = async (
   throw new Error('expected a store with an orderable variant in stock');
 };
 
-// Guest pickup checkout end to end: the order is assigned to the in-stock store, and the
-// basket is used up afterwards.
+// Guest pickup order at the store; cart is empty after.
 test('place a pickup order assigned to the correct store', async ({ request }) => {
   const { accessToken } = await getGuestToken(request);
 
-  // Look up variants that are in stock right now; hardcoded ones go stale as stock sells out.
+  // Pick sizes that are in stock right now.
   const variants = await findOrderableVariants(request, accessToken, {
     masterId: checkout.masterId,
     minCount: 1,
   });
 
-  // find a store stocking one of them (most stores keep their own inventory list)
+  // Find a store that stocks one size.
   const stores = (await (
     await Actions.searchStores(request, accessToken, checkout.storeQuery)
   ).json()) as StoreSearchResult;
@@ -59,7 +58,7 @@ test('place a pickup order assigned to the correct store', async ({ request }) =
   const created = (await (await Actions.createBasket(request, accessToken)).json()) as Basket;
   const id = created.basketId;
 
-  // add against the store's stock, then assign pickup
+  // Add using store stock, set pickup.
   expect(
     (await Actions.addItem(request, accessToken, id, variantId, 1, store.inventoryId)).status(),
   ).toBe(200);
@@ -97,7 +96,7 @@ test('place a pickup order assigned to the correct store', async ({ request }) =
     200,
   );
 
-  // place the order
+  // Place the order.
   const orderResponse = await Actions.createOrder(request, accessToken, id);
   expect(orderResponse.status()).toBe(200);
   const order = (await orderResponse.json()) as Order;
@@ -109,7 +108,7 @@ test('place a pickup order assigned to the correct store', async ({ request }) =
   expect(item?.inventoryId).toBe(store.inventoryId);
   const orderNo = orderNumber(order);
 
-  // the order can be read back, and the basket is gone (404)
+  // Order loads; cart is gone (404).
   expect((await Actions.getOrder(request, accessToken, orderNo)).status()).toBe(200);
   expect((await Actions.getBasket(request, accessToken, id)).status()).toBe(404);
 });

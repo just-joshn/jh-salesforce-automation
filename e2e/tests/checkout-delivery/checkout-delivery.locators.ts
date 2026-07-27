@@ -4,8 +4,9 @@ export const variationGroup = (page: Page, attribute: string): Locator =>
   page.getByRole('radiogroup', { name: attribute });
 export const variationOption = (page: Page, attribute: string): Locator =>
   variationGroup(page, attribute).getByRole('radio');
+// exact so "L" does not match "XL"
 export const sizeOption = (page: Page, size: string): Locator =>
-  variationGroup(page, 'size').getByRole('radio', { name: size });
+  variationGroup(page, 'size').getByRole('radio', { name: size, exact: true });
 export const addToCartButton = (page: Page): Locator =>
   page.getByRole('button', { name: /^add to cart$/i });
 export const addConfirmation = (page: Page): Locator =>
@@ -13,13 +14,13 @@ export const addConfirmation = (page: Page): Locator =>
 
 export const checkoutContainer = (page: Page): Locator => page.getByTestId('sf-checkout-container');
 
-// Contact step: email plus the guest-checkout button.
+// Contact step: email + guest checkout.
 export const emailInput = (page: Page): Locator =>
   checkoutContainer(page).getByLabel('Email', { exact: true });
 export const checkoutAsGuest = (page: Page): Locator =>
   page.getByRole('button', { name: /checkout as guest/i });
 
-// Shipping step. Scoped to step 1 so these labels don't also match the billing form's fields.
+// Shipping fields (step 1 only).
 const shippingStep = (page: Page): Locator => page.getByTestId('sf-toggle-card-step-1-content');
 export const shipFirstName = (page: Page): Locator =>
   shippingStep(page).getByLabel('First Name', { exact: true });
@@ -40,7 +41,7 @@ export const shipPostal = (page: Page): Locator =>
 export const continueToShipping = (page: Page): Locator =>
   page.getByRole('button', { name: /continue to shipping method/i });
 
-// Payment step. Scoped to step 3 so these fields don't collide with the shipping form.
+// Payment fields (step 3 only).
 const paymentStep = (page: Page): Locator => page.getByTestId('sf-toggle-card-step-3-content');
 export const cardNumber = (page: Page): Locator =>
   paymentStep(page).getByLabel('Card Number', { exact: true });

@@ -1,9 +1,9 @@
 import { shopperApiUrl } from '../../support/scapi';
 
-// store search; returns each store's inventoryId for stock lookups
+// Find stores + their stock ids.
 export const storeSearch = (): string => shopperApiUrl('store/shopper-stores/v1', 'store-search');
 
-// pass inventoryIds to get per-store stock for a product
+// Get stock per store for a product.
 export const product = (productId: string): string =>
   shopperApiUrl('product/shopper-products/v1', `products/${encodeURIComponent(productId)}`);
 

@@ -7,13 +7,12 @@ export const openProduct = async (page: Page, productId: string): Promise<void> 
   await page.goto(buildPath(`/product/${productId}`));
 };
 
-// Picking a color redraws the size buttons, so the click gets extra time to wait out the flicker.
+// Color change rebuilds sizes — wait longer for the click.
 export const selectVariation = async (page: Page, attribute: string): Promise<void> => {
   await Locators.variationOption(page, attribute).first().click({ timeout: 30000 });
 };
 
-// The spec already found an in-stock size through the API, so this clicks one known-good
-// size instead of trying sizes until one isn't marked out of stock.
+// Click the in-stock size we already looked up.
 export const selectSize = async (page: Page, size: string): Promise<void> => {
   await Locators.sizeOption(page, size).click({ timeout: 30000 });
 };
@@ -43,14 +42,12 @@ export const fillShippingAddress = async (page: Page, address: Address): Promise
   await Locators.shipState(page).selectOption(address.stateCode);
   await Locators.shipPostal(page).fill(address.postalCode);
   await Locators.continueToShipping(page).click();
-  // Continuing auto-selects a default delivery option and advances to Payment.
+  // Continue picks default shipping and goes to pay.
 };
 
-// A pickup cart already knows its store address and shipping method, so checkout skips the
-// shipping step and lands on Payment. Fill the address only when the form actually appears.
+// Pickup already has store/method — may skip shipping. Fill address only if shown.
 export const fillShippingAddressIfPresent = async (page: Page, address: Address): Promise<void> => {
-  // After the contact step the page shows either the address form or the payment form.
-  // Wait for whichever appears first, and fill only if it was the address form.
+  // After contact: address form or payment. Fill address only if it shows.
   const addressForm = Locators.shipFirstName(page);
   await Promise.race([
     addressForm.waitFor().catch(() => undefined),

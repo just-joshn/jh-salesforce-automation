@@ -7,12 +7,12 @@ export const gotoCategory = async (page: Page, categoryId: string): Promise<void
   await page.goto(buildPath(`/category/${categoryId}`));
 };
 
-// index 1 is the first non-default sort option.
+// Pick the first real sort option (not default).
 export const sortByFirstOption = async (page: Page): Promise<void> => {
   await Locators.sortSelect(page).selectOption({ index: 1 });
 };
 
-// Returns the product id parsed from the link so the spec can prove it opened the one it clicked.
+// Return product id from the link we click.
 export const openFirstProduct = async (page: Page): Promise<string> => {
   const link = Locators.firstProductLink(page);
   const productId = Data.extractProductId(await link.getAttribute('href'));

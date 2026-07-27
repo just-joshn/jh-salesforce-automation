@@ -13,7 +13,7 @@ export const basket = (basketId: string): string =>
   shopperApiUrl(BASKETS, `baskets/${encodeURIComponent(basketId)}`);
 export const basketItems = (basketId: string): string =>
   shopperApiUrl(BASKETS, `baskets/${encodeURIComponent(basketId)}/items`);
-// POST here to add a second shipment, so an order can split across shipments
+// Add a second shipment (split order).
 export const shipments = (basketId: string): string =>
   shopperApiUrl(BASKETS, `baskets/${encodeURIComponent(basketId)}/shipments`);
 export const customer = (basketId: string): string =>

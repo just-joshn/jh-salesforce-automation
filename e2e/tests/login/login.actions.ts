@@ -14,7 +14,7 @@ export const signIn = async (page: Page, credentials: LoginCredentials): Promise
   await Locators.submit(page).click();
 };
 
-// A successful sign-in navigates away from the login page, so the form goes hidden.
+// After login the form goes away.
 export const waitForSignedIn = async (page: Page): Promise<void> => {
   await Locators.container(page).waitFor({ state: 'hidden' });
 };

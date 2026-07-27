@@ -1,5 +1,4 @@
-// Pickup checkout is built from existing steps: pick a store on the product page (from
-// cart-pickup) plus the shared guest checkout steps (from checkout-delivery).
+// Reuse store pick + guest checkout steps.
 export {
   openProduct,
   selectVariation,

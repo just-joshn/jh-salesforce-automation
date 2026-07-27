@@ -18,11 +18,11 @@ export interface Fault {
 
 export const password = 'Test1234!';
 
-// unique per run, so each execution registers exactly one new account
+// New email every run.
 export const uniqueEmail = (): string =>
   `qa.portfolio.${Date.now()}${Math.floor(Math.random() * 100000)}@gmail.com`;
 
-// the test store rejects example.com, so this address is reliably invalid
+// example.com emails are always invalid here.
 export const invalidEmail = 'qa.portfolio.invalid@example.com';
 
 export const registrant = (email: string): RegistrationInput => ({

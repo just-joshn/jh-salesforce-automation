@@ -3,7 +3,7 @@ import * as Actions from './search.actions';
 import { commonQuery } from './search.data';
 import * as Locators from './search.locators';
 
-// Search for a term and open a result, confirming the PDP matches the product clicked.
+// Search → open result → right product page.
 test('search for a term and open the selected product detail page', async ({ page }) => {
   await Actions.openStorefront(page);
 
@@ -12,7 +12,7 @@ test('search for a term and open the selected product detail page', async ({ pag
     (url) => url.pathname.endsWith('/search') && url.searchParams.get('q') === commonQuery.term,
   );
 
-  // a common term shouldn't come back empty
+  // Search should find something.
   await expect(Locators.productList(page)).toBeVisible();
   await expect(Locators.resultsHeading(page)).toContainText(commonQuery.term);
   await expect(Locators.productTiles(page)).not.toHaveCount(0);

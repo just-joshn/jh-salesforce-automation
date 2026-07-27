@@ -1,12 +1,8 @@
 import type { APIRequestContext } from '@playwright/test';
 import { bearer, shopperApiUrl, withSite } from './scapi';
 
-// Finds variants that can be bought right now, so tests never hardcode a variant id.
-// (A "master" is the parent product; its "variants" are the buyable color/size versions.)
-// Stock on the shared demo store sells out over time (our own checkout tests buy from it),
-// so any fixed variant would eventually break every spec that uses it. Specs instead ask
-// for "orderable variants of this master" and assert on what comes back. When the preferred
-// master is completely sold out, a catalog search finds a replacement.
+// Find products still in stock. Don't hardcode sizes — stock runs out.
+// "Master" = parent product. "Variant" = one color/size you can buy.
 
 interface VariationAttributeValue {
   name?: string;
@@ -51,21 +47,23 @@ export interface OrderableVariant {
   sizeName?: string;
 }
 
-// A variant a UI test can reach on the product page by clicking the first color swatch and
-// then a size button. Carries the display names the page shows, so specs can click and
-// assert on them.
+// UI pick: first color + a size, with names the page shows.
 export interface UiOrderableVariant extends OrderableVariant {
   colorName: string;
   sizeName: string;
 }
 
-// A variant with fewer units than this is too close to selling out to be safe test data:
-// parallel workers and the checkout specs themselves buy stock while a run is going.
+// Need this many left in stock so parallel tests don't empty it.
 const MIN_ATS = 10;
 
-// Catalog search used to find a replacement master once the preferred one is sold out.
-const FALLBACK_SEARCH = 'shirt';
+// Backup search if the main product is sold out.
+// API: wide search. UI: safer products (some pages crash).
+const API_FALLBACK_SEARCH = 'shirt';
+const UI_FALLBACK_SEARCH = 'paisley';
 const FALLBACK_LIMIT = '24';
+
+// Prefer S/M/L on the UI over odd sizes like 15R.
+const PREFERRED_UI_SIZES = new Set(['XS', 'S', 'M', 'L', 'XL', 'XXL']);
 
 interface VariantEntry {
   productId: string;
@@ -120,9 +118,7 @@ const variantEntriesOf = (master: MasterProduct, firstColorOnly: boolean): Varia
   return variants.flatMap((variant) => toVariantEntry(variant, firstColorOnly, firstColor));
 };
 
-const stockByIdFrom = (
-  details: ProductsResult,
-): Map<string, VariantDetail['inventory']> => {
+const stockByIdFrom = (details: ProductsResult): Map<string, VariantDetail['inventory']> => {
   const rows = details.data ?? [];
   return new Map(
     rows.flatMap((detail) => {
@@ -207,8 +203,8 @@ const fetchVariantDetails = async (
   return (await response.json()) as ProductsResult;
 };
 
-// All buyable variants of one master with a comfortable stock buffer, best-stocked first.
-// With firstColorOnly, only variants of the first color swatch (what the UI tests click).
+// In-stock variants for one product, most stock first.
+// firstColorOnly = only the first color (what UI clicks).
 const orderableVariantsOf = async (
   request: APIRequestContext,
   accessToken: string,
@@ -231,14 +227,15 @@ const orderableVariantsOf = async (
     .sort((a, b) => b.ats - a.ats);
 };
 
-// Master ids from a catalog search, minus duplicates and the sold-out preferred master.
+// Other product ids from search (skip the one we already tried).
 const fallbackMasterIds = async (
   request: APIRequestContext,
   accessToken: string,
   excludeMasterId: string,
+  search: string,
 ): Promise<string[]> => {
   const response = await request.get(shopperApiUrl('search/shopper-search/v1', 'product-search'), {
-    params: withSite({ q: FALLBACK_SEARCH, limit: FALLBACK_LIMIT }),
+    params: withSite({ q: search, limit: FALLBACK_LIMIT }),
     headers: bearer(accessToken),
   });
   if (!response.ok()) return [];
@@ -251,13 +248,11 @@ const fallbackMasterIds = async (
 
 export interface DiscoveryOptions {
   masterId: string;
-  /** How many distinct orderable variants the caller needs. */
+  /** How many in-stock sizes/colors we need. */
   minCount: number;
 }
 
-// At least minCount buyable variants from a single master, best-stocked first: the preferred
-// master when it has enough, otherwise the first catalog-search master that does. Throws a
-// clear error rather than letting sold-out stock show up later as a confusing 400.
+// Get minCount in-stock variants. Try main product, then search. Fail clear if none.
 export const findOrderableVariants = async (
   request: APIRequestContext,
   accessToken: string,
@@ -265,38 +260,73 @@ export const findOrderableVariants = async (
 ): Promise<OrderableVariant[]> => {
   const preferred = await orderableVariantsOf(request, accessToken, masterId, false);
   if (preferred.length >= minCount) return preferred;
-  for (const candidate of await fallbackMasterIds(request, accessToken, masterId)) {
+  const candidates = await fallbackMasterIds(request, accessToken, masterId, API_FALLBACK_SEARCH);
+  for (const candidate of candidates) {
     const variants = await orderableVariantsOf(request, accessToken, candidate, false);
     if (variants.length >= minCount) return variants;
   }
   throw new Error(
     `no product master with ${minCount} orderable variant(s) holding at least ${MIN_ATS} units was found ` +
-      `(preferred master ${masterId}, fallback search "${FALLBACK_SEARCH}"); the demo store's stock has likely changed`,
+      `(preferred master ${masterId}, fallback search "${API_FALLBACK_SEARCH}"); the demo store's stock has likely changed`,
   );
 };
 
-// The best-stocked variant a UI test can pick on the product page (first color swatch, then
-// its size button), falling back to a catalog search like findOrderableVariants. Throws when
-// no product's first color has a buyable variant.
+const isUiSelectable = (variant: OrderableVariant): variant is UiOrderableVariant =>
+  variant.colorName !== undefined && variant.sizeName !== undefined;
+
+const isPreferredUiSize = (variant: UiOrderableVariant): boolean =>
+  PREFERRED_UI_SIZES.has(variant.sizeName.toUpperCase());
+
+// Prefer S/M/L; else take the one with most stock.
+const pickUiVariant = (variants: OrderableVariant[]): UiOrderableVariant | undefined => {
+  const selectable = variants.filter(isUiSelectable);
+  return selectable.find(isPreferredUiSize) ?? selectable[0];
+};
+
+const uiVariantOf = async (
+  request: APIRequestContext,
+  accessToken: string,
+  masterId: string,
+): Promise<UiOrderableVariant | undefined> =>
+  pickUiVariant(await orderableVariantsOf(request, accessToken, masterId, true));
+
+// Search backup products for UI: S/M/L first, else any size.
+const fallbackUiVariant = async (
+  request: APIRequestContext,
+  accessToken: string,
+  excludeMasterId: string,
+): Promise<UiOrderableVariant | undefined> => {
+  let anySized: UiOrderableVariant | undefined;
+  const candidates = await fallbackMasterIds(
+    request,
+    accessToken,
+    excludeMasterId,
+    UI_FALLBACK_SEARCH,
+  );
+  for (const candidate of candidates) {
+    const variant = await uiVariantOf(request, accessToken, candidate);
+    if (!variant) continue;
+    if (isPreferredUiSize(variant)) return variant;
+    anySized ??= variant;
+  }
+  return anySized;
+};
+
+// Best UI product: S/M/L on main product, else search, else any size.
 export const findUiOrderableVariant = async (
   request: APIRequestContext,
   accessToken: string,
   masterId: string,
 ): Promise<UiOrderableVariant> => {
-  const isUiSelectable = (variant: OrderableVariant): variant is UiOrderableVariant =>
-    variant.colorName !== undefined && variant.sizeName !== undefined;
-  const preferred = (await orderableVariantsOf(request, accessToken, masterId, true)).find(
-    isUiSelectable,
-  );
+  const preferred = await uiVariantOf(request, accessToken, masterId);
+  if (preferred && isPreferredUiSize(preferred)) return preferred;
+
+  const fallback = await fallbackUiVariant(request, accessToken, masterId);
+  if (fallback) return fallback;
   if (preferred) return preferred;
-  for (const candidate of await fallbackMasterIds(request, accessToken, masterId)) {
-    const variant = (await orderableVariantsOf(request, accessToken, candidate, true)).find(
-      isUiSelectable,
-    );
-    if (variant) return variant;
-  }
+
   throw new Error(
     `no variant reachable from a product page's first color swatch is orderable with at least ${MIN_ATS} units ` +
-      `(preferred master ${masterId}, fallback search "${FALLBACK_SEARCH}"); the demo store's stock has likely changed`,
+      `(preferred master ${masterId}, fallback search "${UI_FALLBACK_SEARCH}"); the demo store's stock has likely changed`,
   );
 };

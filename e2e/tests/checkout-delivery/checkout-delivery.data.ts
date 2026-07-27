@@ -23,10 +23,9 @@ export interface CheckoutFixture {
   card: Card;
 }
 
-// Guest checkout fixture. The store rejects example.com addresses, so this uses a real-looking
-// domain. The spec resolves an in-stock variant of the master at runtime.
+// Guest checkout data. No example.com emails (store rejects them).
 export const checkout: CheckoutFixture = {
-  masterId: '78916783M',
+  masterId: '25591139M',
   email: 'test.shopper@gmail.com',
   address: {
     firstName: 'Test',

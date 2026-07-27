@@ -4,8 +4,9 @@ export const variationGroup = (page: Page, attribute: string): Locator =>
   page.getByRole('radiogroup', { name: attribute });
 export const variationOption = (page: Page, attribute: string): Locator =>
   variationGroup(page, attribute).getByRole('radio');
+// exact so "L" does not match "XL"
 export const sizeOption = (page: Page, size: string): Locator =>
-  variationGroup(page, 'size').getByRole('radio', { name: size });
+  variationGroup(page, 'size').getByRole('radio', { name: size, exact: true });
 
 export const selectStoreButton = (page: Page): Locator =>
   page.getByRole('button', { name: /select store/i });
@@ -20,10 +21,11 @@ export const storeFind = (page: Page): Locator =>
   storeModal(page).getByRole('button', { name: /^find$/i });
 export const storeResult = (page: Page, storeName: string): Locator =>
   storeModal(page).getByText(storeName);
-// Each result is a radio; the clickable part is its label, so target the label.
+// Click the store label (not the tiny radio).
 export const storeChoice = (page: Page): Locator => storeModal(page).locator('label.chakra-radio');
+// Close button (aria-label Close).
 export const storeModalClose = (page: Page): Locator =>
-  storeModal(page).getByRole('button', { name: /^close$/i });
+  storeModal(page).getByRole('button', { name: 'Close', exact: true });
 
 export const selectedStore = (page: Page, storeName: string): Locator => page.getByText(storeName);
 

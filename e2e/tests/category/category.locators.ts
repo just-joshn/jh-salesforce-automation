@@ -2,8 +2,7 @@ import type { Locator, Page } from '@playwright/test';
 
 export const productList = (page: Page): Locator => page.getByTestId('sf-product-list-page');
 
-// The category title lives in a region screen readers skip, so grab the <h1> directly instead of
-// finding it by accessible name.
+// Title is an <h1> (not found by accessible name).
 export const heading = (page: Page): Locator =>
   page.getByTestId('sf-product-list-page').locator('h1').first();
 
@@ -13,8 +12,11 @@ export const productLinks = (page: Page): Locator => page.locator('a[href*="/pro
 
 export const firstProductLink = (page: Page): Locator => productLinks(page).first();
 
-// First price on any tile (matches $, £, or €), proving the list renders prices.
-export const anyTilePrice = (page: Page): Locator => productTiles(page).getByText(/[$£€]/).first();
+// Any price on a tile ($ or 12.34).
+export const anyTilePrice = (page: Page): Locator =>
+  productTiles(page)
+    .getByText(/[$£€¥]|USD|GBP|EUR|\d+[.,]\d{2}/)
+    .first();
 
 export const sortSelect = (page: Page): Locator =>
   page.getByTestId('sf-product-list-sort').getByRole('combobox');

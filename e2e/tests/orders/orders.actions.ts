@@ -121,8 +121,7 @@ const placeOrder = async (
   return order.orderNo;
 };
 
-// Create a shopper with exactly one past order, entirely through the API, and return the
-// order number. The browser test can then focus on the signed-in "view my orders" journey.
+// API: make a shopper with one order. Browser test only views orders.
 export const provisionCustomerWithOrder = async (
   request: APIRequestContext,
   credentials: Credentials,
@@ -138,7 +137,7 @@ export const provisionCustomerWithOrder = async (
   const accessToken = requireToken(rawToken);
   const authed = { params: withSite(), headers: bearer(accessToken) };
 
-  // Order a variant that is in stock right now; a hardcoded one would go stale as stock sells out.
+  // Order a size that is in stock right now.
   const [variant] = await findOrderableVariants(request, accessToken, {
     masterId: orderMasterId,
     minCount: 1,

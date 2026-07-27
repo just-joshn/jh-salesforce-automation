@@ -4,8 +4,9 @@ export const variationGroup = (page: Page, attribute: string): Locator =>
   page.getByRole('radiogroup', { name: attribute });
 export const variationOption = (page: Page, attribute: string): Locator =>
   variationGroup(page, attribute).getByRole('radio');
+// exact so "L" does not match "XL"
 export const sizeOption = (page: Page, size: string): Locator =>
-  variationGroup(page, 'size').getByRole('radio', { name: size });
+  variationGroup(page, 'size').getByRole('radio', { name: size, exact: true });
 export const addToCart = (page: Page): Locator =>
   page.getByRole('button', { name: /^add to cart$/i });
 export const addConfirmation = (page: Page): Locator =>

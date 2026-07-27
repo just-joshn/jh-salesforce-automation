@@ -5,11 +5,11 @@ import * as Actions from './cart-delivery.actions';
 import { deliveryProduct } from './cart-delivery.data';
 import * as Locators from './cart-delivery.locators';
 
-// Configure a variant, add it to the cart, and confirm the cart keeps that exact variant.
+// Pick size, add to cart, cart keeps that item.
 test('configure a variant and add it to the cart for delivery', async ({ page, request }) => {
   test.setTimeout(90000);
 
-  // Look up a variant that is in stock right now; hardcoded ones go stale as stock sells out.
+  // Pick a size that is in stock right now.
   const { accessToken } = await getGuestToken(request);
   const variant = await findUiOrderableVariant(request, accessToken, deliveryProduct.masterId);
 

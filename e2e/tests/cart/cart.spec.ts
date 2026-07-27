@@ -5,13 +5,12 @@ import * as Actions from './cart.actions';
 import { cartProduct } from './cart.data';
 import * as Locators from './cart.locators';
 
-// Review a built cart, bump the quantity, and hand off to checkout.
-// Item removal, the empty-cart state, and total math live in the cart API test.
+// Build cart, raise qty, go to checkout. Remove/empty/totals = API test.
 test('review a cart, update quantity, and proceed to checkout', async ({ page, request }) => {
-  // A full click-through on the shared demo store is slow, so give it extra time.
+  // Full flow is slow — extra time.
   test.setTimeout(90000);
 
-  // Look up a variant that is in stock right now; hardcoded ones go stale as stock sells out.
+  // Pick a size that is in stock right now.
   const { accessToken } = await getGuestToken(request);
   const variant = await findUiOrderableVariant(request, accessToken, cartProduct.masterId);
 

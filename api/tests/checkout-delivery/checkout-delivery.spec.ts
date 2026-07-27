@@ -13,12 +13,11 @@ import {
   shippingMethodId,
 } from './checkout-delivery.data';
 
-// Guest delivery checkout end to end: place one order, then prove the used-up basket
-// cannot become a second order.
+// Guest delivery order, then prove the cart can't order again.
 test('place a guest delivery order and consume the basket', async ({ request }) => {
   const { accessToken } = await getGuestToken(request);
 
-  // Order a variant that is in stock right now; a hardcoded one would go stale as stock sells out.
+  // Order a size that is in stock right now.
   const [variant] = await findOrderableVariants(request, accessToken, {
     masterId: checkout.masterId,
     minCount: 1,
@@ -29,7 +28,7 @@ test('place a guest delivery order and consume the basket', async ({ request }) 
   expect(created.basketId).toBeTruthy();
   const id = created.basketId;
 
-  // fill in every checkout step; each must save
+  // Fill each checkout step; each must save.
   expect((await Actions.addItem(request, accessToken, id, variant.variantId, 1)).status()).toBe(
     200,
   );
@@ -60,7 +59,7 @@ test('place a guest delivery order and consume the basket', async ({ request }) 
     (await Actions.setBillingAddress(request, accessToken, id, checkout.address)).status(),
   ).toBe(200);
 
-  // pay the exact order total
+  // Pay the exact order total.
   const priced = (await (await Actions.getBasket(request, accessToken, id)).json()) as Basket;
   expect(typeof priced.orderTotal).toBe('number');
   const amount = orderTotalOf(priced);
@@ -68,7 +67,7 @@ test('place a guest delivery order and consume the basket', async ({ request }) 
     200,
   );
 
-  // place the order
+  // Place the order.
   const orderResponse = await Actions.createOrder(request, accessToken, id);
   expect(orderResponse.status()).toBe(200);
   const order = (await orderResponse.json()) as Order;
@@ -80,14 +79,14 @@ test('place a guest delivery order and consume the basket', async ({ request }) 
   expect(paymentInstrumentsOf(order).length).toBeGreaterThan(0);
   const orderNo = orderNumber(order);
 
-  // the order can be fetched back afterward
+  // Order can be loaded again after.
   const fetched = await Actions.getOrder(request, accessToken, orderNo);
   expect(fetched.status()).toBe(200);
   expect(((await fetched.json()) as Order).orderNo).toBe(orderNo);
 
-  // placing the order uses up the basket (now 404)
+  // After order, cart is gone (404).
   expect((await Actions.getBasket(request, accessToken, id)).status()).toBe(404);
 
-  // sending the used-up basket again must not create a second order
+  // Used cart must not make a second order.
   expect((await Actions.createOrder(request, accessToken, id)).ok()).toBe(false);
 });

@@ -64,7 +64,7 @@ A few things that aren't obvious from the list:
 
 ## Requirements
 
-- Node 20 (what CI runs).
+- Node 22.13+ (pnpm 11 needs it; pinned in `.nvmrc` / `package.json` engines; CI uses the Playwright image's Node).
 - pnpm (version pinned in `package.json`).
 
 ## Setup

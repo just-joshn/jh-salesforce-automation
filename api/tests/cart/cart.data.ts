@@ -2,8 +2,10 @@ export interface ProductItem {
   itemId: string;
   productId: string;
   quantity: number;
-  // price for the whole line (unit price times quantity)
+  // Price before discounts.
   price?: number;
+  // Price after discounts.
+  priceAfterItemDiscount?: number;
 }
 
 export interface Basket {
@@ -28,27 +30,26 @@ export interface CartFixture {
   overQuantity: number;
 }
 
-// A shirt master product; the spec picks two in-stock variants of it at runtime (hardcoded
-// variants go stale as stock sells out), plus a quantity too large to ever be in stock.
+// Main product id. Spec picks two in-stock sizes. overQuantity is impossibly large.
 export const cart: CartFixture = {
-  masterId: '78916783M',
+  masterId: '25591139M',
   updatedQuantity: 3,
   overQuantity: 999999,
 };
 
-// Normalized line items: an empty basket omits the array, so callers get [] instead of undefined.
+// Cart lines; empty cart → [].
 export const lineItems = (basket: Basket): ProductItem[] => basket.productItems ?? [];
 
-// The one line item a step expects to find; fails clearly if the basket is unexpectedly empty.
+// First cart line, or fail clear.
 export const firstLineItem = (basket: Basket): ProductItem => {
   const [item] = lineItems(basket);
   if (!item) throw new Error('expected at least one product item in the basket');
   return item;
 };
 
-// Basket subtotal; the -1 fallback forces a mismatch if the field is ever absent.
+// Cart subtotal (-1 if missing so tests fail).
 export const subtotal = (basket: Basket): number => basket.productSubTotal ?? -1;
 
-// sum of line prices, for comparing against the basket subtotal
+// Sum after discounts (matches basket subtotal on sale items).
 export const lineItemsTotal = (items: ProductItem[]): number =>
-  items.reduce((sum, item) => sum + (item.price ?? 0), 0);
+  items.reduce((sum, item) => sum + (item.priceAfterItemDiscount ?? item.price ?? 0), 0);

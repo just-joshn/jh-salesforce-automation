@@ -8,7 +8,7 @@ export const password = 'Test1234!';
 export const uniqueEmail = (): string =>
   `qa.portfolio.${Date.now()}${Math.floor(Math.random() * 100000)}@gmail.com`;
 
-// Address for the order the test creates up front through the API.
+// Address used when API places the order.
 export const orderAddress = {
   firstName: 'Test',
   lastName: 'Portfolio',
@@ -20,6 +20,5 @@ export const orderAddress = {
   phone: '4155551234',
 };
 
-// Master product the setup step picks an in-stock variant of at runtime; a hardcoded
-// variant would go stale as the demo store's stock sells out.
-export const orderMasterId = '78916783M';
+// Main product id. Setup picks an in-stock size at run time.
+export const orderMasterId = '25591139M';

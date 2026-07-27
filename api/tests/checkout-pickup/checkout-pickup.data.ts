@@ -70,10 +70,10 @@ export interface Basket {
   orderTotal?: number;
 }
 
-// Stores from a search; the demo omits the array for an area with none nearby.
+// Store list; missing array = no stores.
 export const storesOf = (result: StoreSearchResult): Store[] => result.data ?? [];
 
-// True when the store can sell the variant (its own inventory if it has one, else the default).
+// True if store can sell this size.
 export const orderableInStore = (product: Product, inventoryId: string): boolean => {
   const stock =
     (product.inventories ?? []).find((entry) => entry.id === inventoryId) ?? product.inventory;
@@ -84,18 +84,18 @@ export const lineItems = (order: Order): ProductItem[] => order.productItems ?? 
 export const shipmentsOf = (order: Order): Shipment[] => order.shipments ?? [];
 export const orderTotalOf = (basket: Basket): number => basket.orderTotal ?? 0;
 
-// The shipment a step expects on the order; fails clearly if it is missing.
+// Get shipment or fail clear.
 export const shipmentById = (order: Order, shipmentId: string): Shipment => {
   const shipment = shipmentsOf(order).find((s) => s.shipmentId === shipmentId);
   if (!shipment) throw new Error(`order has no shipment ${shipmentId}`);
   return shipment;
 };
 
-// The shipping method id assigned to a shipment (e.g. the pickup method), if one is set.
+// Method id on a shipment (e.g. pickup).
 export const shippingMethodId = (shipment: Shipment): string | undefined =>
   shipment.shippingMethod?.id;
 
-// The order number of a placed order; fails clearly if the order didn't come back with one.
+// Order number or fail clear.
 export const orderNumber = (order: Order): string => {
   if (!order.orderNo) throw new Error('response has no order number');
   return order.orderNo;
@@ -111,9 +111,9 @@ export interface PickupCheckoutFixture {
   card: Card;
 }
 
-// The spec picks an in-stock variant of the master at runtime; hardcoded variants go stale.
+// Spec picks an in-stock size at run time.
 export const checkout: PickupCheckoutFixture = {
-  masterId: '78916783M',
+  masterId: '25591139M',
   email: 'test.shopper@gmail.com',
   shipmentId: 'me',
   pickupMethodId: 'GBP005',

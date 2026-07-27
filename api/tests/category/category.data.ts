@@ -10,7 +10,7 @@ export interface ProductSearchHit {
   orderable?: boolean;
 }
 
-// product search response; hits is absent when nothing matches
+// Search body; no hits array if empty.
 export interface ProductSearchResult {
   total: number;
   hits?: ProductSearchHit[];
@@ -21,7 +21,7 @@ export interface ProductDetail {
   name?: string;
 }
 
-// Search hits; the response omits the array entirely when nothing matches.
+// Hit list; missing array means empty.
 export const hitsOf = (result: ProductSearchResult): ProductSearchHit[] => result.hits ?? [];
 
 export interface CategoryFixture {
@@ -29,8 +29,8 @@ export interface CategoryFixture {
   name: string;
 }
 
-// a real demo-store category with a name and products
+// Real category with products.
 export const validCategory: CategoryFixture = { id: 'newarrivals', name: 'New Arrivals' };
 
-// a nonexistent category id, for the not-found case
+// Fake category id (should 404).
 export const invalidCategory: { id: string } = { id: 'no-such-cat-xyz' };

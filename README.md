@@ -52,6 +52,12 @@ Same journey on both layers unless noted:
 | Order history and detail, with access control      |    ✓    |  ✓  |
 | Discover a product from an Einstein recommendation |    ✓    |     |
 | Claim a bonus product earned by a promotion        |    ✓    |     |
+| One-click checkout from saved identity data        |   ✓†    |     |
+| Pay through Salesforce Payments                    |   ✓†    |     |
+| Create an account after a guest purchase           |    ✓    |     |
+
+† Written and gated, but the public demo is not configured for it, so the run skips it with the
+reason rather than executing it. See the conditional journeys below.
 
 A few things that aren't obvious from the list:
 
@@ -64,12 +70,35 @@ A few things that aren't obvious from the list:
 - The `login` files hold the sign-in steps the auth setup reuses, so those selectors live in one
   place. Its own spec asserts the same journey and skips itself when no shopper account is
   configured.
-- The last two journeys are conditional: they only exist while the store is configured for them, so
-  each one proves its own condition over the commerce API before the browser starts and skips with a
-  reason when it isn't met. The recommendation journey asks Einstein whether it has anything to
-  recommend; the bonus journey puts a qualifying product in a throwaway basket and looks for the
-  bonus discount line item. A store fault is raised rather than skipped, so a broken shop never
-  reads as "this journey doesn't apply here".
+- The last five journeys are conditional: they only exist while the store is configured for them, so
+  each one proves its own condition before the browser starts and skips with a reason when it isn't
+  met. The recommendation journey asks Einstein whether it has anything to recommend; the bonus
+  journey puts a qualifying product in a throwaway basket and looks for the bonus discount line item.
+  A store fault is raised rather than skipped, so a broken shop never reads as "this journey doesn't
+  apply here".
+- The three checkout journeys read their condition out of the storefront's own shipped configuration,
+  which PWA Kit serializes into every page as `#mobify-data` (see `e2e/support/app-config.ts`). That
+  asks the app under test what it is configured to do instead of inferring it from what renders. Each
+  skip names the exact setting that isn't met, so a skip is a statement about the deployment rather
+  than a shrug:
+  - One-click checkout needs `app.oneClickCheckout.enabled` (which is what switches the `/checkout`
+    route to the one-click page) plus `app.login.passwordless.enabled`.
+  - Salesforce Payments needs both halves its own feature hook needs: locally
+    `app.sfPayments.enabled` with a non-empty `sdkUrl` and `metadataUrl`, and server-side
+    `SalesforcePaymentsAllowed` from the Shopper Configuration API. `expressOnCheckoutPagesEnabled`
+    then decides which of PDP, mini-cart, cart and checkout the test expects an express button on.
+  - Creating an account after a guest purchase needs `app.oneClickCheckout.enabled` to be **off**,
+    because that is the flag the confirmation page renders its account form behind.
+- On the public demo one-click checkout and Salesforce Payments are both configured off, so those two
+  skip and only the guest account journey executes. Their steps are written against the deployed
+  app's own contract but have never run, so treat them as unproven until a storefront configured for
+  them says otherwise. Point `E2E_BASE_URL` at such a storefront and they execute with no code
+  change.
+- The guest account journey also proves the address deduplication the confirmation page does: it
+  sends two lines to one destination, so the order carries the same delivery address on two
+  shipments, and then asserts exactly one address write and exactly one saved address. The order's
+  own Shopper Orders payload is what the expected values are read from, so "the form is filled in
+  from the order" is a claim about the order rather than about what the test typed earlier.
 - The recommendation journey also asserts the tracking, not just the tiles: the impression and the
   click are matched in both Einstein (`viewReco` / `clickReco`) and Data Cloud
   (`catalog-object-impression` keyed by the recommender). It covers both endings the journey allows,

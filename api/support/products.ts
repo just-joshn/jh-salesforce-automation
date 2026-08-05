@@ -25,9 +25,17 @@ interface MasterProduct {
   variationAttributes?: VariationAttribute[];
 }
 
+interface Inventory {
+  id?: string;
+  orderable?: boolean;
+  ats?: number;
+}
+
 interface VariantDetail {
   id?: string;
-  inventory?: { orderable?: boolean; ats?: number };
+  inventory?: Inventory;
+  /** Per-store stock, returned only when the call asks for inventory ids. */
+  inventories?: Inventory[];
 }
 
 interface ProductsResult {
@@ -35,6 +43,7 @@ interface ProductsResult {
 }
 
 interface SearchResult {
+  total?: number;
   hits?: { productId?: string }[];
 }
 
@@ -191,11 +200,13 @@ const fetchVariantDetails = async (
   request: APIRequestContext,
   accessToken: string,
   variants: VariantEntry[],
+  inventoryId?: string,
 ): Promise<ProductsResult | undefined> => {
   const response = await request.get(shopperApiUrl('product/shopper-products/v1', 'products'), {
     params: withSite({
       ids: variants.map((variant) => variant.productId).join(','),
       allImages: 'false',
+      ...(inventoryId === undefined ? {} : { inventoryIds: inventoryId }),
     }),
     headers: bearer(accessToken),
   });
@@ -328,5 +339,226 @@ export const findUiOrderableVariant = async (
   throw new Error(
     `no variant reachable from a product page's first color swatch is orderable with at least ${MIN_ATS} units ` +
       `(preferred master ${masterId}, fallback search "${UI_FALLBACK_SEARCH}"); the demo store's stock has likely changed`,
+  );
+};
+
+// A products call takes at most 24 ids.
+const MAX_IDS = 24;
+const PROMO_SEARCH_LIMIT = '25';
+
+interface PromotionEntry {
+  calloutMsg?: string;
+}
+
+interface PromotedMaster {
+  id?: string;
+  productPromotions?: PromotionEntry[];
+}
+
+interface PromotedResult {
+  data?: PromotedMaster[];
+}
+
+// A product the shop advertises, plus the size the product page can add to a cart.
+export interface PromotedUiVariant extends UiOrderableVariant {
+  calloutMessages: string[];
+}
+
+const searchMasterIds = async (
+  request: APIRequestContext,
+  accessToken: string,
+  searchTerm: string,
+): Promise<string[]> => {
+  const response = await request.get(shopperApiUrl('search/shopper-search/v1', 'product-search'), {
+    params: withSite({ q: searchTerm, limit: PROMO_SEARCH_LIMIT }),
+    headers: bearer(accessToken),
+  });
+  if (!response.ok()) return [];
+  const result = (await response.json()) as SearchResult;
+  const ids = (result.hits ?? []).flatMap((hit) =>
+    hit.productId === undefined ? [] : [hit.productId],
+  );
+  return [...new Set(ids)].slice(0, MAX_IDS);
+};
+
+// Callout text comes back only when the call asks for the promotions expansion.
+const fetchPromotedMasters = async (
+  request: APIRequestContext,
+  accessToken: string,
+  ids: string[],
+): Promise<PromotedMaster[]> => {
+  if (ids.length === 0) return [];
+  const response = await request.get(shopperApiUrl('product/shopper-products/v1', 'products'), {
+    params: withSite({
+      ids: ids.join(','),
+      allImages: 'false',
+      expand: 'promotions,availability,variations',
+    }),
+    headers: bearer(accessToken),
+  });
+  if (!response.ok()) return [];
+  const result = (await response.json()) as PromotedResult;
+  return result.data ?? [];
+};
+
+const calloutsOf = (master: PromotedMaster): string[] =>
+  (master.productPromotions ?? []).flatMap((promotion) =>
+    promotion.calloutMsg === undefined ? [] : [promotion.calloutMsg],
+  );
+
+// First search hit that both advertises a promotion and can be bought from the page.
+export const findPromotedUiVariant = async (
+  request: APIRequestContext,
+  accessToken: string,
+  searchTerm: string,
+): Promise<PromotedUiVariant> => {
+  const hitIds = await searchMasterIds(request, accessToken, searchTerm);
+  const masters = await fetchPromotedMasters(request, accessToken, hitIds);
+
+  for (const master of masters) {
+    const calloutMessages = calloutsOf(master);
+    if (master.id === undefined || calloutMessages.length === 0) continue;
+    const variant = await uiVariantOf(request, accessToken, master.id);
+    if (variant) return { ...variant, calloutMessages };
+  }
+
+  throw new Error(
+    `search "${searchTerm}" returned no promoted product with a variant holding at least ${MIN_ATS} units ` +
+      `(searched ${hitIds.length} hit(s)); the demo store's catalog or promotions have likely changed`,
+  );
+};
+
+export interface StoreCategoryProducts {
+  total: number;
+  masterIds: string[];
+}
+
+// Category products a single store has on the shelf. `ilids` is the same
+// in-store-inventory refinement the product list page sends for its store filter.
+export const findCategoryProductsInStore = async (
+  request: APIRequestContext,
+  accessToken: string,
+  categoryId: string,
+  inventoryId: string,
+  limit: number,
+): Promise<StoreCategoryProducts> => {
+  const url = new URL(shopperApiUrl('search/shopper-search/v1', 'product-search'));
+  for (const [key, value] of Object.entries(withSite({ limit: String(limit) }))) {
+    url.searchParams.set(key, value);
+  }
+  url.searchParams.append('refine', `cgid=${categoryId}`);
+  url.searchParams.append('refine', `ilids=${inventoryId}`);
+
+  const response = await request.get(url.toString(), { headers: bearer(accessToken) });
+  if (!response.ok()) {
+    throw new Error(
+      `category ${categoryId} search in store inventory ${inventoryId} failed with ${response.status()}`,
+    );
+  }
+
+  const result = (await response.json()) as SearchResult;
+  const masterIds = (result.hits ?? []).flatMap((hit) =>
+    hit.productId === undefined ? [] : [hit.productId],
+  );
+  return { total: result.total ?? masterIds.length, masterIds };
+};
+
+// One buyable choice at a store. Size is absent for products sold in one size.
+export interface StoreVariant {
+  masterId: string;
+  productName: string;
+  variantId: string;
+  colorName: string;
+  sizeName?: string;
+  ats: number;
+}
+
+const storeStockOf = (detail: VariantDetail, inventoryId: string): Inventory | undefined =>
+  (detail.inventories ?? []).find((entry) => entry.id === inventoryId);
+
+const toStoreVariant = (
+  variant: VariantEntry,
+  stock: Inventory | undefined,
+  masterId: string,
+  productName: string,
+  attributes: VariationAttribute[],
+): StoreVariant[] => {
+  if (stock?.orderable !== true) return [];
+  const colorName = displayName(
+    attributes,
+    'color',
+    variationValue(variant.variationValues, 'color'),
+  );
+  if (colorName === undefined) return [];
+  return [
+    {
+      masterId,
+      productName,
+      variantId: variant.productId,
+      colorName,
+      sizeName: displayName(attributes, 'size', variationValue(variant.variationValues, 'size')),
+      ats: atsOf(stock),
+    },
+  ];
+};
+
+const storeStockById = (
+  details: ProductsResult,
+  inventoryId: string,
+): Map<string, Inventory | undefined> =>
+  new Map(
+    (details.data ?? []).flatMap((detail) =>
+      detail.id === undefined ? [] : [[detail.id, storeStockOf(detail, inventoryId)] as const],
+    ),
+  );
+
+const storeVariantsOf = async (
+  request: APIRequestContext,
+  accessToken: string,
+  masterId: string,
+  inventoryId: string,
+): Promise<StoreVariant[]> => {
+  const master = await fetchMaster(request, accessToken, masterId);
+  if (master === undefined) return [];
+  const attributes = master.variationAttributes ?? [];
+  const variants = variantEntriesOf(master, false).slice(0, MAX_IDS);
+  if (variants.length === 0) return [];
+
+  const details = await fetchVariantDetails(request, accessToken, variants, inventoryId);
+  if (details === undefined) return [];
+  const stockById = storeStockById(details, inventoryId);
+  const productName = productNameOf(master, masterId);
+
+  return variants
+    .flatMap((variant) =>
+      toStoreVariant(variant, stockById.get(variant.productId), masterId, productName, attributes),
+    )
+    .sort((a, b) => b.ats - a.ats);
+};
+
+const firstStoreVariantOf = async (
+  request: APIRequestContext,
+  accessToken: string,
+  masterId: string,
+  inventoryId: string,
+): Promise<StoreVariant | undefined> => {
+  const [best] = await storeVariantsOf(request, accessToken, masterId, inventoryId);
+  return best;
+};
+
+// Best-stocked choice any of these products has on the shelf at that store.
+export const findStoreOrderableVariant = async (
+  request: APIRequestContext,
+  accessToken: string,
+  masterIds: string[],
+  inventoryId: string,
+): Promise<StoreVariant> => {
+  for (const masterId of masterIds) {
+    const best = await firstStoreVariantOf(request, accessToken, masterId, inventoryId);
+    if (best) return best;
+  }
+  throw new Error(
+    `none of the ${masterIds.length} product(s) offered by store inventory ${inventoryId} has a variant ` +
+      `on the shelf; the demo store's store stock has likely changed`,
   );
 };

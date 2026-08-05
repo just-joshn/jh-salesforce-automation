@@ -1,7 +1,9 @@
 import { expect, test } from '@playwright/test';
+import { required } from '../../support/scapi';
+import type { Basket, Order } from '../../support/scapi-types';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './checkout-mixed.actions';
-import type { Basket, Order, StoreSearchResult } from './checkout-mixed.data';
+import type { StoreSearchResult } from './checkout-mixed.data';
 import {
   checkout,
   lineItems,
@@ -33,7 +35,7 @@ test('place one order that splits into delivery and pickup shipments', async ({ 
   );
 
   const created = (await (await Actions.createBasket(request, accessToken)).json()) as Basket;
-  const id = created.basketId;
+  const id = required(created.basketId, 'basketId');
 
   // Ship item on main shipment; pickup on second.
   expect(

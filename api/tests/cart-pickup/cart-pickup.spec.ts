@@ -1,7 +1,9 @@
 import { expect, test } from '@playwright/test';
+import { required } from '../../support/scapi';
+import type { Basket } from '../../support/scapi-types';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './cart-pickup.actions';
-import type { Basket, StoreSearchResult } from './cart-pickup.data';
+import type { StoreSearchResult } from './cart-pickup.data';
 import {
   lineItems,
   orderableVariants,
@@ -33,11 +35,12 @@ test('select an in-stock store and add the product to the basket for pickup', as
   const createResponse = await Actions.createBasket(request, accessToken);
   expect(createResponse.status()).toBe(200);
   const basket = (await createResponse.json()) as Basket;
+  const basketId = required(basket.basketId, 'basketId');
 
   const addResponse = await Actions.addItem(
     request,
     accessToken,
-    basket.basketId,
+    basketId,
     variantId,
     pickup.quantity,
     selectedStore.inventoryId,
@@ -51,7 +54,7 @@ test('select an in-stock store and add the product to the basket for pickup', as
   const assignResponse = await Actions.assignPickup(
     request,
     accessToken,
-    basket.basketId,
+    basketId,
     pickup.shipmentId,
     pickup.pickupMethodId,
     selectedStore.id,
@@ -59,7 +62,7 @@ test('select an in-stock store and add the product to the basket for pickup', as
   expect(assignResponse.status()).toBe(200);
 
   // Reload: pickup, store, stock still set.
-  const refetchResponse = await Actions.getBasket(request, accessToken, basket.basketId);
+  const refetchResponse = await Actions.getBasket(request, accessToken, basketId);
   expect(refetchResponse.status()).toBe(200);
   const persisted = (await refetchResponse.json()) as Basket;
   const persistedShipment = shipmentById(persisted, pickup.shipmentId);

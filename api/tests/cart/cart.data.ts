@@ -1,27 +1,7 @@
 import type { APIRequestContext } from '@playwright/test';
 import type { OrderableVariant } from '../../support/products';
 import { findOrderableVariants } from '../../support/products';
-
-export interface ProductItem {
-  itemId: string;
-  productId: string;
-  quantity: number;
-  // Price before discounts.
-  price?: number;
-  // Price after discounts.
-  priceAfterItemDiscount?: number;
-}
-
-export interface Basket {
-  basketId: string;
-  productItems?: ProductItem[];
-  productSubTotal?: number;
-  orderTotal?: number | null;
-}
-
-export interface Fault {
-  type?: string;
-}
+import type { Basket, BasketProductItem } from '../../support/scapi-types';
 
 export interface AddItem {
   productId: string;
@@ -59,17 +39,17 @@ export const orderableVariantPair = async (
 };
 
 // Cart lines; empty cart → [].
-export const lineItems = (basket: Basket): ProductItem[] => basket.productItems ?? [];
+export const lineItems = (basket: Basket): BasketProductItem[] => basket.productItems ?? [];
 
 // First cart line, or fail clear.
-export const firstLineItem = (basket: Basket): ProductItem => {
+export const firstLineItem = (basket: Basket): BasketProductItem => {
   const [item] = lineItems(basket);
   if (!item) throw new Error('expected at least one product item in the basket');
   return item;
 };
 
 // The line holding one product, or fail clear.
-export const lineItemByProductId = (basket: Basket, productId: string): ProductItem => {
+export const lineItemByProductId = (basket: Basket, productId: string): BasketProductItem => {
   const item = lineItems(basket).find((candidate) => candidate.productId === productId);
   if (!item) throw new Error(`expected the basket to hold product ${productId}`);
   return item;
@@ -79,5 +59,5 @@ export const lineItemByProductId = (basket: Basket, productId: string): ProductI
 export const subtotal = (basket: Basket): number => basket.productSubTotal ?? -1;
 
 // Sum after discounts (matches basket subtotal on sale items).
-export const lineItemsTotal = (items: ProductItem[]): number =>
+export const lineItemsTotal = (items: BasketProductItem[]): number =>
   items.reduce((sum, item) => sum + (item.priceAfterItemDiscount ?? item.price ?? 0), 0);

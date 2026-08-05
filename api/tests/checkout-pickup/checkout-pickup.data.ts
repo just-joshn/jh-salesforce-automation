@@ -1,6 +1,7 @@
 import type { APIRequestContext } from '@playwright/test';
 import type { OrderableVariant } from '../../support/products';
 import { findOrderableVariants } from '../../support/products';
+import type { Basket, Order, OrderProductItem, OrderShipment } from '../../support/scapi-types';
 
 export interface StoreSearchQuery {
   countryCode: string;
@@ -49,31 +50,6 @@ export interface Card {
   securityCode: string;
 }
 
-export interface ProductItem {
-  productId: string;
-  shipmentId?: string;
-  inventoryId?: string;
-}
-
-export interface Shipment {
-  shipmentId: string;
-  shippingMethod?: { id: string };
-  c_fromStoreId?: string;
-}
-
-export interface Order {
-  orderNo?: string;
-  status?: string;
-  productItems?: ProductItem[];
-  shipments?: Shipment[];
-  orderTotal?: number;
-}
-
-export interface Basket {
-  basketId: string;
-  orderTotal?: number;
-}
-
 // Store list; missing array = no stores.
 export const storesOf = (result: StoreSearchResult): Store[] => result.data ?? [];
 
@@ -84,19 +60,19 @@ export const orderableInStore = (product: Product, inventoryId: string): boolean
   return Boolean(stock?.orderable);
 };
 
-export const lineItems = (order: Order): ProductItem[] => order.productItems ?? [];
-export const shipmentsOf = (order: Order): Shipment[] => order.shipments ?? [];
+export const lineItems = (order: Order): OrderProductItem[] => order.productItems ?? [];
+export const shipmentsOf = (order: Order): OrderShipment[] => order.shipments ?? [];
 export const orderTotalOf = (basket: Basket): number => basket.orderTotal ?? 0;
 
 // Get shipment or fail clear.
-export const shipmentById = (order: Order, shipmentId: string): Shipment => {
+export const shipmentById = (order: Order, shipmentId: string): OrderShipment => {
   const shipment = shipmentsOf(order).find((s) => s.shipmentId === shipmentId);
   if (!shipment) throw new Error(`order has no shipment ${shipmentId}`);
   return shipment;
 };
 
 // Method id on a shipment (e.g. pickup).
-export const shippingMethodId = (shipment: Shipment): string | undefined =>
+export const shippingMethodId = (shipment: OrderShipment): string | undefined =>
   shipment.shippingMethod?.id;
 
 // Order number or fail clear.

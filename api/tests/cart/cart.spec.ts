@@ -1,7 +1,8 @@
 import { expect, test } from '@playwright/test';
+import { required } from '../../support/scapi';
+import type { Basket, Fault } from '../../support/scapi-types';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './cart.actions';
-import type { Basket, Fault } from './cart.data';
 import {
   cart,
   firstLineItem,
@@ -23,8 +24,9 @@ test('reconcile a basket (update quantity, remove) with consistent, persisted to
   const createResponse = await Actions.createBasket(request, accessToken);
   expect(createResponse.status()).toBe(200);
   const created = (await createResponse.json()) as Basket;
+  const basketId = required(created.basketId, 'basketId');
 
-  const addResponse = await Actions.addItems(request, accessToken, created.basketId, [
+  const addResponse = await Actions.addItems(request, accessToken, basketId, [
     { productId: variantA.variantId, quantity: 1 },
     { productId: variantB.variantId, quantity: 1 },
   ]);
@@ -37,29 +39,26 @@ test('reconcile a basket (update quantity, remove) with consistent, persisted to
 
   const itemA = lineItemByProductId(afterAdd, variantA.variantId);
   const itemB = lineItemByProductId(afterAdd, variantB.variantId);
+  const itemAId = required(itemA.itemId, 'itemId');
+  const itemBId = required(itemB.itemId, 'itemId');
 
   // Change quantity.
   const updateResponse = await Actions.updateItemQuantity(
     request,
     accessToken,
-    created.basketId,
-    itemA.itemId,
+    basketId,
+    itemAId,
     cart.updatedQuantity,
   );
   expect(updateResponse.status()).toBe(200);
   const afterUpdate = (await updateResponse.json()) as Basket;
   const updatedItems = lineItems(afterUpdate);
-  const updatedA = updatedItems.find((item) => item.itemId === itemA.itemId);
+  const updatedA = updatedItems.find((item) => item.itemId === itemAId);
   expect(updatedA?.quantity).toBe(cart.updatedQuantity);
   expect(lineItemsTotal(updatedItems)).toBeCloseTo(subtotal(afterUpdate), 2);
 
   // Remove the other item.
-  const removeResponse = await Actions.removeItem(
-    request,
-    accessToken,
-    created.basketId,
-    itemB.itemId,
-  );
+  const removeResponse = await Actions.removeItem(request, accessToken, basketId, itemBId);
   expect(removeResponse.status()).toBe(200);
   const afterRemove = (await removeResponse.json()) as Basket;
   const remaining = lineItems(afterRemove);
@@ -68,7 +67,7 @@ test('reconcile a basket (update quantity, remove) with consistent, persisted to
   expect(lineItemsTotal(remaining)).toBeCloseTo(subtotal(afterRemove), 2);
 
   // Reload cart — changes should stick.
-  const refetchResponse = await Actions.getBasket(request, accessToken, created.basketId);
+  const refetchResponse = await Actions.getBasket(request, accessToken, basketId);
   expect(refetchResponse.status()).toBe(200);
   const persisted = (await refetchResponse.json()) as Basket;
   const persistedItems = lineItems(persisted);
@@ -82,8 +81,8 @@ test('reconcile a basket (update quantity, remove) with consistent, persisted to
   const overResponse = await Actions.updateItemQuantity(
     request,
     accessToken,
-    created.basketId,
-    itemA.itemId,
+    basketId,
+    itemAId,
     cart.overQuantity,
   );
   expect(overResponse.status()).toBe(400);
@@ -91,12 +90,7 @@ test('reconcile a basket (update quantity, remove) with consistent, persisted to
   expect(fault.type).toContain(unavailableFaultType);
 
   // Empty cart → no items, total 0.
-  const emptyResponse = await Actions.removeItem(
-    request,
-    accessToken,
-    created.basketId,
-    itemA.itemId,
-  );
+  const emptyResponse = await Actions.removeItem(request, accessToken, basketId, itemAId);
   expect(emptyResponse.status()).toBe(200);
   const empty = (await emptyResponse.json()) as Basket;
   expect(lineItems(empty)).toHaveLength(0);

@@ -1,6 +1,7 @@
 import type { APIRequestContext } from '@playwright/test';
 import type { OrderableVariant } from '../../support/products';
 import { findOrderableVariants } from '../../support/products';
+import type { Basket, BasketProductItem, BasketShipment } from '../../support/scapi-types';
 
 export interface StoreSearchQuery {
   countryCode: string;
@@ -33,25 +34,6 @@ export interface Product {
   inventories?: Inventory[];
 }
 
-export interface Shipment {
-  shipmentId: string;
-  shippingMethod?: { id: string };
-  c_fromStoreId?: string;
-}
-
-export interface ProductItem {
-  productId: string;
-  quantity: number;
-  shipmentId?: string;
-  inventoryId?: string;
-}
-
-export interface Basket {
-  basketId: string;
-  productItems?: ProductItem[];
-  shipments?: Shipment[];
-}
-
 // Store list; missing array = no stores.
 export const storesOf = (result: StoreSearchResult): Store[] => result.data ?? [];
 
@@ -62,18 +44,18 @@ export const orderableInStore = (product: Product, inventoryId: string): boolean
   return Boolean(stock?.orderable);
 };
 
-export const lineItems = (basket: Basket): ProductItem[] => basket.productItems ?? [];
-export const shipmentsOf = (basket: Basket): Shipment[] => basket.shipments ?? [];
+export const lineItems = (basket: Basket): BasketProductItem[] => basket.productItems ?? [];
+export const shipmentsOf = (basket: Basket): BasketShipment[] => basket.shipments ?? [];
 
 // Get cart shipment or fail clear.
-export const shipmentById = (basket: Basket, shipmentId: string): Shipment => {
+export const shipmentById = (basket: Basket, shipmentId: string): BasketShipment => {
   const shipment = shipmentsOf(basket).find((entry) => entry.shipmentId === shipmentId);
   if (!shipment) throw new Error(`basket has no shipment ${shipmentId}`);
   return shipment;
 };
 
 // Method id on a shipment (e.g. pickup).
-export const shippingMethodId = (shipment: Shipment): string | undefined =>
+export const shippingMethodId = (shipment: BasketShipment): string | undefined =>
   shipment.shippingMethod?.id;
 
 export interface PickupFixture {

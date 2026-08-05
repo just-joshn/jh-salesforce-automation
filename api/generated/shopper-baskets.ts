@@ -1,0 +1,4850 @@
+// Generated from the vendored SCAPI OpenAPI spec. Do not edit by hand.
+//
+// Family:  shopper-baskets (called as checkout/shopper-baskets/v1)
+// Version: 1.11.0
+// Source:  SalesforceCommerceCloud/commerce-sdk-isomorphic@main:apis/shopper-baskets-oas-1.11.0/shopper-baskets-oas-v1-public.yaml
+//
+// Regenerate with `pnpm gen:api:fetch && pnpm gen:api`.
+
+export interface paths {
+    "/organizations/{organizationId}/baskets": {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create a new basket.
+         * @description Creates a new basket.
+         *
+         *     The created basket is initialized with default values. Optional JSON data provided in the request body is populated into the created basket. It can be updated with other endpoints offered by the Shopper Baskets API.
+         *
+         *     Each shopper is limited to one open basket at a time. Attempting to create a second basket for the same customer will result in a 400 Bad Request error with the message: "Customer Baskets Quota Exceeded".
+         *     A basket is considered "open" upon creation and remains in this state until it is either converted into an order or explicitly deleted. For implementation best practices, see [Hybrid Storefront Best Practices for Working with Baskets](https://developer.salesforce.com/docs/commerce/commerce-api/guide/hybrid-storefront-baskets.html#hybrid-storefront-best-practices-for-working-with-baskets).
+         */
+        post: operations["createBasket"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/baskets/actions/transfer": {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Transfer an existing basket.
+         * @description Transfer the previous shopper's basket to the current shopper by updating the basket's owner. No other values change. You must obtain the shopper authorization token via SLAS and you must provide the ‘guest usid‘ in both the ‘/oauth2/login‘ and ‘/oauth2/token‘ calls while fetching the registered user JWT token.
+         *
+         *     This endpoint provides different methods for handling the scenario in which both a previous guest shopper and the current registered shopper have an active basket attached, and utilizes the `merge` parameter as follows:
+         *     - `true` (recommended): Triggers a merge hook for graceful handling and prevents 409 status returns. For more information, refer to the `merge` parameter documentation.
+         *     - `false`: Either overrides the basket of the current registered shopper or returns a 409 response, and allows you to choose between the options explained below.
+         *
+         *     If you call the endpoint with `merge=false` and the current shopper has an active basket, you have two options using the `overrideExisting` parameter. Setting it to `true` deletes the registered user's basket, while setting it to `false` returns a `BasketTransferException` (HTTP status 409), after which you can choose how to proceed:
+         *     - Keep the current shopper's active basket.
+         *     - Merge the previous and current shoppers' baskets by calling the `baskets/actions/merge` endpoint.
+         *     - Force the transfer by calling the `baskets/actions/transfer` endpoint again, with the parameter `overrideExisting=true`. Forcing the transfer deletes the current shopper's active basket.
+         *
+         *     A successful response provides the transferred (and merged) current basket. However, if neither the previous nor current shopper had an active basket, a 204 (No Content) response is returned.
+         */
+        post: operations["transferBasket"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/baskets/actions/merge": {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Merge baskets.
+         * @description ( DEPRECATED ) Instead of using this endpoint, we recommend using the `/baskets/actions/transfer` endpoint with the `merge=true` parameter, because the transfer endpoint offers greater customization by invoking a hook, allowing for adjustments if the default implementation does not process the merge as expected.
+         *
+         *     Merge data from the previous shopper's basket into the current shopper's active basket and delete the previous shopper's basket. This endpoint doesn't merge Personally Identifiable Information (PII). You must obtain the shopper authorization token via SLAS and you must provide the ‘guest usid‘ in both the ‘/oauth2/login‘ and ‘/oauth2/token‘ calls while fetching the registered user JWT token. After the merge, all basket amounts are recalculated and totaled, including lookups for prices, taxes, shipping, and promotions, unless hooks are enabled.
+         *
+         *     The following information is merged:
+         *     - custom attributes on the basket and on all copied records
+         *     - product items
+         *     - gift certificate items
+         *     - coupon items
+         *     - shipments
+         *     - ad-hoc price adjustments
+         *
+         *     To control the merging of products that exist in both baskets, use the `productItemMergeMode` parameter. By default, the higher of the two basket quantities is used for each product. Products in both baskets are considered to be the same when all of the following values match (if one product doesn't have a value, the other product is a match only if it also doesn't have that value):
+         *     - shipment
+         *     - productId
+         *     - option values
+         *     - wishlist reference
+         *     - inventory list id
+         *     - gift flag & message
+         *     - ad-hoc price adjustments
+         *
+         *     If any of the listed values don't match, then the item in the previous shopper's basket is copied to a new line item in the current shopper's basket. If the listed values all match, but the matching products have different values for any custom attribute, the merged line item keeps the custom attribute value from the current shopper's basket.
+         *
+         *     A success response contains the current shopper's active basket. The previous guest shopper's active basket is deleted.
+         *
+         *     If the current shopper doesn't have an active basket, and the createDestinationBasket request parameter is false, then the merge request returns a BasketMergeException (HTTP status 409). You can proceed with one of these options:
+         *     - Transfer the previous shopper's active basket to the current logged-in shopper by calling the `baskets/transfer` endpoint.
+         *     - Force the merge by calling the `baskets/merge` endpoint again, with the parameter `createDestinationBasket=true`. Forcing the merge creates a new basket for the current shopper and copies information from the previous shopper's basket into it. Because the merge doesn't copy all basket data, a forced merge is not the same as a transfer. For example, the new basket doesn't contain any Personally Identifiable Information (PII) from the previous basket.
+         *
+         *     ### before merge
+         *     | Previous Shopper's Basket, SKU: Quantity, Custom Attributes | Current Shopper's Basket, SKU: Quantity, Custom Attributes  |
+         *     |-------------------------------------------------------------|-------------------------------------------------------------|
+         *     | SKU_A: 5<br> SKU_B: 3<br> SKU_C: 4<br> c_customAttr_1: 'ABC' <br> c_customAttr_2: 'DEF'   | SKU_A: 2<br> SKU_D: 6<br> SKU_E: 7<br> c_customAttr_1: 'UVW' <br> c_customAttr_3: 'XYZ'   |
+         *
+         *     ### after merge - (previous shopper's basket is deleted)
+         *     | productItemMergeMode | Current Shopper's Basket - SKU: Quantity, Custom Attributes  |
+         *     |----------------------|--------------------------------------------------------------|
+         *     | sum_quantities         | SKU_A: 7<br> SKU_B: 3<br> SKU_C: 4<br> SKU_D: 6<br> SKU_E: 7<br> c_customAttr_1: 'UVW' <br> c_customAttr_2: 'DEF' <br> c_customAttr_3: 'XYZ'              |
+         *     | higher_quantity      | SKU_A: 5<br> SKU_B: 3<br> SKU_C: 4<br> SKU_D: 6<br> SKU_E: 7<br> c_customAttr_1: 'UVW' <br> c_customAttr_2: 'DEF' <br> c_customAttr_3: 'XYZ'              |
+         *     | saved_quantity       | SKU_A: 2<br> SKU_B: 3<br> SKU_C: 4<br> SKU_D: 6<br> SKU_E: 7<br> c_customAttr_1: 'UVW' <br> c_customAttr_2: 'DEF' <br> c_customAttr_3: 'XYZ'              |
+         *     | separate_item        | SKU_A: 5<br> SKU_B: 3<br> SKU_C: 4<br> SKU_A: 2<br> SKU_D: 6<br> SKU_E: 7<br> c_customAttr_1: 'UVW' <br> c_customAttr_2: 'DEF' <br> c_customAttr_3: 'XYZ' |
+         */
+        post: operations["mergeBasket"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/baskets/{basketId}": {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        /**
+         * Retrieve an existing basket.
+         * @description Gets a basket.
+         */
+        get: operations["getBasket"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete a basket.
+         * @description Removes a basket.
+         */
+        delete: operations["deleteBasket"];
+        options?: never;
+        head?: never;
+        /**
+         * Update a basket.
+         * @description Updates a basket. Only the currency of the basket, source code, the custom
+         *     properties of the basket, and the shipping items will be considered.
+         */
+        patch: operations["updateBasket"];
+        trace?: never;
+    };
+    "/organizations/{organizationId}/baskets/{basketId}/agent": {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Designate a basket as an agent basket.
+         * @description Marks a basket as an agent basket.
+         */
+        put: operations["updateAsAgentBasket"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/baskets/{basketId}/billing-address": {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Add a billing address to a basket.
+         * @description Sets the billing address of a basket.
+         */
+        put: operations["updateBillingAddressForBasket"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/baskets/{basketId}/coupons": {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add a coupon to a basket.
+         * @description Adds a coupon to an existing basket.
+         */
+        post: operations["addCouponToBasket"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/baskets/{basketId}/coupons/{couponItemId}": {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+                /** @description The ID of the coupon item. */
+                couponItemId: components["parameters"]["couponItemId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Remove a coupon from a basket.
+         * @description Removes a coupon from the basket.
+         */
+        delete: operations["removeCouponFromBasket"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/baskets/{basketId}/customer": {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Add shopper information to a basket.
+         * @description Sets customer information for an existing basket.
+         */
+        put: operations["updateCustomerForBasket"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/baskets/{basketId}/gift-certificate-items": {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add a gift certificate to a basket.
+         * @description Adds a gift certificate item to an existing basket.
+         */
+        post: operations["addGiftCertificateItemToBasket"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/baskets/{basketId}/gift-certificate-items/{giftCertificateItemId}": {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+                /** @description the ID of the gift certificate item to be updated. */
+                giftCertificateItemId: components["parameters"]["giftCertificateItemId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Remove a gift certificate from a basket.
+         * @description Deletes a gift certificate item from an existing basket.
+         */
+        delete: operations["removeGiftCertificateItemFromBasket"];
+        options?: never;
+        head?: never;
+        /**
+         * Update gift certificate information for a basket.
+         * @description Updates a gift certificate item of an existing basket.
+         */
+        patch: operations["updateGiftCertificateItemInBasket"];
+        trace?: never;
+    };
+    "/organizations/{organizationId}/baskets/{basketId}/items": {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add an item to a basket.
+         * @description Adds new items to a basket. The added items are associated with the
+         *     specified shipment. If no shipment id is specified, the added items are associated with the default shipment.
+         *     Considered values from the request body, for each item are:
+         *
+         *     - productId: a valid product ID. This is the ID of the product to be added to the basket. If the
+         *     product is already in the basket, the API either increments the quantity of the existing product line item or
+         *     creates a new product line item, based on the site preference 'Add Product Behavior'. For option products and
+         *     product bundles containing variation masters, the API creates a new product line item regardless of the site
+         *     preference.
+         *     - shipmentId: a valid shipment ID (optional). This is the ID of the shipment in which the product item
+         *     is created.
+         *     - quantity: a number between 0.01 and 999. This is the quantity of the product to order.
+         *     - inventoryId: a valid inventory ID (optional). This is the ID of the inventory from which the item is
+         *     allocated.
+         *     - bonusDiscountLineItemId: a valid bonus discount line item ID (optional). This is the ID of the
+         *     bonus discount line item for which the added product is a selected bonus product.
+         *     - optionItems/optionValueId: a valid option value ID. This is an option value for an option item of
+         *     an option product.  This is only possible if the product item is an option
+         *     product. To set option values, you must specify a collection of option items in the optionItems
+         *     property. These option items must contain optionId and optionValueId. Also,
+         *     the values you specify must be valid for the option product that this product item represents. Otherwise, the
+         *     server throws an InvalidProductOptionItemException or an
+         *     InvalidProductOptionValueItemException.
+         *     - custom properties in the form c_<CUSTOM_NAME>: the custom property must correspond to a custom
+         *     attribute (<CUSTOM_NAME>) defined for ProductLineItem. The value of this property must be valid for the
+         *     type of custom attribute defined for ProductLineItem.
+         */
+        post: operations["addItemToBasket"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update a basket item.
+         * @description Updates multiple items in a basket. This behaviour matches that of updating a
+         *     single item, but the body contains an array of ProductItems to be updated that are identified by `itemId`.
+         *     The items to update can include bundled product items, although the
+         *     kind of update supported for bundled product items is limited to `productId`, `gift`, `giftMessage`
+         *     and custom properties.
+         *     The following values in the request body are considered by the server:
+         *
+         *     - `itemId` (mandatory): identifies an item to be updated.
+         *     - `productId`: a valid product ID. The purpose of this
+         *     value is to change the variation of a variation product.
+         *     - `shipmentId`: a valid shipment ID. The purpose of
+         *     this value is to move a product item to another shipment.
+         *     - `quantity`: a number between 0 and 999. The purpose of
+         *     this value is to change the quantity of the product item. If the quantity is 0,
+         *     the product item is removed.
+         *     - `optionItems`/`optionValueId`: a valid option value
+         *     ID. The purpose of this value is to exchange an option value for an
+         *     option item of an option product.
+         *     This is only possible if the product item is an option product. To change
+         *     option values, a collection of the option items to be changed must be
+         *     provided in the property `optionItems`. Those
+         *     `optionItems` must contain `optionId`
+         *     and `optionValueId`. The provided values must be valid
+         *     for the option product that this product item represents. Otherwise,
+         *     `InvalidProductOptionItemException` or
+         *     `InvalidProductOptionValueItemException` is thrown.
+         *     - custom properties `c_<CUSTOM_NAME>`: a
+         *     value corresponding to the type defined for custom attribute
+         *     `<CUSTOM_NAME>` of the ProductLineItem. The purpose of this value is to
+         *     add or change the value of a custom attribute defined for the
+         *     ProductLineItem.
+         *     - `gift`: a boolean value that specifies whether the item is a gift.
+         *     - `giftMessage`: a message to include with the gift.
+         */
+        patch: operations["updateItemsInBasket"];
+        trace?: never;
+    };
+    "/organizations/{organizationId}/baskets/{basketId}/items/{itemId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The ID of the item to be updated. */
+                itemId: components["parameters"]["itemId"];
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Remove an item from a basket.
+         * @description Removes a product item from the basket.
+         */
+        delete: operations["removeItemFromBasket"];
+        options?: never;
+        head?: never;
+        /**
+         * Update an item in a basket.
+         * @description Possible reasons:
+         *     - no product item with given item ID was found for the basket.
+         *     - the product with the given product ID in the
+         *     request body is invalid.
+         *     - a null quantity value.
+         *     - an option with the specified option id is unknown.
+         *     - an option with the specified option value id is unknown.
+         *     - the given shipment ID is invalid.
+         *     - the customer assigned to the basket does not.
+         *     match the verified customer represented by the JWT token.
+         */
+        patch: operations["updateItemInBasket"];
+        trace?: never;
+    };
+    "/organizations/{organizationId}/baskets/{basketId}/items/{itemId}/taxes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the item to be updated. */
+                itemId: components["parameters"]["itemId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Add taxation information for a basket item.
+         * @description This method allows you to apply external taxation data to an existing basket to be able to pass tax rates and optional values for a specific taxable line item. This endpoint can be called only if external taxation mode was used for basket creation. See POST /baskets for more information.
+         */
+        put: operations["addTaxesForBasketItem"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/baskets/{basketId}/payment-instruments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add a payment instrument to a basket.
+         * @description Adds a payment instrument to a basket.
+         */
+        post: operations["addPaymentInstrumentToBasket"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/baskets/{basketId}/payment-instruments/{paymentInstrumentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                paymentInstrumentId: components["parameters"]["paymentInstrumentId"];
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Remove a payment instrument from a basket.
+         * @description Removes a payment instrument of a basket.
+         */
+        delete: operations["removePaymentInstrumentFromBasket"];
+        options?: never;
+        head?: never;
+        /**
+         * Update a payment instrument for a basket.
+         * @description Updates payment instrument of an existing basket.
+         */
+        patch: operations["updatePaymentInstrumentInBasket"];
+        trace?: never;
+    };
+    "/organizations/{organizationId}/baskets/{basketId}/payment-methods": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        /**
+         * Retrieve payment instruments for a basket.
+         * @description Gets applicable payment methods for an existing basket considering the open payment amount only.
+         */
+        get: operations["getPaymentMethodsForBasket"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/baskets/{basketId}/price-adjustments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add a price adjustment to a basket.
+         * @description Adds a custom manual price adjustment to the basket.
+         */
+        post: operations["addPriceAdjustmentToBasket"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/baskets/{basketId}/price-adjustments/{priceAdjustmentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                priceAdjustmentId: components["parameters"]["priceAdjustmentId"];
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Remove a price adjustment from a basket.
+         * @description Removes a custom manual price adjustment from the basket.
+         */
+        delete: operations["removePriceAdjustmentFromBasket"];
+        options?: never;
+        head?: never;
+        /**
+         * Update a price adjustment for a basket.
+         * @description Updates a custom manual price adjustment on the basket. Only the following path values are considered for the update; all other attributes are ignored.
+         *     - `discount`
+         *     - `itemText`
+         *     - `reasonCode`
+         *     - `custom properties`
+         *     The discount `type` of a price adjustment cannot be updated and therefore, the value of the existing type must be passed. For an adjustment of type `percentage`, the `percentage` attribute is mandatory. For adjustments of type `amount` and `fixed_price`, the `amount` attribute is mandatory.
+         */
+        patch: operations["updatePriceAdjustmentInBasket"];
+        trace?: never;
+    };
+    "/organizations/{organizationId}/baskets/{basketId}/price-books": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        /**
+         * Retrieve price books for a basket.
+         * @description ( DEPRECATED ) Gets applicable price books for an existing basket. This endpoint is deprecated.
+         *     Use [Shopper Context](https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-context?meta=Summary),
+         *     hooks or `dw.catalog.PriceBookMgr#getApplicablePriceBooks()` instead.
+         */
+        get: operations["getPriceBooksForBasket"];
+        /**
+         * Add price books to a basket.
+         * @description ( DEPRECATED ) This method allows you to put an array of priceBookIds to an existing basket, which will be used for basket calculation. This endpoint is deprecated.  Use [Shopper Context](https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-context?meta=Summary), hooks or `dw.catalog.PriceBookMgr#setApplicablePriceBooks()` instead.
+         */
+        put: operations["addPriceBooksToBasket"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/baskets/{basketId}/shipments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create a shipment for a basket.
+         * @description Creates a new shipment for a basket.
+         *
+         *     The created shipment is initialized with values provided in the body
+         *     document and can be updated with further data API calls. Considered from
+         *     the body are the following properties if specified:
+         *
+         *     - the ID
+         *     - the shipping address
+         *     - the shipping method
+         *     - gift boolean flag
+         *     - gift message
+         *     - custom properties
+         */
+        post: operations["createShipmentForBasket"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/baskets/{basketId}/shipments/{shipmentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The ID of the shipment to be modified. */
+                shipmentId: components["parameters"]["shipmentId"];
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Remove a shipment from a basket.
+         * @description Removes a specified shipment and all associated product, gift certificate,
+         *     shipping, and price adjustment line items from a basket.
+         *     It is not allowed to remove the default shipment.
+         */
+        delete: operations["removeShipmentFromBasket"];
+        options?: never;
+        head?: never;
+        /**
+         * Update a shipment for a basket.
+         * @description Updates a shipment for a basket.
+         *
+         *     The shipment is initialized with values provided in the body
+         *     document and can be updated with further data API calls. Considered from
+         *     the body are the following properties if specified:
+         *     - the ID
+         *     - the shipping address
+         *     - the shipping method
+         *     - gift boolean flag
+         *     - gift message
+         *     - custom properties
+         */
+        patch: operations["updateShipmentForBasket"];
+        trace?: never;
+    };
+    "/organizations/{organizationId}/baskets/{basketId}/shipments/{shipmentId}/shipping-address": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the shipment to be modified. */
+                shipmentId: components["parameters"]["shipmentId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Update the shipping address for a shipment.
+         * @description Sets a shipping address of a specific shipment of a basket.
+         */
+        put: operations["updateShippingAddressForShipment"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/baskets/{basketId}/shipments/{shipmentId}/shipping-method": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the shipment to be modified. */
+                shipmentId: components["parameters"]["shipmentId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Update the shipping method for a shipment.
+         * @description Sets a shipping method to a specific shipment of a basket.
+         */
+        put: operations["updateShippingMethodForShipment"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/baskets/{basketId}/shipments/{shipmentId}/shipping-methods": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the shipment to be modified. */
+                shipmentId: components["parameters"]["shipmentId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        /**
+         * Retrieve the shipping methods for a shipment.
+         * @description Gets the applicable shipping methods for a certain shipment of a basket.
+         */
+        get: operations["getShippingMethodsForShipment"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/baskets/{basketId}/storefront": {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Designate a basket as a storefront basket.
+         * @description Marks a basket as a storefront basket.
+         */
+        put: operations["updateAsStorefrontBasket"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/baskets/{basketId}/taxes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        /**
+         * Retrieve the external taxation information for a basket.
+         * @description This method gives you the external taxation data set by the PUT taxes API. This endpoint can be called only if external taxation mode was used for basket creation. See POST /baskets for more information.
+         */
+        get: operations["getTaxesFromBasket"];
+        /**
+         * Add external taxation information to a basket.
+         * @description This method allows you to apply external taxation data to an existing basket to be able to pass tax rates and optional values for all taxable line items.
+         *     This endpoint can be called only if external taxation mode was used for basket creation. See POST /baskets for more information.
+         */
+        put: operations["addTaxesForBasket"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+}
+export type webhooks = Record<string, never>;
+export interface components {
+    schemas: {
+        /**
+         * @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites
+         * @example RefArch
+         */
+        SiteId: string;
+        /**
+         * @description An identifier for the organization the request is being made by
+         * @example f_ecom_zzxy_prd
+         */
+        OrganizationId: string;
+        /**
+         * @description A concatenated version of the standard Language and Country codes, combined with a hyphen '`-`'.
+         * @example en-US
+         */
+        LanguageCountry: string;
+        /**
+         * @description A two letter lowercase language code conforming to the [ISO 639-1](https://www.iso.org/iso-639-language-codes.html) standard. Additionally, this may be used to submit requests with the header parameter `Accept-Language`, following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766).
+         * @example en
+         */
+        LanguageCode: string;
+        /**
+         * @description A specialized value indicating the system default values for locales.
+         * @default default
+         * @example default
+         */
+        DefaultFallback: string;
+        /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+        LocaleCode: components["schemas"]["LanguageCountry"] | components["schemas"]["LanguageCode"] | components["schemas"]["DefaultFallback"];
+        /**
+         * @description A two letter uppercase country code conforming to the [ISO 3166-1](https://www.iso.org/iso-3166-country-codes.html) alpha-2 standard.
+         * @example US
+         */
+        CountryCode: string;
+        /** @description Document representing an order address. */
+        OrderAddress: {
+            /**
+             * @description The first address line.
+             * @example 45 Main Rd.
+             */
+            address1?: string;
+            /**
+             * @description The second address line.
+             * @example Apartment 204
+             */
+            address2?: string;
+            /**
+             * @description The city.
+             * @example Boston
+             */
+            city?: string;
+            /**
+             * @description The company name.
+             * @example Salesforce
+             */
+            companyName?: string;
+            countryCode?: components["schemas"]["CountryCode"];
+            /**
+             * @description The first name.
+             * @example Max
+             */
+            firstName?: string;
+            /**
+             * @description The full name.
+             * @example Max Mustermann
+             */
+            fullName?: string;
+            /**
+             * @description The ID of the address.
+             * @example me
+             */
+            id?: string;
+            /**
+             * @description The job title.
+             * @example Software Engineer
+             */
+            jobTitle?: string;
+            /**
+             * @description The last name.
+             * @example Mustermann
+             */
+            lastName?: string;
+            /**
+             * @description The phone number.
+             * @example 6175555555
+             */
+            phone?: string;
+            /**
+             * @description The post office box.
+             * @example PO BOX 109
+             */
+            postBox?: string;
+            /**
+             * @description The postal code.
+             * @example 05408
+             */
+            postalCode?: string;
+            /**
+             * @description The salutation.
+             * @example Mr
+             */
+            salutation?: string;
+            /** @description The second name. */
+            secondName?: string;
+            /**
+             * @description The state code.
+             * @example MA
+             */
+            stateCode?: string;
+            /**
+             * @description The suffix.
+             * @example Sr
+             */
+            suffix?: string;
+            /**
+             * @description The suite.
+             * @example 24A
+             */
+            suite?: string;
+            /**
+             * @description The title.
+             * @example Dr.
+             */
+            title?: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /**
+         * @description The id (SKU) of the product.
+         * @example apple-ipod-classic
+         */
+        ProductId: string;
+        /** @description Document representing a link to the resource for product details. */
+        ProductDetailsLink: {
+            /**
+             * @description The description of the product.
+             * @example Nintendo DS revolutionizes handheld gameplay.
+             */
+            productDescription?: string;
+            productId: components["schemas"]["ProductId"];
+            /**
+             * @description The name of the product.
+             * @example Nintendo DS Game Console
+             */
+            productName?: string;
+            /**
+             * @description The link title.
+             * @example Nintendo DS Game Console
+             */
+            title?: string;
+        };
+        /** @description Document representing a bonus discount line item. */
+        BonusDiscountLineItem: {
+            /** @description The bonus products the customer can choose from. */
+            bonusProducts?: components["schemas"]["ProductDetailsLink"][];
+            /**
+             * @description The coupon code that triggered the promotion, if applicable.
+             * @example 5ties
+             */
+            couponCode?: string;
+            /**
+             * @description The ID of the line item. It is read only.
+             * @example 91f4dd8bfa0653d58b7783b04f
+             */
+            id?: string;
+            /**
+             * Format: int32
+             * @description The maximum number of bonus items the user can select for this promotion.
+             */
+            maxBonusItems?: number;
+            /**
+             * @description The ID of the promotion that triggered the creation of the line item.
+             * @example Buy1Get2
+             */
+            promotionId?: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /**
+         * @description The coupon item ID
+         * @example d4c9c0141e9c74c150225580f3
+         */
+        CouponItemId: string;
+        /** @description Document representing a coupon item. */
+        CouponItem: {
+            /**
+             * @description The coupon code.
+             * @example 5ties
+             */
+            code: string;
+            /** @description The coupon item ID. It is read only. */
+            couponItemId?: components["schemas"]["CouponItemId"];
+            /**
+             * @description The status of the coupon item. It is read only.
+             * @example no_applicable_promotion
+             * @enum {string}
+             */
+            statusCode?: "coupon_code_already_in_basket" | "coupon_code_already_redeemed" | "coupon_code_unknown" | "coupon_disabled" | "redemption_limit_exceeded" | "customer_redemption_limit_exceeded" | "timeframe_redemption_limit_exceeded" | "no_active_promotion" | "coupon_already_in_basket" | "no_applicable_promotion" | "applied" | "adhoc";
+            /**
+             * @description A flag indicating whether the coupon item is valid. A coupon line item is valid if
+             *     the status code is "applied" or "no_applicable_promotion". It is read only.
+             * @example true
+             */
+            valid?: boolean;
+        } & {
+            [key: string]: unknown;
+        };
+        /**
+         * @description A three letter uppercase currency code conforming to the [ISO 4217](https://www.iso.org/iso-4217-currency-codes.html) standard, or the string `N/A` indicating that a currency is not applicable.
+         * @example USD
+         */
+        CurrencyCode: string;
+        /** @description The customer information for guest or logged-in customers. */
+        CustomerInfo: {
+            /**
+             * @description The customer ID. It is read only.
+             * @example abMKqMaNYOBMnNdDNzyC5oNTi5
+             */
+            customerId?: string;
+            /**
+             * @description The customer name.
+             * @example Max Mustermann
+             */
+            customerName?: string;
+            /**
+             * @description The customer number.
+             * @example 0002352
+             */
+            customerNo?: string;
+            /**
+             * @description The customer's email address.
+             * @example no-reply@salesforce.com
+             */
+            email: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** @example 629dea6e7b61e58da629b57b21 */
+        GiftCertificateItemId: string;
+        /** @description A gift certificate item. */
+        GiftCertificateItem: {
+            /**
+             * Format: double
+             * @description The gift certificate item amount.
+             * @example 20
+             */
+            amount: number;
+            /** @description The item ID. It is read only. */
+            giftCertificateItemId?: components["schemas"]["GiftCertificateItemId"];
+            /**
+             * @description The gift certificate message.
+             * @example Birthday present.
+             */
+            message?: string;
+            /**
+             * @description The recipient email.
+             * @example no-reply@salesforce.com
+             */
+            recipientEmail: string;
+            /**
+             * @description The recipient's name.
+             * @example Daniel Mustermann
+             */
+            recipientName?: string;
+            /**
+             * @description The sender's name.
+             * @example Max Mustermann
+             */
+            senderName?: string;
+            /**
+             * @description The ID of the shipment this item belongs to.
+             * @example me
+             */
+            shipmentId?: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Document representing a discount. */
+        Discount: {
+            /**
+             * Format: double
+             * @description The discount amount for discount types that define specific discount amounts. It is read only.
+             * @example 130.88
+             */
+            amount?: number;
+            /**
+             * Format: double
+             * @description The discount percent for discount types that define percentage discounts. It is read only.
+             * @example 0.19
+             */
+            percentage?: number;
+            /**
+             * @description The price book ID that is used with some types. It is read only.
+             * @example usd-sale-prices
+             */
+            priceBookId?: string;
+            /**
+             * @description The type of discount. It is read only.
+             * @example fixed_price
+             * @enum {string}
+             */
+            type: "percentage" | "fixed_price" | "amount" | "free" | "price_book_price" | "bonus" | "total_fixed_price" | "bonus_choice" | "percentage_off_options";
+        } & {
+            [key: string]: unknown;
+        };
+        /** @example ba248424e3eee797f062161f8b */
+        PriceAdjustmentId: string;
+        /**
+         * @description Document representing a price adjustment within a basket or order. Price adjustments
+         *     can be assigned at the order, product, or shipping level.
+         */
+        PriceAdjustment: {
+            /**
+             * @description Details describing the discount this price adjustment is based on. For adjustments
+             *     not based on a discount, this value is null.
+             */
+            appliedDiscount?: components["schemas"]["Discount"];
+            /**
+             * @description The coupon code of the coupon this price adjustment is based on. For adjustments
+             *     not based on a coupon, this value is null. It is read only.
+             * @example 5ties
+             */
+            couponCode?: string;
+            /**
+             * @description The user who created the price adjustment. It is read only.
+             * @example Support
+             */
+            createdBy?: string;
+            /**
+             * Format: date-time
+             * @description The timestamp when the price adjustment was created. It is read only.
+             * @example 2015-05-19T15:23:18.000Z
+             */
+            creationDate?: string;
+            /**
+             * @description A flag indicating whether this price adjustment was created by custom logic. This
+             *     flag is set to true unless the price adjustment was created by the promotion
+             *     engine.
+             * @example true
+             */
+            custom?: boolean;
+            /** @description The text describing the item. */
+            itemText?: string;
+            /**
+             * Format: date-time
+             * @description The timestamp when the price adjustment was last modified. It is read only.
+             * @example 2021-02-25T09:58:08.715Z
+             */
+            lastModified?: string;
+            /**
+             * @description A flag indicating whether this price adjustment was created by a manual process.
+             *     If the price adjustment was created by the promotion engine, this value is always
+             *     false.
+             * @example true
+             */
+            manual?: boolean;
+            /**
+             * Format: double
+             * @description The adjustment price. It is read only.
+             * @example 120.88
+             */
+            price?: number;
+            /** @description The price adjustment ID. It is read only. */
+            priceAdjustmentId?: components["schemas"]["PriceAdjustmentId"];
+            /**
+             * @description The ID of the related promotion. Custom price adjustments
+             *     can be assigned any promotion ID so long it is not
+             *     used by a price adjustment belonging to the same item,
+             *     and is not used by a promotion defined in the promotion engine.
+             *     If not specified, a promotion ID is generated.
+             */
+            promotionId?: string;
+            /** @description The reason for the price adjustment. */
+            reasonCode?: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Document representing an object status. */
+        Status: {
+            /** @description The status code. */
+            code?: string;
+            /** @description The status message. */
+            message?: string;
+            /**
+             * Format: int32
+             * @description The status.
+             *     For more information on the status values see Status.OK and Status.ERROR.
+             */
+            status?: number;
+        };
+        /** @description Document representing a payment card. */
+        PaymentCard: {
+            /**
+             * @description The payment card type.
+             * @example Visa
+             */
+            cardType?: string;
+            /**
+             * @description A flag indicating if the credit card is expired. It is read only.
+             * @example true
+             */
+            creditCardExpired?: boolean;
+            /**
+             * @description A credit card token. If a credit card is tokenized, the token can be used to look up the credit card data
+             *     in the token store.
+             * @example E67TY8GQ27X
+             */
+            creditCardToken?: string;
+            /**
+             * Format: int32
+             * @description The month when the payment card expires.
+             * @example 3
+             */
+            expirationMonth?: number;
+            /**
+             * Format: int32
+             * @description The year when the payment card expires.
+             * @example 2025
+             */
+            expirationYear?: number;
+            /**
+             * @description The payment card holder.
+             * @example Max Mustermann
+             */
+            holder?: string;
+            /**
+             * @description The payment card issue number.
+             * @example 2
+             */
+            issueNumber?: string;
+            /**
+             * @description The masked payment card number.
+             * @example *********4422
+             */
+            maskedNumber?: string;
+            /**
+             * @description The last digits of the payment card number. It is read only.
+             * @example 4422
+             */
+            numberLastDigits?: string;
+            /**
+             * Format: int32
+             * @description The month the payment card is valid from.
+             * @example 5
+             */
+            validFromMonth?: number;
+            /**
+             * Format: int32
+             * @description The year the payment card is valid from.
+             * @example 2015
+             */
+            validFromYear?: number;
+        };
+        /**
+         * @description The payment instrument ID
+         * @example ba248424e3eee797f062162f8b
+         */
+        PaymentInstrumentId: string;
+        /** @description Document representing an order payment instrument. */
+        OrderPaymentInstrument: {
+            /**
+             * Format: double
+             * @description The payment transaction amount.
+             * @example 130.88
+             */
+            amount?: number;
+            /** @description The authorization status of the payment transaction. It is read only. */
+            authorizationStatus?: components["schemas"]["Status"];
+            /**
+             * @description The bank routing number.
+             * @example 12030000
+             */
+            bankRoutingNumber?: string;
+            /**
+             * @description The gift certificate code with the last 4 characters not masked.
+             * @example ******Gzzy
+             */
+            maskedGiftCertificateCode?: string;
+            /** @description The payment card. */
+            paymentCard?: components["schemas"]["PaymentCard"];
+            /** @description The payment instrument ID. It is read only. */
+            paymentInstrumentId?: components["schemas"]["PaymentInstrumentId"];
+            /**
+             * @description The payment method ID. It is read only.
+             * @example CREDIT_CARD
+             */
+            paymentMethodId?: string;
+        };
+        /** @description Document representing a product item. */
+        ProductItem: {
+            /**
+             * Format: double
+             * @description The tax on the line item, including any adjustments. It is read only.
+             * @example 19
+             */
+            adjustedTax?: number;
+            /**
+             * Format: double
+             * @description The base price of the line item, which is the unit price not including
+             *     adjustments. If the taxation policy is net, it doesn't include tax. If the
+             *     taxation policy is gross, it includes tax. It is read only.
+             * @example 130
+             */
+            basePrice?: number;
+            /** @description The ID of the bonus discount line item this bonus product relates to. It is read only. */
+            bonusDiscountLineItemId?: string;
+            /**
+             * @description A flag indicating whether the product item is a bonus.
+             * @example true
+             */
+            bonusProductLineItem?: boolean;
+            /** @description The bundled product items. */
+            bundledProductItems?: components["schemas"]["ProductItem"][];
+            /**
+             * @description Returns true if the item is a gift. It is read only.
+             * @example true
+             */
+            gift?: boolean;
+            /**
+             * @description The gift message.
+             * @example Happy Birthday
+             */
+            giftMessage?: string;
+            /**
+             * @description The inventory list ID associated with this item.
+             * @example inventory
+             */
+            inventoryId?: string;
+            /**
+             * @description The product item ID. Use it to identify this item when updating its quantity or
+             *     creating a custom price adjustment for it. It is read only.
+             */
+            itemId?: components["schemas"]["ItemId"];
+            /** @description The text describing the item. */
+            itemText?: string;
+            /** @description The option items. */
+            optionItems?: components["schemas"]["OptionItem"][];
+            /**
+             * Format: double
+             * @description The price of the line item before applying any adjustments. If the line item is based on net pricing
+             *     then the net price is returned. If the line item is based on gross
+             *     pricing then the gross price is returned. It is read only.
+             */
+            price?: number;
+            /** @description The price adjustments. */
+            priceAdjustments?: components["schemas"]["PriceAdjustment"][];
+            /**
+             * Format: double
+             * @description The price of the product line item including item-level adjustments, but not
+             *     including order-level adjustments or shipping charges. If the taxation policy is
+             *     net, it doesn't include tax. If the taxation policy is gross, it includes tax. It is read only.
+             * @example 20.99
+             */
+            priceAfterItemDiscount?: number;
+            /**
+             * Format: double
+             * @description The price of the product line item including item-level adjustments and prorated
+             *     order-level adjustments, but not including shipping charges. If the taxation
+             *     policy is net, it doesn't include tax. If the taxation policy is gross, it
+             *     includes tax. It is read only.
+             * @example 15.5
+             */
+            priceAfterOrderDiscount?: number;
+            /**
+             * @description The ID of the product.
+             * @example nintendo-ds-console
+             */
+            productId?: string;
+            /**
+             * @description If this product line item was added from a product list, this value is a reference
+             *     to the corresponding product list item.
+             */
+            productListItem?: components["schemas"]["ProductListItemReference"];
+            /**
+             * @description The name of the product.
+             * @example Nintendo DS Game Console
+             */
+            productName?: string;
+            /**
+             * @description Returns the id of the ProductLineItem that qualified the basket for this bonus product.
+             *     This method is only applicable if the product line item is a bonus product line item, and if the promotion is a
+             *     product promotion with number of qualifying products granting a bonus-product discount. If these conditions
+             *     aren't met, the method returns null. If there are multiple product line items that triggered this bonus product,
+             *     this method returns the last one by position within the order.
+             */
+            qualifyingProductItemId?: string;
+            /**
+             * Format: double
+             * @description The quantity of the products represented by this item.
+             * @example 1
+             */
+            quantity?: number;
+            /**
+             * @description The ID of the shipment this item belongs to.
+             * @example me
+             */
+            shipmentId?: string;
+            /**
+             * @description If the product line item has a related shipping item, this value is its ID. A
+             *     related shipping item represents a surcharge applied to individual products using
+             *     a particular shipping method. It is read only.
+             * @example 006490dcc338feeafc71c964bf
+             */
+            shippingItemId?: string;
+            /**
+             * Format: double
+             * @description The tax for the product item, not including price adjustments. It is read only.
+             * @example 0.3
+             */
+            tax?: number;
+            /**
+             * Format: double
+             * @description The price used to calculate the tax for this product item. It is read only.
+             * @example 30
+             */
+            taxBasis?: number;
+            /**
+             * @description The tax class ID for the product item, or null
+             *     if no tax class ID is associated with the product item. It is read only.
+             */
+            taxClassId?: string;
+            /**
+             * Format: double
+             * @description The tax rate, which is the decimal tax rate to be applied
+             *     to the product represented by this item. It is read only.
+             * @example 0.9
+             */
+            taxRate?: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /**
+         * @description The item id.
+         * @example 430ef5aad3a24de59378458434
+         */
+        ItemId: string;
+        /**
+         * @description An option item represents an optional purchase related to a product item, and is always associated with that parent product
+         *     item. An option item can have different values from which to select. For example, a refrigerator item can have an option item representing an extended warranty, with a set of option item values representing different warranty lengths. When a shopper purchases the warranty option item together with the parent refrigerator item, they select one of the available warranty option item values.
+         */
+        OptionItem: {
+            /**
+             * Format: double
+             * @description The tax on the line item, including any adjustments. It is read only.
+             * @example 19
+             */
+            adjustedTax?: number;
+            /**
+             * Format: double
+             * @description The base price of the line item, which is the unit price not including adjustments.
+             *     If the taxation policy is net, it doesn't include tax. If the taxation policy is gross, it includes tax. It is read only.
+             * @example 50
+             */
+            basePrice?: number;
+            /**
+             * @description The ID of the bonus discount line item this bonus product relates to. It is read only.
+             * @example ba248414e3eee797f062162f8b
+             */
+            bonusDiscountLineItemId?: string;
+            /**
+             * @description A flag indicating whether the product item is a bonus. It is read only.
+             * @example false
+             */
+            bonusProductLineItem?: boolean;
+            /** @description The bundled product items. */
+            bundledProductItems?: components["schemas"]["ProductItem"][];
+            /**
+             * @description Returns true if the item is a gift. It is read only.
+             * @example false
+             */
+            gift?: boolean;
+            /**
+             * @description The gift message.
+             * @example Happy Birthday
+             */
+            giftMessage?: string;
+            /**
+             * @description The inventory list ID associated with this item. It is read only.
+             * @example inventory
+             */
+            inventoryId?: string;
+            /** @description The product item ID. Use it to identify this item when updating its quantity or creating a custom price adjustment for it. It is read only. */
+            itemId?: components["schemas"]["ItemId"];
+            /**
+             * @description The text describing the item.
+             * @example The item text.
+             */
+            itemText?: string;
+            /**
+             * @description The ID of the option. It is read only.
+             * @example consoleWarranty
+             */
+            optionId: string;
+            /** @description The option items. */
+            optionItems?: components["schemas"]["OptionItem"][];
+            /**
+             * @description The ID of the option value. It is read only.
+             * @example 000
+             */
+            optionValueId: string;
+            /**
+             * Format: double
+             * @description The price of the line item before applying any adjustments. If the taxation policy is net, it doesn't include tax.
+             *     If the taxation policy is gross, it includes tax. It is read only.
+             * @example 150.99
+             */
+            price?: number;
+            /** @description The price adjustments. */
+            priceAdjustments?: components["schemas"]["PriceAdjustment"][];
+            /**
+             * Format: double
+             * @description The price of the product line item including item-level adjustments, but not including order-level adjustments or
+             *     shipping charges. If the taxation policy is net, it doesn't include tax. If the taxation policy is gross, it includes tax. It is read only.
+             * @example 50.99
+             */
+            priceAfterItemDiscount?: number;
+            /**
+             * Format: double
+             * @description The price of the product line item including item-level adjustments and prorated order-level adjustments, but not
+             *     including shipping charges. If the taxation policy is net, it doesn't include tax. If the taxation policy is gross, it
+             *     includes tax. It is read only.
+             * @example 40.5
+             */
+            priceAfterOrderDiscount?: number;
+            productId?: components["schemas"]["ProductId"];
+            /** @description If this product line item was added from a product list, this value is a reference to the corresponding product list item. */
+            productListItem?: components["schemas"]["ProductListItemReference"];
+            /**
+             * @description The name of the product.
+             * @example Nintendo DS Game Console
+             */
+            productName?: string;
+            /**
+             * Format: double
+             * @description The ordered quantity of the products represented by this item.
+             * @example 1
+             */
+            quantity?: number;
+            /**
+             * @description The ID of the shipment this item belongs to.
+             * @example me
+             */
+            shipmentId?: string;
+            /**
+             * @description If the product line item has a related shipping item, this value is its ID. A related shipping item represents a
+             *     surcharge applied to individual products using a particular shipping method. It is read only.
+             * @example 006490dcc338feeafc71c964bf
+             */
+            shippingItemId?: string;
+            /**
+             * Format: double
+             * @description The tax on the line item before applying any adjustments. It is read only.
+             * @example 0
+             */
+            tax?: number;
+            /**
+             * Format: double
+             * @description The amount used to calculate the tax for this item. It is read only.
+             * @example 50
+             */
+            taxBasis?: number;
+            /**
+             * @description The tax class ID for the product item, or null
+             *     if no tax class ID is associated with the product item. It is read only.
+             */
+            taxClassId?: string;
+            /**
+             * Format: double
+             * @description The tax rate, which is the decimal tax rate to be applied
+             *     to the product represented by this item. It is read only.
+             * @example 0.19
+             */
+            taxRate?: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Document representing a link to a product list. */
+        ProductListLink: {
+            /** @description The description of this product list. */
+            description?: string;
+            /** @description The name of this product list. */
+            name?: string;
+            /**
+             * @description A flag indicating whether the owner made this product list available for access
+             *     by other customers. It is read only.
+             * @example true
+             */
+            public?: boolean;
+            /** @description The link title. */
+            title?: string;
+            /**
+             * @description The type of the product list.
+             * @example shopping_list
+             * @enum {string}
+             */
+            type?: "wish_list" | "gift_registry" | "shopping_list" | "custom_1" | "custom_2" | "custom_3";
+        };
+        /** @description Document representing product list item details. */
+        ProductListItemReference: {
+            /** @description The ID of the product list item. It is read only. */
+            id: components["schemas"]["ItemId"];
+            /**
+             * Format: int32
+             * @description The priority of the product list item.
+             * @example 1
+             */
+            priority?: number;
+            productDetailsLink?: components["schemas"]["ProductDetailsLink"];
+            /** @description A reference to the associated product list. It is read only. */
+            productList?: components["schemas"]["ProductListLink"];
+            /** @example false */
+            public?: boolean;
+            /**
+             * Format: double
+             * @description The total quantity of this item purchased from the product list.
+             * @example 0
+             */
+            purchasedQuantity?: number;
+            /**
+             * Format: double
+             * @description The number of products or gift certificates that get shipped when purchasing this product list item.
+             * @example 1
+             */
+            quantity?: number;
+            /**
+             * @description Specifies whether the item is a product or a gift certificate.
+             * @example product
+             * @enum {string}
+             */
+            type?: "product" | "gift_certificate";
+        };
+        /**
+         * @description The identifier of the shipment
+         * @example me
+         */
+        ShipmentId: string;
+        /** @description Document representing a shipping promotion. */
+        ShippingPromotion: {
+            /**
+             * @description The localized callout message of the promotion.
+             * @example $30 Fixed Shipping Amount Above 150
+             */
+            calloutMsg?: string;
+            /**
+             * @description The unique ID of the promotion.
+             * @example $30FixedShippingAmountAbove150
+             */
+            promotionId?: string;
+            /**
+             * @description The localized promotion name.
+             * @example $30 Fixed Shipping Amount Above 150
+             */
+            promotionName?: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Document representing a shipping method. */
+        ShippingMethod: {
+            /**
+             * @description The localized description of the shipping method.
+             * @example Order received within 7-10 business days
+             */
+            description?: string;
+            /** @description The external shipping method. */
+            externalShippingMethod?: string;
+            /**
+             * @description The shipping method ID.
+             * @example 001
+             */
+            id: string;
+            /**
+             * @description The localized name of the shipping method.
+             * @example Ground
+             */
+            name?: string;
+            /**
+             * Format: double
+             * @description The shipping cost total, including shipment level costs,
+             *     product level fix, and surcharge costs. It is read only.
+             * @example 15
+             */
+            price?: number;
+            /**
+             * @description The array of active customer shipping promotions for this shipping
+             *     method. This array can be empty.
+             */
+            shippingPromotions?: components["schemas"]["ShippingPromotion"][];
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Document representing a shipment. */
+        Shipment: {
+            /**
+             * Format: double
+             * @description The total tax on products in the shipment, including item-level price adjustments but not including
+             *     service charges such as shipping. If the Discount Taxation preference is set to Tax Products and
+             *     Shipping Only Based on Adjusted Price, this amount also includes prorated order-level price adjustments. It is read only.
+             * @example 4.95
+             */
+            adjustedMerchandizeTotalTax?: number;
+            /**
+             * Format: double
+             * @description The total tax on shipping charges in the shipment, including shipping price adjustments. It is read only.
+             * @example 0.3
+             */
+            adjustedShippingTotalTax?: number;
+            /**
+             * @description A flag indicating whether the shipment is a gift. It is read only.
+             * @example true
+             */
+            gift?: boolean;
+            /**
+             * @description The gift message.
+             * @example Happy Birthday
+             */
+            giftMessage?: string;
+            /**
+             * Format: double
+             * @description The total tax on products in the shipment, not including price adjustments or service charges such as
+             *     shipping. It is read only.
+             * @example 4.95
+             */
+            merchandizeTotalTax?: number;
+            /**
+             * Format: double
+             * @description The total price of all products in the shipment, including item-level adjustments, but not including
+             *     order-level adjustments or shipping charges. If the taxation policy is net, it doesn't include tax. If
+             *     the taxation policy is gross, it includes tax. It is read only.
+             * @example 99
+             */
+            productSubTotal?: number;
+            /**
+             * Format: double
+             * @description The total price of all products in the shipment including item-level adjustments and prorated
+             *     order-level adjustments, but not including shipping charges. If the taxation policy is net, it doesn't
+             *     include tax. If the taxation policy is gross, it includes tax. It is read only.
+             * @example 99
+             */
+            productTotal?: number;
+            /**
+             * @description The order-specific ID of the shipment. The default value is 'me'.
+             * @default me
+             */
+            shipmentId: components["schemas"]["ShipmentId"];
+            /** @description The shipment number of this shipment. This number is automatically generated. It is read only. */
+            shipmentNo?: string;
+            /**
+             * Format: double
+             * @description The total price of all products in the shipment including item-level adjustments, shipping charges,
+             *     and tax. It is read only.
+             * @example 39.99
+             */
+            shipmentTotal?: number;
+            /** @description The shipping address. */
+            shippingAddress?: components["schemas"]["OrderAddress"];
+            shippingMethod?: components["schemas"]["ShippingMethod"];
+            /**
+             * @description The shipping status of the shipment.
+             * @example shipped
+             * @enum {string}
+             */
+            shippingStatus?: "not_shipped" | "shipped";
+            /**
+             * Format: double
+             * @description The total price of all shipping charges in the shipment, including shipping adjustments. If the
+             *     taxation policy is net, it doesn't include tax. If the taxation policy is gross, it includes tax. It is read only.
+             * @example 5.99
+             */
+            shippingTotal?: number;
+            /**
+             * Format: double
+             * @description The total tax on shipping charges in the shipment, not including shipping price adjustments. It is read only.
+             * @example 0.3
+             */
+            shippingTotalTax?: number;
+            /**
+             * Format: double
+             * @description The total tax on the shipment, including item-level price adjustments and service charges such as
+             *     shipping. If the Discount Taxation preference is set to Tax Products and Shipping Only Based on
+             *     Adjusted Price, this amount also includes prorated order-level price adjustments. It is read only.
+             * @example 1.8
+             */
+            taxTotal?: number;
+            /**
+             * @description The tracking number of the shipment.
+             * @example 1Z204E380338943508
+             */
+            trackingNumber?: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Document representing a shipping item. */
+        ShippingItem: {
+            /**
+             * Format: double
+             * @description The tax for the shipping item, including price adjustments. It is read only.
+             * @example 19
+             */
+            adjustedTax?: number;
+            /**
+             * Format: double
+             * @description The base price of the shipping item, which is the unit price not including adjustments.
+             *     If the taxation policy is net, it doesn't include tax. If the taxation policy is gross, it includes tax. It is read only.
+             * @example 50
+             */
+            basePrice?: number;
+            /**
+             * @description The shipping item ID. Use it to identify this shipping item when updating its quantity or creating a
+             *     custom price adjustment for it. It is read only.
+             * @example 430ef5aad3a24de59378458434
+             */
+            itemId?: string;
+            /**
+             * @description The text describing the shipping item.
+             * @example Shipping
+             */
+            itemText?: string;
+            /**
+             * Format: double
+             * @description The price of the line item before applying any adjustments. If the line item is based on net pricing
+             *     then the net price is returned. If the line item is based on gross
+             *     pricing then the gross price is returned. It is read only.
+             */
+            price?: number;
+            /** @description The price adjustments. */
+            priceAdjustments?: components["schemas"]["PriceAdjustment"][];
+            /**
+             * Format: double
+             * @description The price of the shipping item including item-level adjustments, but not including order-level
+             *     adjustments or shipping charges. If the taxation policy is net, it doesn't include tax.
+             *     If the taxation policy is gross, it includes tax. It is read only.
+             */
+            priceAfterItemDiscount?: number;
+            /** @description The identifier of the shipment to which this item belongs. */
+            shipmentId?: components["schemas"]["ShipmentId"];
+            /**
+             * Format: double
+             * @description The tax on the product item, not including adjustments. It is read only.
+             * @example 0.19
+             */
+            tax?: number;
+            /**
+             * Format: double
+             * @description The price used to calculate the tax for this shipping item. It is read only.
+             */
+            taxBasis?: number;
+            /**
+             * @description The tax class ID for the product item, or null
+             *     if no tax class ID is associated with the product item. It is read only.
+             */
+            taxClassId?: string;
+            /**
+             * Format: double
+             * @description The tax rate applicable to this product line item. For a 10% tax rate, the value is 0.1. It is read only.
+             */
+            taxRate?: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Document representing a basket. */
+        Basket: {
+            /**
+             * Format: double
+             * @description The total tax on products in the shipment, including item-level price adjustments but not
+             *     including service charges such as shipping. If the Discount Taxation preference is set to Tax
+             *     Products and Shipping Only Based on Adjusted Price, this amount also includes prorated
+             *     order-level price adjustments. It is read only.
+             * @example 4.95
+             */
+            adjustedMerchandizeTotalTax?: number;
+            /**
+             * Format: double
+             * @description The total tax on shipping charges in the shipment, including shipping price adjustments. It is read only.
+             * @example 0.3
+             */
+            adjustedShippingTotalTax?: number;
+            /**
+             * @description Is the basket created by an agent? It is read only.
+             * @example true
+             */
+            agentBasket?: boolean;
+            /**
+             * @description The unique identifier for the basket. It is read only.
+             * @example e78aa5646a8efebdd9cdd38be7
+             */
+            basketId?: string;
+            /** @description The billing address. */
+            billingAddress?: components["schemas"]["OrderAddress"];
+            /** @description The bonus discount line items. */
+            bonusDiscountLineItems?: components["schemas"]["BonusDiscountLineItem"][];
+            /**
+             * @description The sales channel. It is read only.
+             * @example storefront
+             * @enum {string}
+             */
+            channelType?: "storefront" | "callcenter" | "marketplace" | "dss" | "store" | "pinterest" | "twitter" | "facebookads" | "subscriptions" | "onlinereservation" | "customerservicecenter" | "instagramcommerce" | "tiktok" | "snapchat" | "google" | "whatsapp" | "youtube";
+            /** @description The coupon items. */
+            couponItems?: components["schemas"]["CouponItem"][];
+            /**
+             * Format: date-time
+             * @description The timestamp when the basket was created. It is read only.
+             * @example 2015-05-19T15:23:18.000Z
+             */
+            creationDate?: string;
+            currency?: components["schemas"]["CurrencyCode"];
+            /** @description The customer information, if the customer is logged in. */
+            customerInfo?: components["schemas"]["CustomerInfo"];
+            /** @description The gift certificate line items. */
+            giftCertificateItems?: components["schemas"]["GiftCertificateItem"][];
+            /**
+             * Format: date-time
+             * @description The expiration datetime of the inventory reservation. It is read only.
+             * @example 2015-05-19T15:30:18.000Z
+             */
+            inventoryReservationExpiry?: string;
+            /**
+             * Format: date-time
+             * @description The timestamp when the basket was last modified. It is read only.
+             * @example 2015-05-19T15:25:18.000Z
+             */
+            lastModified?: string;
+            /**
+             * Format: double
+             * @description The total products tax in the purchase currency.
+             *     Merchandise total price represents the sum of the product prices before
+             *     services (such as shipping) or adjustments from promotions have
+             *     been added. It is read only.
+             * @example 4.95
+             */
+            merchandizeTotalTax?: number;
+            /** @description The order-level price adjustments. */
+            orderPriceAdjustments?: components["schemas"]["PriceAdjustment"][];
+            /**
+             * Format: double
+             * @description The total price, including products, shipping and tax. It is read only.
+             * @example 110.24
+             */
+            orderTotal?: number;
+            /** @description The payment instruments list. */
+            paymentInstruments?: components["schemas"]["OrderPaymentInstrument"][];
+            /** @description The product items. */
+            productItems?: components["schemas"]["ProductItem"][];
+            /**
+             * Format: double
+             * @description The total price of all products including item-level adjustments, but not including order-level adjustments or shipping
+             *     charges. If the taxation policy is net, it doesn't include tax. If the taxation policy is gross, it includes tax. It is read only.
+             * @example 99
+             */
+            productSubTotal?: number;
+            /**
+             * Format: double
+             * @description The total price of all products including adjustments, but not including shipping charges. If the taxation policy is net,
+             *     it doesn't include tax. If the taxation policy is gross, it includes tax. It is read only.
+             * @example 88
+             */
+            productTotal?: number;
+            /** @description The shipments. */
+            shipments?: components["schemas"]["Shipment"][];
+            /** @description The shipping items. */
+            shippingItems?: components["schemas"]["ShippingItem"][];
+            /**
+             * Format: double
+             * @description The total price of all shipping charges, including shipping adjustments. If the taxation policy is net, it doesn't
+             *     include tax. If the taxation policy is gross, it includes tax. It is read only.
+             * @example 5.99
+             */
+            shippingTotal?: number;
+            /**
+             * Format: double
+             * @description The total tax on all shipping charges, not including shipping adjustments. It is read only.
+             * @example 0.3
+             */
+            shippingTotalTax?: number;
+            /**
+             * @description The source code assigned to the basket. It is read only.
+             * @example OUTDOOR1
+             */
+            sourceCode?: string;
+            /**
+             * Format: double
+             * @description The total tax amount. It is read only.
+             * @example 5.25
+             */
+            taxTotal?: number;
+            /**
+             * @description The taxation policy (gross or net). It is read only.
+             * @example net
+             * @enum {string}
+             */
+            taxation?: "gross" | "net";
+        } & {
+            [key: string]: unknown;
+        };
+        ErrorResponse: {
+            /**
+             * @description A short, human-readable summary of the problem
+             *     type.  It will not change from occurrence to occurrence of the
+             *     problem, except for purposes of localization
+             * @example You do not have enough credit
+             */
+            title: string;
+            /**
+             * @description A URI reference [RFC3986] that identifies the
+             *     problem type.  This specification encourages that, when
+             *     dereferenced, it provide human-readable documentation for the
+             *     problem type (e.g., using HTML [W3C.REC-html5-20141028]).  When
+             *     this member is not present, its value is assumed to be
+             *     "about:blank". It accepts relative URIs; this means
+             *     that they must be resolved relative to the document's base URI, as
+             *     per [RFC3986], Section 5.
+             * @example NotEnoughMoney
+             */
+            type: string;
+            /**
+             * @description A human-readable explanation specific to this occurrence of the problem.
+             * @example Your current balance is 30, but that costs 50
+             */
+            detail: string;
+            /**
+             * @description A URI reference that identifies the specific
+             *     occurrence of the problem.  It may or may not yield further
+             *     information if dereferenced.  It accepts relative URIs; this means
+             *     that they must be resolved relative to the document's base URI, as
+             *     per [RFC3986], Section 5.
+             * @example /account/12345/msgs/abc
+             */
+            instance?: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Object representing the taxation. */
+        TaxItem: {
+            /** @description The taxation identifier. */
+            id: string;
+            /**
+             * Format: double
+             * @description The taxation rate.
+             * @example 0.13
+             */
+            rate: number;
+            /**
+             * Format: double
+             * @description The tax amount. Will be computed if not set.
+             */
+            value?: number;
+        };
+        /** @description Taxation for a line item. */
+        TaxItems: {
+            /** @description The list of tax items. It is read only. */
+            taxItems?: components["schemas"]["TaxItem"][];
+        };
+        /** @description Document representing an order payment card request. */
+        OrderPaymentCardRequest: {
+            /**
+             * @description The payment card type (for example: Visa).
+             * @example Visa
+             */
+            cardType?: string;
+            /**
+             * @description A credit card token. If a credit card is tokenized, the token can be used to look up the credit card data
+             *     in the token store.
+             * @example E67TY8GQ27X
+             */
+            creditCardToken?: string;
+            /**
+             * Format: int32
+             * @description The month when the payment card expires.
+             * @example 3
+             */
+            expirationMonth?: number;
+            /**
+             * Format: int32
+             * @description The year when the payment card expires.
+             * @example 2025
+             */
+            expirationYear?: number;
+            /**
+             * @description The payment card holder.
+             * @example Max Mustermann
+             */
+            holder?: string;
+            /**
+             * @description The payment card issue number.
+             * @example 2
+             */
+            issueNumber?: string;
+            /**
+             * @description The masked payment card number.
+             * @example *********4422
+             */
+            maskedNumber?: string;
+            /**
+             * Format: int32
+             * @description The month the payment card is valid from.
+             * @example 5
+             */
+            validFromMonth?: number;
+            /**
+             * Format: int32
+             * @description The year the payment card is valid from.
+             * @example 2019
+             */
+            validFromYear?: number;
+        };
+        /** @description Document representing a basket payment instrument request. */
+        BasketPaymentInstrumentRequest: {
+            /**
+             * Format: double
+             * @description The payment transaction amount.
+             * @example 130.88
+             */
+            amount?: number;
+            /**
+             * @description The bank routing number.
+             * @example 12030000
+             */
+            bankRoutingNumber?: string;
+            /**
+             * @description The gift certificate code.
+             * @example AFGRTUZ
+             */
+            giftCertificateCode?: string;
+            /** @description The payment card. */
+            paymentCard?: components["schemas"]["OrderPaymentCardRequest"];
+            /**
+             * @description The payment method ID.
+             * @example CREDIT_CARD
+             */
+            paymentMethodId?: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Document representing the specification for a payment card. */
+        PaymentCardSpec: {
+            /**
+             * @description The payment card type. It is read only.
+             * @example Visa
+             */
+            cardType?: string;
+            /**
+             * @description A flag indicating whether the card number is verified using the Luhn checksum algorithm. It is read only.
+             * @example true
+             */
+            checksumVerificationEnabled?: boolean;
+            /** @description The localized description of the payment card. It is read only. */
+            description?: string;
+            /** @description The URL to the image that represents the payment card. It is read only. */
+            image?: string;
+            /** @description The localized name of the payment card. It is read only. */
+            name?: string;
+            /**
+             * @description The sorted list of number lengths (individual lengths as well as
+             *     length ranges). It is read only.
+             */
+            numberLengths?: string[];
+            /**
+             * @description The sorted list of number prefixes (individual prefixes as well
+             *     as prefix ranges). It is read only.
+             */
+            numberPrefixes?: string[];
+            /**
+             * Format: int32
+             * @description The length of the security code for this card. It is read only.
+             */
+            securityCodeLength?: number;
+        };
+        /** @description Document representing a payment method. */
+        PaymentMethod: {
+            /** @description The sorted array of payment cards (included only when the system payment method is CREDIT_CARD). It is read only. */
+            cards?: components["schemas"]["PaymentCardSpec"][];
+            /** @description The localized description of the payment method or card. It is read only. */
+            description?: string;
+            /** @description The ID of the payment method or card. It is read only. */
+            id: string;
+            /** @description The URL to the image that represents the payment method or card. It is read only. */
+            image?: string;
+            /** @description The localized name of the payment method or card. It is read only. */
+            name?: string;
+            /** @description The payment processor ID. It is read only. It is read only. */
+            paymentProcessorId?: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Result document of payment methods applicable for a basket. */
+        PaymentMethodResult: {
+            /** @description The applicable payment methods. It is read only. */
+            applicablePaymentMethods?: components["schemas"]["PaymentMethod"][];
+        };
+        /** @description Request that represents a discount to be applied to a custom price adjustment. */
+        DiscountRequest: {
+            /**
+             * @description The type of discount.
+             *     - `amount` describes a (unit) price discount, and its corresponding value (positive) defines the amount each unit is to be reduced by. Example: For a $10 discount, set `type` to `amount` and `value` to `10.00`.
+             *     - `percentage` describes a percentage discount, and its corresponding value (positive) defines the percentage reduction. Example: For a 5% discount, set `type` to `percentage` and `value` to `5.00`.
+             *     - `fixed_price` describes a fixed price discount, and its corresponding value (positive) defines the resulting fixed price for the item. Only one `fixed_price` discount can be set for each item. Example: To set a fixed price of $15, set `type` to `fixed_price` and `value` to `15.00`. **Important**: Setting `type` to `fixed_price` is not supported when `level` is set to `order`.
+             * @example percentage
+             * @enum {string}
+             */
+            type: "percentage" | "fixed_price" | "amount";
+            /**
+             * Format: double
+             * @description The amount of the discount.
+             * @example 20
+             */
+            value: number;
+        };
+        /** @description Request that represents a price adjustment. */
+        PriceAdjustmentRequest: {
+            /** @description A discount that can be specified instead of a price. */
+            discount?: components["schemas"]["DiscountRequest"];
+            /**
+             * @description The item to which the price adjustment should be added, depending on the specified level. If the level is ´order´, item id is not needed. If `shipping`, specify the UUID of the shipping item. If `product`, specify the UUID of the product item.
+             * @example 93196fae953cbedbe54d67e760
+             */
+            itemId?: string;
+            /**
+             * @description The text describing the item in more detail.
+             * @example A discounted item
+             */
+            itemText?: string;
+            /**
+             * @description The level at which the adjustment is applied.
+             *     - `order` indicates that the price adjustment should be added directly to basket.
+             *     - `product` indicates that the price adjustment should be added to the product item.
+             *     - `shipping` indicates that the price adjustment is added to the shipping item.
+             * @example order
+             * @enum {string}
+             */
+            level: "product" | "shipping" | "order";
+            /**
+             * @description The ID of the related promotion. Custom price adjustments can be assigned any promotion ID as long as it's not used by a price adjustment belonging to the same item and isn't used by a promotion defined in the promotion engine. If not specified, a promotion ID is generated.
+             * @example Shipping100
+             */
+            promotionId?: string;
+            /**
+             * @description The reason for the price adjustment.
+             * @example Shipping promotion on order above $1,000 USD
+             */
+            reasonCode?: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Array of price book IDs to use for the basket calculation. */
+        PriceBookIds: string[];
+        /** @description Result document containing shipping methods. */
+        ShippingMethodResult: {
+            /** @description The applicable shipping method documents. It is read only. */
+            applicableShippingMethods?: components["schemas"]["ShippingMethod"][];
+            /**
+             * @description The default shipping method. It is read only.
+             * @example me
+             */
+            defaultShippingMethodId?: string;
+        };
+        /** @description Document representing the tax rates and (optionally) amounts for all items in a basket. */
+        Taxes: {
+            /** @description Map containing the TaxItems for the line item ids: Map<LineItemId, TaxItems []> */
+            taxes: {
+                [key: string]: components["schemas"]["TaxItems"];
+            };
+        };
+    };
+    responses: never;
+    parameters: {
+        /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+        siteId: components["schemas"]["SiteId"];
+        /**
+         * @description An identifier for the organization the request is being made by
+         * @example f_ecom_zzxy_prd
+         */
+        organizationId: components["schemas"]["OrganizationId"];
+        /**
+         * @description Determines how taxes are calculated.
+         *
+         *     The default value is `internal` where the tax calculation is done automatically based on internal tax tables. Setting `taxMode` to `external` allows manual modification of the tax rates and values.
+         *     External tax data is mandatory for product line items, option line items, shipping line items, coupon line items, and bonus discount line item.
+         *     Gift certificate line items are optional and use zero tax rate by default, which can be overwritten. Price adjustments cannot be set because they are either calculated or inherited.
+         *     Depending on the type, the tax rate is either obtained from the related line item or computed as a prorate of the basket.
+         */
+        taxMode: "internal" | "external";
+        /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+        locale: components["schemas"]["LocaleCode"];
+        /**
+         * @description If the current shopper has no active basket, this parameter is ignored. If the current shopper has an active basket, this parameter controls the behavior:
+         *     - `false` (default): Return a BasketTransferException (HTTP status 409). The basket owner doesn't change.
+         *     - `true`: Force the transfer by deleting the current shopper's active basket and making the current shopper the owner of the previous shopper's basket. Returns the transferred basket (HTTP status 200).
+         */
+        overrideExisting: boolean;
+        /**
+         * @description This parameter controls the behavior:
+         *         - `false` (default): Transfers the basket or returns a 409 response with the appropriate message (taking `overrideExisting` in consideration).
+         *         - `true`: (recommended): Executes the dw.order.mergeBasket hook if at least one basket exists.
+         *
+         *     The hook dw.order.mergeBasket default implementation merges a source basket into the current basket. This behavior can be customized, as shown
+         *     in this [sample implementation](https://gist.github.com/sf-thomas-loesche/3446c7d71a97e559bf1caee96ae56d9f).
+         *
+         *     There are four possible use cases:
+         *
+         *     a) Guest basket and registered basket exist
+         *     The guest basket becomes the current basket for the registered shopper by updating the basket's owner (no personal data is removed). The hook
+         *     dw.order.mergeBasket is called with the source basket (former registered shopper basket) and the transferred current basket (former guest basket).
+         *
+         *     b) Guest basket exists but no registered basket exists
+         *     The guest basket becomes the current basket for the registered shopper by updating the basket's owner (no personal data is removed). The hook
+         *     dw.order.mergeBasket is called without the source basket (null passed to the hook) and the transferred current basket (former guest basket).
+         *
+         *     c) No guest basket exists but a registered basket exists
+         *     The registered basket is retained. The hook dw.order.mergeBasket is called with the retained current basket but without the source basket (null
+         *     passed to the hook).
+         *
+         *     d) Neither basket exists
+         *     The hook dw.order.mergeBasket is not called.
+         *
+         *     The API returns the current basket (after executing dw.order.mergeBasket).
+         */
+        merge: boolean;
+        /**
+         * @description If the current shopper has an active basket, this parameter is ignored. If the current shopper has no active basket, this parameter controls the behavior:
+         *     - `false` (default): Return a BasketMergeException (HTTP status 409).
+         *     - `true`: Force the merge by creating a basket for the current shopper and copying information from the previous shopper's basket into it. Return success (HTTP status 200).
+         */
+        createDestinationBasket: boolean;
+        /**
+         * @description This parameter controls the quantity calculation for products that exist in both baskets.
+         *     - higher_quantity (default): Compare the product's quantities in each basket, and use the higher value.
+         *     - sum_quantities: Use the sum of the product's quantities from both baskets.
+         *     - saved_quantity: Use the product's quantity in the current shopper's active basket. Ignore the quantity from the previous shopper's basket.
+         *     - separate_item: Add a separate product item to the current shopper's basket for the quantity in the previous shopper's basket.
+         */
+        productItemMergeMode: "higher_quantity" | "sum_quantities" | "saved_quantity" | "separate_item";
+        /** @description The ID of the basket to be modified. */
+        basketId: string;
+        /** @description If `true` (default value), the external tax rates are removed from the basket and set to null. To add external tax rates to a basket, use the `addTaxesForBasket` or `addTaxesForBasketItem` endpoint. The removal of external tax rates depends on the update performed on the basket, for example: an update to the `currency` triggers a removal. Set this parameter to `false` to disable the removal of external tax rates/values. */
+        removeExternalTax: boolean;
+        /** @example true */
+        useAsShipping: boolean;
+        /** @description The ID of the coupon item. */
+        couponItemId: components["schemas"]["CouponItemId"];
+        /** @description the ID of the gift certificate item to be updated. */
+        giftCertificateItemId: components["schemas"]["GiftCertificateItemId"];
+        /** @description The ID of the item to be updated. */
+        itemId: components["schemas"]["ItemId"];
+        paymentInstrumentId: components["schemas"]["PaymentInstrumentId"];
+        priceAdjustmentId: components["schemas"]["PriceAdjustmentId"];
+        /** @description The ID of the shipment to be modified. */
+        shipmentId: components["schemas"]["ShipmentId"];
+        /** @example true */
+        useAsBilling: boolean;
+        /** @description If true, an existing storefront basket is exchanged and marked as an agent basket. If false, a `CustomerBasketsQuotaExceededException` is thrown. */
+        exchange: boolean;
+    };
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
+}
+export type $defs = Record<string, never>;
+export interface operations {
+    createBasket: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /**
+                 * @description Determines how taxes are calculated.
+                 *
+                 *     The default value is `internal` where the tax calculation is done automatically based on internal tax tables. Setting `taxMode` to `external` allows manual modification of the tax rates and values.
+                 *     External tax data is mandatory for product line items, option line items, shipping line items, coupon line items, and bonus discount line item.
+                 *     Gift certificate line items are optional and use zero tax rate by default, which can be overwritten. Price adjustments cannot be set because they are either calculated or inherited.
+                 *     Depending on the type, the tax rate is either obtained from the related line item or computed as a prorate of the basket.
+                 */
+                taxMode?: components["parameters"]["taxMode"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Basket"];
+            };
+        };
+        responses: {
+            /** @description The initialized basket. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Basket"];
+                };
+            };
+            /**
+             * @description Possible reasons:
+             *     - the provided payment method is invalid or not applicable.
+             *     - the customerId URL parameter does not match the verified customer
+             *     represented by the JSON Web Token (JWT).
+             *     - a new basket cannot be created because the maximum number
+             *     of baskets per customer would be exceeded.
+             *     - the same shipment ID appeared twice in the body.
+             *     - the coupon number is not provided.
+             *     - a fixed price adjustment was added at order level which is disallowed.
+             *     - a promotion ID was
+             *     used twice, while attempting to add a price adjustment.
+             *     - a system promotion
+             *     ID was used as a manual promotion ID, while attempting to add a price adjustment.
+             *     - more than one hundred price adjustments would have been
+             *     created.
+             */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Thrown if the shipment with the given shipment ID is unknown. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    transferBasket: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /**
+                 * @description If the current shopper has no active basket, this parameter is ignored. If the current shopper has an active basket, this parameter controls the behavior:
+                 *     - `false` (default): Return a BasketTransferException (HTTP status 409). The basket owner doesn't change.
+                 *     - `true`: Force the transfer by deleting the current shopper's active basket and making the current shopper the owner of the previous shopper's basket. Returns the transferred basket (HTTP status 200).
+                 */
+                overrideExisting?: components["parameters"]["overrideExisting"];
+                /**
+                 * @description This parameter controls the behavior:
+                 *         - `false` (default): Transfers the basket or returns a 409 response with the appropriate message (taking `overrideExisting` in consideration).
+                 *         - `true`: (recommended): Executes the dw.order.mergeBasket hook if at least one basket exists.
+                 *
+                 *     The hook dw.order.mergeBasket default implementation merges a source basket into the current basket. This behavior can be customized, as shown
+                 *     in this [sample implementation](https://gist.github.com/sf-thomas-loesche/3446c7d71a97e559bf1caee96ae56d9f).
+                 *
+                 *     There are four possible use cases:
+                 *
+                 *     a) Guest basket and registered basket exist
+                 *     The guest basket becomes the current basket for the registered shopper by updating the basket's owner (no personal data is removed). The hook
+                 *     dw.order.mergeBasket is called with the source basket (former registered shopper basket) and the transferred current basket (former guest basket).
+                 *
+                 *     b) Guest basket exists but no registered basket exists
+                 *     The guest basket becomes the current basket for the registered shopper by updating the basket's owner (no personal data is removed). The hook
+                 *     dw.order.mergeBasket is called without the source basket (null passed to the hook) and the transferred current basket (former guest basket).
+                 *
+                 *     c) No guest basket exists but a registered basket exists
+                 *     The registered basket is retained. The hook dw.order.mergeBasket is called with the retained current basket but without the source basket (null
+                 *     passed to the hook).
+                 *
+                 *     d) Neither basket exists
+                 *     The hook dw.order.mergeBasket is not called.
+                 *
+                 *     The API returns the current basket (after executing dw.order.mergeBasket).
+                 */
+                merge?: components["parameters"]["merge"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The current basket. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Basket"];
+                };
+            };
+            /** @description The operation was successful. No current basket was returned because neither the previous nor current shopper had an active basket attached that could be transferred. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The call returns this error if no SLAS token for a registered shopper is available. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /**
+             * @description The call returns this response when the `merge` request parameter is set to `false` and one of the following cases applies:
+             *     - The previous shopper has no active basket.
+             *     - The current shopper has an active basket and the `overrideExisting` query parameter is set to `false` (default value).
+             */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    mergeBasket: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /**
+                 * @description If the current shopper has an active basket, this parameter is ignored. If the current shopper has no active basket, this parameter controls the behavior:
+                 *     - `false` (default): Return a BasketMergeException (HTTP status 409).
+                 *     - `true`: Force the merge by creating a basket for the current shopper and copying information from the previous shopper's basket into it. Return success (HTTP status 200).
+                 */
+                createDestinationBasket?: components["parameters"]["createDestinationBasket"];
+                /**
+                 * @description This parameter controls the quantity calculation for products that exist in both baskets.
+                 *     - higher_quantity (default): Compare the product's quantities in each basket, and use the higher value.
+                 *     - sum_quantities: Use the sum of the product's quantities from both baskets.
+                 *     - saved_quantity: Use the product's quantity in the current shopper's active basket. Ignore the quantity from the previous shopper's basket.
+                 *     - separate_item: Add a separate product item to the current shopper's basket for the quantity in the previous shopper's basket.
+                 */
+                productItemMergeMode?: components["parameters"]["productItemMergeMode"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The current shopper's active basket, including items merged from the previous shopper's basket. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Basket"];
+                };
+            };
+            /** @description The call returns this error if no SLAS token for a registered shopper is available. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /**
+             * @description The call returns this response in either of these cases:
+             *     - The previous shopper has no active basket.
+             *     - The current shopper has no active basket and the `createDestinationBasket` query parameter was `false` (default value).
+             */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getBasket: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success, the response body contains the retrieved basket. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Basket"];
+                };
+            };
+            /**
+             * @description The customer assigned to the basket does not
+             *     match the verified customer represented by the JSON Web Token (JWT).
+             */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The basket with the given basket ID is unknown. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    deleteBasket: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success, without a body. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /**
+             * @description The customer assigned to the basket does not
+             *     match the verified customer represented by the JSON Web Token (JWT).
+             */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The basket with the given basket ID is unknown. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateBasket: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description If `true` (default value), the external tax rates are removed from the basket and set to null. To add external tax rates to a basket, use the `addTaxesForBasket` or `addTaxesForBasketItem` endpoint. The removal of external tax rates depends on the update performed on the basket, for example: an update to the `currency` triggers a removal. Set this parameter to `false` to disable the removal of external tax rates/values. */
+                removeExternalTax?: components["parameters"]["removeExternalTax"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Basket"];
+            };
+        };
+        responses: {
+            /** @description Success, the response body contains the updated basket. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Basket"];
+                };
+            };
+            /**
+             * @description Possible reasons:
+             *     - the customer assigned to the basket does not
+             *     match the verified customer represented by the JSON Web Token (JWT).
+             *     - the basket cannot be updated because the
+             *     requested currency is not supported by the site.
+             *     - the given shipping item ID is null or empty.
+             *     - a few shipping items with the same item ID are
+             *     provided.
+             *     - the provided code is not currently active.
+             */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /**
+             * @description Possible reasons:
+             *     - the basket with the given basket ID is unknown.
+             *     - the shipping item with the given item ID is
+             *     unknown for the basket.
+             *     - the provided code was not found.
+             */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateAsAgentBasket: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success, the response body contains basket that is set as an agent basket. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Basket"];
+                };
+            };
+            /** @description Marking this basket as an agent basket would exceed the open agent basket limit for the basket customer. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The basket with the given basket ID is unknown. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateBillingAddressForBasket: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+                /** @example true */
+                useAsShipping?: components["parameters"]["useAsShipping"];
+                /** @description If `true` (default value), the external tax rates are removed from the basket and set to null. To add external tax rates to a basket, use the `addTaxesForBasket` or `addTaxesForBasketItem` endpoint. The removal of external tax rates depends on the update performed on the basket, for example: an update to the `currency` triggers a removal. Set this parameter to `false` to disable the removal of external tax rates/values. */
+                removeExternalTax?: components["parameters"]["removeExternalTax"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrderAddress"];
+            };
+        };
+        responses: {
+            /** @description Success, the response body contains basket with the added billing address. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Basket"];
+                };
+            };
+            /**
+             * @description The customer assigned to the basket does not
+             *     match the verified customer represented by the JSON Web Token (JWT).
+             */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The basket with the given basket ID is unknown. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    addCouponToBasket: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CouponItem"];
+            };
+        };
+        responses: {
+            /** @description Success, the response body contains the basket with the added coupon. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Basket"];
+                };
+            };
+            /**
+             * @description Possible Reasons:
+             *     - the customer assigned to the basket does not
+             *     match the verified customer represented by the JSON Web Token (JWT).
+             *     - the coupon number is not provided.
+             *     - the coupon code specified is invalid.
+             */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The basket with the given basket ID is unknown. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    removeCouponFromBasket: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+                /** @description The ID of the coupon item. */
+                couponItemId: components["parameters"]["couponItemId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success, the response body contains the basket without the deleted coupon. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Basket"];
+                };
+            };
+            /**
+             * @description The customer assigned to the basket does not
+             *     match the verified customer represented by the JSON Web Token (JWT).
+             */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /**
+             * @description Possible reasons:
+             *     - the basket with the given basket ID is unknown.
+             *     - the couponItemId URL parameter does not match any
+             *     coupon item ID in the basket.
+             */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateCustomerForBasket: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomerInfo"];
+            };
+        };
+        responses: {
+            /** @description Success, the response body contains the basket with the added customer information. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Basket"];
+                };
+            };
+            /**
+             * @description Possible reasons:
+             *     - the customer assigned to the basket does not match the verified
+             *     customer represented by the JSON Web Token (JWT).
+             *     - the customer cannot be set to the basket because the
+             *     max number of baskets per customer would be exceeded.
+             */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /**
+             * @description Possible reasons:
+             *     - the customer with the given customer number is unknown.
+             *     - the basket with the given basket ID is unknown.
+             */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    addGiftCertificateItemToBasket: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["GiftCertificateItem"];
+            };
+        };
+        responses: {
+            /** @description Success, the response body contains the basket with the added gift certificate. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Basket"];
+                };
+            };
+            /** @description The gift certificate item amount is negative. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /**
+             * @description Possible reasons:
+             *       - the basket with the given basket ID is unknown.
+             *       - the shipment with the given shipment ID is unknown.
+             */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    removeGiftCertificateItemFromBasket: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+                /** @description the ID of the gift certificate item to be updated. */
+                giftCertificateItemId: components["parameters"]["giftCertificateItemId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success, the response body contains the basket without the deleted gift certificate. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Basket"];
+                };
+            };
+            /**
+             * @description Possible reasons:
+             *     - the basket with the given basket ID is unknown.
+             *     - the gift certificate item with the given gift certificate item ID is unknown.
+             */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    updateGiftCertificateItemInBasket: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+                /** @description the ID of the gift certificate item to be updated. */
+                giftCertificateItemId: components["parameters"]["giftCertificateItemId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["GiftCertificateItem"];
+            };
+        };
+        responses: {
+            /** @description Success, the response body contains the basket with the updated gift certificate. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Basket"];
+                };
+            };
+            /** @description The gift certificate item amount is negative. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /**
+             * @description Possible reasons:
+             *     - the basket with the given basket ID is unknown.
+             *     - the gift certificate item with the given gift certificate item ID is unknown.
+             */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    addItemToBasket: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProductItem"][];
+            };
+        };
+        responses: {
+            /** @description Success, the response body contains the basket with the added items. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Basket"];
+                };
+            };
+            /**
+             * @description Possible reasons:
+             *     - the given product ID is null or invalid.
+             *     - the product with the given product ID is unknown, offline or
+             *     not assigned to site catalog or the given product item quantity is null or invalid.
+             *     - a null quantity value.
+             *     - the requested product quantity is not available.
+             *     - the product cannot be added to the basket because of its type.
+             *     - an option with the specified option ID is unknown.
+             *     - an option with the specified option value ID is
+             *     unknown.
+             *     - the maximum allowed number of products added to the basket,
+             *     has been exceeded.
+             *     - the customer assigned to the basket does not match the verified
+             *     customer represented by the JSON Web Token (JWT).
+             *     - the provided bonus discount line item ID is not
+             *     present in the current basket.
+             *     - the quantity of the product to be added will result in the
+             *     number of selected bonus choice products to exceed the amount that the user is permitted to select.
+             *     - the selected bonus product is not an applicable product for
+             *     the bonus discount line item provided.
+             *     body:
+             *     application/problem+json:
+             *         type: ErrorResponse
+             *         examples:
+             *           dataTypes.ErrorResponse: !include exchange_modules/893f605e-10e2-423a-bdb4-f952f56eb6d8/checkout-data-types/2.0.6/examples/error/bad-request-example.raml
+             */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /**
+             * @description Possible reasons:
+             *     - the basket with the given basket ID is unknown.
+             *     - the basket does not contain a shipment with the given shipment ID.
+             */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateItemsInBasket: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description If `true` (default value), the external tax rates are removed from the basket and set to null. To add external tax rates to a basket, use the `addTaxesForBasket` or `addTaxesForBasketItem` endpoint. The removal of external tax rates depends on the update performed on the basket, for example: an update to the `currency` triggers a removal. Set this parameter to `false` to disable the removal of external tax rates/values. */
+                removeExternalTax?: components["parameters"]["removeExternalTax"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProductItem"][];
+            };
+        };
+        responses: {
+            /** @description Success, the response body contains the basket with the updated item. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Basket"];
+                };
+            };
+            /**
+             * @description Possible reasons:
+             *     - no product item with a given item ID was found for the basket.
+             *     - the product with the given product ID in the
+             *     request body is invalid.
+             *     - a null quantity value.
+             *     - an option with a specified option ID is unknown.
+             *     - an option with a specified option value ID is unknown.
+             *     - the given shipment ID is invalid.
+             *     - the customer assigned to the basket does not
+             *     match the verified customer represented by the JWT token.
+             */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Possible reasons: basket not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    removeItemFromBasket: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                /** @description The ID of the item to be updated. */
+                itemId: components["parameters"]["itemId"];
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success, the response body contains the basket without the deleted item. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Basket"];
+                };
+            };
+            /**
+             * @description The customer assigned to the basket does not
+             *     match the verified customer represented by the JSON Web Token (JWT).
+             */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The basket with the given basket ID is unknown. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateItemInBasket: {
+        parameters: {
+            query: {
+                /** @description If `true` (default value), the external tax rates are removed from the basket and set to null. To add external tax rates to a basket, use the `addTaxesForBasket` or `addTaxesForBasketItem` endpoint. The removal of external tax rates depends on the update performed on the basket, for example: an update to the `currency` triggers a removal. Set this parameter to `false` to disable the removal of external tax rates/values. */
+                removeExternalTax?: components["parameters"]["removeExternalTax"];
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                /** @description The ID of the item to be updated. */
+                itemId: components["parameters"]["itemId"];
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProductItem"];
+            };
+        };
+        responses: {
+            /** @description Success, the response body contains the basket with the updated item. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Basket"];
+                };
+            };
+            /**
+             * @description Possible reasons:
+             *     - no product item with given item ID was found for the basket.
+             *     - the product with the given product ID in the
+             *     request body is invalid.
+             *     - a null quantity value.
+             *     - an option with the specified option id is unknown.
+             *     - an option with the specified option value id is unknown.
+             *     - the given shipment ID is invalid.
+             *     - the customer assigned to the basket does not.
+             *     match the verified customer represented by the JWT token.
+             */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /**
+             * @description Possible reasons:
+             *     - the basket with the given basket ID is unknown.
+             *     - a shipment with it's given ID is unknown.
+             */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    addTaxesForBasketItem: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the item to be updated. */
+                itemId: components["parameters"]["itemId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TaxItems"];
+            };
+        };
+        responses: {
+            /** @description Success, without body. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /**
+             * @description Possible reasons:
+             *     - The basket with the given basket ID is unknown.
+             *     - The item with the given item ID is unknown.
+             */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /**
+             * @description Possible Reasons:
+             *     - The tax mode of the referenced basket is not set to EXTERNAL.
+             */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    addPaymentInstrumentToBasket: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BasketPaymentInstrumentRequest"];
+            };
+        };
+        responses: {
+            /** @description Success, the response body contains the basket with the added payment instrument. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Basket"];
+                };
+            };
+            /**
+             * @description Possible reasons:
+             *     - the provided payment method is invalid or not applicable.
+             *     - the customer assigned to the basket does not match the verified
+             *     customer represented by the JSON Web Token (JWT).
+             */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The basket with the given basket ID is unknown. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    removePaymentInstrumentFromBasket: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                paymentInstrumentId: components["parameters"]["paymentInstrumentId"];
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success, the response body contains the basket without the deleted payment instrument. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Basket"];
+                };
+            };
+            /**
+             * @description The customer assigned to the basket does not
+             *     match the verified customer represented by the JSON Web Token (JWT).
+             */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /**
+             * @description Possible reasons:
+             *     - the basket with the given basket ID is unknown.
+             *     - the payment instrument with the given basket payment
+             *     instrument ID is unknown.
+             */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updatePaymentInstrumentInBasket: {
+        parameters: {
+            query: {
+                /** @description If `true` (default value), the external tax rates are removed from the basket and set to null. To add external tax rates to a basket, use the `addTaxesForBasket` or `addTaxesForBasketItem` endpoint. The removal of external tax rates depends on the update performed on the basket, for example: an update to the `currency` triggers a removal. Set this parameter to `false` to disable the removal of external tax rates/values. */
+                removeExternalTax?: components["parameters"]["removeExternalTax"];
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                paymentInstrumentId: components["parameters"]["paymentInstrumentId"];
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrderPaymentInstrument"];
+            };
+        };
+        responses: {
+            /** @description Success, the response body contains the basket with the updated payment instrument. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Basket"];
+                };
+            };
+            /**
+             * @description Possible reasons:
+             *     - the provided payment method is invalid or not applicable.
+             *     - the basket payment intsrument with the given id is already permanently masked.
+             *     - The customer assigned to the basket does not match the
+             *     verified customer represented by the JSON Web Token (JWT).
+             */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /**
+             * @description Possible reasons:
+             *     - the basket with the given basket ID is unknown.
+             *     - the payment instrument item with the given payment instrument ID is unknown.
+             */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getPaymentMethodsForBasket: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success, the response body contains the applicable payment methods for the basket. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaymentMethodResult"];
+                };
+            };
+            /**
+             * @description The customer assigned to the basket does not
+             *     match the verified customer represented by the JSON Web Token (JWT).
+             */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The basket with the given basket ID is unknown. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    addPriceAdjustmentToBasket: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PriceAdjustmentRequest"];
+            };
+        };
+        responses: {
+            /** @description Success, the response body contains the basket with added price adjustment. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Basket"];
+                };
+            };
+            /**
+             * @description Possible reasons:
+             *     - a fixed price adjustment was already created for the given level.
+             *     - a fixed price adjustment was added at `order` level.
+             *     - a promotion ID was used twice.
+             *     - a system promotion ID was used as a manual promotion ID.
+             *     - more than one hundred price adjustments would have been created.
+             *     - the price adjustment limit had exceeded.
+             */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The basket with the given basket ID is unknown. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    removePriceAdjustmentFromBasket: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                priceAdjustmentId: components["parameters"]["priceAdjustmentId"];
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success, the response body contains the basket without the deleted price adjustment. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Basket"];
+                };
+            };
+            /** @description The priceAdjustmentId is missing, empty or whitespace. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The basket with the given basket ID is unknown. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updatePriceAdjustmentInBasket: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                priceAdjustmentId: components["parameters"]["priceAdjustmentId"];
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PriceAdjustment"];
+            };
+        };
+        responses: {
+            /** @description Success, the response body contains the basket with the updated price adjustment. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Basket"];
+                };
+            };
+            /**
+             * @description Possible reasons:
+             *     - the price adjustment is not manual and cannot be updated.
+             *     - the expected attributes are missing in the input.
+             *     - the type of a price adjustment does not match the adjustment type of the input data.
+             *     - the price adjustment limit is exceeded.
+             */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The price adjustment ID is not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getPriceBooksForBasket: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success, the response body contains the priceBookIds for the basket. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PriceBookIds"];
+                };
+            };
+            /** @description The basket with the given basket ID is unknown. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    addPriceBooksToBasket: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PriceBookIds"];
+            };
+        };
+        responses: {
+            /** @description Success, without body. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The basket with the given basket ID is unknown or contains a price book ID that does not correspond to an existing price book. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    createShipmentForBasket: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Shipment"];
+            };
+        };
+        responses: {
+            /** @description Success, the response body contains the basket with added shipment. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Basket"];
+                };
+            };
+            /**
+             * @description Possible reasons:
+             *     - a shipment id is not provided.
+             *     - a shipment with the provided ID already.
+             *     exists for the basket.
+             *     - a shipment with the provided shipment number
+             *     already exists for the basket.
+             *     - a shipping method with an ID was specified
+             *     which is not a valid shipping method ID.
+             *     - the customer assigned to the basket does not match the
+             *     verified customer represented by the JSON Web Token (JWT).
+             */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /**
+             * @description The basket with the given basket ID is
+             *     unknown.
+             */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    removeShipmentFromBasket: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                /** @description The ID of the shipment to be modified. */
+                shipmentId: components["parameters"]["shipmentId"];
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success, the response body contains the basket without the deleted shipment. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Basket"];
+                };
+            };
+            /**
+             * @description Possible reasons:
+             *     - the given shipment ID is invalid.
+             *     - the customer assigned to the basket does not match the
+             *     verified customer represented by the JSON Web Token (JWT).
+             */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /**
+             * @description The given shipment ID corresponds to the
+             *     default shipment and cannot be removed.
+             */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /**
+             * @description The basket with the given basket ID is
+             *     unknown.
+             */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateShipmentForBasket: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                /** @description The ID of the shipment to be modified. */
+                shipmentId: components["parameters"]["shipmentId"];
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Shipment"];
+            };
+        };
+        responses: {
+            /** @description Success, the response body contains the basket with the updated shipment. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Basket"];
+                };
+            };
+            /**
+             * @description Possible reasons:
+             *     - the given shipment ID was invalid.
+             *     - a shipment with the provided ID already
+             *     exists for the basket.
+             *     - a shipment with the provided shipment number
+             *     already exists for the basket.
+             *     - a missing shipping method.
+             *     - an invalid shipping method.
+             *     - the customer assigned to the basket does not match the
+             *     verified customer represented by the JSON Web Token (JWT).
+             */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The basket with the given basket ID is unknown. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateShippingAddressForShipment: {
+        parameters: {
+            query: {
+                /** @example true */
+                useAsBilling?: components["parameters"]["useAsBilling"];
+                /** @description If `true` (default value), the external tax rates are removed from the basket and set to null. To add external tax rates to a basket, use the `addTaxesForBasket` or `addTaxesForBasketItem` endpoint. The removal of external tax rates depends on the update performed on the basket, for example: an update to the `currency` triggers a removal. Set this parameter to `false` to disable the removal of external tax rates/values. */
+                removeExternalTax?: components["parameters"]["removeExternalTax"];
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the shipment to be modified. */
+                shipmentId: components["parameters"]["shipmentId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrderAddress"];
+            };
+        };
+        responses: {
+            /** @description Success, the response body contains the basket with the added shipping address. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Basket"];
+                };
+            };
+            /**
+             * @description Possible reasons:
+             *     - the shipment with the given shipment ID is unknown.
+             *     - the customer assigned to the basket does not
+             *     match the verified customer represented by the JSON Web Token (JWT).
+             */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The basket with the given basket ID is unknown. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateShippingMethodForShipment: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the shipment to be modified. */
+                shipmentId: components["parameters"]["shipmentId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ShippingMethod"];
+            };
+        };
+        responses: {
+            /** @description Success, the response body contains the basket with the added shipping method. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Basket"];
+                };
+            };
+            /**
+             * @description Possible reasons:
+             *     - the id of the shipping method is missing.
+             *     - a shipping method with an ID was specified
+             *     which is not a valid shipping method ID.
+             *     - the customer assigned to the basket does not match the
+             *     verified customer represented by the JSON Web Token (JWT).
+             */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The basket with the given basket ID is unknown. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getShippingMethodsForShipment: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the shipment to be modified. */
+                shipmentId: components["parameters"]["shipmentId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success, the response body contains the applicable shipping methods for a certain shipment of the basket. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShippingMethodResult"];
+                };
+            };
+            /**
+             * @description The customer assigned to the basket does not
+             *     match the verified customer represented by the JSON Web Token (JWT).
+             */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /**
+             * @description Possible reasons:
+             *     - The basket with the given basket ID is unknown.
+             *     - The shipment with the given shipment ID is unknown.
+             */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateAsStorefrontBasket: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description If true, an existing storefront basket is exchanged and marked as an agent basket. If false, a `CustomerBasketsQuotaExceededException` is thrown. */
+                exchange?: components["parameters"]["exchange"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success, the response body contains a basket that is set as a storefront basket. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Basket"];
+                };
+            };
+            /** @description Thrown if a storefront basket already exists and the query parameter `exchange` is false. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The basket with the given basket ID is unknown. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getTaxesFromBasket: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success, the response body contains the external taxation from all line items from the referenced basket. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Taxes"];
+                };
+            };
+            /** @description The basket with the given basket ID is unknown. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /**
+             * @description Possible Reasons:
+             *     - The tax mode of the referenced basket is not set to EXTERNAL.
+             */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    addTaxesForBasket: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the organization the request is being made by
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The ID of the basket to be modified. */
+                basketId: components["parameters"]["basketId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Taxes"];
+            };
+        };
+        responses: {
+            /** @description Success, without body. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The basket with the given basket ID is unknown. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /**
+             * @description Possible Reasons:
+             *     - The tax mode of the referenced basket is not set to EXTERNAL.
+             */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+}

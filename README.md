@@ -59,6 +59,9 @@ Same journey on both layers unless noted:
 | Cancel an eligible Order Management order               |   ✓†    |     |
 | Return eligible order items                             |   ✓†    |     |
 | An un-ingested order offers no Order Management actions |    ✓    |     |
+| Set tracking consent across Commerce and analytics      |    ✓    |     |
+| Obtain shopping assistance from a Commerce Agent        |   ✓†    |     |
+| A storefront with no Commerce Agent offers no way in    |    ✓    |     |
 
 † Written and gated, but the public demo is not configured for it, so the run skips it with the
 reason rather than executing it. See the conditional journeys below.
@@ -74,12 +77,12 @@ A few things that aren't obvious from the list:
 - The `login` files hold the sign-in steps the auth setup reuses, so those selectors live in one
   place. Its own spec asserts the same journey and skips itself when no shopper account is
   configured.
-- The last nine journeys are conditional: they only exist while the store is configured for them, so
-  each one proves its own condition before the browser starts and skips with a reason when it isn't
-  met. The recommendation journey asks Einstein whether it has anything to recommend; the bonus
-  journey puts a qualifying product in a throwaway basket and looks for the bonus discount line item.
-  A store fault is raised rather than skipped, so a broken shop never reads as "this journey doesn't
-  apply here".
+- Every journey from the Einstein recommendation down is conditional: it only exists while the store
+  is configured for it, so each one proves its own condition before the browser starts and skips with
+  a reason when it isn't met. The recommendation journey asks Einstein whether it has anything to
+  recommend; the bonus journey puts a qualifying product in a throwaway basket and looks for the bonus
+  discount line item. A store fault is raised rather than skipped, so a broken shop never reads as
+  "this journey doesn't apply here".
 - The three checkout journeys read their condition out of the storefront's own shipped configuration,
   which PWA Kit serializes into every page as `#mobify-data` (see `e2e/support/app-config.ts`). That
   asks the app under test what it is configured to do instead of inferring it from what renders. Each
@@ -107,6 +110,77 @@ A few things that aren't obvious from the list:
   click are matched in both Einstein (`viewReco` / `clickReco`) and Data Cloud
   (`catalog-object-impression` keyed by the recommender). It covers both endings the journey allows,
   opening the recommended product and saving it to the wishlist.
+
+### The tracking-consent journey
+
+This is the one journey that must not arrive with the consent pop-up already answered, so it is the
+only one that takes Playwright's own fixtures instead of the shared ones — those set `dw_dnt` up front
+precisely so the form never interrupts anything else. It runs twice, once accepting and once
+declining, and each run follows the choice all the way out to both analytics layers:
+
+- The stored preference is `dw_dnt`, `0` for accepted and `1` for declined.
+- The SLAS session is reauthorized to carry the same DNT, as a `refresh_token` grant rather than a
+  fresh login, so it stays the same shopper's session. A session that already declares the chosen DNT
+  is not reauthorized again, which is why the assertion is that the session in effect matches the
+  choice rather than that an exchange always happens.
+- Einstein either records the product view against the shopper's own session id or records nothing at
+  all — the layer is suppressed outright rather than anonymised.
+- Data Cloud keeps sending the catalog view either way, but replaces every shopper identifier with
+  `__DNT__` and drops its `identity` and `partyIdentification` events when tracking is declined.
+
+Two things about it are worth knowing, because both were found the hard way and both are what make it
+stable:
+
+- The storefront deletes a stored preference that disagrees with the DNT its current access token
+  carries, and reopens the form when it does. A test that pressed the button and navigated could
+  therefore lose the choice silently and still look green, so the choice is only treated as made once
+  the preference and the session agree.
+- The form is served rendered and stays pressable for several seconds before hydration attaches its
+  handler, so an early press is dropped with no sign of it. The press repeats until the preference is
+  actually stored.
+
+The condition has two halves. The analytics layers are read from the app's own shipped configuration
+before the browser starts (`app.einsteinAPI.einsteinId`, `app.dataCloudAPI.appSourceId` and
+`tenantId`); whether the consent UX is still there at all can only be answered by the rendered page,
+so a storefront that renders and never asks skips with that reason. The public demo has all of it, so
+both runs execute. Its consent copy is the template's `Lorem ipsum` placeholder rather than a privacy
+notice, so the test asserts that the choice is offered and explained without pinning the words a
+merchant has to replace before launch.
+
+### The Commerce Agent journeys
+
+Obtaining shopping assistance is conditional on the storefront being configured for an agent at all.
+The condition is read from `app.commerceAgent` in the storefront's own shipped configuration, and the
+skip names every setting that isn't met. `enabled` must be exactly `"true"` — the settings are strings
+parsed out of one environment variable, so `"false"` is a value the agent reads rather than an absent
+one. Beyond that, which settings are required depends on the provider the storefront selects:
+
+- `miaw`, the default, needs all of `embeddedServiceName`, `embeddedServiceEndpoint`,
+  `scriptSourceUrl`, `scrt2Url`, `salesforceOrgId`, `commerceOrgId`, `siteId` and `askAgentOnSearch`.
+- `commerce-client` needs `scrt2Url`, `salesforceOrgId`, one of `cc_esDeveloperName` or
+  `embeddedServiceName`, and one of `cc_cdnVersion` or `commerceClientScriptSourceUrl`.
+
+On the public demo `enabled` is `"false"` and all seven MIAW identifiers and URLs are empty, so
+neither provider could initialize and the journey skips naming all of it. Its steps are written
+against the deployed app's own contract but have never run — treat them as unproven until a storefront
+configured for an agent says otherwise.
+
+What that journey asserts is deliberately the storefront's own half of the contract: the provider
+bundle its configuration names is requested, that provider publishes its global, Shopper
+Configurations is read for the Salesforce domain the agent platform is reached on, the shopper already
+holds a Commerce session, and opening the agent posts that identity to the storefront's own token
+bridge (`/api/agent/identity/bridge`) for this site. The conversation window itself is the provider's
+surface — an Embedded Messaging iframe, or the Commerce Client widget injected into the storefront's
+container — and site, locale, currency, USID and auth type reach it through that provider's pre-chat
+API. Typing into that conversation, and escalation to a human agent, are the provider's behaviour
+rather than this storefront's, so they are not asserted as if they were.
+
+The complement is the part the public demo can prove, and it is what keeps the skip honest: a
+storefront with no agent configured must offer no header entry, no widget container and no ask-agent
+entry beside search suggestions, must load neither provider bundle, and must hand nothing to an agent
+platform. Search still returns real suggestions in that test, which is what makes the missing entry a
+decision rather than a page that failed to render one. It skips in the other direction, on a
+storefront that does configure an agent.
 
 ### The Order Management journeys
 
@@ -165,7 +239,7 @@ ingest into OMS and therefore has no un-ingested order to assert against.
 
 ## Requirements
 
-- Node 22.13+ (pnpm 11 needs it; pinned in `.nvmrc` / `package.json` engines; CI uses the Playwright image's Node).
+- Node 24 (pinned in `.nvmrc` / `package.json` engines; the Playwright image CI runs in ships Node 24).
 - pnpm (version pinned in `package.json`).
 
 ## Setup
@@ -202,6 +276,9 @@ pnpm report          # open the last HTML report
 pnpm typecheck
 pnpm lint
 pnpm format
+
+pnpm gen:api:fetch  # re-vendor the SCAPI specs from upstream
+pnpm gen:api        # regenerate types from the vendored specs
 ```
 
 ## Signing in once
@@ -228,6 +305,41 @@ The demo's login service (SLAS) uses a public client with no secret, so `api/sup
 sign in the same way the storefront does — the SLAS + PKCE flow — straight from Playwright's
 request context. One token per spec keeps it well under the rate limit.
 
+## Typed API responses
+
+Response shapes are generated from Salesforce's own OpenAPI specs rather than hand-written, so a
+field this suite reads that SCAPI does not return is a compile error instead of an `undefined` that
+surfaces halfway through an assertion.
+
+Salesforce publishes SCAPI as OpenAPI 3, but the download button on the docs portal needs a browser
+and the Schemas API needs OAuth with the `sfcc.scapi-schemas` scope. Salesforce's own SDK repo
+commits the same specs in public, so that is where `pnpm gen:api:fetch` reads them: no credentials,
+and it works in CI with no secrets. The eight families this suite calls land in `api/specs/`, and
+`pnpm gen:api` turns each into a module under `api/generated/`.
+
+Both are committed. That keeps `pnpm test` a single step with no codegen in front of it, and it
+makes an upstream change arrive as a reviewable diff. `api/specs/MANIFEST.json` records the resolved
+version of each family, so the diff says "shopper-baskets 1.11.0 → 1.12.0" instead of showing tens
+of thousands of lines of YAML.
+
+A few things worth knowing:
+
+- `api/support/scapi-types.ts` is the only place the `components['schemas'][...]` indirection lives.
+  It exports the response shapes under readable names and is where to look first.
+- Names are prefixed by family where two families disagree. A basket line item (`BasketProductItem`)
+  and an order line item (`OrderProductItem`) are different shapes. Order history is served by
+  Shopper Customers, which declares its own `Order`, exported here as `CustomerOrder`.
+- The spec marks nearly every response field optional, including ones a 200 always carries. Where a
+  value feeds a later request, `required()` from `api/support/scapi.ts` narrows it and names the
+  field if it really is missing, rather than passing `undefined` down the call.
+- Request bodies and expected values stay in each feature's `*.data.ts`. Only response shapes are
+  generated.
+- Nothing fetches at test time. The committed spec is the pin; `pnpm gen:api:fetch` runs when you
+  decide, or nightly in CI to detect drift.
+
+Einstein, Data Cloud, the storefront's own `#mobify-data` config and the OMS metadata resource have
+no published spec, so those stay hand-written.
+
 ## Layout
 
 ```
@@ -245,12 +357,18 @@ e2e/
     <feature>/               # <feature>.{locators,actions,data,spec}.ts
     journeys/<feature>/      # same four files, one folder per cross-service journey
 api/
+  specs/                     # vendored SCAPI OpenAPI specs + MANIFEST.json (generated)
+  generated/                 # types generated from those specs (generated)
   support/
     slas.ts                  # guest token (SLAS + PKCE)
-    scapi.ts                 # URL and header helpers
+    scapi.ts                 # URL and header helpers, and required()
+    scapi-types.ts           # named response shapes from api/generated
     einstein.ts              # recommendation host, paths, and a recs call
   tests/
     <feature>/               # <feature>.{endpoints,actions,data,spec}.ts
+scripts/
+  fetch-api-specs.mjs        # pnpm gen:api:fetch
+  generate-api-types.mjs     # pnpm gen:api
 playwright.config.ts         # projects: setup, e2e-chromium, api
 ```
 
@@ -259,6 +377,13 @@ playwright.config.ts         # projects: setup, e2e-chromium, api
 `.github/workflows/playwright.yml` runs on PRs into main, on pushes to main, nightly, and on manual
 trigger. Add `E2E_ACCOUNT_EMAIL` and `E2E_ACCOUNT_PASSWORD` as repository secrets to include the
 signed-in journeys; without them the run is guest only. Every run uploads its HTML report.
+
+A second job, `spec-drift`, runs nightly and on demand only. It re-fetches the SCAPI specs from
+upstream, regenerates the types, and fails if either differs from what is committed — so the run goes
+red when Salesforce changes the contract, and the job summary names the family whose version moved.
+Generation is deterministic, so a green run means nothing upstream moved rather than that the check
+did nothing. It never runs on a pull request: it answers "did Salesforce change something", not "is
+this branch correct".
 
 ## Known limitations
 

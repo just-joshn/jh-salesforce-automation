@@ -4,7 +4,7 @@
   "description": "Playwright E2E + API tests for the Salesforce PWA Kit Retail React App storefront",
   "private": true,
   "engines": {
-    "node": ">=22.13.0"
+    "node": ">=24"
   },
   "packageManager": "pnpm@11.17.0",
   "scripts": {
@@ -14,6 +14,8 @@
     "test:headed": "playwright test --project=e2e-chromium --headed",
     "test:ui": "playwright test --ui",
     "report": "playwright show-report",
+    "gen:api:fetch": "node scripts/fetch-api-specs.mjs",
+    "gen:api": "node scripts/generate-api-types.mjs",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -29,6 +31,7 @@
     "@types/node": "^26.1.1",
     "dotenv": "^16.4.5",
     "eslint": "^9.13.0",
+    "openapi-typescript": "^7.13.0",
     "prettier": "^3.3.3",
     "typescript": "^5.6.3",
     "typescript-eslint": "^8.11.0"

@@ -1,7 +1,9 @@
 import { expect, test } from '@playwright/test';
+import { required } from '../../support/scapi';
+import type { Basket, Fault } from '../../support/scapi-types';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './cart-delivery.actions';
-import type { Basket, Fault, Product } from './cart-delivery.data';
+import type { Product } from './cart-delivery.data';
 import {
   deliveryProduct,
   firstLineItem,
@@ -28,11 +30,12 @@ test('configure a variant and add it to the basket for delivery', async ({ reque
   expect(createResponse.status()).toBe(200);
   const basket = (await createResponse.json()) as Basket;
   expect(basket.basketId).toBeTruthy();
+  const basketId = required(basket.basketId, 'basketId');
 
   const addResponse = await Actions.addItem(
     request,
     accessToken,
-    basket.basketId,
+    basketId,
     variant.productId,
     deliveryProduct.quantity,
   );
@@ -45,7 +48,7 @@ test('configure a variant and add it to the basket for delivery', async ({ reque
   expect(item.shipmentId).toBe(deliveryProduct.defaultShipmentId);
 
   // Reload cart — item should stick.
-  const refetchResponse = await Actions.getBasket(request, accessToken, basket.basketId);
+  const refetchResponse = await Actions.getBasket(request, accessToken, basketId);
   expect(refetchResponse.status()).toBe(200);
   const persisted = (await refetchResponse.json()) as Basket;
   const persistedItem = lineItems(persisted).find(
@@ -57,7 +60,7 @@ test('configure a variant and add it to the basket for delivery', async ({ reque
   const overResponse = await Actions.addItem(
     request,
     accessToken,
-    basket.basketId,
+    basketId,
     variant.productId,
     deliveryProduct.overQuantity,
   );

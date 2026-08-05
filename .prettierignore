@@ -3,3 +3,8 @@ playwright-report
 test-results
 blob-report
 playwright/.auth
+.omo
+
+# Vendored SCAPI specs and the types generated from them.
+api/specs
+api/generated

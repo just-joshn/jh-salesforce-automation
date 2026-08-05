@@ -1,0 +1,4642 @@
+// Generated from the vendored SCAPI OpenAPI spec. Do not edit by hand.
+//
+// Family:  auth (called as shopper/auth/v1)
+// Version: 1.50.0
+// Source:  SalesforceCommerceCloud/commerce-sdk-isomorphic@main:apis/auth-oas-1.50.0/auth-oas-v1-public.yaml
+//
+// Regenerate with `pnpm gen:api:fetch && pnpm gen:api`.
+
+export interface paths {
+    "/organizations/{organizationId}/oauth2/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Log in a shopper with credentials that are managed by a B2C Commerce instance (B2C Commerce).
+         * @description This follows the authorization code grant flow as defined by the OAuth 2.1 standard. It also uses a proof key for code exchange (PKCE).
+         *
+         *     For PKCE values:
+         *     - The `code_verifier` string is a random string used for the `/token` endpoint request.
+         *     - The `code_challenge` is an encoded version of the `code_verifier` string using an SHA-256 hash.
+         *
+         *     The request must include a basic authorization header that contains a Base64 encoded version of the following string: `<shopperUserID>:<shopperPassword>`.
+         *     Required parameters: `code_challenge`, `channel_id`, `client_id`, and `redirect_uri`.
+         *
+         *     Optional parameters: `usid`.
+         *     The SLAS `/login` endpoint redirects back to the redirect URI and returns an authorization code.
+         *     Calls to `/login` made with the same loginId and tenantId within 1 second result in a conflict.
+         */
+        post: operations["authenticateCustomer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/oauth2/passwordless/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Allow the customer to authenticate when their identity provider is down.
+         * @description This endpoint allows customers to authenticate when their configured identity provider is inaccessible. It provides an alternative authentication path through passwordless login methods like email or SMS verification.
+         */
+        post: operations["authorizePasswordlessCustomer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/oauth2/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Log out a shopper.
+         * @description The shopper's access token and refresh token are revoked. If the shopper authenticated with a B2C Commerce (B2C Commerce) instance, the OCAPI JWT is also revoked. Call this endpoint for registered users that have logged in using SLAS. Do not use this endpoint for guest users.
+         *
+         *     Required header: Authorization header bearer token of the Shopper access token to log out.
+         *
+         *     Required parameters: `refresh token`, `channel_id`, and `client`.
+         */
+        get: operations["logoutCustomer"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/oauth2/authorize": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get an authorization code after authenticating a user against an identity provider (IDP).
+         * @description This is the first step of the OAuth 2.1 authorization code flow, in which a user can log in via federation to the IDP configured for the client. After successfully logging in, the user gets an authorization code via a redirect URI.
+         *
+         *     You can call this endpoint from the front channel (the browser).
+         */
+        get: operations["authorizeCustomer"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/oauth2/token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Get the shopper or guest JWT access token and a refresh token.
+         * @description This is the second step of the OAuth 2.1 authorization code flow.
+         *
+         *     For a private client, an application is able to get an access token for the shopper through the back channel (a trusted server) by passing in the client credentials and the authorization code retrieved from the `authorize` endpoint.
+         *
+         *     For a guest user, get the shopper JWT access token and a refresh token. This is where a client application is able to get an access token for the guest user through the back channel (a trusted server) by passing in the client credentials.
+         *
+         *     For a public client using PKCE, an application passes a PKCE `code_verifier` that matches the `code_challenge` that was used to `authorize` the customer along with the authorization code.
+         *
+         *     When refreshing the access token with a private client ID and client secret, the refresh token is _not_ regenerated. However, when refreshing the access token with a public client ID, the refresh token is _always_ regenerated. The old refresh token is voided with every refresh call, so the refresh token on the client must be replaced to always store the new refresh token.
+         *
+         *     See the Body section for required parameters, including `grant_type` and others that depend on the value of `grant_type`.
+         *
+         *     **Important**: As of July 31, 2024**, SLAS requires the `channel_id` query parameter in token requests.
+         *
+         *     ---
+         *
+         *     # Token Issuer Subject Construction & Constraints #
+         *     The Issuer Subject (`isb`) claim of the issued JWT is a composite string that
+         *     identifies the shopper session. It concatenates the identity origin (`uido`),
+         *     login ID (`upn`), display name (`uidn`), guest customer ID (`gcid`, 26 chars),
+         *     registered customer ID (`rcid`, 26 chars, when applicable), channel ID (`chid`),
+         *     and any flow-specific values (`tsob`, `taob`, `agent`, `login`, `sesb`) as
+         *     `key:value` pairs separated by `::`.
+         *
+         *     **Constraint:** the assembled `isb` must not exceed **256 characters**.
+         *     Exceeding this returns `400 BAD_REQUEST` with *"Issuer Subject length must be
+         *     less than 256 characters"*.
+         *
+         *     **Length calculation breakdown** (with `gcid`=26, `rcid`=26, `chid`≤100).
+         *     Overhead = key chars + each key's trailing `:` + `::` separators between pairs.
+         *
+         *     | Shape | Overhead | Fixed values | Remaining budget |
+         *     |---|---|---|---|
+         *     | Guest | 32 | gcid 26 + chid 100 = 126 | 98 |
+         *     | Registered | 39 | gcid 26 + rcid 26 + chid 100 = 152 | 65 |
+         *     | TSOB guest | 39 | gcid 26 + chid 100 = 126 | 91 - len(tsob) |
+         *     | TSOB registered | 46 | gcid 26 + rcid 26 + chid 100 = 152 | 58 - len(tsob) |
+         *     | Pwdless | 47 | gcid 26 + rcid 26 + chid 100 = 152 | 57 - len(login) |
+         *     | SESB guest | 39 | gcid 26 + chid 100 = 126 | 91 - len(sesb) |
+         *     | SESB registered | 46 | gcid 26 + rcid 26 + chid 100 = 152 | 58 - len(sesb) |
+         *     | TAOB guest | 47 | gcid 26 + chid 100 = 126 | 83 - len(taob + agent) |
+         *     | TAOB registered | 54 | gcid 26 + rcid 26 + chid 100 = 152 | 50 - len(taob + agent) |
+         *
+         *     **Worst case (TAOB registered):**
+         *
+         *     ```
+         *     256  total
+         *     - 54 overhead
+         *     - 26  gcid
+         *     - 26  rcid
+         *     - 100  chid (allowed max)
+         *     ----
+         *     50
+         *
+         *     Then if taob = ta_ext_on_behalf_of:
+         *     50 - 19 = 31
+         *
+         *     Meaning only 31 characters remain for uido + upn + uidn + agent.
+         *
+         *     ```
+         *
+         *     **Practical caps per variable sub-claim:**
+         *
+         *     | Sub-claim | Description | Max length |
+         *     |---|---|---|
+         *     | `uido` | Identity origin | ~20 |
+         *     | `upn` | Login ID / email | ~80 |
+         *     | `uidn` | Display name (after `%3A` escaping) | ~60 |
+         *     | `tsob` / `taob` | Trusted-system / trusted-agent hint | ~21 |
+         *     | `agent` | Agent ID | ~32 |
+         *     | `login` | Passwordless literal (e.g. `pwdless`) | short |
+         *     | `sesb` | Session-bridge hint | short |
+         *     | `chid` | Channel ID | 100 |
+         *
+         *     **Notes:**
+         *     - **Identity Origin Variance** — `uido` is a static IDP-configuration string
+         *       (e.g. `ecom`, `google`, `Link_Brand_Production`). A longer origin reduces
+         *       the budget available for user-supplied inputs.
+         *     - **Double-Count Fallback** — if a shopper registers without a first and last
+         *       name, `uidn` is generated from the email (prefix as first name, domain as
+         *       last name), so the email is effectively counted **twice** (once as `upn`,
+         *       once as `uidn`). Long emails are the most common cause of overflow.
+         *     - Colons inside `uidn` are URL-encoded as `%3A`, which can further inflate
+         *       its length.
+         */
+        post: operations["getAccessToken"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/oauth2/session-bridge/token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Get a shopper JWT access token for a customer using session bridging.
+         * @description For public client ID requests, you must set the grant_type to `session_bridge`.
+         *
+         *     For private client_id and secret, you must set the grant_type to `client_credentials` along with a basic authorization header.
+         *
+         *     **DEPRECATED** - As of January 31, 2024, SLAS no longer supports the SESB `dwsid` parameter for `guest` users for `session-bridge/token` calls. We recommended you transition to using a SESB `dwsgst` token.
+         *
+         *     The `dwsid` is still needed for `registered` user `session-bridge/token` calls.
+         *
+         *     **NOTE:** The registered customer Json Web Token (JWT) is available in B2C Commerce versions 25.4 and later.
+         */
+        post: operations["getSessionBridgeAccessToken"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/oauth2/trusted-system/token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Get a shopper JWT access token for a registered customer whose credentials are stored using a third party.
+         * @description The SLAS client must have the `sfcc.ts_ext_on_behalf_of` scope to access this endpoint.
+         *
+         *
+         *     For trusted-system requests, you can use a basic authorization header that includes a SLAS private client ID and SLAS private client secret instead of the bearer token.
+         *
+         *
+         *     For trusted-system requests, you cannot use SLAS public client_ids.
+         *
+         *     ---
+         *
+         *     # Token Issuer Subject Construction & Constraints #
+         *     The Issuer Subject (`isb`) claim of the issued JWT is a composite string that
+         *     identifies the shopper session. It concatenates the identity origin (`uido`),
+         *     login ID (`upn`), display name (`uidn`), guest customer ID (`gcid`, 26 chars),
+         *     registered customer ID (`rcid`, 26 chars, when applicable), channel ID (`chid`),
+         *     and any flow-specific values (`tsob`, `taob`, `agent`, `login`, `sesb`) as
+         *     `key:value` pairs separated by `::`.
+         *
+         *     **Constraint:** the assembled `isb` must not exceed **256 characters**.
+         *     Exceeding this returns `400 BAD_REQUEST` with *"Issuer Subject length must be
+         *     less than 256 characters"*.
+         *
+         *     **Length calculation breakdown** (with `gcid`=26, `rcid`=26, `chid`≤100).
+         *     Overhead = key chars + each key's trailing `:` + `::` separators between pairs.
+         *
+         *     | Shape | Overhead | Fixed values | Remaining budget |
+         *     |---|---|---|---|
+         *     | Guest | 32 | gcid 26 + chid 100 = 126 | 98 |
+         *     | Registered | 39 | gcid 26 + rcid 26 + chid 100 = 152 | 65 |
+         *     | TSOB guest | 39 | gcid 26 + chid 100 = 126 | 91 - len(tsob) |
+         *     | TSOB registered | 46 | gcid 26 + rcid 26 + chid 100 = 152 | 58 - len(tsob) |
+         *     | Pwdless | 47 | gcid 26 + rcid 26 + chid 100 = 152 | 57 - len(login) |
+         *     | SESB guest | 39 | gcid 26 + chid 100 = 126 | 91 - len(sesb) |
+         *     | SESB registered | 46 | gcid 26 + rcid 26 + chid 100 = 152 | 58 - len(sesb) |
+         *     | TAOB guest | 47 | gcid 26 + chid 100 = 126 | 83 - len(taob + agent) |
+         *     | TAOB registered | 54 | gcid 26 + rcid 26 + chid 100 = 152 | 50 - len(taob + agent) |
+         *
+         *     **Worst case (TAOB registered):**
+         *
+         *     ```
+         *     256  total
+         *     - 54 overhead
+         *     - 26  gcid
+         *     - 26  rcid
+         *     - 100  chid (allowed max)
+         *     ----
+         *     50
+         *
+         *     Then if taob = ta_ext_on_behalf_of:
+         *     50 - 19 = 31
+         *
+         *     Meaning only 31 characters remain for uido + upn + uidn + agent.
+         *
+         *     ```
+         *
+         *     **Practical caps per variable sub-claim:**
+         *
+         *     | Sub-claim | Description | Max length |
+         *     |---|---|---|
+         *     | `uido` | Identity origin | ~20 |
+         *     | `upn` | Login ID / email | ~80 |
+         *     | `uidn` | Display name (after `%3A` escaping) | ~60 |
+         *     | `tsob` / `taob` | Trusted-system / trusted-agent hint | ~21 |
+         *     | `agent` | Agent ID | ~32 |
+         *     | `login` | Passwordless literal (e.g. `pwdless`) | short |
+         *     | `sesb` | Session-bridge hint | short |
+         *     | `chid` | Channel ID | 100 |
+         *
+         *     **Notes:**
+         *     - **Identity Origin Variance** — `uido` is a static IDP-configuration string
+         *       (e.g. `ecom`, `google`, `Link_Brand_Production`). A longer origin reduces
+         *       the budget available for user-supplied inputs.
+         *     - **Double-Count Fallback** — if a shopper registers without a first and last
+         *       name, `uidn` is generated from the email (prefix as first name, domain as
+         *       last name), so the email is effectively counted **twice** (once as `upn`,
+         *       once as `uidn`). Long emails are the most common cause of overflow.
+         *     - Colons inside `uidn` are URL-encoded as `%3A`, which can further inflate
+         *       its length.
+         */
+        post: operations["getTrustedSystemAccessToken"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/oauth2/trusted-agent/authorize": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Obtain a new agent on behalf of an authorization token for a registered customer.
+         * @description This endpoint enables trusted agents (such as customer service representatives or merchants) to obtain authorization tokens that allow them to act on behalf of registered customers. This facilitates customer support scenarios where agents need secure access to customer accounts.
+         */
+        get: operations["getTrustedAgentAuthorizationToken"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/oauth2/trusted-agent/token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Get a shopper JWT access token for a registered customer using a trusted agent (merchant).
+         * @description If using a SLAS private client ID, you must also use an `_sfdc_client_auth` header.
+         *
+         *     The value of the `_sfdc_client_auth` header must be a Base64-encoded string. The string is composed of a SLAS private client ID and client secret, separated by a colon (`:`). For example, `privateClientId:privateClientsecret` becomes `cHJpdmF0ZUNsaWVudElkOnByaXZhdGVDbGllbnRzZWNyZXQ=` after Base64 encoding.
+         */
+        post: operations["getTrustedAgentAccessToken"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/oauth2/password/reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Request a reset password token.
+         * @description This endpoint initiates the password reset process for a customer by requesting a password reset token. The token is delivered through the configured delivery mode (email, SMS, etc.) and can be used with the password/action endpoint to set a new password.
+         */
+        post: operations["getPasswordResetToken"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/oauth2/password/action": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create a new password.
+         * @description This endpoint allows a customer to set a new password using a valid password reset token. The customer must provide the token received from the password/reset endpoint along with the desired new password.
+         */
+        post: operations["resetPassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/oauth2/passwordless/token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Issue a shopper token (JWT).
+         * @description This endpoint issues a shopper JSON Web Token (JWT) using a passwordless login token. It enables authentication flows where traditional username/password combinations are not required, supporting alternative authentication methods.
+         *
+         *     ---
+         *
+         *     # Token Issuer Subject Construction & Constraints #
+         *     The Issuer Subject (`isb`) claim of the issued JWT is a composite string that
+         *     identifies the shopper session. It concatenates the identity origin (`uido`),
+         *     login ID (`upn`), display name (`uidn`), guest customer ID (`gcid`, 26 chars),
+         *     registered customer ID (`rcid`, 26 chars, when applicable), channel ID (`chid`),
+         *     and any flow-specific values (`tsob`, `taob`, `agent`, `login`, `sesb`) as
+         *     `key:value` pairs separated by `::`.
+         *
+         *     **Constraint:** the assembled `isb` must not exceed **256 characters**.
+         *     Exceeding this returns `400 BAD_REQUEST` with *"Issuer Subject length must be
+         *     less than 256 characters"*.
+         *
+         *     **Length calculation breakdown** (with `gcid`=26, `rcid`=26, `chid`≤100).
+         *     Overhead = key chars + each key's trailing `:` + `::` separators between pairs.
+         *
+         *     | Shape | Overhead | Fixed values | Remaining budget |
+         *     |---|---|---|---|
+         *     | Guest | 32 | gcid 26 + chid 100 = 126 | 98 |
+         *     | Registered | 39 | gcid 26 + rcid 26 + chid 100 = 152 | 65 |
+         *     | TSOB guest | 39 | gcid 26 + chid 100 = 126 | 91 - len(tsob) |
+         *     | TSOB registered | 46 | gcid 26 + rcid 26 + chid 100 = 152 | 58 - len(tsob) |
+         *     | Pwdless | 47 | gcid 26 + rcid 26 + chid 100 = 152 | 57 - len(login) |
+         *     | SESB guest | 39 | gcid 26 + chid 100 = 126 | 91 - len(sesb) |
+         *     | SESB registered | 46 | gcid 26 + rcid 26 + chid 100 = 152 | 58 - len(sesb) |
+         *     | TAOB guest | 47 | gcid 26 + chid 100 = 126 | 83 - len(taob + agent) |
+         *     | TAOB registered | 54 | gcid 26 + rcid 26 + chid 100 = 152 | 50 - len(taob + agent) |
+         *
+         *     **Worst case (TAOB registered):**
+         *
+         *     ```
+         *     256  total
+         *     - 54 overhead
+         *     - 26  gcid
+         *     - 26  rcid
+         *     - 100  chid (allowed max)
+         *     ----
+         *     50
+         *
+         *     Then if taob = ta_ext_on_behalf_of:
+         *     50 - 19 = 31
+         *
+         *     Meaning only 31 characters remain for uido + upn + uidn + agent.
+         *
+         *     ```
+         *
+         *     **Practical caps per variable sub-claim:**
+         *
+         *     | Sub-claim | Description | Max length |
+         *     |---|---|---|
+         *     | `uido` | Identity origin | ~20 |
+         *     | `upn` | Login ID / email | ~80 |
+         *     | `uidn` | Display name (after `%3A` escaping) | ~60 |
+         *     | `tsob` / `taob` | Trusted-system / trusted-agent hint | ~21 |
+         *     | `agent` | Agent ID | ~32 |
+         *     | `login` | Passwordless literal (e.g. `pwdless`) | short |
+         *     | `sesb` | Session-bridge hint | short |
+         *     | `chid` | Channel ID | 100 |
+         *
+         *     **Notes:**
+         *     - **Identity Origin Variance** — `uido` is a static IdP-configuration string
+         *     (e.g. `ecom`, `google`, `Link_Brand_Production`). A longer origin reduces
+         *     the budget available for user-supplied inputs.
+         *     - **Double-Count Fallback** — if a shopper registers without a first and last
+         *     name, `uidn` is generated from the email (prefix as first name, domain as
+         *     last name), so the email is effectively counted **twice** (once as `upn`,
+         *     once as `uidn`). Long emails are the most common cause of overflow.
+         *     - Colons inside `uidn` are URL-encoded as `%3A`, which can further inflate
+         *     its length.
+         */
+        post: operations["getPasswordLessAccessToken"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/oauth2/revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Invalidate a refresh token.
+         * @description A basic auth header with Base64-encoded `clientId:secret` is required in the Authorization header, and the refresh token to be revoked is required in the body.
+         */
+        post: operations["revokeToken"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/oauth2/introspect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Return token properties.
+         * @description A basic auth header with Base64-encoded `clientId:secret` is required in the Authorization header, as well as an access token or refresh token. Use `token_type_hint` to help identify the token.
+         */
+        post: operations["introspectToken"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/oauth2/userinfo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Return a JSON listing of claims about the currently authenticated user.
+         * @description This endpoint returns identity information about the authenticated user in the form of OpenID Connect claims. It requires a valid access token and returns information such as user ID, name, email, and other identity attributes based on the scopes granted during authentication.
+         */
+        get: operations["getUserInfo"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/oauth2/.well-known/openid-configuration": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Return a JSON listing of the OpenID/OAuth endpoints, supported scopes and claims, public keys used to sign the tokens, and other details.
+         *
+         *     For performance purposes, the `/.well-known/openid-configuration` endpoint is rate limited to 25 call per minute.
+         * @description This endpoint provides OpenID Connect discovery information in a standardized format. It allows clients to programmatically discover SLAS capabilities, including available endpoints, supported authentication flows, token signing algorithms, and other configuration details. This information helps clients integrate with the authentication service with minimal manual configuration.
+         */
+        get: operations["getWellknownOpenidConfiguration"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/oauth2/jwks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Retrieve JWKS keys.
+         * @description The `/jwks` endpoint provides a JSON Web Key Set (JWKS) that includes current, past, and future public keys. These keys allow clients to validate the Shopper JSON Web Token (JWT) issued by SLAS, ensuring that no tampering with the token has occurred. Every SLAS JWT that is passed into SLAS, SCAPI, or OCAPI is always validated and is rejected if the signature validation does not match.
+         *
+         *     To optimize performance, the `/jwks` endpoint is limited to 25 calls per minute, so we recommended caching the JWKS keys and refresh them only when necessary, instead of making frequent requests. Typically, the JWKs endpoint can be used once per DAY.
+         *
+         *     For additional information on using JWKS, see https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-validate-jwt-with-jwks.html.
+         */
+        get: operations["getJwksUri"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/oauth2/webauthn/register/authorize": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Authorize user for WebAuthn registration
+         * @description Authorizes a user to register a WebAuthn credential (passkey). This endpoint validates the user's
+         *     credentials and creates a password action token that can be used to start the registration process.
+         *     The token is sent to the user via the specified channel (email or SMS).
+         *
+         *     The SLAS client must have the `sfcc.pwdless_login` scope to access this endpoint.
+         */
+        post: operations["authorizeWebauthnRegistration"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/oauth2/webauthn/register/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start WebAuthn registration
+         * @description Starts the WebAuthn registration process by generating credential creation options.
+         *     Returns the challenge and other parameters needed by the authenticator to create a new credential.
+         *
+         *     The SLAS client must have the `sfcc.pwdless_login` scope to access this endpoint.
+         */
+        post: operations["startWebauthnUserRegistration"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/oauth2/webauthn/register/finish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Finish WebAuthn registration
+         * @description Completes the WebAuthn registration process by verifying the credential created by the authenticator.
+         *     Stores the public key and credential information for future authentication.
+         *
+         *     The SLAS client must have the `sfcc.pwdless_login` scope to access this endpoint.
+         */
+        post: operations["finishWebauthnUserRegistration"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/oauth2/webauthn/authenticate/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start WebAuthn authentication
+         * @description Starts the WebAuthn authentication process by generating credential request options.
+         *     Returns the challenge and allowed credentials for the user to authenticate with.
+         *
+         *     The SLAS client must have the `sfcc.pwdless_login` scope to access this endpoint.
+         */
+        post: operations["startWebauthnAuthentication"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/oauth2/webauthn/authenticate/finish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Finish WebAuthn authentication
+         * @description Completes the WebAuthn authentication process by verifying the assertion from the authenticator.
+         *     Returns OAuth tokens upon successful authentication.
+         *
+         *     The SLAS client must have the `sfcc.pwdless_login` scope to access this endpoint.
+         */
+        post: operations["finishWebauthnAuthentication"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/oauth2/webauthn/passkey/user/{loginId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Retrieve passkey user information and credentials by login ID
+         * @description This endpoint retrieves a user's WebAuthn passkey information including all associated credentials.
+         *     It returns the user's profile information along with a list of all registered passkey credentials.
+         *
+         *     The SLAS client must have the `sfcc.pwdless_login` scope to access this endpoint.
+         *
+         *     This endpoint requires Shopper JWT authentication.
+         */
+        get: operations["getPasskeyUserByLoginId"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete passkey user and all associated credentials
+         * @description This endpoint deletes a user's WebAuthn passkey information and all associated credentials.
+         *     The endpoint validates the Shopper JWT signature and ensures that the loginId, organizationId,
+         *     and channel_id in the token match the values in the path and query parameters.
+         *
+         *     The SLAS client must have the `sfcc.pwdless_login` scope to access this endpoint.
+         *
+         *     This endpoint requires Shopper JWT authentication.
+         */
+        delete: operations["deletePasskeyUser"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/oauth2/webauthn/passkey/user/{loginId}/credentials/{credentialId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete a specific passkey credential
+         * @description This endpoint deletes a specific WebAuthn passkey credential for a user.
+         *     The endpoint validates the Shopper JWT signature and ensures that the loginId, organizationId,
+         *     and channel_id in the token match the values in the path and query parameters.
+         *
+         *     The SLAS client must have the `sfcc.pwdless_login` scope to access this endpoint.
+         *
+         *     This endpoint requires Shopper JWT authentication.
+         */
+        delete: operations["deletePasskeyCredential"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/oauth2/otp/request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Request a one-time password (OTP) for a shopper.
+         * @description Generates a one-time password (OTP) and delivers it to the shopper via the specified mode (email or callback). The OTP can then be used with the `/otp/verify` endpoint to verify the shopper.
+         *
+         *     When `mode` is `email`, the `email` field is required. A shopper is limited to 6 email OTP requests per 10-minute window.
+         *     When `mode` is `callback`, the `callback_uri` field is required and must match a registered callback URI for the client.
+         */
+        post: operations["requestOtp"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/oauth2/otp/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Verify a one-time password (OTP) for a shopper.
+         * @description Verifies a one-time password (OTP) previously issued by the `/otp/request` endpoint. On success, the OTP token is consumed and cannot be reused. Each new call to `/otp/request` invalidates any previously issued OTP.
+         */
+        post: operations["verifyOtp"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+}
+export type webhooks = Record<string, never>;
+export interface components {
+    schemas: {
+        /**
+         * @description Response Type
+         * @example code
+         * @enum {string}
+         */
+        ResponseType: "code";
+        /**
+         * @description Supports multiple custom parameters to invoke hooks in B2C Commerce API. Multiple custom parameters can be added. Use the `c_` prefix to distinguish custom query parameters from standard query parameters, for example: c_captcha=true
+         *     If there is a validation error, a 400 Bad_Request with the details of the error is thrown.
+         */
+        LoginRequest: {
+            /**
+             * @description SLAS client ID. Required when the grant type is `authorization_code_pkce`.
+             * @example z99ec276-cg53-4g94-cf72-76f300c6778zc
+             */
+            client_id?: string;
+            /** @description Must be `code`. Indicates that the client wants an authorization code (when the grant type is `authorization_code`). */
+            response_type?: components["schemas"]["ResponseType"];
+            /**
+             * @description The URI to which the server redirects the browser after the user grants the authorization. The URI must be registered with the SLAS client. A variety of URI formats and wildcards for host are supported, but app links like airbnb:// or fb:// are not. Examples of supported URIs:
+             *
+             *     Examples of supported URIs:
+             *       - `http://localhost:3000/callback`
+             *       - `https://example.com/callback`
+             *       - `com.example.app:redirect_uri_path`
+             *       - ` *.subdomain.topleveldomain.com`
+             * @example http://localhost:3000/callback
+             */
+            redirect_uri: string;
+            /**
+             * @description Value to be sent by the client to determine the state between the authorization request and the server response. Optional, but strongly recommended.
+             * @example client-state
+             */
+            state?: string;
+            /**
+             * @description Scopes to limit an application's access to a user's account.
+             * @example openid|offline_access|email
+             */
+            scope?: string;
+            /**
+             * @description The unique shopper ID.
+             * @example 18cda486-fe32-4e27-888b-6e4f89938e67
+             */
+            usid?: string;
+            /**
+             * @description The channel that the request is for. For a B2C Commerce request, this is angalous to the site ID.
+             * @example RefArch
+             */
+            channel_id: string;
+            /**
+             * @description PKCE code verifier. Created by the client calling the `login` endpoint.
+             *
+             *     The `code_challenge` is created by SHA256 hashing the `code_verifier` and Base64 encoding the resulting hash.
+             *
+             *     The `code_verifier` should be a high entropy cryptographically random string with a minimum of 43 characters and a maximum of 128 characters.
+             *
+             *     The `code_challenge` is optional when using a private client id for the token request.
+             * @example krc5G3_5lRUcXDUzFZQ88oJA_-ZmlHWkyGsgOrSLEWg
+             */
+            code_challenge?: string;
+        } & {
+            [key: string]: unknown;
+        };
+        Oauth2ErrorResponse: {
+            /** @example invalid_client */
+            error: string;
+            /** @example https://api.commercecloud.salesforce.com/documentation/error/v1/errors/oauth-service */
+            error_uri?: string;
+            /** @example Missing access token or refresh token. */
+            error_description?: string;
+        };
+        /** @description A request for a passwordless login token. This is only available for registered users using B2C Commerce. */
+        PasswordlessLoginRequest: {
+            /**
+             * @description User ID for logging in.
+             * @example samantha.sampleson@example.com
+             */
+            user_id: string;
+            /**
+             * @description Password Action delivery modes
+             * @example email
+             * @enum {string}
+             */
+            mode: "callback" | "sms" | "email";
+            /**
+             * @description The locale of the template. Required when the mode is `email` or `sms`.
+             * @example en-us
+             */
+            locale?: string;
+            /**
+             * @description The shopper's unique identifier, if known. If not provided, a new USID is generated.
+             * @example 18cda486-fe32-4e27-888b-6e4f89938e67
+             */
+            usid?: string;
+            /**
+             * @description The channel (B2C Commerce site) that the user is associated with.
+             * @example RefArch
+             */
+            channel_id: string;
+            /**
+             * @description The callback URI. Required when the mode is `callback`. The `callback_uri` property will be validated against the callback URIs that have been registered with the SLAS client. The callback URI _must_ be a `POST` endpoint because the token will be included in the body.
+             *
+             *     Wildcards are not allowed in the callback_uri because this is a security risk that can expose the token. This is not considered an OAuth2 callback_url.
+             * @example http://localhost:9050/passwordless/login/callback
+             */
+            callback_uri?: string;
+            /**
+             * @description The user's last name. Required when `register_customer` is `true`.
+             *     The `last_name` parameter is not used when `register_customer` parameter is not added or is `false`.
+             * @example Sampleson
+             */
+            last_name?: string;
+            /**
+             * @description The user's email address. Required when `register_customer` is `true` and `user_id` is not an email address.
+             *     The `email` parameter is not used when `register_customer` parameter is not added or is `false`.
+             * @example samantha.sampleson@example.com
+             */
+            email?: string;
+            /**
+             * @description The user's first name. Optional when `register_customer` is `true`.
+             *     The `first_name` parameter is not used when `register_customer` parameter is not added or is `false`.
+             * @example Samantha
+             */
+            first_name?: string;
+            /**
+             * @description The user's phone number. Optional when `register_customer` is `true`.
+             *     The `phone_number` parameter is not used when `register_customer` parameter is not added or is `false`.
+             * @example 17776665555
+             */
+            phone_number?: string;
+            /**
+             * @description The customer number assigned to the shopper profile when `register_customer` is set to `true`.
+             *     If the `customer_no` already exists, the request fails.
+             *     The `customer_no` parameter is optional and only used when `register_customer` is set to `true`.
+             * @example 123456789
+             */
+            customer_no?: string;
+        };
+        /**
+         * @description Token Type
+         * @example Bearer
+         * @enum {string}
+         */
+        TokenType: "Bearer";
+        TokenResponse: {
+            /**
+             * @description Short term shopper JWT that can be used to access Shopper APIs. Valid for 30 minutes.
+             *
+             *     A trusted agent shopper JWT is valid for 15 min.
+             * @example eyJ2ZXIiOiIxLjAiLCJraWQiOiJTTEFTIiwidHlwIjoiand0IiwiY2x2IjoiSjIuMS4wIiwiYWxnIjoiRVMyNTYifQ.eyJhdWQiOiJjb3JlL2Rldi9idGluZ2V5bHRtMiIsImF1dCI6IkdVSUQiLCJzdWIiOiJ1c2lkOjo1NGFkMmM1YS05MWYwLTQ0YWItODE3Yy03M2Q2Yjg2ODcyZDk6OnVwbjpndWVzdCIsIm5iZiI6MTU4Mjg0NTYyNCwiY3R4Ijoic2ZkYy5jb21tZXJjZWNsb3VkIiwiaXNzIjoiY29yZS9kZXYvYnRpbmdleWx0bTIiLCJzdHkiOiJVc2VyIiwiaXN0IjoxLCJleHAiOjE1ODI4NDU3NDQsImlhdCI6MTU4Mjg0NTY1NCwianRpIjoiQzJDOTA0ODg2NDA3MDkwNDg4NjQwNzMyMjExNzQ1ODEyMTQzIn0.2a6lMBSY17PrhDO8pvEk7PCXW_nkguMHi4J-Tuirkz-ETB6rnKyuRjF5yD6B55tMvm8dO8ulAHyDYqjObMxLJg
+             */
+            access_token: string;
+            /**
+             * @description User ID token. Valid for 30 minutes.
+             * @example eyJraWQiOiI3NGU2YjMxZS1lYTczLTQ3OTYtOWRkYi1jMDJmZGI4ZDgwYmUiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ1c2lkOmQ1MDBhMzY5LTc1MWQtNDkzYy1iNDAzLThmOThmYjg3MTdiNiIsImF1ZCI6IjU1M2FjOGFjLTRkYjktNGVkMy04MjVjLTNhZTNiZjVkMzI3YiIsImlzcyI6ImRldi51cy5zaG9wcGVyLmNjLnNhbGVzZm9yY2UuY29tIiwibmFtZSI6ImJsYWlyLnNsYXMudGVzdEBnbWFpbC5jb20iLCJleHAiOjE1OTExMTE0MzgsImlhdCI6MTU5MTEwOTYzOCwiZW1haWwiOiJibGFpci5zbGFzLnRlc3RAZ21haWwuY29tIn0.KgpAcq-G9Lz7IGnjkJlaFLFXYncVCwcVrRIuy3bEfgzRozqaDRvAori4oOz4RtgYjmoc5x2euoisHL0mVnHgPKOdYBty1wTJqneJEQt6hP4Kp0KFciID_ILCi-DE8VWS5t0NknnMP_iKhIkqcRL48iwPFUWkWA6AEWxE_yvJLNRLithsSxsx7EfBfpD8Hr2b5tMEwImQNmJNYGRTI4LSmcYspBORvJoAnfGpMC0kglxl40bhf5j4ItX4_DiWQC4zaGYD-HJV4BDr6C7iGCs5ZVPypF0yQD3iBio26fwj9Ys5WF9XMtPtqET2kqsz6fDC5GkE6HTUHH_r87jxbDq-8w
+             */
+            id_token: string;
+            /**
+             * @description Long term refresh token that can be used to refresh an access token. Valid for 30 days.
+             *
+             *     The refresh_token will not be returned for trusted agents JWTs. A JWT for trusted agents expires after 15 minutes and is not refreshable. When expired, then app must restart the authorization flow and make another request to the /trusted-agent/authorize endpoint.
+             * @example EgMYpjfFKdlSy-a3PYeyihmP95IpIp3FaDpPmVH1yu8.lahomBi7zJbRa6yKAuAAiKu3lprTPsEueKwqcBvhRLU
+             */
+            refresh_token: string;
+            /**
+             * @description Remaining access token expiry time, in seconds.
+             * @example 900
+             */
+            expires_in: number;
+            /**
+             * @description Remaining refresh token expiry time, in seconds.
+             * @example 2592000
+             */
+            refresh_token_expires_in: number;
+            token_type: components["schemas"]["TokenType"];
+            /**
+             * @description The unique shopper ID. Returned when using the `client_credentials` grant type.
+             * @example 18cda486-fe32-4e27-888b-6e4f89938e67
+             */
+            usid: string;
+            /**
+             * @description Customer's ID
+             * @example 1000005
+             */
+            customer_id: string;
+            /**
+             * @description MD5 Hashed B2C Commerce user ID in uppercase.
+             * @example 45D39A8499A95288F82855427EBA99B5
+             */
+            enc_user_id: string;
+            /**
+             * @description This is the access token that is returned from the IDP. The IDP access token is returned to be able to make calls into the IDP outside of SLAS.
+             * @example eyJraWQiOiJYS21HbHVuSm0zSlBTMHNjQXZXV19XQlYtRi1wMkxLSDR0V05UMHVVSjVJIiwiYWxnIjoiUlMyNTYifQ.eyJ2ZXIiOjEsImp0aSI6IkFULjFMY0xxTWhqM2t0N1FKeFhxQ0VtdGZOOVV2eUcweW1meDFxZG9BdzF1NWMub2FyeXhveHF0QUtxaVFMbkM1ZDYiLCJpc3MiOiJodHRwczovL2Rldi05NTY1MjM2Lm9rdGEuY29tIiwiYXVkIjoiaHR0cHM6Ly9kZXYtOTU2NTIzNi5va3RhLmNvbSIsInN1YiI6Im9rdGEuc2xhcy50ZXN0IiwiaWF0IjoxNjc5Njk4MzA4LCJleHAiOjE2Nzk3MDE5MDgsImNpZCI6IjBvYTJrNXNma0JXZ0poTEVHNWQ2IiwidWlkIjoiMDB1MzhxZGpuU2NMT0IxbXE1ZDYiLCJzY3AiOlsib2ZmbGluZV9hY2Nlc3MiLCJvcGVuaWQiLCJlbWFpbCIsInByb2ZpbGUiXSwiYXV0aF90aW1lIjoxNjc5Njk4MzA2fQ.FDbGsnZGwTYVKGSlAo6jqcjG2HQ_BqQKRk72M5h69DRHyOM4wngsEELN_Wtgj3E77sP7IOmIKjiK5SFP17ADMbKZptVr2pqaMVF3PuU3Cbl_MgXZValfT-z12jHRq9sHMfsdTjY2RnvG44ZDFKc2no8mdL6IJ1MfCaZT5Tql5Ktq_UgudaWFsYqad3ETcmp5Y8ivz1bFnqud0sO9D9JzYOtfd9h71JKcsSC2rXc_Si-INPKKaGl8CDgaLXxu_Am9twJpUenHLpy0BerhcVvdFz7_611E53xOT_Esrc1pe-XAZtlYsJFnhxTBDT342ukiSWk2m6juVappv1GsRfUf2g
+             */
+            idp_access_token: string;
+            /**
+             * @description This is the refresh token that is returned from the IDP. The IDP refresh token is returned to be able to make calls into the IDP outside of SLAS.
+             * @example EgMYpjfFKdlSy-a3PYeyihmP95IpIp3FaDpPmVH1yu8.lahomBi7zJbRa6yKAuAAiKu3lprTPsEueKwqcBvhRLU
+             */
+            idp_refresh_token?: string;
+            /**
+             * @description Do not track
+             * @example true
+             */
+            dnt?: string;
+        };
+        /**
+         * @description Grant Type
+         * @example authorization_code
+         * @enum {string}
+         */
+        GrantType: "authorization_code" | "refresh_token" | "client_credentials" | "authorization_code_pkce" | "session_bridge";
+        TokenRequest: {
+            /** @description The long-term token used to refresh the short term access token. Required only with a grant type of `refresh_token`. */
+            refresh_token?: string;
+            /**
+             * @description Authorization code from the OAuth 2.1 service received in the front channel that is used to get access tokens and refresh tokens. Required with a grant type of `authorization_code` and `session_bridge`.
+             * @example M0t1K0pyoFKhBpUZnuUYO07xf8iYyMJrAc7h31h_ra8.gglPClJHsofqdTm_yPe5n6m2yCXzFmD8qICwIEjQGVA
+             */
+            code?: string;
+            /**
+             * @description The shopper's unique identifier, if known. If not provided, a new USID is generated.
+             * @example 54ad2c5a-91f0-44ab-817c-73d6b86872d9
+             */
+            usid?: string;
+            grant_type: components["schemas"]["GrantType"];
+            /**
+             * @description The redirect URI that was used when getting the authorization code. A variety of URI formats and wildcards for host are supported, but app links like `airbnb://` or `fb://` are not.
+             *
+             *     Examples of supported URIs:
+             *       - `http://localhost:3000/callback`
+             *       - `https://example.com/callback`
+             *       - `com.example.app:redirect_uri_path`
+             *       - ` *.subdomain.topleveldomain.com`
+             * @example http://localhost:3000/callback
+             */
+            redirect_uri?: string;
+            /**
+             * @description PKCE code verifier. Created by the client calling the `login` endpoint.
+             *
+             *     The `code_verifier` should be a high entropy cryptographically random string with a minimum of 43 characters and a maximum of 128 characters.
+             *
+             *     The `code_verifier` is optional when using a private client id for the token request.
+             */
+            code_verifier?: string;
+            /**
+             * @description The SLAS client ID. Required when the grant type is `authorization_code_pkce`.
+             * @example z99ec276-cg53-4g94-cf72-76f300c6778zc
+             */
+            client_id?: string;
+            /**
+             * @description The channel (B2C Commerce site) that the user is associated with.
+             *
+             *     **Important: We strongly recommended using the channel_id query parameter because it will be required in the future.
+             *
+             *     **NOTE - As of July 31, 2024**, SLAS will be requiring the `channel_id` query parameter in token requests.
+             * @example RefArch
+             */
+            channel_id?: string;
+            /**
+             * @description This is an optional parameter to set `Do Not Track` for the session.
+             *
+             *     SLAS is making this available, but will not be used by B2C Commerce until after the 24.4 release.
+             *
+             *     Values are:
+             *       * `false`
+             *       * `true`
+             *
+             *     If not added the `dnt` value will default to `false`.
+             * @example true
+             */
+            dnt?: string;
+        };
+        SessionBridgeTokenRequest: {
+            /**
+             * @description Authorization code returned from session bridge authorization received in the front channel that is used to get session bridge access tokens and refresh tokens. Required with a grant type of `session_bridge`. The SLAS client must have the `sfcc.session_bridge` scope to request a session bridge token.
+             * @example M0t1K0pyoFKhBpUZnuUYO07xf8iYyMJrAc7h31h_ra8.gglPClJHsofqdTm_yPe5n6m2yCXzFmD8qICwIEjQGVA
+             */
+            code: string;
+            /**
+             * @description The SLAS public client ID for use with PKCE requests. This is a required parameter when using a public client.
+             * @example 6c388ebd-6843-4863-aef9-781382c9e8cd
+             */
+            client_id: string;
+            /**
+             * @description The channel (B2C Commerce site) that the user is associated with.
+             * @example RefArch
+             */
+            channel_id: string;
+            /**
+             * @description PKCE code verifier. Created by the caller. This is a required parameter when using a public client.
+             *
+             *     The `code_challenge` is created by SHA256 hashing the `code_verifier` and Base64 encoding the resulting hash.
+             *
+             *     The `code_verifier` should be a high entropy cryptographically random string with a minimum of 43 characters and a maximum of 128 characters.
+             * @example Ar0lAwU_jsuA~ZXX8-JnMbZFxrnDot2OtgLEi1kOT_FxD6Bo0EQDbbrvoym9xHvatNGnNzrObLJeK6e4U9m4pveRMbdwNGa4jwiAlKGvijVn0PW0hqb03_w1gQE00wTo
+             */
+            code_verifier: string;
+            /**
+             * @description Cookie passed back from the '/authorize' endpoint call for session bridge. This parameter is optional and not needed if using the `dwsgst` parameter.
+             *
+             *     **DEPRECATED** - As of January 31, 2024, SLAS will no longer support the SESB `dwsid` parameter for `guest` users for `session-bridge/token` calls. It is recommended to transition over to using a SESB `dwsgst` token.
+             *
+             *     The `dwsid` will still be needed for `registered` user session-bridge/token calls.
+             * @example pATvWUO3KSdt-Kmcy-8-RsxKnoO4BMDwoec7ACVlW6tZNnhaOL7gt7mHqL-h7QYn5TyE61z0DeSMCqxngsWeHw==
+             */
+            dwsid: string;
+            /**
+             * @description Grant Type
+             * @enum {string}
+             */
+            grant_type: "authorization_code" | "refresh_token" | "client_credentials" | "authorization_code_pkce" | "session_bridge";
+            /**
+             * @description The ID of the shopper for session bridge access. If requesting a token for a guest user set login_id to `guest`.
+             * @example jack.shopper@example.com
+             */
+            login_id: string;
+            /**
+             * @description Signed guest Json Web Token (JWT) that was obtained from B2C Commerce. This parameter is optional and not needed if using the guest `dwsid` parameter.
+             * @example eyJraWQiOiIxNjgxNTU5OTkxNzkwIiwiYWxnIjoiRVMyNTYifQ.eyJ0ZW5hbnRJZCI6IkJHVk5fUzA1IiwiZHdzaWQiOiJuWHRhckdNU2ZxbnBaSUNJUGFKTHJSWGZ6b2lWYXBBU3BBTFNfeFdUMV9QZjRBWDA0N1lMQ1dSUFByM1BiSEl4d2RaODFiVGZoM3M1Wlgza2NhOG0zZz09IiwiY3VzdG9tZXJJZCI6ImJjQXI5N2NuMm1ZdmhjMGhqTGsxYmFXSzRqIiwiaWF0IjoxNjg1MTI4NjM2LCJleHAiOjE2ODUxMjkyMzksImlzcyI6ImNvbW1lcmNlY2xvdWQvcHJvZHVjdGlvbi9iZ3ZuczA1IiwidmVycyI6IjEiLCJ0eXBlIjoiRyJ9.BGY4kyOXbQSzZxubE3BrSzhf8ByehGUfJa7_J2XRQ93xY4dAOhF_xbXcHmBaEUBUzSny-Cf0pATzEaSsKpTxkg
+             */
+            dwsgst?: string;
+            /**
+             * @description Signed registered customer Json Web Token (JWT) that was obtained from B2C Commerce. This parameter is optional and not needed if using the registered user `dwsid` parameter.
+             *
+             *     **NOTE:** The registered customer Json Web Token (JWT) will be available in ECOM versions 25.4 and higher.
+             * @example eyJraWQiOiIxNjMwOTM5MzAyODE0IiwiYWxnIjoiRVMyNTYifQ.eyJmbmFtZSI6Ikx1a2UiLCJkd3NpZCI6IkdkWWpSQjViZGVpU0xkb3Ixdy15QzRTZ1l3dDJHYl9Ec255OG5nZ2I3c0VDajVMWndnT0ZJWTZsa21sNlVRMXZoazl1SDVJUGxMek5rZTJhNTV2YU9nPT0iLCJ2ZXJzIjoiMiIsImlzcyI6InNsYXMvZGV2L2Jndm5fc3RnIiwidHlwZSI6IlIiLCJsbmFtZSI6IlNreXdhbGtlciIsInJjdXN0b21lcklkIjoiOGgzNHh6dDQxOTVpOHA1MmE2ejAzczIxNDgiLCJwaG9uZSI6bnVsbCwidGVuYW50SWQiOiJiZ3ZuX3N0ZyIsImN1c3RvbWVySWQiOiI0OHB1eXA4dTdmMmM5NHgzMTUxeDA4bGEweiIsImV4cCI6MTczNTE1NDQ4NiwiaWF0IjoxNzMyNTYyNDg2LCJlbWFpbCI6Imx1a2Uuc2t5d2Fsa2VyQG5hYm9vLm9yZyJ9.Q2nF0wuEl1X7aVZ-ycCwxDjjmq5toJred5AEDqKXXjj89BY_0HIQoAEMbx9UDqOmhjdBkxN4idVzYVoXcl0c2A
+             */
+            dwsrst?: string;
+            /**
+             * @description The unique shopper ID. Returned when from session bridge authorization.
+             * @example 18cda486-fe32-4e27-888b-6e4f89938e67
+             */
+            usid?: string;
+            /**
+             * @description This is an optional parameter to set `Do Not Track` for the session.
+             *
+             *     SLAS is making this available, but will not be used by B2C Commerce until after the 24.4 release.
+             *
+             *     Values are:
+             *       * `false`
+             *       * `true`
+             *
+             *     If not added the `dnt` value will default to `false`.
+             * @example true
+             */
+            dnt?: string;
+        };
+        /** @description A request for an access token on behalf of a registered user whose credentials are stored using a third party system. */
+        TrustedSystemTokenRequest: {
+            /**
+             * @description The shopper's unique identifier, if known. If not provided, a new USID is generated.
+             * @example 54ad2c5a-91f0-44ab-817c-73d6b86872d9
+             */
+            usid?: string;
+            /**
+             * @description Grant Type
+             * @enum {string}
+             */
+            grant_type: "authorization_code" | "refresh_token" | "client_credentials" | "authorization_code_pkce" | "session_bridge";
+            /**
+             * @description Type of system used for Trusted System On Behalf of requests.
+             * @enum {string}
+             */
+            hint: "ts_ext_on_behalf_of";
+            /**
+             * @description The ID used by the shopper for trusted system access.
+             *
+             *     If set to `guest`, a token is returned for a guest user.
+             * @example samantha.sampleson@example.com
+             */
+            login_id: string;
+            /**
+             * @description IDPs that work with SLAS. Use `ecom` when using B2C Commerce is the identity provider.
+             * @enum {string}
+             */
+            idp_origin: "apple" | "auth0" | "azure" | "azure_adb2c" | "cognito" | "default" | "ecom" | "facebook" | "forgerock" | "gigya" | "gigya_socialize" | "google" | "okta" | "ping" | "salesforce";
+            /**
+             * @description The SLAS public client ID for use with trusted-system requests.
+             * @example 6c388ebd-6843-4863-aef9-781382c9e8cd
+             */
+            client_id: string;
+            /**
+             * @description The channel (ECOM site) that the user is associated with.
+             * @example RefArch
+             */
+            channel_id: string;
+            /**
+             * @description The email address for the shopper that is used for trusted-system requests. If not provided, `login_id` is used instead.
+             * @example samantha.sampleson@example.com
+             */
+            email_id?: string;
+            /**
+             * @description This is an optional parameter to set `Do Not Track` for the session.
+             *
+             *     SLAS is making this available, but will not be used by B2C Commerce until after the 24.4 release.
+             *
+             *     Values are:
+             *       * `false`
+             *       * `true`
+             *
+             *     If not added the `dnt` value will default to `false`.
+             *
+             *     Note: The default value for `dnt` is set to `false` for SLAS token requests except for Trusted Agent token request. For Trusted Agent token requests the default value for `dnt` is `true`.
+             * @example true
+             */
+            dnt?: string;
+        };
+        TrustedAgentTokenRequest: {
+            /**
+             * @description The ID of the merchant. If passed in, the `agent_id` will be validated using the SUB claim in the response from Account Manager.
+             *
+             *     This is an optional parameter unless the request is for a Trusted Agent on Behalf then `agent_id` is required.
+             * @example merchant@example.com
+             */
+            agent_id?: string;
+            /**
+             * @description The SLAS public client ID or SLAS private client ID for use with trusted-system requests.
+             *
+             *     The `client_id` is not needed if a using a SLAS private `client_id` and the `_sfdc_client_auth` header.
+             * @example 6c388ebd-6843-4863-aef9-781382c9e8cd
+             */
+            client_id: string;
+            /**
+             * @description The channel (B2C Commerce site) that the user is associated with.
+             * @example RefArch
+             */
+            channel_id: string;
+            /**
+             * @description PKCE code verifier. Created by the caller.
+             *
+             *     The `code_challenge` is created by SHA256 hashing the `code_verifier` and Base64 encoding the resulting hash.
+             *
+             *     The `code_verifier` should be a high entropy cryptographically random string with a minimum of 43 characters and a maximum of 128 characters.
+             *
+             *     The `code_verifier` is not needed if a using a SLAS private `client_id` and the `_sfdc_client_auth` header.
+             * @example Ar0lAwU_jsuA~ZXX8-JnMbZFxrnDot2OtgLEi1kOT_FxD6Bo0EQDbbrvoym9xHvatNGnNzrObLJeK6e4U9m4pveRMbdwNGa4jwiAlKGvijVn0PW0hqb03_w1gQE00wTo
+             */
+            code_verifier: string;
+            /**
+             * @description Grant Type
+             * @enum {string}
+             */
+            grant_type: "authorization_code" | "refresh_token" | "client_credentials" | "authorization_code_pkce" | "session_bridge";
+            /**
+             * @description The ID is the shopper for trusted agent access.
+             *
+             *     For TAOB Guest the `login_id` must be set to `Guest`.
+             * @example jack.shopper@example.com
+             */
+            login_id: string;
+            /**
+             * @description The IDP that the user is associated with.
+             *
+             *     For TAOB Guest the `idp_origin` parameter should be `slas`. If set to any other IDP origin a 400 Bad Request will be returned.
+             * @example ecom
+             */
+            idp_origin: string;
+            /**
+             * @description The shopper's unique identifier, if known. If not provided, a new USID is generated.
+             * @example 54ad2c5a-91f0-44ab-817c-73d6b86872d9
+             */
+            usid?: string;
+            /**
+             * @description This is an optional parameter to set `Do Not Track` for the session.
+             *
+             *     SLAS is making this available, but will not be used by B2C Commerce until after the 24.4 release.
+             *
+             *     Values are:
+             *       * `false`
+             *       * `true`
+             *
+             *       If not added the `dnt` value will default to `true`
+             *
+             *       Note: The default value for `dnt` is set to `true` for all TAOB flows. This is opposite from other SLAS token requests.
+             * @example true
+             */
+            dnt?: string;
+            /**
+             * @description This is an optional parameter to set state for the trusted agent session.
+             *
+             *     If the `state` parameter is used it will be validated and a 400 Bad Request will be returned if missing or invalid.
+             *
+             *     For TAOB Guest you must pass the `state` parameter to transfer the state from the TAOB Guest authorization call to the token call.
+             *     The `state` parameter value is returned with the authorization code in the response url from the TAOB guest authorization call,
+             *     for example: `.../taob/callback?code=HETXpvg5LKBNIHjDTWkRrf2MLVU&state=taob.gst.7bc7fb7f-e646-44fd-bc73-dfd5c3c9019b`.
+             *
+             *     You would use `taob.gst.7bc7fb7f-e646-44fd-bc73-dfd5c3c9019b` for the `state` value in the TAOB request.
+             * @example taobgst.3ebdcbb6-ef87-4f41-8173-67728636e513
+             */
+            state?: string;
+        };
+        /** @description A request for a password reset token. This is only available for resgistered users using B2C Commerce. */
+        PasswordActionRequest: {
+            /**
+             * @description User ID for logging in. This is the id that is used to log into SFCC.
+             * @example samantha.sampleson@example.com
+             */
+            user_id: string;
+            /**
+             * @description Password Action delivery modes
+             * @example email
+             * @enum {string}
+             */
+            mode: "callback" | "sms" | "email";
+            /**
+             * @description The channel (B2C Commerce site) that the user is associated with.
+             * @example RefArch
+             */
+            channel_id: string;
+            /**
+             * @description The locale of the template. Required when the mode is `email` or `sms`.
+             * @example en-us
+             */
+            locale?: string;
+            /**
+             * @description -| The public client ID. Requires setting `grant_type` to `passwordless_login_pkce`.
+             *     When using the `hint` query parameter either a public or private client ID can be used.
+             * @example 6b200ebd-7843-4073-aef9-792482c9e1de
+             */
+            client_id?: string;
+            /**
+             * @description PKCE code challenge. Created by the client.
+             *
+             *     The `code_challenge` is created by SHA256 hashing the `code_verifier` and Base64 encoding the resulting hash.
+             *
+             *     The `code_verifier` should be a high entropy cryptographically random string with a minimum of 43 characters and a maximum of 128 characters.
+             *
+             *      Requires setting `grant_type` to `passwordless_login_pkce`
+             * @example Nx_Vf0-0W6SpyRVBVTbl8VSu2OE4yD2fZNExW6N3V_Q
+             */
+            code_challenge?: string;
+            /**
+             * @description The callback uri. Required when the mode is `callback`. The `callback_uri` property will be validated against the callback URIs that have been registered with the SLAS client. The callback URI _must_ be a `POST` endpoint because the token will be included in the body.
+             *
+             *     Wildcards are not allowed in the callback_uri because this is a security risk that can expose the token. This is not considered an OAuth2 callback_url.
+             * @example http://localhost:9050/password/reset/callback
+             */
+            callback_uri?: string;
+            /**
+             * @description The name of the 3rd party identity provider for the user ID
+             * @example okta
+             */
+            idp_name?: string;
+            /**
+             * @description Adding a `hint` query parameter with a value of `cross_device` will remove the need to have the code_challenge for password reset request. If the `hint` query parameter is used it must also be used in the password reset request.
+             * @example cross_device
+             */
+            hint?: string;
+        };
+        /** @description A request for creating a new password using the password action token. */
+        PasswordActionVerifyRequest: {
+            /**
+             * @description -| The public client ID.
+             *     When using the `hint` query parameter either a public or private client ID can be used.
+             * @example 6b200ebd-7843-4073-aef9-792482c9e1de
+             */
+            client_id: string;
+            /**
+             * @description Password action token that was returned from the `/password/reset` endpoint.
+             * @example QJO3CA7QTPVCQ3OMROXF2MTDDED3EEC3
+             */
+            pwd_action_token: string;
+            /**
+             * @description PKCE code verifier. Created by the client.
+             *
+             *     The `code_challenge` is created by SHA256 hashing the `code_verifier` and Base64 encoding the resulting hash.
+             *
+             *     The `code_verifier` should be a high entropy cryptographically random string with a minimum of 43 characters and a maximum of 128 characters.
+             * @example Ar0lAwU_jsuA~ZXX8-JnMbZFxrnDot2OtgLEi1kOT_FxD6Bo0EQDbbrvoym9xHvatNGnNzrObLJeK6e4U9m4pveRMbdwNGa4jwiAlKGvijVn0PW0hqb03_w1gQE00wTo
+             */
+            code_verifier?: string;
+            /**
+             * @description The new password to set for the shopper associated with the password action token.
+             * @example new_password
+             */
+            new_password?: string;
+            /**
+             * @description The channel that the request is for. For a B2C Commerce request, this is angalous to the site ID.
+             * @example RefArch
+             */
+            channel_id: string;
+            /**
+             * @description Adding a `hint` query parameter with a value of `cross_device` will remove the need to have the code_verifier for password reset request. If the `hint` query parameter is used it must also have been used in the password action request.
+             * @example cross_device
+             */
+            hint?: string;
+            /**
+             * @description User ID for logging in. This is the id that is used to log into SFCC. Required only when hint is provided.
+             * @example samantha.sampleson@example.com
+             */
+            user_id?: string;
+        };
+        /** @description A request for an access token using a passwordless token. */
+        PasswordLessLoginTokenRequest: {
+            /**
+             * @description Grant Type
+             * @enum {string}
+             */
+            grant_type: "authorization_code" | "refresh_token" | "client_credentials" | "authorization_code_pkce" | "session_bridge";
+            /**
+             * @description Passwordless hint. Use `pwdless_login`.
+             * @example pwdless_login
+             */
+            hint: string;
+            /**
+             * @description Passwordless login token that was created from the user ID.
+             * @example QJO3CA7QTPVCQ3OMROXF2MTDDED3EEC3
+             */
+            pwdless_login_token: string;
+            /**
+             * @description The public client ID.
+             * @example 6b200ebd-7843-4073-aef9-792482c9e1de
+             */
+            client_id?: string;
+            /**
+             * @description PKCE code verifier. Created by the client.
+             *
+             *     The `code_challenge` is created by SHA256 hashing the `code_verifier` and Base64 encoding the resulting hash.
+             *
+             *     The `code_verifier` should be a high entropy cryptographically random string with a minimum of 43 characters and a maximum of 128 characters.
+             * @example Ar0lAwU_jsuA~ZXX8-JnMbZFxrnDot2OtgLEi1kOT_FxD6Bo0EQDbbrvoym9xHvatNGnNzrObLJeK6e4U9m4pveRMbdwNGa4jwiAlKGvijVn0PW0hqb03_w1gQE00wTo
+             */
+            code_verifier?: string;
+            /**
+             * @description The ID used by the shopper for password token request. When provided, login_id must exactly match the ID used during passwordless login.
+             *     ex. If passwordless login used `samantha.sampleson@example.com`, but the passwordless login token request provides `sam.sampleson@example.com`, the request fails due to mismatch.
+             * @example samantha.sampleson@example.com
+             */
+            login_id?: string;
+        };
+        TokenActionRequest: {
+            /**
+             * @description Token to inspect or revoke.
+             * @example EgMYpjfFKdlSy-a3PYeyihmP95IpIp3FaDpPmVH1yu8.lahomBi7zJbRa6yKAuAAiKu3lprTPsEueKwqcBvhRLU
+             */
+            token: string;
+            /**
+             * @description Token Type Hint
+             * @enum {string}
+             */
+            token_type_hint?: "access_token" | "refresh_token";
+        };
+        /**
+         * @description WebAuthn registration request. Inherits most fields from PasswordActionVerifyRequest
+         *     but does NOT use code_verifier or new_password fields.
+         */
+        RegistrationStartRequest: {
+            /**
+             * @description OAuth client identifier. Required if Authorization header is not provided.
+             * @example 12345678-1234-1234-1234-123456789012
+             */
+            client_id?: string;
+            /**
+             * @description Password action token (TOTP) received by the user. The token length is either 6 or 8 digits, configurable in SLAS Admin.
+             * @example 12345678
+             */
+            pwd_action_token: string;
+            /**
+             * @description The ID of the user.
+             * @example user@example.com
+             */
+            user_id: string;
+            /**
+             * @description The ID of the channel.
+             * @example RefArch
+             */
+            channel_id: string;
+            /**
+             * @description Display name for the passkey.
+             * @example John Doe
+             */
+            display_name?: string;
+            /**
+             * @description Nickname for the credential.
+             * @example My iPhone
+             */
+            nick_name?: string;
+        };
+        /** @description Authenticator response for registration (attestation). */
+        AuthenticatorAttestationResponseJson: {
+            /** @description Base64url-encoded client data JSON. */
+            clientDataJSON: {
+                /**
+                 * Format: byte
+                 * @example eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiVjJGc2RHVnlJRmRvYVhSbElGUmxjM1FnUTJoaGJHeGxibWRsIiwib3JpZ2luIjoiaHR0cHM6Ly9leGFtcGxlLmNvbSJ9
+                 */
+                id?: string;
+            }[];
+            /** @description Base64url-encoded attestation object. */
+            attestationObject: {
+                /**
+                 * Format: byte
+                 * @example o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVikSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NFAAAAAK3OAAI1vMYKZIsLJfHwVQMAIAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gpQECAyYgASFYIIGjL8Hs9Yz5LvVGBnGJlGYKbJZXLqLLnKLJKLJLKLJLIlgg
+                 */
+                id?: string;
+            }[];
+        };
+        /** @description Authenticator response for authentication (assertion). */
+        AuthenticatorAssertionResponseJson: {
+            /** @description Base64url-encoded authenticator data */
+            authenticatorData: {
+                /**
+                 * Format: byte
+                 * @example SZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2MFAAAAAQ
+                 */
+                id?: string;
+            }[];
+            /** @description Base64url-encoded client data JSON. */
+            clientDataJSON: {
+                /**
+                 * Format: byte
+                 * @example eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiVjJGc2RHVnlJRmRvYVhSbElGUmxjM1FnUTJoaGJHeGxibWRsIiwib3JpZ2luIjoiaHR0cHM6Ly9leGFtcGxlLmNvbSJ9
+                 */
+                id?: string;
+            }[];
+            /** @description Base64url-encoded signature. */
+            signature: {
+                /**
+                 * Format: byte
+                 * @example MEYCIQDqwzerkQlKKLJKLJKLJKLJKLJKLJKLJKLJKLJKLJKLJAiEA
+                 */
+                id?: string;
+            }[];
+            /** @description Base64url-encoded user handle. */
+            userHandle?: {
+                /**
+                 * Format: byte
+                 * @example dXNlckBleGFtcGxlLmNvbQ
+                 */
+                id?: string;
+            }[] | null;
+        };
+        /**
+         * @description WebAuthn credential representation. The response field can contain either
+         *     AuthenticatorAttestationResponseJson (for registration) or
+         *     AuthenticatorAssertionResponseJson (for authentication).
+         */
+        PublicKeyCredentialJson: {
+            /**
+             * @description Base64url-encoded credential ID
+             * @example AQIDBAUGBwgJCgsMDQ4PEA
+             */
+            id: string;
+            /**
+             * @description Base64url-encoded raw credential ID.
+             * @example AQIDBAUGBwgJCgsMDQ4PEA
+             */
+            rawId: string;
+            /**
+             * @description The type of credential.
+             * @example public-key
+             * @enum {string}
+             */
+            type: "public-key";
+            /**
+             * @description WebAuthn client extension results (typically empty).
+             * @example {
+             *       "extensions": {}
+             *     }
+             */
+            clientExtensionResults?: string | null;
+            /** @description Authenticator response (attestation for registration, assertion for authentication) */
+            response: components["schemas"]["AuthenticatorAttestationResponseJson"] | components["schemas"]["AuthenticatorAssertionResponseJson"];
+        };
+        RegistrationFinishRequest: {
+            /**
+             * @description The ID of the OAuth client.
+             * @example 12345678-1234-1234-1234-123456789012
+             */
+            client_id: string;
+            /**
+             * @description Username for the credential.
+             * @example user@example.com
+             */
+            username: string;
+            credential: components["schemas"]["PublicKeyCredentialJson"];
+            /**
+             * @description The ID of the channel.
+             * @example RefArch
+             */
+            channel_id: string;
+            /**
+             * @description Password action token. The token length is either 6 or 8 digits, configurable in SLAS Admin.
+             * @example 12345678
+             */
+            pwd_action_token: string;
+        };
+        AuthenticateRequest: {
+            /**
+             * @description The ID of the tenant.
+             * @example zzte_053
+             */
+            tenant_id?: string;
+            /**
+             * @description The ID of the OAuth client.
+             * @example 12345678-1234-1234-1234-123456789012
+             */
+            client_id: string;
+            /**
+             * @description The ID of the channel.
+             * @example RefArch
+             */
+            channel_id: string;
+            /**
+             * @description The ID of the user.
+             * @example user@example.com
+             */
+            user_id?: string;
+        };
+        /** @description Public key credential descriptor. */
+        PublicKeyCredentialDescriptor: {
+            /**
+             * @description Credential type.
+             * @example public-key
+             * @enum {string}
+             */
+            type: "public-key";
+            /**
+             * @description The base64url-encoded ID of the credential.
+             * @example AQIDBAUGBwgJCgsMDQ4PEA
+             */
+            id: string;
+            /**
+             * @description Authenticator transports.
+             * @example [
+             *       "internal",
+             *       "usb"
+             *     ]
+             */
+            transports?: ("usb" | "nfc" | "ble" | "internal")[];
+        };
+        /** @description Options for requesting a WebAuthn credential (returned by authenticate/start). */
+        PublicKeyCredentialRequestOptions: {
+            /**
+             * @description Base64url-encoded challenge.
+             * @example V2FsdGVyIFdoaXRlIFRlc3QgQ2hhbGxlbmdl
+             */
+            challenge?: string;
+            /**
+             * @description Timeout value in milliseconds.
+             * @example 60000
+             */
+            timeout?: number;
+            /**
+             * @description The ID of the relying party.
+             * @example example.com
+             */
+            rpId?: string;
+            /** @description Allowed credentials for authentication. */
+            allowCredentials?: components["schemas"]["PublicKeyCredentialDescriptor"][];
+            /**
+             * @description The level of requirement for user verification.
+             * @example preferred
+             * @enum {string}
+             */
+            userVerification?: "required" | "preferred" | "discouraged";
+            /** @description WebAuthn extensions. */
+            extensions?: {
+                [key: string]: unknown;
+            };
+        };
+        AuthenticateFinishRequest: {
+            /**
+             * @description The ID of the user.
+             * @example user@example.com
+             */
+            user_id?: string;
+            /**
+             * @description The ID of the channel.
+             * @example RefArch
+             */
+            channel_id: string;
+            /**
+             * @description The ID of the OAuth client.
+             * @example 12345678-1234-1234-1234-123456789012
+             */
+            client_id: string;
+            /**
+             * Format: email
+             * @description User's email address.
+             * @example user@example.com
+             */
+            email?: string;
+            /**
+             * @description The ID of the tenant.
+             * @example zzte_053
+             */
+            tenant_id?: string;
+            /**
+             * @description The unique session ID.
+             * @example 87654321-4321-4321-4321-210987654321
+             */
+            usid?: string;
+            credential: components["schemas"]["PublicKeyCredentialJson"];
+        };
+        AuthenticateResult: {
+            /**
+             * @description The credential ID that was used for authentication.
+             * @example AQIDBAUGBwgJCgsMDQ4PEA
+             */
+            credentialId?: string;
+            /**
+             * @description The authenticated username.
+             * @example user@example.com
+             */
+            username?: string;
+            /**
+             * @description Specifies whether authentication was successful (true) or not (false).
+             * @example true
+             */
+            success?: boolean;
+            tokenResponse?: components["schemas"]["TokenResponse"];
+        };
+        /** @description Represents a WebAuthn passkey credential */
+        PasskeyCredential: {
+            /**
+             * Format: int32
+             * @description Unique identifier for the credential
+             * @example 20
+             */
+            id?: number;
+            /**
+             * Format: int32
+             * @description The ID of the user who owns this credential
+             * @example 26
+             */
+            userId?: number;
+            /**
+             * @description The WebAuthn credential ID
+             * @example SVKfbUGBXofb2JzliJrMtZDENYByWgq_j4-p2M_3wC4
+             */
+            credentialId?: string;
+            /**
+             * @description User-friendly name for the credential
+             * @example Fingerprint
+             */
+            nickName?: string;
+            /**
+             * @description The public key associated with this credential
+             * @example pQECAyYgASFYIHM_4IKLMC8dboiRNfD0E0Gk4LmCTIgEyCTr-9SyHHeIIlggfn5_AzAl67kttLXWb-_Ts6MG7WHKoXzlKtame_wEYPE
+             */
+            publicKey?: string;
+            /**
+             * @description The user handle associated with this credential
+             * @example yRU-7pWyWUE6nw8hztqqUZG635p7UKDDb2lbC1FyF78
+             */
+            userHandle?: string;
+            /**
+             * @description The signature counter for replay attack prevention
+             * @example 42
+             */
+            signatureCount?: string;
+        };
+        /** @description Represents a passkey user with their associated credentials */
+        PasskeyUser: {
+            /**
+             * Format: int32
+             * @description Unique identifier for the passkey user
+             * @example 26
+             */
+            id?: number;
+            /**
+             * @description The username of the passkey user
+             * @example user@example.com
+             */
+            userName?: string;
+            /**
+             * @description The display name of the passkey user
+             * @example John Doe
+             */
+            displayName?: string;
+            /**
+             * @description The user handle (WebAuthn user ID)
+             * @example yRU-7pWyWUE6nw8hztqqUZG635p7UKDDb2lbC1FyF78
+             */
+            userHandle?: string;
+            /**
+             * Format: int32
+             * @description The associated SLAS user ID
+             * @example 10000
+             */
+            slasUserId?: number;
+            /** @description Set of passkey credentials associated with this user */
+            credentials?: components["schemas"]["PasskeyCredential"][];
+        };
+        /**
+         * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+         * @example f_ecom_zzxy_prd
+         */
+        OrganizationId: string;
+        /**
+         * @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites
+         * @example RefArch
+         */
+        SiteId: string;
+        /**
+         * @description A concatenated version of the standard Language and Country codes, combined with a hyphen '`-`'.
+         * @example en-US
+         */
+        LanguageCountry: string;
+        /** @description A request to generate and deliver a one-time password (OTP) to a shopper. */
+        OtpRequest: {
+            /**
+             * @description The ID of the OAuth client.
+             * @example 12345678-1234-1234-1234-123456789012
+             */
+            client_id: string;
+            channel_id: components["schemas"]["SiteId"];
+            /**
+             * @description User ID for the shopper requesting the OTP.
+             * @example shopper123
+             */
+            user_id: string;
+            /**
+             * @description Password Action delivery modes
+             * @example email
+             * @enum {string}
+             */
+            mode: "callback" | "sms" | "email";
+            /**
+             * @description Required when `mode` is `email`. Must match a registered email for the shopper.
+             * @example shopper@example.com
+             */
+            email?: string;
+            /**
+             * @description Required when `mode` is `callback`. Must match a registered callback URI for the client. The callback URI must be a `POST` endpoint. Wildcards are not allowed.
+             * @example https://example.com/otp-callback
+             */
+            callback_uri?: string;
+            /** @description The locale for the OTP delivery template. Defaults to `en-US` for email mode. */
+            locale?: components["schemas"]["LanguageCountry"];
+        };
+        /** @description A request to verify a one-time password (OTP) token for a shopper. */
+        OtpVerifyRequest: {
+            /**
+             * @description Password action token (TOTP) received by the user. The token length is either 6 or 8 digits, configurable in SLAS Admin.
+             * @example 12345678
+             */
+            pwd_action_token: string;
+            /**
+             * @description The ID of the OAuth client.
+             * @example 12345678-1234-1234-1234-123456789012
+             */
+            client_id: string;
+            channel_id: components["schemas"]["SiteId"];
+            /**
+             * @description The user ID of the shopper whose OTP is being verified.
+             * @example shopper123
+             */
+            user_id: string;
+        };
+    };
+    responses: never;
+    parameters: {
+        /**
+         * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html#instance-types).
+         * @example f_ecom_zzxy_prd
+         */
+        organizationId: string;
+        /**
+         * @description Base64-encoded string of client credentials. The string is composed of
+         *     a client ID and client secret, separated by a colon (`:`). For example, `clientId:clientSecret`. Don't add the string `"Basic"`.
+         *
+         *     The `x-slas-client-auth` header is supported for SLAS private clients.
+         *     When strict client auth is enabled for the client, requests without
+         *     this header are rejected with a 401.
+         */
+        slasClientAuth: string;
+        /**
+         * @description When set to `true`, creates a new customer profile in B2C Commerce if one doesn't already exist. Requires `last_name` and `email` body parameters unless `user_id` is an email address. Optionally accepts `first_name` and `phone_number` body parameters.
+         *     If the customer profile doesn't exist, it is created when the TOTP is validated via the `passwordless/token` endpoint.
+         *
+         *     When set to `false` (or omitted), no customer profile is created in B2C Commerce.
+         */
+        register_customer: string;
+        /**
+         * @description When set to `true`, blocks the passwordless login request and returns a `400` error if the shopper's email is not verified. Use this to enforce shopper email verification before allowing passwordless authentication. Available in B2C Commerce version 26.6 and later.
+         *
+         *     Default: `false`
+         */
+        strict_verify: boolean;
+        /** @description The SLAS public client ID or SLAS private client ID for use with trusted-agent requests. When using a private client ID a PKCE code challenge is not required. */
+        client_id: string;
+        /** @description Refresh token that was given during the access token request. */
+        refresh_token: string;
+        /**
+         * @description `hint=all-sessions` logs out all sessions and invalidates all refresh tokens for a shopper with the same SLAS user ID.
+         *     This only works within the same session type. Sessions created through different authentication methods (/authorize vs. Trusted System On Behalf) are treated as separate sessions. To invalidate tokens with different SLAS User IDs, you must make explicit logout calls with each token.
+         *     A shopper authenticated via both /authorize and TSOB has two separate sessions. You will need two logout calls (one per token) to fully log them out.
+         *
+         *     If this query parameter is not provided, the default behavior is to log out only the current session that matches the refresh token in the request.
+         *
+         *     If an incorrect value is provided for the hint other than `all-sessions`, the request fails.
+         */
+        logout_hint: "all-sessions";
+        /**
+         * @description The redirect for Account Manager to redirect to. A variety of URI formats and wildcard for host are supported, but app links like `airbnb://` or `fb://` are not. Examples of supported URIs:
+         *       - `http://localhost:3000/callback`
+         *       - `https://example.com/callback`
+         *       - `com.example.app:redirect_uri_path`
+         *       - ` *.subdomain.topleveldomain.com`
+         */
+        redirect_uri: string;
+        /** @description Must be `code`. Indicates that the caller wants an authorization code. */
+        response_type: "code";
+        scope: "openid" | "offline_access" | "email";
+        /** @description Value to send the client to determine the state between the authorization request and the server response. Optional, but strongly recommended. */
+        state: string;
+        /** @description A unique shopper identifier (USID). If not provided, a new USID is generated. */
+        usid: string;
+        /**
+         * @description Name of an identity provider (IDP) to optionally redirect to, thereby skipping the IDP selection step.
+         *
+         *     To use a public client, set `hint` to `guest` and use a public client ID to get an authorization code. If no `hint` is provided, the preferred IDP of the tenant is used by default.
+         *
+         *     For session bridge authorization the `hint` should be set to `sb-user` for a registered customer and to `sb-guest` for a guest. For session bridge authorization the SLAS Client `sfcc.session_bridge` scope.
+         */
+        hint: string;
+        /**
+         * @description PKCE code challenge. Created by the caller.
+         *
+         *     The `code_challenge` is created by SHA256 hashing the `code_verifier` and Base64 encoding the resulting hash.
+         *
+         *     The `code_verifier` should be a high entropy cryptographically random string with a minimum of 43 characters and a maximum of 128 characters.
+         *
+         *     The *`code_challenge` and 'code_verifier'* are required if a using SLAS public `client_id`.
+         */
+        code_challenge: string;
+        /**
+         * @description End-User's preferred languages and scripts for the user interface, represented as a space-separated list of BCP47 [RFC5646] language tag values, ordered by preference. For example, the value `fr-CA fr en` represents a preference for French as spoken in Canada, then French (without a region designation), followed by English (without a region designation).
+         *
+         *     In most cases the IDP supports one language tag and has a default language set on the server. SLAS will support the space-separated list and pass them to the IDP.
+         */
+        ui_locales: string;
+        /**
+         * @description The channel (B2C Commerce site) that the user is associated with.
+         * @example RefArch
+         */
+        channel_id: string;
+        /**
+         * @description The ID of the shopper for trusted agent access.
+         *
+         *     For TAOB Guest the `login_id` must be set to `Guest`.
+         */
+        login_id: string;
+        /**
+         * @description The IDP that the shopper is associated with.
+         *
+         *     For TAOB Guest the `idp_origin` must be set to `slas`. This is standard for SLAS Guest requests. If any other `idp_origin` value is used, SLAS returns a bad request.
+         */
+        idp_origin: string;
+        /**
+         * @description "Base64-encoded string of client credentials. The string is composed of a client ID and client secret, separated by a colon (`:`), like this: `clientId:clientSecret`. (Do not add the string `"Basic"`.)
+         *
+         *     The `_sfdc_client_auth` header is only required when using a SLAS private client ID."
+         */
+        _sfdc_client_auth: string;
+        /** @description Base64 string for HTTP Basic authentication. */
+        Authorization: string;
+        /**
+         * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+         * @example f_ecom_zzxy_prd
+         */
+        "parameters-organizationId": components["schemas"]["OrganizationId"];
+    };
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
+}
+export type $defs = Record<string, never>;
+export interface operations {
+    authenticateCustomer: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Base64-encoded username and password for HTTP basic authentication */
+                Authorization: string;
+                /**
+                 * @description Base64-encoded string of client credentials. The string is composed of
+                 *     a client ID and client secret, separated by a colon (`:`). For example, `clientId:clientSecret`. Don't add the string `"Basic"`.
+                 *
+                 *     The `x-slas-client-auth` header is supported for SLAS private clients.
+                 *     When strict client auth is enabled for the client, requests without
+                 *     this header are rejected with a 401.
+                 */
+                "x-slas-client-auth"?: components["parameters"]["slasClientAuth"];
+            };
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html#instance-types).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/x-www-form-urlencoded": components["schemas"]["LoginRequest"];
+            };
+        };
+        responses: {
+            /** @description The authorization code and usid were successfuly added to the location header and sent to the callback as query parameters. */
+            303: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string;
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+        };
+    };
+    authorizePasswordlessCustomer: {
+        parameters: {
+            query?: {
+                /**
+                 * @description When set to `true`, creates a new customer profile in B2C Commerce if one doesn't already exist. Requires `last_name` and `email` body parameters unless `user_id` is an email address. Optionally accepts `first_name` and `phone_number` body parameters.
+                 *     If the customer profile doesn't exist, it is created when the TOTP is validated via the `passwordless/token` endpoint.
+                 *
+                 *     When set to `false` (or omitted), no customer profile is created in B2C Commerce.
+                 */
+                register_customer?: components["parameters"]["register_customer"];
+                /**
+                 * @description When set to `true`, blocks the passwordless login request and returns a `400` error if the shopper's email is not verified. Use this to enforce shopper email verification before allowing passwordless authentication. Available in B2C Commerce version 26.6 and later.
+                 *
+                 *     Default: `false`
+                 */
+                strict_verify?: components["parameters"]["strict_verify"];
+            };
+            header?: {
+                /** @description Base64-encoded string for HTTP Basic authentication. The string is composed of a client ID and client secret, separated by a colon (`:`), for example: `clientId:clientSecret` */
+                Authorization?: string;
+            };
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html#instance-types).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/x-www-form-urlencoded": components["schemas"]["PasswordlessLoginRequest"];
+            };
+        };
+        responses: {
+            /** @description The customer authenticated successfully. */
+            200: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string;
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Precondition failure */
+            412: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+        };
+    };
+    logoutCustomer: {
+        parameters: {
+            query: {
+                /** @description The SLAS public client ID or SLAS private client ID for use with trusted-agent requests. When using a private client ID a PKCE code challenge is not required. */
+                client_id: components["parameters"]["client_id"];
+                /** @description Refresh token that was given during the access token request. */
+                refresh_token: components["parameters"]["refresh_token"];
+                /**
+                 * @description The `channel_id` parameter must be provided if the shopper authenticated using the `login` endpoint with B2C Commerce.
+                 * @example RefArch
+                 */
+                channel_id?: string;
+                /**
+                 * @description `hint=all-sessions` logs out all sessions and invalidates all refresh tokens for a shopper with the same SLAS user ID.
+                 *     This only works within the same session type. Sessions created through different authentication methods (/authorize vs. Trusted System On Behalf) are treated as separate sessions. To invalidate tokens with different SLAS User IDs, you must make explicit logout calls with each token.
+                 *     A shopper authenticated via both /authorize and TSOB has two separate sessions. You will need two logout calls (one per token) to fully log them out.
+                 *
+                 *     If this query parameter is not provided, the default behavior is to log out only the current session that matches the refresh token in the request.
+                 *
+                 *     If an incorrect value is provided for the hint other than `all-sessions`, the request fails.
+                 */
+                hint?: components["parameters"]["logout_hint"];
+            };
+            header: {
+                /** @description Shopper access token to be revoked */
+                Authorization: string;
+            };
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html#instance-types).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TokenResponse"];
+                };
+            };
+            /** @description The user has sent too many requests in a given amount of time, and rate limiting is in effect. */
+            303: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+        };
+    };
+    authorizeCustomer: {
+        parameters: {
+            query: {
+                /**
+                 * @description The redirect for Account Manager to redirect to. A variety of URI formats and wildcard for host are supported, but app links like `airbnb://` or `fb://` are not. Examples of supported URIs:
+                 *       - `http://localhost:3000/callback`
+                 *       - `https://example.com/callback`
+                 *       - `com.example.app:redirect_uri_path`
+                 *       - ` *.subdomain.topleveldomain.com`
+                 */
+                redirect_uri: components["parameters"]["redirect_uri"];
+                /** @description Must be `code`. Indicates that the caller wants an authorization code. */
+                response_type: components["parameters"]["response_type"];
+                /** @description The SLAS public client ID or SLAS private client ID for use with trusted-agent requests. When using a private client ID a PKCE code challenge is not required. */
+                client_id: components["parameters"]["client_id"];
+                scope?: components["parameters"]["scope"];
+                /** @description Value to send the client to determine the state between the authorization request and the server response. Optional, but strongly recommended. */
+                state?: components["parameters"]["state"];
+                /** @description A unique shopper identifier (USID). If not provided, a new USID is generated. */
+                usid?: components["parameters"]["usid"];
+                /**
+                 * @description Name of an identity provider (IDP) to optionally redirect to, thereby skipping the IDP selection step.
+                 *
+                 *     To use a public client, set `hint` to `guest` and use a public client ID to get an authorization code. If no `hint` is provided, the preferred IDP of the tenant is used by default.
+                 *
+                 *     For session bridge authorization the `hint` should be set to `sb-user` for a registered customer and to `sb-guest` for a guest. For session bridge authorization the SLAS Client `sfcc.session_bridge` scope.
+                 */
+                hint?: components["parameters"]["hint"];
+                /**
+                 * @description The channel that this request is for. For a B2C Commerce request, this is angalous to the site ID.
+                 * @example RefArch
+                 */
+                channel_id?: string;
+                /**
+                 * @description PKCE code challenge. Created by the caller.
+                 *
+                 *     The `code_challenge` is created by SHA256 hashing the `code_verifier` and Base64 encoding the resulting hash.
+                 *
+                 *     The `code_verifier` should be a high entropy cryptographically random string with a minimum of 43 characters and a maximum of 128 characters.
+                 *
+                 *     The *`code_challenge` and 'code_verifier'* are required if a using SLAS public `client_id`.
+                 */
+                code_challenge?: components["parameters"]["code_challenge"];
+                /**
+                 * @description End-User's preferred languages and scripts for the user interface, represented as a space-separated list of BCP47 [RFC5646] language tag values, ordered by preference. For example, the value `fr-CA fr en` represents a preference for French as spoken in Canada, then French (without a region designation), followed by English (without a region designation).
+                 *
+                 *     In most cases the IDP supports one language tag and has a default language set on the server. SLAS will support the space-separated list and pass them to the IDP.
+                 */
+                ui_locales?: components["parameters"]["ui_locales"];
+            };
+            header?: {
+                /**
+                 * @description Base64-encoded string of client credentials. The string is composed of
+                 *     a client ID and client secret, separated by a colon (`:`). For example, `clientId:clientSecret`. Don't add the string `"Basic"`.
+                 *
+                 *     The `x-slas-client-auth` header is supported for SLAS private clients.
+                 *     When strict client auth is enabled for the client, requests without
+                 *     this header are rejected with a 401.
+                 */
+                "x-slas-client-auth"?: components["parameters"]["slasClientAuth"];
+            };
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html#instance-types).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The authorization code was successfully added to the `redirect_uri`. */
+            303: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string;
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+        };
+    };
+    getAccessToken: {
+        parameters: {
+            query?: never;
+            header?: {
+                /**
+                 * @description Base64-encoded string for HTTP Basic authentication. The string is composed of a client ID and client secret, separated by a colon (`:`), for example: `clientId:clientSecret`.
+                 *     Not required if the grant type is `authorization_code_pkce` or `refresh_token`.
+                 */
+                Authorization?: string;
+            };
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html#instance-types).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/x-www-form-urlencoded": components["schemas"]["TokenRequest"];
+            };
+        };
+        responses: {
+            /** @description the shopper or guest JWT access token and a refresh token were retrieved successfully. */
+            200: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TokenResponse"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+        };
+    };
+    getSessionBridgeAccessToken: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html#instance-types).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/x-www-form-urlencoded": components["schemas"]["SessionBridgeTokenRequest"];
+            };
+        };
+        responses: {
+            /** @description The shopper JWT access token was retrieved successfully. */
+            200: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TokenResponse"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Gateway error */
+            503: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+        };
+    };
+    getTrustedSystemAccessToken: {
+        parameters: {
+            query?: never;
+            header?: {
+                /**
+                 * @description Base64-encoded string for HTTP Basic authentication. The string is composed of a client ID and client secret, separated by a colon (`:`), for example: `clientId:clientSecret`.
+                 *     Not required if the grant type is `authorization_code_pkce` or `refresh_token`.
+                 */
+                Authorization?: string;
+            };
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html#instance-types).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/x-www-form-urlencoded": components["schemas"]["TrustedSystemTokenRequest"];
+            };
+        };
+        responses: {
+            /** @description The shopper JWT access token was retrieved successfully. */
+            200: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TokenResponse"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Gateway error */
+            503: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+        };
+    };
+    getTrustedAgentAuthorizationToken: {
+        parameters: {
+            query: {
+                /** @description The SLAS public client ID or SLAS private client ID for use with trusted-agent requests. When using a private client ID a PKCE code challenge is not required. */
+                client_id: components["parameters"]["client_id"];
+                /**
+                 * @description The channel (B2C Commerce site) that the user is associated with.
+                 * @example RefArch
+                 */
+                channel_id: components["parameters"]["channel_id"];
+                /**
+                 * @description PKCE code challenge. Created by the caller.
+                 *
+                 *     The `code_challenge` is created by SHA256 hashing the `code_verifier` and Base64 encoding the resulting hash.
+                 *
+                 *     The `code_verifier` should be a high entropy cryptographically random string with a minimum of 43 characters and a maximum of 128 characters.
+                 *
+                 *     The *`code_challenge` and 'code_verifier'* are required if a using SLAS public `client_id`.
+                 */
+                code_challenge?: components["parameters"]["code_challenge"];
+                /**
+                 * @description The ID of the shopper for trusted agent access.
+                 *
+                 *     For TAOB Guest the `login_id` must be set to `Guest`.
+                 */
+                login_id: components["parameters"]["login_id"];
+                /**
+                 * @description The IDP that the shopper is associated with.
+                 *
+                 *     For TAOB Guest the `idp_origin` must be set to `slas`. This is standard for SLAS Guest requests. If any other `idp_origin` value is used, SLAS returns a bad request.
+                 */
+                idp_origin: components["parameters"]["idp_origin"];
+                /**
+                 * @description The redirect for Account Manager to redirect to. A variety of URI formats and wildcard for host are supported, but app links like `airbnb://` or `fb://` are not. Examples of supported URIs:
+                 *       - `http://localhost:3000/callback`
+                 *       - `https://example.com/callback`
+                 *       - `com.example.app:redirect_uri_path`
+                 *       - ` *.subdomain.topleveldomain.com`
+                 */
+                redirect_uri: components["parameters"]["redirect_uri"];
+                /** @description Must be `code`. Indicates that the caller wants an authorization code. */
+                response_type: components["parameters"]["response_type"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html#instance-types).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The new agent was obtained successfully. */
+            303: {
+                headers: {
+                    /** @description Location header with the `redirect_uri` to Account Manager, which allows the agent to log in. */
+                    Location?: string;
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string;
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+        };
+    };
+    getTrustedAgentAccessToken: {
+        parameters: {
+            query?: never;
+            header?: {
+                /**
+                 * @description "Base64-encoded string of client credentials. The string is composed of a client ID and client secret, separated by a colon (`:`), like this: `clientId:clientSecret`. (Do not add the string `"Basic"`.)
+                 *
+                 *     The `_sfdc_client_auth` header is only required when using a SLAS private client ID."
+                 */
+                _sfdc_client_auth?: components["parameters"]["_sfdc_client_auth"];
+                /** @description This is the `Bearer` token that is returned from Account Manager after the trusted agent on behalf of (TAOB) authorize call. */
+                Authorization?: string;
+            };
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html#instance-types).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/x-www-form-urlencoded": components["schemas"]["TrustedAgentTokenRequest"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TokenResponse"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Gateway error */
+            503: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+        };
+    };
+    getPasswordResetToken: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html#instance-types).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/x-www-form-urlencoded": components["schemas"]["PasswordActionRequest"];
+            };
+        };
+        responses: {
+            /** @description The reset password token was requested successfully. */
+            200: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Precondition failure */
+            412: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+        };
+    };
+    resetPassword: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Base64-encoded string for HTTP Basic authentication. The string is composed of a client ID and client secret, separated by a colon (`:`), for example: `clientId:clientSecret` */
+                Authorization?: string;
+            };
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html#instance-types).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/x-www-form-urlencoded": components["schemas"]["PasswordActionVerifyRequest"];
+            };
+        };
+        responses: {
+            /** @description The password was created successfully. */
+            200: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Gateway error */
+            503: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+        };
+    };
+    getPasswordLessAccessToken: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Base64-encoded string for HTTP Basic authentication. The string is composed of a client ID and client secret, separated by a colon (`:`), for example: `clientId:clientSecret` */
+                Authorization?: string;
+            };
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html#instance-types).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/x-www-form-urlencoded": components["schemas"]["PasswordLessLoginTokenRequest"];
+            };
+        };
+        responses: {
+            /** @description The shopper token was issued successfully. */
+            200: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TokenResponse"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Gateway error */
+            503: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+        };
+    };
+    revokeToken: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Base64-encoded string for HTTP Basic authentication. The string is composed of a client ID and client secret, separated by a colon (`:`), like this: `clientId:clientSecret` */
+                Authorization: string;
+            };
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html#instance-types).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/x-www-form-urlencoded": components["schemas"]["TokenActionRequest"];
+            };
+        };
+        responses: {
+            /** @description The refresh token was revoked successfully. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TokenActionRequest"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+        };
+    };
+    introspectToken: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Base64 string for HTTP Basic authentication. */
+                Authorization: components["parameters"]["Authorization"];
+            };
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html#instance-types).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/x-www-form-urlencoded": components["schemas"]["TokenActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Token properties returned successfully. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TokenActionRequest"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+        };
+    };
+    getUserInfo: {
+        parameters: {
+            query?: {
+                /**
+                 * @description Used when getting user information for a SFCC login. For an B2C Commerce customer, this is angalous to the site ID. Required when getting user information for an B2C Commerce customer.
+                 * @example RefArch
+                 */
+                channel_id?: string;
+                /**
+                 * @description When a user authenticates via an IDP, SLAS calls the IDP's `/userinfo` endpoint to retrieve user information. Since some IDPs don't reliably return user info, set `idpValidate=false` to skip this call and use the user information already stored in SLAS instead.
+                 *
+                 *     Default: `true`
+                 * @example false
+                 */
+                idpValidate?: boolean;
+            };
+            header: {
+                /** @description SLAS Access Token */
+                Authorization: string;
+            };
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html#instance-types).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Claims returned successfully. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string;
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+        };
+    };
+    getWellknownOpenidConfiguration: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html#instance-types).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The JSON listing information was returned successfully. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string;
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+        };
+    };
+    getJwksUri: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html#instance-types).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The response body containing the JWKS keys was retrieved successfully. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+        };
+    };
+    authorizeWebauthnRegistration: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Base64-encoded string for HTTP Basic authentication. The string is composed of a client ID and client secret, separated by a colon (`:`). For example: `clientId:clientSecret`. */
+                Authorization?: string;
+            };
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html#instance-types).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/x-www-form-urlencoded": components["schemas"]["PasswordActionRequest"];
+            };
+        };
+        responses: {
+            /** @description User successfully authorized for WebAuthn registration. TOTP sent to user. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+        };
+    };
+    startWebauthnUserRegistration: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Base64-encoded string for HTTP Basic authentication. The string is composed of a client ID and client secret, separated by a colon (`:`). For example: `clientId:clientSecret`. */
+                Authorization?: string;
+            };
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html#instance-types).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/x-www-form-urlencoded": components["schemas"]["RegistrationStartRequest"];
+            };
+        };
+        responses: {
+            /** @description Registration options successfully generated. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+        };
+    };
+    finishWebauthnUserRegistration: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Base64-encoded string for HTTP Basic authentication. The string is composed of a client ID and client secret, separated by a colon (`:`). For example: `clientId:clientSecret`. */
+                Authorization?: string;
+            };
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html#instance-types).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegistrationFinishRequest"];
+            };
+        };
+        responses: {
+            /** @description Registration successfully completed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+        };
+    };
+    startWebauthnAuthentication: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Base64-encoded string for HTTP Basic authentication. The string is composed of a client ID and client secret, separated by a colon (`:`). For example: `clientId:clientSecret`. */
+                Authorization?: string;
+            };
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html#instance-types).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/x-www-form-urlencoded": components["schemas"]["AuthenticateRequest"];
+            };
+        };
+        responses: {
+            /** @description Authentication options successfully generated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicKeyCredentialRequestOptions"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+        };
+    };
+    finishWebauthnAuthentication: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Base64-encoded string for HTTP Basic authentication. The string is composed of a client ID and client secret, separated by a colon (`:`). For example: `clientId:clientSecret`. */
+                Authorization?: string;
+            };
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html#instance-types).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AuthenticateFinishRequest"];
+            };
+        };
+        responses: {
+            /** @description Authentication successful */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuthenticateResult"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+        };
+    };
+    getPasskeyUserByLoginId: {
+        parameters: {
+            query: {
+                /**
+                 * @description The channel (B2C Commerce site) that the user is associated with.
+                 * @example RefArch
+                 */
+                channel_id: components["parameters"]["channel_id"];
+            };
+            header: {
+                /** @description Shopper JWT access token */
+                Authorization: string;
+            };
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html#instance-types).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The login ID (username) of the user whose passkey information is being retrieved */
+                loginId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The passkey user information and credentials were retrieved successfully. */
+            200: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PasskeyUser"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Forbidden - token validation failed */
+            403: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+        };
+    };
+    deletePasskeyUser: {
+        parameters: {
+            query: {
+                /**
+                 * @description The channel (B2C Commerce site) that the user is associated with.
+                 * @example RefArch
+                 */
+                channel_id: components["parameters"]["channel_id"];
+            };
+            header: {
+                /** @description Shopper JWT access token */
+                Authorization: string;
+            };
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html#instance-types).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The login ID (username) of the user whose passkey information is being deleted */
+                loginId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The passkey user and all credentials were deleted successfully. */
+            204: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Forbidden - token validation failed */
+            403: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+        };
+    };
+    deletePasskeyCredential: {
+        parameters: {
+            query: {
+                /**
+                 * @description The channel (B2C Commerce site) that the user is associated with.
+                 * @example RefArch
+                 */
+                channel_id: components["parameters"]["channel_id"];
+            };
+            header: {
+                /** @description Shopper JWT access token */
+                Authorization: string;
+            };
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/get-started.html#instance-types).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The login ID (username) of the user whose passkey credential is being deleted */
+                loginId: string;
+                /** @description The unique identifier of the credential to delete */
+                credentialId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The passkey credential was deleted successfully. */
+            204: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Forbidden - token validation failed */
+            403: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+        };
+    };
+    requestOtp: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["parameters-organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/x-www-form-urlencoded": components["schemas"]["OtpRequest"];
+            };
+        };
+        responses: {
+            /** @description The OTP was generated and delivery was initiated successfully. */
+            202: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+        };
+    };
+    verifyOtp: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["parameters-organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/x-www-form-urlencoded": components["schemas"]["OtpVerifyRequest"];
+            };
+        };
+        responses: {
+            /** @description The OTP was verified successfully. */
+            204: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad request or invalid/expired OTP */
+            400: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description The 1 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-1M-Limit"?: string;
+                    /** @description The 1 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-1M-Remaining"?: string;
+                    /** @description The 1 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-1M-Reset"?: string;
+                    /** @description The 5 minute maximum number of requests permitted per hour. */
+                    "X-RateLimit-5M-Limit"?: string;
+                    /** @description The 5 minute number of requests remaining in the current rate limit window. */
+                    "X-RateLimit-5M-Remaining"?: string;
+                    /** @description The 5 minute time at which the current rate limit window resets in UTC epoch seconds. */
+                    "X-RateLimit-5M-Reset"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Oauth2ErrorResponse"];
+                };
+            };
+        };
+    };
+}

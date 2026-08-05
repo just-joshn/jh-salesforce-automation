@@ -1,0 +1,5464 @@
+// Generated from the vendored SCAPI OpenAPI spec. Do not edit by hand.
+//
+// Family:  shopper-customers (called as customer/shopper-customers/v1)
+// Version: 1.8.0
+// Source:  SalesforceCommerceCloud/commerce-sdk-isomorphic@main:apis/shopper-customers-oas-1.8.0/shopper-customers-oas-v1-public.yaml
+//
+// Regenerate with `pnpm gen:api:fetch && pnpm gen:api`.
+
+export interface paths {
+    "/organizations/{organizationId}/customers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Register a new customer.
+         * @description Mandatory data includes the credentials, profile last name, and email. This endpoint requires a guest JSON Web Token (JWT) from the [Shopper Login and API Access Service](https://developer.salesforce.com/docs/commerce/commerce-api/references/auth?meta=getAccessToken). The return type object for this endpoint is a common customer object shared by multiple Shopper Customer endpoints. In this case, all customer object details are returned, but attributes that are not included in the response, although they might be part of the customer object, are ignored. For example, although address information is included in the customer object, it is not displayed in the response for this endpoint and is ignored.
+         */
+        post: operations["registerCustomer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/customers/password/actions/reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reset customer password after obtaining a reset token.
+         * @description This is the second step in the reset customer password flow, in which a customer password is reset by providing new credentials along with a reset token. This call should be preceded by a call to the /create-reset-token endpoint.
+         */
+        post: operations["resetPassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/customers/password/actions/create-reset-token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Get reset password token.
+         * @description This is the first step in the reset customer password flow, in which a password reset token is requested for future use to reset a customer password. This call should be followed by a call to the /reset endpoint.
+         */
+        post: operations["getResetPasswordToken"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/customers/external-profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Gets the new external profile for a customer. This endpoint only accepts a registered customer ShopperToken (JWT). */
+        get: operations["getExternalProfile"];
+        put?: never;
+        /** Register a new external profile for a customer. This endpoint accepts a guest customer ShopperToken (JWT) only. */
+        post: operations["registerExternalProfile"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/customers/{customerId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a customer and all existing addresses and payment instruments associated with the requested customer. This endpoint only accepts a registered customer ShopperToken (JWT). */
+        get: operations["getCustomer"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update a customer. This endpoint only accepts a registered customer ShopperToken (JWT). */
+        patch: operations["updateCustomer"];
+        trace?: never;
+    };
+    "/organizations/{organizationId}/customers/{customerId}/addresses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create a new address with the given name for the customer. This endpoint only accepts a registered customer ShopperToken (JWT). */
+        post: operations["createCustomerAddress"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/customers/{customerId}/addresses/{addressName}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Retrieve a customer's address by address name. This endpoint only accepts a registered customer ShopperToken (JWT). */
+        get: operations["getCustomerAddress"];
+        put?: never;
+        post?: never;
+        /** Delete a customer's address by address name. This endpoint only accepts a registered customer ShopperToken (JWT). */
+        delete: operations["removeCustomerAddress"];
+        options?: never;
+        head?: never;
+        /** Update a customer's address by address name. This endpoint only accepts a registered customer ShopperToken (JWT). */
+        patch: operations["updateCustomerAddress"];
+        trace?: never;
+    };
+    "/organizations/{organizationId}/customers/{customerId}/baskets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the baskets for a customer. This endpoint accepts a registered customer ShopperToken (JWT) or a guest customer ShopperToken. */
+        get: operations["getCustomerBaskets"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/customers/{customerId}/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Return a page list of all the customer's orders. The default page size is 10. This endpoint accepts a registered customer ShopperToken (JWT) or a guest customer ShopperToken. */
+        get: operations["getCustomerOrders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/customers/{customerId}/password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update a customer's password. This endpoint only accepts a registered customer ShopperToken (JWT). */
+        put: operations["updateCustomerPassword"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/customers/{customerId}/payment-instruments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add a payment instrument to the customer information. This endpoint only accepts a registered customer ShopperToken (JWT). */
+        post: operations["createCustomerPaymentInstrument"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/customers/{customerId}/payment-instruments/{paymentInstrumentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Retrieve a customer's payment instrument by its ID. This endpoint only accepts a registered customer ShopperToken (JWT). */
+        get: operations["getCustomerPaymentInstrument"];
+        put?: never;
+        post?: never;
+        /** Delete a customer's payment instrument. This endpoint only accepts a registered customer ShopperToken (JWT). */
+        delete: operations["deleteCustomerPaymentInstrument"];
+        options?: never;
+        head?: never;
+        /** Update a customer's payment instrument. This endpoint only accepts a registered customer ShopperToken (JWT). */
+        patch: operations["updateCustomerPaymentInstrument"];
+        trace?: never;
+    };
+    "/organizations/{organizationId}/customers/{customerId}/payment-method-references/{paymentMethodReferenceId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete a customer's payment method reference. This endpoint only accepts a registered customer ShopperToken (JWT).
+         * @description Deletes a specific payment method reference from a customer's account using the payment method reference ID and account ID. This endpoint requires Salesforce Payments integration.
+         */
+        delete: operations["deleteCustomerPaymentMethodReference"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/customers/{customerId}/payment-method-references/actions/setup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Set up a new payment method reference for a customer. This endpoint only accepts a registered customer ShopperToken (JWT).
+         * @description Initiates the setup of a new payment method reference for a customer. This endpoint requires Salesforce Payments integration.
+         */
+        post: operations["setupCustomerPaymentMethodReference"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/customers/{customerId}/product-lists": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Return all customer product lists. This endpoint accepts a registered customer ShopperToken (JWT) or a guest customer ShopperToken. */
+        get: operations["getCustomerProductLists"];
+        put?: never;
+        /** Create a customer product list. This endpoint accepts a registered customer ShopperToken (JWT) or a guest customer ShopperToken. */
+        post: operations["createCustomerProductList"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/customers/{customerId}/product-lists/{listId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Return a customer product list for the given customer and the items in the list. This endpoint accepts a registered customer ShopperToken (JWT) or a guest customer ShopperToken. */
+        get: operations["getCustomerProductList"];
+        put?: never;
+        post?: never;
+        /** @description Delete a customer product list. This endpoint accepts a registered customer ShopperToken (JWT) or a guest customer ShopperToken. */
+        delete: operations["deleteCustomerProductList"];
+        options?: never;
+        head?: never;
+        /** Change a product list. Changeable properties include name, description, and if the list is public. This endpoint accepts a registered customer ShopperToken (JWT) or a guest customer ShopperToken. */
+        patch: operations["updateCustomerProductList"];
+        trace?: never;
+    };
+    "/organizations/{organizationId}/customers/{customerId}/product-lists/{listId}/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add an item to the customer's product list.
+         * @description This endpoint accepts a registered customer ShopperToken (JWT) or a guest customer ShopperToken.
+         *
+         *     Considered values from the request body are:
+         *
+         *     - `type` → The item type to be added to the customer's product. This value is required and must be a valid type.
+         *     list.
+         *     - `priority` → The priority of the item to be added to the customer's product list.
+         *     - `public` → The flag that determines whether the item to be added to the customer's product list is public.
+         *     - `product_id` → The ID (SKU) of the product related to the item to be added to the customer's product list. Required when item type is `product`, and must be a valid product ID and only used for product item type. Otherwise, a `ProductListProductIdMissingException` or `ProductListProductNotFoundException` is thrown.
+         *     - `quantity` → Only used for product item type. This is the quantity of the item to be added to the customer's product list.
+         *
+         *     You can also use a custom property of the form `c_<CUSTOM_NAME>`. The custom property must correspond to a custom attribute (`<CUSTOM_NAME>`) that is defined for `ProductListItem`. The value of this property must be valid for the type of custom attribute defined for `ProductListItem`.
+         */
+        post: operations["createCustomerProductListItem"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/customers/{customerId}/product-lists/{listId}/items/{itemId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Return an item of a customer product list and the actual product details such as image, availability, and price. This endpoint accepts a registered customer ShopperToken (JWT) or a guest customer ShopperToken. */
+        get: operations["getCustomerProductListItem"];
+        put?: never;
+        post?: never;
+        /** Remove an item from a customer product list. This endpoint accepts a registered customer ShopperToken (JWT) or a guest customer ShopperToken. */
+        delete: operations["deleteCustomerProductListItem"];
+        options?: never;
+        head?: never;
+        /**
+         * Update an item in a customer's product list.
+         * @description This endpoint accepts a registered customer ShopperToken (JWT) or a guest customer ShopperToken.
+         *     Considered values from the request body are:
+         *
+         *     priority: The priority of the customer's product list item.
+         *     public: The flag that indicates if the customer's product list item is public.
+         *     quantity: The quantity of
+         *     the customer's product list item. Onlyl used for product item type.
+         *     custom properties in the form c_<CUSTOM_NAME>: The custom property
+         *     must correspond to a custom attribute (<CUSTOM_NAME>) defined for ProductListItem.
+         *     The value of this property must be valid for the type of custom attribute defined for ProductListItem.
+         */
+        patch: operations["updateCustomerProductListItem"];
+        trace?: never;
+    };
+    "/organizations/{organizationId}/product-lists": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Retrieve all public product lists as defined by the given search term, for example: email OR first name and last name). This endpoint accepts a registered customer ShopperToken (JWT) or a guest customer ShopperToken. */
+        get: operations["getPublicProductListsBySearchTerm"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/product-lists/{listId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Retrieve a public product list by ID and the items under that product list. This endpoint accepts a registered customer ShopperToken (JWT) or a guest customer ShopperToken. */
+        get: operations["getPublicProductList"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/product-lists/{listId}/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Retrieve all items of a public product list.
+         * @description The possible expansions are product, images, and availability. For images and availability, the product must be expanded as well. This endpoint accepts a registered customer ShopperToken (JWT) or a guest customer ShopperToken.
+         */
+        get: operations["getPublicProductListItems"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/product-lists/{listId}/items/{itemId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Retrieve an item from a public product list and the actual product details such as product, image, availability, and price. This endpoint accepts a registered customer ShopperToken (JWT) or a guest customer ShopperToken. */
+        get: operations["getProductListItem"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+}
+export type webhooks = Record<string, never>;
+export interface components {
+    schemas: {
+        /**
+         * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+         * @example f_ecom_zzxy_prd
+         */
+        OrganizationId: string;
+        /**
+         * @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites
+         * @example RefArch
+         */
+        SiteId: string;
+        /** @description Address that is associated with a shopper (billing, shipping, mailing, and so on). */
+        CustomerAddress: {
+            /**
+             * @description The first address.
+             * @example 10 Presidential Way
+             */
+            address1?: string;
+            /**
+             * @description The second address.
+             * @example Apt-616
+             */
+            address2?: string;
+            /**
+             * @description The ID of the address as specified by account owner.
+             * @example Home
+             */
+            addressId: string;
+            /**
+             * @description The city.
+             * @example New York
+             */
+            city?: string;
+            /**
+             * @description The company name.
+             * @example Acme Inc
+             */
+            companyName?: string;
+            /**
+             * @description The two-letter ISO 3166-1 (Alpha-2) country code.
+             * @example US
+             */
+            countryCode: string;
+            /**
+             * Format: date-time
+             * @description Returns the value of attribute 'creationDate'.
+             * @example 9999-12-31T17:12:56.670Z
+             */
+            creationDate?: string;
+            /**
+             * @description The first name.
+             * @example John
+             */
+            firstName?: string;
+            /**
+             * @description The full name.
+             * @example John Smith
+             */
+            fullName?: string;
+            /**
+             * @description The job title.
+             * @example Supervisor
+             */
+            jobTitle?: string;
+            /**
+             * Format: date-time
+             * @description Returns the value of attribute 'lastModified'.
+             * @example 9999-12-31T17:12:56.670Z
+             */
+            lastModified?: string;
+            /**
+             * @description The last name.
+             * @example Smith
+             */
+            lastName: string;
+            /**
+             * @description The phone number.
+             * @example 555-555-5555
+             */
+            phone?: string;
+            /**
+             * @description The post box.
+             * @example 12345
+             */
+            postBox?: string;
+            /**
+             * @description The postal code.
+             * @example N5
+             */
+            postalCode?: string;
+            /**
+             * @description The preferred attribute.
+             * @example true
+             */
+            preferred?: boolean;
+            /**
+             * @description The salutation.
+             * @example Sir
+             */
+            salutation?: string;
+            /**
+             * @description The second name.
+             * @example Smith
+             */
+            secondName?: string;
+            /**
+             * @description The state code.
+             * @example UT
+             */
+            stateCode?: string;
+            /**
+             * @description The suffix.
+             * @example Sr.
+             */
+            suffix?: string;
+            /**
+             * @description The suite.
+             * @example 100
+             */
+            suite?: string;
+            /**
+             * @description The title.
+             * @example Supervisor
+             */
+            title?: string;
+        };
+        /** @description Document representing a payment card. */
+        PaymentCard: {
+            /**
+             * @description The payment card type.
+             * @example Visa
+             */
+            cardType?: string;
+            /**
+             * @description A flag indicating if the credit card is expired. It is read only.
+             * @example true
+             */
+            creditCardExpired?: boolean;
+            /**
+             * @description A credit card token. If a credit card is tokenized, the token can be used to look up the credit card data
+             *     in the token store.
+             * @example E67TY8GQ27X
+             */
+            creditCardToken?: string;
+            /**
+             * Format: int32
+             * @description The month when the payment card expires.
+             * @example 3
+             */
+            expirationMonth?: number;
+            /**
+             * Format: int32
+             * @description The year when the payment card expires.
+             * @example 2025
+             */
+            expirationYear?: number;
+            /**
+             * @description The payment card holder.
+             * @example Max Mustermann
+             */
+            holder?: string;
+            /**
+             * @description The payment card issue number.
+             * @example 2
+             */
+            issueNumber?: string;
+            /**
+             * @description The masked payment card number.
+             * @example *********4422
+             */
+            maskedNumber?: string;
+            /**
+             * @description The last digits of the payment card number. It is read only.
+             * @example 4422
+             */
+            numberLastDigits?: string;
+            /**
+             * Format: int32
+             * @description The month the payment card is valid from.
+             * @example 5
+             */
+            validFromMonth?: number;
+            /**
+             * Format: int32
+             * @description The year the payment card is valid from.
+             * @example 2015
+             */
+            validFromYear?: number;
+        };
+        /** @description Method for customers to pay for the goods purchased on an ecommerce site. Payment methods include - credit card, debit card, bank account, and gift card. */
+        CustomerPaymentInstrument: {
+            /**
+             * @description The bank routing number.
+             * @example KDSJHKS
+             */
+            bankRoutingNumber?: string;
+            /**
+             * Format: date-time
+             * @description Returns the value of attribute 'creationDate'.
+             * @example 253402214400
+             */
+            creationDate?: string;
+            /**
+             * Format: date-time
+             * @description Returns the value of attribute 'lastModified'.
+             * @example 253402214400
+             */
+            lastModified?: string;
+            /**
+             * @description The masked gift certificate code.
+             * @example gift-code
+             */
+            maskedGiftCertificateCode?: string;
+            /** @description The payment card. */
+            paymentCard?: components["schemas"]["PaymentCard"];
+            /**
+             * @description The payment instrument ID.
+             * @example Personal
+             */
+            paymentInstrumentId?: string;
+            /**
+             * @description The payment method ID. Optional if a customer payment instrument ID is specified.
+             * @example Personal
+             */
+            paymentMethodId?: string;
+            /**
+             * @description The default payment instrument.
+             * @example true
+             */
+            default?: boolean;
+        };
+        CustomerPaymentMethodReference: {
+            /**
+             * @description The payment method type. It is read only.
+             * @example card
+             * @enum {string}
+             */
+            type?: "card" | "sepa_debit";
+            /**
+             * @description The gateway ID for the payment method. It is read only.
+             * @example pm_1234567890
+             */
+            id?: string;
+            /**
+             * @description The last four digits of the payment method number. It is read only.
+             * @example 4242
+             */
+            last4?: string;
+            /**
+             * @description Account identifier
+             * @example acct_1RegszI5I22eU0I3
+             */
+            accountId?: string;
+        };
+        /** @description Person or entity who shops on Commerce Cloud storefronts by creating a shopper account in Commerce Cloud. */
+        Customer: {
+            /** @description The customer's addresses. */
+            addresses?: components["schemas"]["CustomerAddress"][];
+            /**
+             * @description The customer's authorization type (indicates whether the customer is a guest or a registered customer).
+             * @example registered
+             * @enum {string}
+             */
+            authType?: "guest" | "registered";
+            /**
+             * Format: date
+             * @description The customer's birthday.
+             */
+            birthday?: string;
+            /**
+             * @description The customer's company name.
+             * @example Acme
+             */
+            companyName?: string;
+            /**
+             * @description The customer's core contact ID.
+             * @example 003xx000004WhKe
+             */
+            crmContactId?: string;
+            /**
+             * Format: date-time
+             * @description Returns the value of attribute 'creationDate'.
+             * @example 9999-12-31T00:00:00.0Z
+             */
+            creationDate?: string;
+            /** @description The shopper's current password. This is only used when attempting to update a shopper's `loginId` in a PATCH call. This value is never returned in any response for security reasons, but is validated and must match shopper's existing password in order to update `loginId`. Otherwise, an HTTP 400 statusCode is returned and the `loginId` is not updated. This field and functionality is available with B2C Commerce version 24.7. */
+            currentPassword?: string;
+            /**
+             * @description The customer's number (ID). Both registered and guest customers have an customer ID.
+             * @example dfuisydifu2342usyf
+             */
+            customerId?: string;
+            /**
+             * @description The customer's number (ID). Only a registered customer has a customer number.
+             * @example D0000123
+             */
+            customerNo?: string;
+            /**
+             * @description The customer's email address.
+             * @example johnsmith@email.com
+             */
+            email?: string;
+            /**
+             * @description Indicates whether the customer's email address has been verified. Only included for customers who registered after the "Enable Email Verification" site preference under "Storefront Login Preferences" was enabled. This is a read-only field. If included in a PATCH or Register customer request, it's ignored. This field is available with B2C Commerce version 26.6.
+             * @example true
+             */
+            readonly emailVerified?: boolean;
+            /**
+             * @description A flag indicating whether this customer is enabled and can log in.
+             * @example true
+             */
+            enabled?: boolean;
+            /**
+             * @description The customer's fax number. The length is restricted to 32 characters.
+             * @example 555-555-5555
+             */
+            fax?: string;
+            /**
+             * @description The customer's first name.
+             * @example John
+             */
+            firstName?: string;
+            /**
+             * Format: int32
+             * @description The customer's gender.
+             * @example 1
+             */
+            gender?: number;
+            /**
+             * @description Indicates whether the customer has a password set. A value of `false` means the customer was created via another method (for example, social login or passwordless flow). This is a read-only field. If included in a PATCH or Register customer request, it's ignored. This field is available with B2C Commerce version 26.6.
+             * @example true
+             */
+            readonly hasPassword?: boolean;
+            /**
+             * @description Represents the read-only hashed value for the `loginId` used for Einstein events. This field is available with B2C Commerce version 24.9.
+             * @example 123927deac310a3dae382897d9e458bd92ef1d4ea5cdd327a0fcffd8426dfbb5
+             */
+            hashedLogin?: string;
+            /**
+             * @description The customer's job title.
+             * @example Supervisor
+             */
+            jobTitle?: string;
+            /**
+             * Format: date-time
+             * @description The time when the customer last logged in.
+             * @example 9999-12-31T00:00:00.0Z
+             */
+            lastLoginTime?: string;
+            /**
+             * Format: date-time
+             * @description Returns the value of attribute 'lastModified'.
+             * @example 9999-12-31T00:00:00.0Z
+             */
+            lastModified?: string;
+            /**
+             * @description The customer's last name.
+             * @example Smith
+             */
+            lastName?: string;
+            /**
+             * Format: date-time
+             * @description The time when the customer last visited.
+             * @example 9999-12-31T00:00:00.0Z
+             */
+            lastVisitTime?: string;
+            /**
+             * @description The customer's login. In a PATCH call, this field can only be updated by providing a valid `currentPassword` for the shopper. The `loginId` update feature is available with B2C Commerce version 24.7, but is disabled by default. Contact Customer Support to enable this feature.
+             * @example jsmith
+             */
+            login?: string;
+            /**
+             * @description The customer's note.
+             * @example customer-note
+             */
+            note?: string;
+            /** @description The customer's payment instruments. */
+            paymentInstruments?: components["schemas"]["CustomerPaymentInstrument"][];
+            /** @description Payment method reference information for Salesforce Payments. */
+            paymentMethodReferences?: components["schemas"]["CustomerPaymentMethodReference"][];
+            /**
+             * @description The customer's business phone number.
+             * @example 555-555-5555
+             */
+            phoneBusiness?: string;
+            /**
+             * @description The customer's home phone number.
+             * @example 555-555-5555
+             */
+            phoneHome?: string;
+            /**
+             * @description The customer's mobile phone number.
+             * @example 555-555-5555
+             */
+            phoneMobile?: string;
+            /**
+             * @description The customer's preferred locale.
+             * @example us-en
+             */
+            preferredLocale?: string;
+            /**
+             * Format: date-time
+             * @description The time when the customer previously logged in.
+             * @example 9999-12-31T00:00:00.0Z
+             */
+            previousLoginTime?: string;
+            /**
+             * Format: date-time
+             * @description The time when the customer last visited the store.
+             * @example 9999-12-31T00:00:00.0Z
+             */
+            previousVisitTime?: string;
+            /**
+             * @description The salutation to use for the customer.
+             * @example Mr.
+             */
+            salutation?: string;
+            /**
+             * @description The customer's second name.
+             * @example Smith
+             */
+            secondName?: string;
+            /**
+             * @description The customer's suffix (for example, "Jr." or "Sr.").
+             * @example Jr.
+             */
+            suffix?: string;
+            /**
+             * @description The customer's title (for example, "Mrs" or "Mr").
+             * @example Mr.
+             */
+            title?: string;
+        };
+        /** @description Document representing the registration information for a customer. */
+        CustomerRegistration: {
+            /**
+             * @description The customer registration information. The mandatory properties for registration are login, last name and email.
+             * @example {
+             *       "email": "jsmith@test.com",
+             *       "last_name": "Smith",
+             *       "login": "jsmith"
+             *     }
+             */
+            customer: components["schemas"]["Customer"];
+            /**
+             * @description The login password
+             * @example Abcd!1234
+             */
+            password: string;
+        };
+        ErrorResponse: {
+            /**
+             * @description A short, human-readable summary of the problem
+             *     type.  It will not change from occurrence to occurrence of the
+             *     problem, except for purposes of localization
+             * @example You do not have enough credit
+             */
+            title: string;
+            /**
+             * @description A URI reference [RFC3986] that identifies the
+             *     problem type.  This specification encourages that, when
+             *     dereferenced, it provide human-readable documentation for the
+             *     problem type (e.g., using HTML [W3C.REC-html5-20141028]).  When
+             *     this member is not present, its value is assumed to be
+             *     "about:blank". It accepts relative URIs; this means
+             *     that they must be resolved relative to the document's base URI, as
+             *     per [RFC3986], Section 5.
+             * @example NotEnoughMoney
+             */
+            type: string;
+            /**
+             * @description A human-readable explanation specific to this occurrence of the problem.
+             * @example Your current balance is 30, but that costs 50
+             */
+            detail: string;
+            /**
+             * @description A URI reference that identifies the specific
+             *     occurrence of the problem.  It may or may not yield further
+             *     information if dereferenced.  It accepts relative URIs; this means
+             *     that they must be resolved relative to the document's base URI, as
+             *     per [RFC3986], Section 5.
+             * @example /account/12345/msgs/abc
+             */
+            instance?: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Document representing a reset password request. */
+        ResetPasswordRequest: {
+            /**
+             * @description Temporary token used to reset password.
+             * @example R1e2s3e4t5T6o7k8e9n0
+             */
+            resetToken: string;
+            /**
+             * @description The customer's login.
+             * @example loginId
+             */
+            login: string;
+            /**
+             * @description New password to reset to.
+             * @example p@ssword2
+             */
+            newPassword: string;
+        };
+        /** @description Document representing a reset password token request. */
+        ResetPasswordTokenRequest: {
+            /**
+             * @description The customer's login.
+             * @example loginId
+             */
+            login: string;
+        };
+        /** @description Document representing reset password token response. */
+        ResetPasswordToken: {
+            /**
+             * @description The customer's login.
+             * @example loginId
+             */
+            login: string;
+            /**
+             * @description The customer's email address.
+             * @example jdoe@customer.com
+             */
+            email: string;
+            /**
+             * @description Temporary token generated that will be used to reset password.
+             * @example R1e2s3e4t5T6o7k8e9n0
+             */
+            resetToken: string;
+            /**
+             * Format: int32
+             * @description Reset token expiry (in minutes).
+             * @example 30
+             */
+            expiresInMinutes: number;
+        };
+        /** @description Document representing the External Profile Request. */
+        CustomerExtProfileRequest: {
+            /**
+             * @description The authentication Provider Id
+             * @example Google
+             */
+            authenticationProviderId: string;
+            /**
+             * @description The Email of the customer.
+             * @example s@gmail.com
+             */
+            email?: string;
+            /**
+             * @description The ID of the customer.
+             * @example jsmith@gmail.com
+             */
+            externalId: string;
+            /**
+             * @description The First Name of the customer.
+             * @example John
+             */
+            firstName?: string;
+            /**
+             * @description The Last Name of the customer.
+             * @example Smith
+             */
+            lastName?: string;
+        };
+        /** @description The Document representing the External Profile of a Customer. */
+        CustomerExternalProfile: {
+            /**
+             * @description The Id of the Customer
+             * @example 1234
+             */
+            customerId: string;
+        } & components["schemas"]["CustomerExtProfileRequest"];
+        /**
+         * @description A two letter uppercase country code conforming to the [ISO 3166-1](https://www.iso.org/iso-3166-country-codes.html) alpha-2 standard.
+         * @example US
+         */
+        CountryCode: string;
+        /** @description Document representing an order address. */
+        OrderAddress: {
+            /**
+             * @description The first address line.
+             * @example 45 Main Rd.
+             */
+            address1?: string;
+            /**
+             * @description The second address line.
+             * @example Apartment 204
+             */
+            address2?: string;
+            /**
+             * @description The city.
+             * @example Boston
+             */
+            city?: string;
+            /**
+             * @description The company name.
+             * @example Salesforce
+             */
+            companyName?: string;
+            countryCode?: components["schemas"]["CountryCode"];
+            /**
+             * @description The first name.
+             * @example Max
+             */
+            firstName?: string;
+            /**
+             * @description The full name.
+             * @example Max Mustermann
+             */
+            fullName?: string;
+            /**
+             * @description The ID of the address.
+             * @example me
+             */
+            id?: string;
+            /**
+             * @description The job title.
+             * @example Software Engineer
+             */
+            jobTitle?: string;
+            /**
+             * @description The last name.
+             * @example Mustermann
+             */
+            lastName?: string;
+            /**
+             * @description The phone number.
+             * @example 6175555555
+             */
+            phone?: string;
+            /**
+             * @description The post office box.
+             * @example PO BOX 109
+             */
+            postBox?: string;
+            /**
+             * @description The postal code.
+             * @example 05408
+             */
+            postalCode?: string;
+            /**
+             * @description The salutation.
+             * @example Mr
+             */
+            salutation?: string;
+            /** @description The second name. */
+            secondName?: string;
+            /**
+             * @description The state code.
+             * @example MA
+             */
+            stateCode?: string;
+            /**
+             * @description The suffix.
+             * @example Sr
+             */
+            suffix?: string;
+            /**
+             * @description The suite.
+             * @example 24A
+             */
+            suite?: string;
+            /**
+             * @description The title.
+             * @example Dr.
+             */
+            title?: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /**
+         * @description The id (SKU) of the product.
+         * @example apple-ipod-classic
+         */
+        ProductId: string;
+        /** @description Document representing a link to the resource for product details. */
+        ProductDetailsLink: {
+            /**
+             * @description The description of the product.
+             * @example Nintendo DS revolutionizes handheld gameplay.
+             */
+            productDescription?: string;
+            productId: components["schemas"]["ProductId"];
+            /**
+             * @description The name of the product.
+             * @example Nintendo DS Game Console
+             */
+            productName?: string;
+            /**
+             * @description The link title.
+             * @example Nintendo DS Game Console
+             */
+            title?: string;
+        };
+        /** @description Document representing a bonus discount line item. */
+        BonusDiscountLineItem: {
+            /** @description The bonus products the customer can choose from. */
+            bonusProducts?: components["schemas"]["ProductDetailsLink"][];
+            /**
+             * @description The coupon code that triggered the promotion, if applicable.
+             * @example 5ties
+             */
+            couponCode?: string;
+            /**
+             * @description The ID of the line item. It is read only.
+             * @example 91f4dd8bfa0653d58b7783b04f
+             */
+            id?: string;
+            /**
+             * Format: int32
+             * @description The maximum number of bonus items the user can select for this promotion.
+             */
+            maxBonusItems?: number;
+            /**
+             * @description The ID of the promotion that triggered the creation of the line item.
+             * @example Buy1Get2
+             */
+            promotionId?: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /**
+         * @description The coupon item ID
+         * @example d4c9c0141e9c74c150225580f3
+         */
+        CouponItemId: string;
+        /** @description Document representing a coupon item. */
+        CouponItem: {
+            /**
+             * @description The coupon code.
+             * @example 5ties
+             */
+            code: string;
+            /** @description The coupon item ID. It is read only. */
+            couponItemId?: components["schemas"]["CouponItemId"];
+            /**
+             * @description The status of the coupon item. It is read only.
+             * @example no_applicable_promotion
+             * @enum {string}
+             */
+            statusCode?: "coupon_code_already_in_basket" | "coupon_code_already_redeemed" | "coupon_code_unknown" | "coupon_disabled" | "redemption_limit_exceeded" | "customer_redemption_limit_exceeded" | "timeframe_redemption_limit_exceeded" | "no_active_promotion" | "coupon_already_in_basket" | "no_applicable_promotion" | "applied" | "adhoc";
+            /**
+             * @description A flag indicating whether the coupon item is valid. A coupon line item is valid if
+             *     the status code is "applied" or "no_applicable_promotion". It is read only.
+             * @example true
+             */
+            valid?: boolean;
+        } & {
+            [key: string]: unknown;
+        };
+        /**
+         * @description A three letter uppercase currency code conforming to the [ISO 4217](https://www.iso.org/iso-4217-currency-codes.html) standard, or the string `N/A` indicating that a currency is not applicable.
+         * @example USD
+         */
+        CurrencyCode: string;
+        /** @description The customer information for guest or logged-in customers. */
+        CustomerInfo: {
+            /**
+             * @description The customer ID. It is read only.
+             * @example abMKqMaNYOBMnNdDNzyC5oNTi5
+             */
+            customerId?: string;
+            /**
+             * @description The customer name.
+             * @example Max Mustermann
+             */
+            customerName?: string;
+            /**
+             * @description The customer number.
+             * @example 0002352
+             */
+            customerNo?: string;
+            /**
+             * @description The customer's email address.
+             * @example no-reply@salesforce.com
+             */
+            email: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** @example 629dea6e7b61e58da629b57b21 */
+        GiftCertificateItemId: string;
+        /** @description A gift certificate item. */
+        GiftCertificateItem: {
+            /**
+             * Format: double
+             * @description The gift certificate item amount.
+             * @example 20
+             */
+            amount: number;
+            /** @description The item ID. It is read only. */
+            giftCertificateItemId?: components["schemas"]["GiftCertificateItemId"];
+            /**
+             * @description The gift certificate message.
+             * @example Birthday present.
+             */
+            message?: string;
+            /**
+             * @description The recipient email.
+             * @example no-reply@salesforce.com
+             */
+            recipientEmail: string;
+            /**
+             * @description The recipient's name.
+             * @example Daniel Mustermann
+             */
+            recipientName?: string;
+            /**
+             * @description The sender's name.
+             * @example Max Mustermann
+             */
+            senderName?: string;
+            /**
+             * @description The ID of the shipment this item belongs to.
+             * @example me
+             */
+            shipmentId?: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Document representing the grouped tax item. */
+        GroupedTaxItem: {
+            /**
+             * Format: double
+             * @description The tax rate. It is read only.
+             * @example 0.1
+             */
+            taxRate?: number;
+            /**
+             * Format: double
+             * @description The summed up tax total for the tax rate. It is read only.
+             * @example 10.03
+             */
+            taxValue?: number;
+        };
+        /** @description Document representing a discount. */
+        Discount: {
+            /**
+             * Format: double
+             * @description The discount amount for discount types that define specific discount amounts. It is read only.
+             * @example 130.88
+             */
+            amount?: number;
+            /**
+             * Format: double
+             * @description The discount percent for discount types that define percentage discounts. It is read only.
+             * @example 0.19
+             */
+            percentage?: number;
+            /**
+             * @description The price book ID that is used with some types. It is read only.
+             * @example usd-sale-prices
+             */
+            priceBookId?: string;
+            /**
+             * @description The type of discount. It is read only.
+             * @example fixed_price
+             * @enum {string}
+             */
+            type: "percentage" | "fixed_price" | "amount" | "free" | "price_book_price" | "bonus" | "total_fixed_price" | "bonus_choice" | "percentage_off_options";
+        } & {
+            [key: string]: unknown;
+        };
+        /** @example ba248424e3eee797f062161f8b */
+        PriceAdjustmentId: string;
+        /**
+         * @description Document representing a price adjustment within a basket or order. Price adjustments
+         *     can be assigned at the order, product, or shipping level.
+         */
+        PriceAdjustment: {
+            /**
+             * @description Details describing the discount this price adjustment is based on. For adjustments
+             *     not based on a discount, this value is null.
+             */
+            appliedDiscount?: components["schemas"]["Discount"];
+            /**
+             * @description The coupon code of the coupon this price adjustment is based on. For adjustments
+             *     not based on a coupon, this value is null. It is read only.
+             * @example 5ties
+             */
+            couponCode?: string;
+            /**
+             * @description The user who created the price adjustment. It is read only.
+             * @example Support
+             */
+            createdBy?: string;
+            /**
+             * Format: date-time
+             * @description The timestamp when the price adjustment was created. It is read only.
+             * @example 2015-05-19T15:23:18.000Z
+             */
+            creationDate?: string;
+            /**
+             * @description A flag indicating whether this price adjustment was created by custom logic. This
+             *     flag is set to true unless the price adjustment was created by the promotion
+             *     engine.
+             * @example true
+             */
+            custom?: boolean;
+            /** @description The text describing the item. */
+            itemText?: string;
+            /**
+             * Format: date-time
+             * @description The timestamp when the price adjustment was last modified. It is read only.
+             * @example 2021-02-25T09:58:08.715Z
+             */
+            lastModified?: string;
+            /**
+             * @description A flag indicating whether this price adjustment was created by a manual process.
+             *     If the price adjustment was created by the promotion engine, this value is always
+             *     false.
+             * @example true
+             */
+            manual?: boolean;
+            /**
+             * Format: double
+             * @description The adjustment price. It is read only.
+             * @example 120.88
+             */
+            price?: number;
+            /** @description The price adjustment ID. It is read only. */
+            priceAdjustmentId?: components["schemas"]["PriceAdjustmentId"];
+            /**
+             * @description The ID of the related promotion. Custom price adjustments
+             *     can be assigned any promotion ID so long it is not
+             *     used by a price adjustment belonging to the same item,
+             *     and is not used by a promotion defined in the promotion engine.
+             *     If not specified, a promotion ID is generated.
+             */
+            promotionId?: string;
+            /** @description The reason for the price adjustment. */
+            reasonCode?: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Document representing an object status. */
+        Status: {
+            /** @description The status code. */
+            code?: string;
+            /** @description The status message. */
+            message?: string;
+            /**
+             * Format: int32
+             * @description The status.
+             *     For more information on the status values see Status.OK and Status.ERROR.
+             */
+            status?: number;
+        };
+        /** @description Document representing a gift card response. */
+        GiftCardResponse: {
+            /**
+             * @description The gift card brand.
+             * @example givex
+             */
+            brand?: string;
+            /**
+             * @description The masked gift card number.
+             * @example *********4422
+             */
+            maskedCardNumber?: string;
+            /**
+             * Format: int32
+             * @description The month when the gift card expires.
+             * @example 1
+             */
+            expirationMonth?: number;
+            /**
+             * Format: int32
+             * @description The year when the gift card expires.
+             * @example 2030
+             */
+            expirationYear?: number;
+        };
+        /**
+         * @description The payment instrument ID
+         * @example ba248424e3eee797f062162f8b
+         */
+        PaymentInstrumentId: string;
+        /** @description Document representing an order payment instrument. */
+        OrderPaymentInstrument: {
+            /**
+             * Format: double
+             * @description The payment transaction amount.
+             * @example 130.88
+             */
+            amount?: number;
+            /** @description The authorization status of the payment transaction. It is read only. */
+            authorizationStatus?: components["schemas"]["Status"];
+            /**
+             * @description The bank routing number.
+             * @example 12030000
+             */
+            bankRoutingNumber?: string;
+            /**
+             * @description The gift certificate code with the last 4 characters not masked.
+             * @example ******Gzzy
+             */
+            maskedGiftCertificateCode?: string;
+            /** @description The payment card. */
+            paymentCard?: components["schemas"]["PaymentCard"];
+            /** @description The gift card. */
+            giftCard?: components["schemas"]["GiftCardResponse"];
+            /** @description The payment instrument ID. It is read only. */
+            paymentInstrumentId?: components["schemas"]["PaymentInstrumentId"];
+            /**
+             * @description The payment method ID. It is read only.
+             * @example CREDIT_CARD
+             */
+            paymentMethodId?: string;
+            /** @description Payment reference information for various payment service providers, only when Salesforce Payments is enabled. */
+            paymentReference?: {
+                /**
+                 * @description Payment reference identifier. Can be payment intent ID for Stripe, PSP reference for Adyen, PayPal order ID for PayPal, or similar identifier for other payment providers.
+                 * @example pi_3N4B2vF0wDjebNCp1234567
+                 */
+                paymentReferenceId?: string;
+                /**
+                 * @description The payment gateway used to process the payment.
+                 * @example stripe
+                 * @enum {string}
+                 */
+                gateway?: "stripe" | "paypal" | "adyen";
+                /** @description The payment gateway specific properties. */
+                gatewayProperties?: {
+                    /**
+                     * @description # Stripe specific properties.
+                     *
+                     *     - setupFutureUsage: Indicates that you intend to make future payments with this payment method.
+                     *       - **on_session**: The payment method is intended to be used for a future payment on the same website session.
+                     *       - **off_session**: The payment method is intended to be used for a future payment on a different website session.
+                     *      - **null**: The payment method is not intended to be used for a future payment.
+                     *     - clientSecret: Secret for Stripe client-side payment confirmation. Don't store, log, or expose the client secret to anyone other than the customer, and only use it on pages where TLS is enabled.
+                     *       - type: string
+                     *       - maxLength: 256
+                     *       - example: "pi_1J4K5L2eZvKYlo2CyZ8K5L6M_secret_abc123"
+                     */
+                    stripe?: {
+                        [key: string]: unknown;
+                    };
+                    /** @description # PayPal specific properties. */
+                    paypal?: {
+                        [key: string]: unknown;
+                    };
+                    /**
+                     * @description # Adyen specific properties.
+                     *
+                     *     - adyenError: Error information returned by Adyen if the payment fails. Null on success.
+                     *     - adyenPaymentIntent: The Adyen payment intent object containing payment details and required actions.
+                     *       - resultCode: The result of the payment request (for example, "REDIRECT_SHOPPER", "AUTHORISED", "PENDING", "REFUSED").
+                     *       - accountID: The Adyen merchant account ID.
+                     *       - adyenPaymentIntentAction: The action object for payment methods requiring additional shopper interaction.
+                     *         - url: The URL for completing the payment (redirect or 3DS authentication).
+                     *         - type: The action type (for example, "redirect", "threeDS2", "voucher").
+                     *         - method: The HTTP method for the action (for example, "GET", "POST").
+                     *     - successful: A boolean indicating whether the Adyen operation is successful.
+                     */
+                    adyen?: {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+        /** @description Document representing a product item. */
+        ProductItem: {
+            /**
+             * Format: double
+             * @description The tax on the line item, including any adjustments. It is read only.
+             * @example 19
+             */
+            adjustedTax?: number;
+            /**
+             * Format: double
+             * @description The base price of the line item, which is the unit price not including
+             *     adjustments. If the taxation policy is net, it doesn't include tax. If the
+             *     taxation policy is gross, it includes tax. It is read only.
+             * @example 130
+             */
+            basePrice?: number;
+            /** @description The ID of the bonus discount line item this bonus product relates to. It is read only. */
+            bonusDiscountLineItemId?: string;
+            /**
+             * @description A flag indicating whether the product item is a bonus.
+             * @example true
+             */
+            bonusProductLineItem?: boolean;
+            /** @description The bundled product items. */
+            bundledProductItems?: components["schemas"]["ProductItem"][];
+            /**
+             * @description Returns true if the item is a gift. It is read only.
+             * @example true
+             */
+            gift?: boolean;
+            /**
+             * @description The gift message.
+             * @example Happy Birthday
+             */
+            giftMessage?: string;
+            /**
+             * @description The inventory list ID associated with this item.
+             * @example inventory
+             */
+            inventoryId?: string;
+            /**
+             * @description The product item ID. Use it to identify this item when updating its quantity or
+             *     creating a custom price adjustment for it. It is read only.
+             */
+            itemId?: components["schemas"]["ItemId"];
+            /** @description The text describing the item. */
+            itemText?: string;
+            /** @description The option items. */
+            optionItems?: components["schemas"]["OptionItem"][];
+            /**
+             * Format: double
+             * @description The price of the line item before applying any adjustments. If the line item is based on net pricing
+             *     then the net price is returned. If the line item is based on gross
+             *     pricing then the gross price is returned. It is read only.
+             */
+            price?: number;
+            /** @description The price adjustments. */
+            priceAdjustments?: components["schemas"]["PriceAdjustment"][];
+            /**
+             * Format: double
+             * @description The price of the product line item including item-level adjustments, but not
+             *     including order-level adjustments or shipping charges. If the taxation policy is
+             *     net, it doesn't include tax. If the taxation policy is gross, it includes tax. It is read only.
+             * @example 20.99
+             */
+            priceAfterItemDiscount?: number;
+            /**
+             * Format: double
+             * @description The price of the product line item including item-level adjustments and prorated
+             *     order-level adjustments, but not including shipping charges. If the taxation
+             *     policy is net, it doesn't include tax. If the taxation policy is gross, it
+             *     includes tax. It is read only.
+             * @example 15.5
+             */
+            priceAfterOrderDiscount?: number;
+            /**
+             * @description The ID of the product.
+             * @example nintendo-ds-console
+             */
+            productId?: string;
+            /**
+             * @description If this product line item was added from a product list, this value is a reference
+             *     to the corresponding product list item.
+             */
+            productListItem?: components["schemas"]["ProductListItemReference"];
+            /**
+             * @description The name of the product.
+             * @example Nintendo DS Game Console
+             */
+            productName?: string;
+            /**
+             * @description Returns the id of the ProductLineItem that qualified the basket for this bonus product.
+             *     This method is only applicable if the product line item is a bonus product line item, and if the promotion is a
+             *     product promotion with number of qualifying products granting a bonus-product discount. If these conditions
+             *     aren't met, the method returns null. If there are multiple product line items that triggered this bonus product,
+             *     this method returns the last one by position within the order.
+             */
+            qualifyingProductItemId?: string;
+            /**
+             * Format: double
+             * @description The quantity of the products represented by this item.
+             * @example 1
+             */
+            quantity?: number;
+            /**
+             * @description The ID of the shipment this item belongs to.
+             * @example me
+             */
+            shipmentId?: string;
+            /**
+             * @description If the product line item has a related shipping item, this value is its ID. A
+             *     related shipping item represents a surcharge applied to individual products using
+             *     a particular shipping method. It is read only.
+             * @example 006490dcc338feeafc71c964bf
+             */
+            shippingItemId?: string;
+            /**
+             * Format: double
+             * @description The tax for the product item, not including price adjustments. It is read only.
+             * @example 0.3
+             */
+            tax?: number;
+            /**
+             * Format: double
+             * @description The price used to calculate the tax for this product item. It is read only.
+             * @example 30
+             */
+            taxBasis?: number;
+            /**
+             * @description The tax class ID for the product item, or null
+             *     if no tax class ID is associated with the product item. It is read only.
+             */
+            taxClassId?: string;
+            /**
+             * Format: double
+             * @description The tax rate, which is the decimal tax rate to be applied
+             *     to the product represented by this item. It is read only.
+             * @example 0.9
+             */
+            taxRate?: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /**
+         * @description The item id.
+         * @example 430ef5aad3a24de59378458434
+         */
+        ItemId: string;
+        /**
+         * @description An option item represents an optional purchase related to a product item, and is always associated with that parent product
+         *     item. An option item can have different values from which to select. For example, a refrigerator item can have an option item representing an extended warranty, with a set of option item values representing different warranty lengths. When a shopper purchases the warranty option item together with the parent refrigerator item, they select one of the available warranty option item values.
+         */
+        OptionItem: {
+            /**
+             * Format: double
+             * @description The tax on the line item, including any adjustments. It is read only.
+             * @example 19
+             */
+            adjustedTax?: number;
+            /**
+             * Format: double
+             * @description The base price of the line item, which is the unit price not including adjustments.
+             *     If the taxation policy is net, it doesn't include tax. If the taxation policy is gross, it includes tax. It is read only.
+             * @example 50
+             */
+            basePrice?: number;
+            /**
+             * @description The ID of the bonus discount line item this bonus product relates to. It is read only.
+             * @example ba248414e3eee797f062162f8b
+             */
+            bonusDiscountLineItemId?: string;
+            /**
+             * @description A flag indicating whether the product item is a bonus. It is read only.
+             * @example false
+             */
+            bonusProductLineItem?: boolean;
+            /** @description The bundled product items. */
+            bundledProductItems?: components["schemas"]["ProductItem"][];
+            /**
+             * @description Returns true if the item is a gift. It is read only.
+             * @example false
+             */
+            gift?: boolean;
+            /**
+             * @description The gift message.
+             * @example Happy Birthday
+             */
+            giftMessage?: string;
+            /**
+             * @description The inventory list ID associated with this item. It is read only.
+             * @example inventory
+             */
+            inventoryId?: string;
+            /** @description The product item ID. Use it to identify this item when updating its quantity or creating a custom price adjustment for it. It is read only. */
+            itemId?: components["schemas"]["ItemId"];
+            /**
+             * @description The text describing the item.
+             * @example The item text.
+             */
+            itemText?: string;
+            /**
+             * @description The ID of the option. It is read only.
+             * @example consoleWarranty
+             */
+            optionId: string;
+            /** @description The option items. */
+            optionItems?: components["schemas"]["OptionItem"][];
+            /**
+             * @description The ID of the option value. It is read only.
+             * @example 000
+             */
+            optionValueId: string;
+            /**
+             * Format: double
+             * @description The price of the line item before applying any adjustments. If the taxation policy is net, it doesn't include tax.
+             *     If the taxation policy is gross, it includes tax. It is read only.
+             * @example 150.99
+             */
+            price?: number;
+            /** @description The price adjustments. */
+            priceAdjustments?: components["schemas"]["PriceAdjustment"][];
+            /**
+             * Format: double
+             * @description The price of the product line item including item-level adjustments, but not including order-level adjustments or
+             *     shipping charges. If the taxation policy is net, it doesn't include tax. If the taxation policy is gross, it includes tax. It is read only.
+             * @example 50.99
+             */
+            priceAfterItemDiscount?: number;
+            /**
+             * Format: double
+             * @description The price of the product line item including item-level adjustments and prorated order-level adjustments, but not
+             *     including shipping charges. If the taxation policy is net, it doesn't include tax. If the taxation policy is gross, it
+             *     includes tax. It is read only.
+             * @example 40.5
+             */
+            priceAfterOrderDiscount?: number;
+            productId?: components["schemas"]["ProductId"];
+            /** @description If this product line item was added from a product list, this value is a reference to the corresponding product list item. */
+            productListItem?: components["schemas"]["ProductListItemReference"];
+            /**
+             * @description The name of the product.
+             * @example Nintendo DS Game Console
+             */
+            productName?: string;
+            /**
+             * Format: double
+             * @description The ordered quantity of the products represented by this item.
+             * @example 1
+             */
+            quantity?: number;
+            /**
+             * @description The ID of the shipment this item belongs to.
+             * @example me
+             */
+            shipmentId?: string;
+            /**
+             * @description If the product line item has a related shipping item, this value is its ID. A related shipping item represents a
+             *     surcharge applied to individual products using a particular shipping method. It is read only.
+             * @example 006490dcc338feeafc71c964bf
+             */
+            shippingItemId?: string;
+            /**
+             * Format: double
+             * @description The tax on the line item before applying any adjustments. It is read only.
+             * @example 0
+             */
+            tax?: number;
+            /**
+             * Format: double
+             * @description The amount used to calculate the tax for this item. It is read only.
+             * @example 50
+             */
+            taxBasis?: number;
+            /**
+             * @description The tax class ID for the product item, or null
+             *     if no tax class ID is associated with the product item. It is read only.
+             */
+            taxClassId?: string;
+            /**
+             * Format: double
+             * @description The tax rate, which is the decimal tax rate to be applied
+             *     to the product represented by this item. It is read only.
+             * @example 0.19
+             */
+            taxRate?: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Document representing a link to a product list. */
+        ProductListLink: {
+            /** @description The description of this product list. */
+            description?: string;
+            /** @description The name of this product list. */
+            name?: string;
+            /**
+             * @description A flag indicating whether the owner made this product list available for access
+             *     by other customers. It is read only.
+             * @example true
+             */
+            public?: boolean;
+            /** @description The link title. */
+            title?: string;
+            /**
+             * @description The type of the product list.
+             * @example shopping_list
+             * @enum {string}
+             */
+            type?: "wish_list" | "gift_registry" | "shopping_list" | "custom_1" | "custom_2" | "custom_3";
+        };
+        /** @description Document representing product list item details. */
+        ProductListItemReference: {
+            /** @description The ID of the product list item. It is read only. */
+            id: components["schemas"]["ItemId"];
+            /**
+             * Format: int32
+             * @description The priority of the product list item.
+             * @example 1
+             */
+            priority?: number;
+            productDetailsLink?: components["schemas"]["ProductDetailsLink"];
+            /** @description A reference to the associated product list. It is read only. */
+            productList?: components["schemas"]["ProductListLink"];
+            /** @example false */
+            public?: boolean;
+            /**
+             * Format: double
+             * @description The total quantity of this item purchased from the product list.
+             * @example 0
+             */
+            purchasedQuantity?: number;
+            /**
+             * Format: double
+             * @description The number of products or gift certificates that get shipped when purchasing this product list item.
+             * @example 1
+             */
+            quantity?: number;
+            /**
+             * @description Specifies whether the item is a product or a gift certificate.
+             * @example product
+             * @enum {string}
+             */
+            type?: "product" | "gift_certificate";
+        };
+        /** @description Document representing a basket product item. */
+        BasketProductItem: components["schemas"]["ProductItem"];
+        /**
+         * @description The identifier of the shipment
+         * @example me
+         */
+        ShipmentId: string;
+        /** @description Document representing a shipping promotion. */
+        ShippingPromotion: {
+            /**
+             * @description The localized callout message of the promotion.
+             * @example $30 Fixed Shipping Amount Above 150
+             */
+            calloutMsg?: string;
+            /**
+             * @description The unique ID of the promotion.
+             * @example $30FixedShippingAmountAbove150
+             */
+            promotionId?: string;
+            /**
+             * @description The localized promotion name.
+             * @example $30 Fixed Shipping Amount Above 150
+             */
+            promotionName?: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Document representing a shipping method. */
+        ShippingMethod: {
+            /**
+             * @description The localized description of the shipping method.
+             * @example Order received within 7-10 business days
+             */
+            description?: string;
+            /** @description The external shipping method. */
+            externalShippingMethod?: string;
+            /**
+             * @description The shipping method ID.
+             * @example 001
+             */
+            id: string;
+            /**
+             * @description The localized name of the shipping method.
+             * @example Ground
+             */
+            name?: string;
+            /**
+             * Format: double
+             * @description The shipping cost total, including shipment level costs,
+             *     product level fix, and surcharge costs. It is read only.
+             * @example 15
+             */
+            price?: number;
+            /**
+             * @description The array of active customer shipping promotions for this shipping
+             *     method. This array can be empty.
+             */
+            shippingPromotions?: components["schemas"]["ShippingPromotion"][];
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Document representing a shipment. */
+        Shipment: {
+            /**
+             * Format: double
+             * @description The total tax on products in the shipment, including item-level price adjustments but not including
+             *     service charges such as shipping. If the Discount Taxation preference is set to Tax Products and
+             *     Shipping Only Based on Adjusted Price, this amount also includes prorated order-level price adjustments. It is read only.
+             * @example 4.95
+             */
+            adjustedMerchandizeTotalTax?: number;
+            /**
+             * Format: double
+             * @description The total tax on shipping charges in the shipment, including shipping price adjustments. It is read only.
+             * @example 0.3
+             */
+            adjustedShippingTotalTax?: number;
+            /**
+             * @description A flag indicating whether the shipment is a gift. It is read only.
+             * @example true
+             */
+            gift?: boolean;
+            /**
+             * @description The gift message.
+             * @example Happy Birthday
+             */
+            giftMessage?: string;
+            /**
+             * Format: double
+             * @description The total tax on products in the shipment, not including price adjustments or service charges such as
+             *     shipping. It is read only.
+             * @example 4.95
+             */
+            merchandizeTotalTax?: number;
+            /**
+             * Format: double
+             * @description The total price of all products in the shipment, including item-level adjustments, but not including
+             *     order-level adjustments or shipping charges. If the taxation policy is net, it doesn't include tax. If
+             *     the taxation policy is gross, it includes tax. It is read only.
+             * @example 99
+             */
+            productSubTotal?: number;
+            /**
+             * Format: double
+             * @description The total price of all products in the shipment including item-level adjustments and prorated
+             *     order-level adjustments, but not including shipping charges. If the taxation policy is net, it doesn't
+             *     include tax. If the taxation policy is gross, it includes tax. It is read only.
+             * @example 99
+             */
+            productTotal?: number;
+            /**
+             * @description The order-specific ID of the shipment. The default value is 'me'.
+             * @default me
+             */
+            shipmentId: components["schemas"]["ShipmentId"];
+            /** @description The shipment number of this shipment. This number is automatically generated. It is read only. */
+            shipmentNo?: string;
+            /**
+             * Format: double
+             * @description The total price of all products in the shipment including item-level adjustments, shipping charges,
+             *     and tax. It is read only.
+             * @example 39.99
+             */
+            shipmentTotal?: number;
+            /** @description The shipping address. */
+            shippingAddress?: components["schemas"]["OrderAddress"];
+            shippingMethod?: components["schemas"]["ShippingMethod"];
+            /**
+             * @description The shipping status of the shipment.
+             * @example shipped
+             * @enum {string}
+             */
+            shippingStatus?: "not_shipped" | "shipped";
+            /**
+             * Format: double
+             * @description The total price of all shipping charges in the shipment, including shipping adjustments. If the
+             *     taxation policy is net, it doesn't include tax. If the taxation policy is gross, it includes tax. It is read only.
+             * @example 5.99
+             */
+            shippingTotal?: number;
+            /**
+             * Format: double
+             * @description The total tax on shipping charges in the shipment, not including shipping price adjustments. It is read only.
+             * @example 0.3
+             */
+            shippingTotalTax?: number;
+            /**
+             * Format: double
+             * @description The total tax on the shipment, including item-level price adjustments and service charges such as
+             *     shipping. If the Discount Taxation preference is set to Tax Products and Shipping Only Based on
+             *     Adjusted Price, this amount also includes prorated order-level price adjustments. It is read only.
+             * @example 1.8
+             */
+            taxTotal?: number;
+            /**
+             * @description The tracking number of the shipment.
+             * @example 1Z204E380338943508
+             */
+            trackingNumber?: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Document representing a shipping item. */
+        ShippingItem: {
+            /**
+             * Format: double
+             * @description The tax for the shipping item, including price adjustments. It is read only.
+             * @example 19
+             */
+            adjustedTax?: number;
+            /**
+             * Format: double
+             * @description The base price of the shipping item, which is the unit price not including adjustments.
+             *     If the taxation policy is net, it doesn't include tax. If the taxation policy is gross, it includes tax. It is read only.
+             * @example 50
+             */
+            basePrice?: number;
+            /**
+             * @description The shipping item ID. Use it to identify this shipping item when updating its quantity or creating a
+             *     custom price adjustment for it. It is read only.
+             * @example 430ef5aad3a24de59378458434
+             */
+            itemId?: string;
+            /**
+             * @description The text describing the shipping item.
+             * @example Shipping
+             */
+            itemText?: string;
+            /**
+             * Format: double
+             * @description The price of the line item before applying any adjustments. If the line item is based on net pricing
+             *     then the net price is returned. If the line item is based on gross
+             *     pricing then the gross price is returned. It is read only.
+             */
+            price?: number;
+            /** @description The price adjustments. */
+            priceAdjustments?: components["schemas"]["PriceAdjustment"][];
+            /**
+             * Format: double
+             * @description The price of the shipping item including item-level adjustments, but not including order-level
+             *     adjustments or shipping charges. If the taxation policy is net, it doesn't include tax.
+             *     If the taxation policy is gross, it includes tax. It is read only.
+             */
+            priceAfterItemDiscount?: number;
+            /** @description The identifier of the shipment to which this item belongs. */
+            shipmentId?: components["schemas"]["ShipmentId"];
+            /**
+             * Format: double
+             * @description The tax on the product item, not including adjustments. It is read only.
+             * @example 0.19
+             */
+            tax?: number;
+            /**
+             * Format: double
+             * @description The price used to calculate the tax for this shipping item. It is read only.
+             */
+            taxBasis?: number;
+            /**
+             * @description The tax class ID for the product item, or null
+             *     if no tax class ID is associated with the product item. It is read only.
+             */
+            taxClassId?: string;
+            /**
+             * Format: double
+             * @description The tax rate applicable to this product line item. For a 10% tax rate, the value is 0.1. It is read only.
+             */
+            taxRate?: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Document representing a basket. */
+        Basket: {
+            /**
+             * Format: double
+             * @description The total tax on products in the shipment, including item-level price adjustments but not
+             *     including service charges such as shipping. If the Discount Taxation preference is set to Tax
+             *     Products and Shipping Only Based on Adjusted Price, this amount also includes prorated
+             *     order-level price adjustments. It is read only.
+             * @example 4.95
+             */
+            adjustedMerchandizeTotalTax?: number;
+            /**
+             * Format: double
+             * @description The total tax on shipping charges in the shipment, including shipping price adjustments. It is read only.
+             * @example 0.3
+             */
+            adjustedShippingTotalTax?: number;
+            /**
+             * @description Is the basket created by an agent? It is read only.
+             * @example true
+             */
+            agentBasket?: boolean;
+            /**
+             * @description The unique identifier for the basket. It is read only.
+             * @example e78aa5646a8efebdd9cdd38be7
+             */
+            basketId?: string;
+            /** @description The billing address. */
+            billingAddress?: components["schemas"]["OrderAddress"];
+            /** @description The bonus discount line items. */
+            bonusDiscountLineItems?: components["schemas"]["BonusDiscountLineItem"][];
+            /**
+             * @description The sales channel. It is read only.
+             * @example storefront
+             * @enum {string}
+             */
+            channelType?: "storefront" | "callcenter" | "marketplace" | "dss" | "store" | "pinterest" | "twitter" | "facebookads" | "subscriptions" | "onlinereservation" | "customerservicecenter" | "instagramcommerce" | "tiktok" | "snapchat" | "google" | "whatsapp" | "youtube";
+            /** @description The coupon items. */
+            couponItems?: components["schemas"]["CouponItem"][];
+            /**
+             * Format: date-time
+             * @description The timestamp when the basket was created. It is read only.
+             * @example 2015-05-19T15:23:18.000Z
+             */
+            creationDate?: string;
+            currency?: components["schemas"]["CurrencyCode"];
+            /** @description The customer information, if the customer is logged in. */
+            customerInfo?: components["schemas"]["CustomerInfo"];
+            /** @description The gift certificate line items. */
+            giftCertificateItems?: components["schemas"]["GiftCertificateItem"][];
+            /**
+             * @description Tax values that are grouped and summed based on the tax rate. The tax totals of the line items with the same
+             *     tax rate are grouped together and summed up. This does not affect the calculation in any way. It is read only.
+             */
+            groupedTaxItems?: components["schemas"]["GroupedTaxItem"][];
+            /**
+             * Format: date-time
+             * @description The expiration datetime of the inventory reservation. It is read only.
+             * @example 2015-05-19T15:30:18.000Z
+             */
+            inventoryReservationExpiry?: string;
+            /**
+             * Format: date-time
+             * @description The timestamp when the basket was last modified. It is read only.
+             * @example 2015-05-19T15:25:18.000Z
+             */
+            lastModified?: string;
+            /**
+             * Format: double
+             * @description The total products tax in the purchase currency.
+             *     Merchandise total price represents the sum of the product prices before
+             *     services (such as shipping) or adjustments from promotions have
+             *     been added. It is read only.
+             * @example 4.95
+             */
+            merchandizeTotalTax?: number;
+            /** @description The order-level price adjustments. */
+            orderPriceAdjustments?: components["schemas"]["PriceAdjustment"][];
+            /**
+             * Format: double
+             * @description The total price, including products, shipping and tax. It is read only.
+             * @example 110.24
+             */
+            orderTotal?: number;
+            /** @description The payment instruments list. */
+            paymentInstruments?: components["schemas"]["OrderPaymentInstrument"][];
+            /** @description The product items. */
+            productItems?: components["schemas"]["BasketProductItem"][];
+            /**
+             * Format: double
+             * @description The total price of all products including item-level adjustments, but not including order-level adjustments or shipping
+             *     charges. If the taxation policy is net, it doesn't include tax. If the taxation policy is gross, it includes tax. It is read only.
+             * @example 99
+             */
+            productSubTotal?: number;
+            /**
+             * Format: double
+             * @description The total price of all products including adjustments, but not including shipping charges. If the taxation policy is net,
+             *     it doesn't include tax. If the taxation policy is gross, it includes tax. It is read only.
+             * @example 88
+             */
+            productTotal?: number;
+            /** @description The shipments. */
+            shipments?: components["schemas"]["Shipment"][];
+            /** @description The shipping items. */
+            shippingItems?: components["schemas"]["ShippingItem"][];
+            /**
+             * Format: double
+             * @description The total price of all shipping charges, including shipping adjustments. If the taxation policy is net, it doesn't
+             *     include tax. If the taxation policy is gross, it includes tax. It is read only.
+             * @example 5.99
+             */
+            shippingTotal?: number;
+            /**
+             * Format: double
+             * @description The total tax on all shipping charges, not including shipping adjustments. It is read only.
+             * @example 0.3
+             */
+            shippingTotalTax?: number;
+            /**
+             * @description The source code assigned to the basket. It is read only.
+             * @example OUTDOOR1
+             */
+            sourceCode?: string;
+            /**
+             * Format: double
+             * @description The total tax amount. It is read only.
+             * @example 5.25
+             */
+            taxTotal?: number;
+            /**
+             * @description The taxation policy (gross or net). It is read only.
+             * @example net
+             * @enum {string}
+             */
+            taxation?: "gross" | "net";
+            /**
+             * @description If the tax is rounded at the group level, this is set to true. If the tax is rounded at the item or unit level, it is set to false.
+             * @example true
+             */
+            taxRoundedAtGroup?: boolean;
+            /**
+             * @description If the created basket is a temporary basket, this is set to true. Otherwise, it is set to false.
+             * @example true
+             */
+            temporaryBasket?: boolean;
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Result document containing an array of baskets. */
+        BasketsResult: {
+            /** @description The list of baskets for a customer. */
+            baskets?: (components["schemas"]["Basket"] & unknown)[];
+            /**
+             * Format: int32
+             * @description The total number of baskets.
+             * @example 10
+             */
+            total: number;
+        };
+        /**
+         * Format: int32
+         * @description The total number of hits that match the search's criteria. This can be greater than the number of results returned as search results are pagenated.
+         * @default 0
+         * @example 10
+         */
+        Total: number;
+        /**
+         * @description Schema defining generic list result. Each response schema of a resource requiring a list response should extend this schema.
+         *     Additionally it needs to be defined what data is returned.
+         */
+        ResultBase: {
+            /**
+             * Format: int32
+             * @description Maximum records to retrieve per request. The limit with its constraints (minimum, maximum, default) is defined by the request parameter `limit` of the endpoint returning this schema.
+             * @example 10
+             */
+            limit: number;
+            total: components["schemas"]["Total"];
+        };
+        /**
+         * Format: int32
+         * @description The zero-based index of the first hit/data to include in the result.
+         * @default 0
+         * @example 0
+         */
+        Offset: number;
+        /**
+         * @description Schema defining generic pageable result. Each response schema of a resource requiring pagination should extend this schema.
+         *     If you use this extend this schema directly, it needs to be defined what data is returned. Allowed names for the data field is `data`.
+         */
+        PaginatedResultBase: {
+            offset: components["schemas"]["Offset"];
+        } & WithRequired<components["schemas"]["ResultBase"], "limit" | "total">;
+        /**
+         * @description The order number
+         * @example 00000410
+         */
+        OrderNo: string;
+        /**
+         * @description Additional information retrieved from Order Management (OMS)
+         *     See https://developer.salesforce.com/docs/atlas.en-us.order_management_developer_guide.meta/order_management_developer_guide/sforce_api_objects_orderitemsummary.htm for more information.
+         *     Only available in context of an order.
+         */
+        OmsProductData: {
+            /**
+             * @description Order Management (OMS) status
+             * @example ordered
+             * @enum {string}
+             */
+            status?: "ordered" | "returned" | "canceled" | "paid" | "reshipped" | "fulfilled" | "partially_fulfilled" | "allocated" | "partially_allocated" | "return_initiated";
+            /**
+             * Format: double
+             * @description The quantity that can be cancelled.
+             * @example 2
+             */
+            quantityAvailableToCancel?: number;
+        };
+        /** @description Document representing an order product item. */
+        OrderProductItem: {
+            /** @description Product information retrieved from Order Management (OMS). Only available in the context of an order. */
+            omsData?: components["schemas"]["OmsProductData"];
+        } & components["schemas"]["ProductItem"];
+        /** @description Individual item within a shipment */
+        OmsShipmentItem: {
+            /**
+             * @description Unique identifier for the shipment item
+             * @example 0OBVF000006603F4AQ
+             */
+            id?: string;
+            /**
+             * @description Reference to the product item in the order
+             * @example 10uVF0000002fGnYAI
+             */
+            productItemId?: string;
+            /**
+             * Format: double
+             * @description Quantity of product items with the referenced productItemId in this shipment
+             * @example 2
+             */
+            quantity?: number;
+        };
+        /** @description Shipment information from Salesforce Order Management created during fulfillment process. See https://developer.salesforce.com/docs/atlas.en-us.230.0.order_management_developer_guide.meta/order_management_developer_guide/sforce_api_objects_fulfillmentorder.htm for more information. */
+        OmsShipment: {
+            /**
+             * @description Unique identifier for the shipment
+             * @example 0OBVF000000003F4AQ
+             */
+            id?: string;
+            /**
+             * @description Current status of the shipment
+             * @example shipped
+             */
+            status?: string;
+            /**
+             * @description Shipping provider name
+             * @example UPS
+             */
+            provider?: string;
+            /**
+             * @description Tracking number for the shipment
+             * @example 123456789
+             */
+            trackingNumber?: string;
+            /**
+             * @description URL to track the shipment
+             * @example https://www.ups.com/track?loc=en_US&tracknum=123456789
+             */
+            trackingUrl?: string;
+            /**
+             * Format: date-time
+             * @description Expected delivery date and time
+             * @example 2025-11-12T20:00:00.000+0000
+             */
+            expectedDeliveryDate?: string;
+            /**
+             * Format: date-time
+             * @description Actual delivery date and time (null if not yet delivered)
+             * @example 2025-11-12T20:00:00.000+0000
+             */
+            actualDeliveryDate?: string;
+            /** @description Items included in this shipment */
+            shipmentItems?: components["schemas"]["OmsShipmentItem"][];
+        };
+        /**
+         * @description Additional information retrieved from Order Management (OMS)
+         *     See https://developer.salesforce.com/docs/atlas.en-us.order_management_developer_guide.meta/order_management_developer_guide/sforce_api_objects_ordersummary.htm for more information.
+         */
+        OmsData: {
+            /**
+             * @description Current status of the order
+             * @example shipped
+             */
+            status?: string;
+            /** @description List of shipments associated with the order */
+            shipments?: components["schemas"]["OmsShipment"][];
+        };
+        /** @description Document representing an order. */
+        Order: {
+            /**
+             * Format: double
+             * @description The total tax on products in the order, including price adjustments, but not including service charges such as
+             *     shipping. It is read only.
+             * @example 1.5
+             */
+            adjustedMerchandizeTotalTax?: number;
+            /**
+             * Format: double
+             * @description The total tax on shipping charges in the order, including shipping price adjustments. It is read only.
+             * @example 0.3
+             */
+            adjustedShippingTotalTax?: number;
+            /** @description The billing address. */
+            billingAddress?: components["schemas"]["OrderAddress"];
+            /** @description The bonus discount line items. */
+            bonusDiscountLineItems?: components["schemas"]["BonusDiscountLineItem"][];
+            /**
+             * @description The sales channel. It is read only.
+             * @example storefront
+             * @enum {string}
+             */
+            channelType?: "storefront" | "callcenter" | "marketplace" | "dss" | "store" | "pinterest" | "twitter" | "facebookads" | "subscriptions" | "onlinereservation" | "customerservicecenter" | "instagramcommerce" | "tiktok" | "snapchat" | "google" | "whatsapp" | "youtube";
+            /**
+             * @description The confirmation status.
+             * @example confirmed
+             * @enum {string}
+             */
+            confirmationStatus?: "not_confirmed" | "confirmed";
+            /** @description The coupon items. It is read only. */
+            couponItems?: components["schemas"]["CouponItem"][];
+            /**
+             * @description This value depends on how the order was created. If a shopper created the order, this value is Customer.
+             *     If a job created the order, this value is System. Otherwise, this value is the name of the user who created the order. It is read only.
+             * @example Customer
+             */
+            createdBy?: string;
+            /**
+             * Format: date-time
+             * @description The timestamp when the order was created. It is read only.
+             * @example 2015-05-19T15:23:18.000Z
+             */
+            creationDate?: string;
+            /** @description The ISO 4217 mnemonic code of the currency. It is read only. */
+            currency?: components["schemas"]["CurrencyCode"];
+            /** @description The customer information for guest or logged-in customers. It is read only. */
+            customerInfo?: components["schemas"]["CustomerInfo"];
+            /**
+             * @description The customer name. It is read only.
+             * @example Max Mustermann
+             */
+            customerName?: string;
+            /**
+             * @description The export status of the order.
+             * @example exported
+             * @enum {string}
+             */
+            exportStatus?: "not_exported" | "exported" | "ready" | "failed";
+            /**
+             * @description The external status of the order.
+             * @example Submitted
+             */
+            externalOrderStatus?: string;
+            /** @description The gift certificate line items. It is read only. */
+            giftCertificateItems?: components["schemas"]["GiftCertificateItem"][];
+            /**
+             * @description The Customer 360 Global Party ID associated with the shopper. It is read only.
+             * @example GP_1234
+             */
+            globalPartyId?: string;
+            /**
+             * Format: date-time
+             * @description The timestamp when the order was last modified. It is read only.
+             * @example 2021-02-25T09:58:08.715Z
+             */
+            lastModified?: string;
+            /**
+             * Format: double
+             * @description The total products tax in the purchase currency. Merchandise total prices represent the sum of product prices
+             *     not including shipping or adjustments. It is read only.
+             * @example 1.5
+             */
+            merchandizeTotalTax?: number;
+            /**
+             * @description The order number.
+             * @example 00000410
+             */
+            orderNo?: components["schemas"]["OrderNo"];
+            /** @description The order-level price adjustments. It is read only. */
+            orderPriceAdjustments?: components["schemas"]["PriceAdjustment"][];
+            /**
+             * @description The order token used to secure the lookup of an order on base of the
+             *     plain order number. The order token contains only URL safe characters. It is read only.
+             */
+            orderToken?: string;
+            /**
+             * Format: double
+             * @description The total price, including products, shipping, and tax. It is read only.
+             * @example 110.24
+             */
+            orderTotal?: number;
+            /**
+             * @description The order view code used to secure the order lookup of an order using Order Lookup API.
+             *     The order view code contains only URL safe characters.
+             *     Warning : Order view code must not be exposed in the URL and must only be displayed to the shopper or sent as an email.
+             *     Order view code must not be logged in the code. It is read only.
+             */
+            orderViewCode?: string;
+            /** @description The payment instruments list. */
+            paymentInstruments?: components["schemas"]["OrderPaymentInstrument"][];
+            /**
+             * @description The payment status.
+             * @example paid
+             * @enum {string}
+             */
+            paymentStatus?: "not_paid" | "part_paid" | "paid";
+            /** @description The product items. It is read only. */
+            productItems?: components["schemas"]["OrderProductItem"][];
+            /**
+             * Format: double
+             * @description The total price of all products including item-level adjustments, but not including
+             *     order-level adjustments or shipping charges. If the taxation policy is net, it doesn't include tax.
+             *     If the taxation policy is gross, it includes tax. It is read only.
+             * @example 99
+             */
+            productSubTotal?: number;
+            /**
+             * Format: double
+             * @description The total price of all products in the shipment including item-level adjustments and prorated
+             *     order-level adjustments, but not including shipping charges. If the taxation policy is net,
+             *     it doesn't include tax. If the taxation policy is gross, it includes tax. It is read only.
+             * @example 99
+             */
+            productTotal?: number;
+            /**
+             * @description If the tax is rounded at the group level, this is set to true. If the tax is rounded at the item or unit level, it is set to false. It is read only.
+             * @example true
+             */
+            taxRoundedAtGroup?: boolean;
+            /** @description The shipments. It is read only. */
+            shipments?: components["schemas"]["Shipment"][];
+            /** @description The shipping items. It is read only. */
+            shippingItems?: components["schemas"]["ShippingItem"][];
+            /**
+             * @description The shipping status.
+             * @example shipped
+             * @enum {string}
+             */
+            shippingStatus?: "not_shipped" | "part_shipped" | "shipped";
+            /**
+             * Format: double
+             * @description The total price of all shipping charges, including shipping adjustments. If the taxation policy is net,
+             *     it doesn't include tax. If the taxation policy is gross, it includes tax. It is read only.
+             * @example 5.99
+             */
+            shippingTotal?: number;
+            /**
+             * Format: double
+             * @description The total tax on all shipping charges, not including shipping adjustments. It is read only.
+             * @example 0.3
+             */
+            shippingTotalTax?: number;
+            /**
+             * @description The order's site. It is read only.
+             * @example ShoppingSite
+             */
+            siteId?: components["schemas"]["SiteId"];
+            /** @description Information retrieved from Order Management (OMS) for the order. */
+            omsData?: components["schemas"]["OmsData"];
+            /**
+             * @description The source code assigned to the basket from which this order was created. It is read only.
+             * @example OUTDOOR1
+             */
+            sourceCode?: string;
+            /**
+             * @description The status.
+             * @example created
+             * @enum {string}
+             */
+            status?: "created" | "new" | "completed" | "cancelled" | "replaced" | "failed";
+            /**
+             * Format: double
+             * @description The total tax amount. It is read only.
+             * @example 5.25
+             */
+            taxTotal?: number;
+            /**
+             * @description The taxation policy (gross or net). It is read only.
+             * @example net
+             * @enum {string}
+             */
+            taxation?: "gross" | "net";
+            /**
+             * @description Tax values that are grouped and summed based on the tax rate. The tax totals of the line items with the same
+             *     tax rate are grouped together and summed up. This does not affect the calculation in any way. It is read only.
+             */
+            groupedTaxItems?: components["schemas"]["GroupedTaxItem"][];
+            /**
+             * @description The registration status of the customer. It is read only.
+             * @example true
+             */
+            guest?: boolean;
+        };
+        /** @description Result document containing an array of customer orders. */
+        CustomerOrderResult: {
+            /** @description The array of customer order documents. */
+            data?: components["schemas"]["Order"][];
+        } & components["schemas"]["PaginatedResultBase"];
+        /** @description Document representing a password change request. */
+        PasswordChangeRequest: {
+            /**
+             * @description The customer's current password.
+             * @example p@ssword1
+             */
+            currentPassword: string;
+            /**
+             * @description The customer's new password.
+             * @example p@ssword2
+             */
+            password: string;
+        };
+        /** @description Document representing a payment bank account request. */
+        PaymentBankAccountRequest: {
+            /**
+             * @description The driver’s license.
+             * @example 84736485
+             */
+            driversLicense: string;
+            /**
+             * @description The driver’s license state code.
+             * @example UT
+             */
+            driversLicenseStateCode: string;
+            /**
+             * @description The holder of the bank account.
+             * @example John Smith
+             */
+            holder: string;
+            /**
+             * @description The payment bank account number.
+             * @example 9796976
+             */
+            number: string;
+        };
+        /** @description Document representing a customer payment card request. */
+        CustomerPaymentCardRequest: {
+            /**
+             * @description The payment card type (for example, "Visa").
+             * @example Visa
+             */
+            cardType: string;
+            /**
+             * @description A credit card token. If a credit card is tokenized, the token can be used to look up the credit card data at the
+             *     token store.
+             * @example hk2jh293484
+             */
+            creditCardToken?: string;
+            /**
+             * Format: int32
+             * @description The month the payment card expires.
+             * @example 11
+             */
+            expirationMonth: number;
+            /**
+             * Format: int32
+             * @description The year the payment card expires.
+             * @example 9999
+             */
+            expirationYear: number;
+            /**
+             * @description The payment card holder.
+             * @example John Smith
+             */
+            holder: string;
+            /**
+             * @description The payment card issue number.
+             * @example 92743927
+             */
+            issueNumber: string;
+            /**
+             * @description The payment card number.
+             * @example 4454852652415965
+             */
+            number: string;
+            /**
+             * Format: int32
+             * @description The month the payment card valid is from.
+             * @example 11
+             */
+            validFromMonth: number;
+            /**
+             * Format: int32
+             * @description The year the payment card is valid from.
+             * @example 23
+             */
+            validFromYear: number;
+        };
+        /** @description Document representing a customer payment instrument request. */
+        CustomerPaymentInstrumentRequest: {
+            /**
+             * @description The bank routing number.
+             * @example AB123
+             */
+            bankRoutingNumber?: string;
+            /**
+             * @description The gift certificate code.
+             * @example gift-code
+             */
+            giftCertificateCode?: string;
+            /** @description The payment bank account request data. */
+            paymentBankAccount?: components["schemas"]["PaymentBankAccountRequest"];
+            /** @description The customer payment card. */
+            paymentCard?: components["schemas"]["CustomerPaymentCardRequest"];
+            /**
+             * @description The payment method ID. Optional if a customer payment instrument ID is specified.
+             * @example Credit Card
+             */
+            paymentMethodId?: string;
+            /**
+             * @description The default payment instrument.
+             * @example true
+             */
+            default?: boolean;
+        };
+        /** @description Document representing a customer payment instrument update request. Only allows updating the default flag and card expiration date. */
+        CustomerPaymentInstrumentUpdateRequest: {
+            /**
+             * @description The default payment instrument.
+             * @example true
+             */
+            default?: boolean;
+            /** @description The payment card expiration information. */
+            paymentCard?: {
+                /**
+                 * Format: int32
+                 * @description The month when the payment card expires.
+                 * @example 12
+                 */
+                expirationMonth?: number;
+                /**
+                 * Format: int32
+                 * @description The year when the payment card expires.
+                 * @example 2028
+                 */
+                expirationYear?: number;
+            };
+        };
+        /** @description Request to set up a new payment method reference. */
+        PaymentMethodReferenceSetupRequest: {
+            /**
+             * @description Payment Method Type
+             * @example card
+             */
+            paymentMethodType?: string;
+            /** @description Properties specific to the payment gateway */
+            gatewayProperties: {
+                /** @description # Stripe-specific properties. */
+                stripe?: {
+                    [key: string]: unknown;
+                };
+                /** @description # Adyen-specific properties. */
+                adyen?: {
+                    [key: string]: unknown;
+                };
+            };
+        };
+        /** @description Response from setting up a new payment method reference. */
+        PaymentMethodReferenceSetupResponse: {
+            /**
+             * @description The provider-specific identifier for the payment method reference setup (e.g., Stripe Setup Intent ID, Adyen pspReference).
+             * @example seti_1Mm8s8LkdIwHu7ix0OXBfTRG
+             */
+            paymentMethodReferenceSetupId: string;
+            /** @description Properties specific to the payment gateway */
+            gatewayProperties?: {
+                /** @description # Stripe-specific properties. */
+                stripe?: {
+                    [key: string]: unknown;
+                };
+                /** @description # Adyen-specific properties. */
+                adyen?: {
+                    [key: string]: unknown;
+                };
+            };
+        };
+        /** @description Document representing a customer product list registrant. */
+        CustomerProductListRegistrant: {
+            /**
+             * @description The email of the registrant.
+             * @example jsmith@mail.com
+             */
+            email: string;
+            /**
+             * @description The first name of the registrant.
+             * @example John
+             */
+            firstName: string;
+            /**
+             * @description The last name of the registrant.
+             * @example Smith
+             */
+            lastName: string;
+            /**
+             * @description The role of the registrant.
+             * @example Friend
+             */
+            role: string;
+        };
+        /** @description Result document of product list addresses. */
+        CustomerAddressInfo: {
+            /**
+             * @description The ID of the address.
+             * @example Home
+             */
+            addressId: string;
+            /**
+             * @description The link title.
+             * @example title
+             */
+            title: string;
+        };
+        /** @description Any product that is sold, shown alone, and does not have variations such as different sizes or colors. A product has no reliance on any other product for inheritance. *A product has a SKU and can have a product option, which has a different SKU*. */
+        Product: {
+            /**
+             * @description The product's brand.
+             * @example Apple
+             */
+            brand?: string;
+            /** @description The array of all bundled products of this product. */
+            bundledProducts?: components["schemas"]["BundledProduct"][];
+            currency?: components["schemas"]["CurrencyCode"];
+            /**
+             * @description The European Article Number of the product.
+             * @example 8essdf9w3
+             */
+            ean?: string;
+            /**
+             * Format: int32
+             * @example 5
+             */
+            fetchDate?: number;
+            id: components["schemas"]["ProductId"];
+            /** @description The array of product image groups. */
+            imageGroups?: components["schemas"]["ImageGroup"][];
+            /**
+             * @description The array of product inventories explicitly requested via the 'inventory_ids' query parameter. This property
+             *      is only returned in context of the 'availability' expansion.
+             */
+            inventories?: components["schemas"]["Inventory"][];
+            /**
+             * @description The site default inventory information. This property is only
+             *      returned in context of the 'availability' expansion.
+             */
+            inventory?: components["schemas"]["Inventory"];
+            /**
+             * @description The localized product's long description.
+             * @example Awesome long description of product
+             */
+            longDescription?: string;
+            /**
+             * @description The product's manufacturer name.
+             * @example Apple
+             */
+            manufacturerName?: string;
+            /**
+             * @description The product's manufacturer SKU.
+             * @example 2ND8834
+             */
+            manufacturerSku?: string;
+            /** @description The master product information, only for types: master, variation group, and variant. */
+            master?: components["schemas"]["Master"];
+            /**
+             * Format: double
+             * @description The minimum order quantity for this product.
+             * @example 2
+             */
+            minOrderQuantity?: number;
+            /**
+             * @description The localized product name.
+             * @example Apple IPod Classic
+             */
+            name?: string;
+            /** @description The array of product options, only for type option. This array can be empty. */
+            options?: components["schemas"]["Option"][];
+            /**
+             * @description The localized product's page description.
+             * @example Really good Product
+             */
+            pageDescription?: string;
+            /**
+             * @description The localized product's page description.
+             * @example Ipod, Music Player
+             */
+            pageKeywords?: string;
+            /**
+             * @description The localized product's page title.
+             * @example Apple IPod Classic
+             */
+            pageTitle?: string;
+            /** @description Page Meta tags associated with the given product. */
+            pageMetaTags?: components["schemas"]["PageMetaTag"][];
+            /**
+             * Format: double
+             * @description The sales price of the product. In case of complex products, like master or set, this is the minimum price of
+             *      related child products.
+             * @example 59.99
+             */
+            price?: number;
+            /**
+             * Format: double
+             * @description The price per unit if defined for the product
+             * @example 19.99
+             */
+            pricePerUnit?: number;
+            /**
+             * Format: double
+             * @description The max price per unit typically for a master product's variant.
+             * @example 29.99
+             */
+            pricePerUnitMax?: number;
+            /**
+             * Format: double
+             * @description The maximum sales of related child products in complex products like master or set.
+             * @example 69.99
+             */
+            priceMax?: number;
+            /** @description Array of one or more price range objects representing one or more Pricebooks in context for the site. */
+            priceRanges?: components["schemas"]["PriceRange"][];
+            /** @description The prices map with pricebook IDs and their values. */
+            prices?: {
+                [key: string]: number;
+            };
+            /**
+             * @description The ID of the products primary category.
+             * @example electronics
+             */
+            primaryCategoryId?: string;
+            /** @description The array of source and target product links information. */
+            productLinks?: components["schemas"]["ProductLink"][];
+            /**
+             * @description An array of active customer product promotions for this product, sorted by promotion priority
+             *     using SORT_BY_EXCLUSIVITY ordering (exclusivity → rank → promotion class → discount type →
+             *     best discount → ID). This array can be empty. Coupon promotions are not returned in this array.
+             *     See [PromotionPlan.SORT_BY_EXCLUSIVITY](https://salesforcecommercecloud.github.io/b2c-dev-doc/docs/current/scriptapi/html/index.html?target=class_dw_campaign_PromotionPlan.html) for more details.
+             */
+            productPromotions?: components["schemas"]["ProductPromotion"][];
+            /** @description Returns a list of recommendations. */
+            recommendations?: components["schemas"]["Recommendation"][];
+            /** @description The array of set products of this product. */
+            setProducts?: components["schemas"]["Product"][];
+            /**
+             * @description The localized product short description.
+             * @example Awesome Product
+             */
+            shortDescription?: string;
+            /**
+             * @description The complete link to this product's storefront page.
+             * @example https://www.example.com/on/store/Sites-MySite/default/Product-Show?pid=MyProduct
+             */
+            slugUrl?: string;
+            /**
+             * Format: double
+             * @description The steps in which the order amount of the product can be
+             *      increased.
+             * @example 2
+             */
+            stepQuantity?: number;
+            /** @description The document represents list of tiered prices if the product is a variant */
+            tieredPrices?: components["schemas"]["ProductPriceTable"][];
+            /** @description The product type information. Can be one or more of the following values: item, master, variation_group, variant, bundle, and set. */
+            type?: components["schemas"]["ProductType"];
+            /**
+             * @description The sales unit of the product.
+             * @example lbs
+             */
+            unit?: string;
+            /**
+             * @description The Universal Product Code (UPC).
+             * @example JSDU876
+             */
+            upc?: string;
+            /**
+             * Format: date-time
+             * @description The time a product is valid from.
+             * @example 9999-12-31T00:00:00.0Z
+             */
+            validFrom?: string;
+            /**
+             * Format: date-time
+             * @description The time a product is valid to.
+             * @example 9999-12-31T23:59:59.0Z
+             */
+            validTo?: string;
+            /** @description The array of actual variants. Only for master, variation group, and variant types. This array can be empty. */
+            variants?: components["schemas"]["Variant"][];
+            /**
+             * @description Sorted array of variation attributes information. Only for master,
+             *      variation group, and variant types. This array can be empty.
+             */
+            variationAttributes?: components["schemas"]["VariationAttribute"][];
+            /** @description The array of actual variation groups. Only for master, variation group, and variant types. This array can be empty. */
+            variationGroups?: components["schemas"]["VariationGroup"][];
+            /**
+             * @description The actual variation attribute ID - value pairs. Only for variant and
+             *      variation group types.
+             */
+            variationValues?: {
+                [key: string]: string;
+            };
+            /**
+             * @description The array of applicable shipping methods for this product. This array can be empty.
+             *     This property is only returned in context of the 'shipping_methods' expansion.
+             */
+            shippingMethods?: components["schemas"]["ShippingMethod"][];
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description A bundle of products that can be bought together (all or nothing). Each product in the bundle can itself be bought independently, but this is outside of the context of the bundle. A bundle is a purchasing convenience. *Product bundle has a SKU and price.* */
+        BundledProduct: {
+            /** @example 823476 */
+            id: string;
+            /** @description The product being bundled. */
+            product: components["schemas"]["Product"];
+            /**
+             * Format: double
+             * @description For the product being bundled, the quantity added to the bundle.
+             * @example 5
+             */
+            quantity: number;
+        };
+        /** @description Product image */
+        Image: {
+            /**
+             * @description The localized alternative text of the image.
+             * @example Apple iPod Shuffle, large
+             */
+            alt?: string;
+            /**
+             * @description Base URL for the Dynamic Image Service (DIS) address. This is only shown if the image is stored on the server and DIS is enabled.
+             * @example https://example.com/images/large/ipod-shuffle-silver.jpg
+             */
+            disBaseLink?: string;
+            /**
+             * @description The URL of the actual image.
+             * @example https://example.com/on/demandware.static/-/Sites-electronics-catalog/default/dwc2/images/large/ipod-shuffle.jpg
+             */
+            link: string;
+            /**
+             * @description The localized title of the image.
+             * @example Apple iPod Shuffle
+             */
+            title?: string;
+        };
+        /** @description Document representing a variation attribute value. */
+        VariationAttributeValue: {
+            /**
+             * @description The localized description of the variation value.
+             * @example Color of the product
+             */
+            description?: string;
+            /** @description The first product image for the configured viewtype and this variation value. */
+            image?: components["schemas"]["Image"];
+            /** @description The first product image for the configured viewtype and this variation value (typically the swatch image). */
+            imageSwatch?: components["schemas"]["Image"];
+            /**
+             * @description The localized display name of the variation value.
+             * @example Red
+             */
+            name?: string;
+            /**
+             * @description A flag indicating whether at least one variant with this variation attribute value is available to sell.
+             * @example true
+             */
+            orderable?: boolean;
+            /**
+             * @description The actual variation value.
+             * @example red
+             */
+            value: string;
+        };
+        /** @description Document representing a variation attribute. */
+        VariationAttribute: {
+            /**
+             * @description The ID of the variation attribute.
+             * @example color
+             */
+            id: string;
+            /**
+             * @description The localized display name of the variation attribute.
+             * @example Color
+             */
+            name?: string;
+            /** @description The sorted array of variation values. This array can be empty. */
+            values?: components["schemas"]["VariationAttributeValue"][];
+        };
+        /** @description Document representing an image group containing a list of images for a particular view type and an optional variation value. */
+        ImageGroup: {
+            /** @description The images of the image group. */
+            images: components["schemas"]["Image"][];
+            /** @description Returns a list of variation attributes applying to this image group. */
+            variationAttributes?: components["schemas"]["VariationAttribute"][];
+            /**
+             * @description The image view type.
+             * @example hi-res
+             */
+            viewType: string;
+        };
+        /**
+         * @description The inventory ID.
+         * @example Site1InventoryList
+         */
+        InventoryId: string;
+        /** @description Document representing inventory information of the current product for a particular inventory list. */
+        Inventory: {
+            /**
+             * Format: double
+             * @description The Available To Sell (ATS) of the product. If it is infinity, the return value is 999999. The value can be overwritten by the
+             *      OCAPI setting 'product.inventory.ats.max_threshold'.
+             * @example 15
+             */
+            ats?: number;
+            /**
+             * @description A flag indicating whether the product is backorderable.
+             * @example true
+             */
+            backorderable?: boolean;
+            id: components["schemas"]["InventoryId"];
+            /**
+             * Format: date-time
+             * @description A flag indicating the date when the product will be in stock.
+             * @example 9999-12-31T00:00:00.0Z
+             */
+            inStockDate?: string;
+            /**
+             * @description A flag indicating whether at least one of the products is available to sell.
+             * @example true
+             */
+            orderable?: boolean;
+            /**
+             * @description A flag indicating whether the product is preorderable.
+             * @example false
+             */
+            preorderable?: boolean;
+            /**
+             * Format: double
+             * @description The stock level of the product. If it is infinity, the return value is 999999. The value can be overwritten by the
+             *      OCAPI setting 'product.inventory.stock_level.max_threshold'.
+             * @example 10
+             */
+            stockLevel?: number;
+        };
+        /**
+         * Format: double
+         * @description Document representing a price for a product
+         * @example 12.99
+         */
+        Price: number;
+        /** @description The master product is a representation of a group of variant products. This is a non-buyable entity, provides inheritable attributes for its product variants, and is used for navigation. *Doesn't have a SKU.* */
+        Master: {
+            /** @description The ID (SKU) of the master product. */
+            masterId: components["schemas"]["ProductId"];
+            /**
+             * @description A flag indicating whether at least one of the variants can be ordered.
+             * @example true
+             */
+            orderable?: boolean;
+            /** @description The minimum sales price of the related variants. */
+            price?: components["schemas"]["Price"];
+            /** @description The maximum sales price of the related variants. */
+            priceMax?: components["schemas"]["Price"];
+            /** @description List of sale prices. */
+            prices?: {
+                [key: string]: number;
+            };
+        };
+        /** @description Document representing an option value. */
+        OptionValue: {
+            /**
+             * @description A flag indicating whether this option value is the default one.
+             * @example true
+             */
+            default?: boolean;
+            /**
+             * @description The ID of the option value.
+             * @example 5YR
+             */
+            id: components["schemas"]["ProductId"];
+            /**
+             * @description The localized name of the option value.
+             * @example 5 Year Warranty
+             */
+            name?: string;
+            /** @description The effective price of the option value. */
+            price?: components["schemas"]["Price"];
+        };
+        /** @description Product options enable you to sell configurable products that have optional accessories, upgrades, or additional services. Options are always purchased with a product and can't be purchased separately. *Product Option has a SKU and a price associated with it.* */
+        Option: {
+            /**
+             * @description The localized description of the option.
+             * @example Get this Option
+             */
+            description?: string;
+            /**
+             * @description The ID of the option.
+             * @example Warranty
+             */
+            id: components["schemas"]["ProductId"];
+            /**
+             * @description The URL to the option image.
+             * @example https://www.exampleimage.com/images/optionImage.jpg
+             */
+            image?: string;
+            /**
+             * @description The localized name of the option.
+             * @example Warranty
+             */
+            name?: string;
+            /** @description The array of option values. This array can be empty. */
+            values?: components["schemas"]["OptionValue"][];
+        };
+        /** @description Document representing a Page Meta Tag object. */
+        PageMetaTag: {
+            /**
+             * @description The ID of the Page Meta Tag.
+             * @example title
+             */
+            id?: string;
+            /**
+             * @description Locale-specific value of the Page Meta Tag, evaluated by resolving the rule set for the given Business Manager ID.
+             * @example Buy the Long Sleeve Covered Placket Blouse for USD 61.99.
+             */
+            value?: string;
+        };
+        /** @description Document representing price ranges for a product which happens to be a master product (per Pricebook) */
+        PriceRange: {
+            /** @description Maximum price for the given pricebook (usually for a master Product would be the price for the Variant which has the highest price out of all Variants in that pricebook) */
+            maxPrice?: components["schemas"]["Price"];
+            /** @description Minimum price for the given pricebook (usually for a master Product would be the price for the Variant which has the least price out of all Variants in that pricebook) */
+            minPrice?: components["schemas"]["Price"];
+            /**
+             * @description The active pricebook from which the min and the max prices are calculated. The pricebook is based on the site context of the request as defined in ECOM.
+             * @example usd-list-pricebook
+             */
+            pricebook?: string;
+        };
+        /**
+         * @description Document representing a link between two products. It contains the ID of the source and target products, the type of
+         *      product link, and the URLs to retrieve product data.
+         */
+        ProductLink: {
+            /**
+             * @description The semantic ID of the product this product link is coming from.
+             * @example 824756924
+             */
+            sourceProductId: components["schemas"]["ProductId"];
+            /**
+             * @description The URL addressing the product this product link is coming from.
+             * @example Link
+             */
+            sourceProductLink: string;
+            /**
+             * @description The semantic ID of the product this product link is pointing to.
+             * @example 2TR93459
+             */
+            targetProductId: components["schemas"]["ProductId"];
+            /**
+             * @description The URL addressing the product this product link is pointing to.
+             * @example Link
+             */
+            targetProductLink: string;
+            /**
+             * @description The type of product link.
+             * @example up_sell
+             * @enum {string}
+             */
+            type: "cross_sell" | "replacement" | "up_sell" | "accessory" | "newer_version" | "alt_orderunit" | "spare_part" | "other";
+        };
+        /** @description Document representing a product promotion. */
+        ProductPromotion: {
+            /**
+             * @description The localized call-out message of the promotion.
+             * @example Fantastic promotion
+             */
+            calloutMsg: string;
+            /**
+             * @description The unique ID of the promotion.
+             * @example summerSale
+             */
+            promotionId: string;
+            /** @description The promotional price for this product. */
+            promotionalPrice: components["schemas"]["Price"];
+        };
+        /** @description Document representing a recommendation type. */
+        RecommendationType: {
+            /**
+             * @description The localized display value of the recommendation type.
+             * @example UpSell
+             */
+            displayValue: string;
+            /**
+             * Format: int32
+             * @description The value of the recommendation type.
+             * @example 2
+             */
+            value: number;
+        };
+        /** @description Document representing a product recommendation. */
+        Recommendation: {
+            /**
+             * @description The localized callout message of the recommendation.
+             * @example Absolutely recommended
+             */
+            calloutMsg?: string;
+            image?: components["schemas"]["Image"];
+            /**
+             * @description The localized long description of the recommendation.
+             * @example Really good detailed product description
+             */
+            longDescription?: string;
+            /**
+             * @description The localized name of the recommendation.
+             * @example Apple Ipod Shuffle
+             */
+            name?: string;
+            recommendationType: components["schemas"]["RecommendationType"];
+            /**
+             * @description The recommended item ID of the recommendation.
+             * @example apple-ipod-shuffle
+             */
+            recommendedItemId?: string;
+            /**
+             * @description The localized short description of the recommendation.
+             * @example Product description
+             */
+            shortDescription?: string;
+        };
+        /** @description Tiered Price Level Object */
+        ProductPriceTable: {
+            /** @description Price for the product for the specified tier for the specified pricebook */
+            price?: components["schemas"]["Price"];
+            /**
+             * @description The active pricebook for which this price is defined
+             * @example usd-list-pricebook
+             */
+            pricebook?: string;
+            /**
+             * Format: double
+             * @description Quantity tier for which the price is defined.
+             * @example 1
+             */
+            quantity?: number;
+        };
+        /** @description Document representing a product type. */
+        ProductType: {
+            /**
+             * @description A flag indicating whether the product is a bundle.
+             * @example true
+             */
+            bundle?: boolean;
+            /**
+             * @description A flag indicating whether the product is a standard item.
+             * @example false
+             */
+            item?: boolean;
+            /**
+             * @description A flag indicating whether the product is a master.
+             * @example true
+             */
+            master?: boolean;
+            /**
+             * @description A flag indicating whether the product is an option.
+             * @example false
+             */
+            option?: boolean;
+            /**
+             * @description A flag indicating whether the product is a set.
+             * @example true
+             */
+            set?: boolean;
+            /**
+             * @description A flag indicating whether the product is a variant.
+             * @example false
+             */
+            variant?: boolean;
+            /**
+             * @description A flag indicating whether the product is a variation group.
+             * @example false
+             */
+            variationGroup?: boolean;
+        };
+        /** @description A product which is a variation within a master product that describes different colors, sizes, or other variation attributes. *Has a SKU.* */
+        Variant: {
+            /**
+             * @description A flag indicating whether the variant is orderable.
+             * @example true
+             */
+            orderable?: boolean;
+            /** @description The sales price of the variant. */
+            price?: components["schemas"]["Price"];
+            /**
+             * @description The ID (SKU) of the variant.
+             * @example 8W4756834
+             */
+            productId: components["schemas"]["ProductId"];
+            /** @description List of tiered prices if the product is a variant */
+            tieredPrices?: components["schemas"]["ProductPriceTable"][];
+            /** @description The actual variation attribute ID - value pairs. */
+            variationValues?: {
+                [key: string]: string;
+            };
+        };
+        /** @description Representation of a group of variant products by an attribute. This is a non-buyable entity, provides inheritable attributes for its product variants, and is used for navigation. *Doesn't have a SKU.* */
+        VariationGroup: {
+            /**
+             * @description A flag indicating whether the variation group is orderable.
+             * @example false
+             */
+            orderable: boolean;
+            /** @description The sales price of the variation group. */
+            price: components["schemas"]["Price"];
+            /**
+             * @description The ID (SKU) of the variation group.
+             * @example 49345VG
+             */
+            productId: components["schemas"]["ProductId"];
+            /** @description The actual variation attribute ID - value pairs. */
+            variationValues: {
+                [key: string]: string;
+            };
+        };
+        /** @description Document representing a customer product list item. */
+        CustomerProductListItem: {
+            /**
+             * @description The ID of this product list item.
+             * @example Main Product
+             */
+            id?: string;
+            /**
+             * Format: int32
+             * @description The priority of the item.
+             * @example 1
+             */
+            priority: number;
+            /** @description The product item. */
+            product?: components["schemas"]["Product"];
+            /**
+             * @description The ID of the product.
+             * @example Toaster
+             */
+            productId?: components["schemas"]["ProductId"];
+            /**
+             * @description Is this product list item available for access by other customers?
+             * @example true
+             */
+            public: boolean;
+            /**
+             * Format: double
+             * @description The quantity of products already purchased.
+             * @example 1
+             */
+            purchasedQuantity?: number;
+            /**
+             * Format: double
+             * @description The quantity of this product list item.
+             * @example 2
+             */
+            quantity: number;
+            /**
+             * @description The type of the item.
+             * @example product
+             * @enum {string}
+             */
+            type?: "product" | "gift_certificate";
+        };
+        /** @description Document representing a product list event. */
+        ProductListEvent: {
+            /**
+             * @description The city where the event takes place.
+             * @example New York
+             */
+            city?: string;
+            /**
+             * @description The country where the event takes place.
+             * @example USA
+             */
+            country?: string;
+            /**
+             * Format: date-time
+             * @description The date when the event takes place.
+             * @example 253402214400
+             */
+            date?: string;
+            /**
+             * @description The federal state where the event takes place.
+             * @example UT
+             */
+            state?: string;
+            /**
+             * @description Type of the event to celebrate.
+             * @example wedding
+             */
+            type: string;
+        };
+        /** @description Document representing a product list shipping address. */
+        ProductListShippingAddress: {
+            /**
+             * @description The ID of this address.
+             * @example Home
+             */
+            addressId: string;
+            /**
+             * @description The city of this address.
+             * @example New York
+             */
+            city?: string;
+            /**
+             * @description The first name of this address.
+             * @example John
+             */
+            firstName?: string;
+            /**
+             * @description The last name of this address.
+             * @example Smith
+             */
+            lastName?: string;
+        };
+        /** @description Document representing a customer product list. */
+        CustomerProductList: {
+            /** @description The coregistrant of this product list. */
+            coRegistrant?: components["schemas"]["CustomerProductListRegistrant"];
+            /**
+             * Format: date-time
+             * @description Returns the value of attribute 'creationDate'.
+             * @example 9999-12-31T00:00:00.0Z
+             */
+            creationDate?: string;
+            /** @description The resource link to the current shipping address of this customer product list. */
+            currentShippingAddressInfo?: components["schemas"]["CustomerAddressInfo"];
+            /** @description The list of customer product list items. */
+            customerProductListItems?: components["schemas"]["CustomerProductListItem"][];
+            /**
+             * @description The description of this product list.
+             * @example My Product List
+             */
+            description?: string;
+            /** @description The event of this product list. */
+            event?: components["schemas"]["ProductListEvent"];
+            /**
+             * @description The ID of this product list.
+             * @example MyList
+             */
+            id?: string;
+            /**
+             * Format: date-time
+             * @description Returns the value of attribute 'lastModified'.
+             * @example 9999-12-31T00:00:00.0Z
+             */
+            lastModified?: string;
+            /**
+             * @description The name of this product list.
+             * @example Danny's Product List
+             */
+            name?: string;
+            /** @description The resource link to the post event shipping address of this customer product list. */
+            postEventShippingAddressInfo?: components["schemas"]["CustomerAddressInfo"];
+            /** @description The abbreviated shipping address of this product list representing what an anonymous user can see. */
+            productListShippingAddress?: components["schemas"]["ProductListShippingAddress"];
+            /**
+             * @description Indicates whether the owner made this product list available for access by other customers.
+             * @example true
+             */
+            public?: boolean;
+            /** @description The registrant of this product list. */
+            registrant?: components["schemas"]["CustomerProductListRegistrant"];
+            /** @description The resource link to the shipping address of this customer product list. */
+            shippingAddressInfo?: components["schemas"]["CustomerAddressInfo"];
+            /**
+             * @description The type of the product list.
+             * @example wish_list
+             * @enum {string}
+             */
+            type?: "wish_list" | "gift_registry" | "shopping_list" | "custom_1" | "custom_2" | "custom_3";
+        };
+        /** @description Document representing a customer product lists result. */
+        CustomerProductListResult: {
+            /** @description The customer product lists. */
+            data: components["schemas"]["CustomerProductList"][];
+        } & components["schemas"]["ResultBase"];
+        /** @description Document representing a link to a public product list. */
+        PublicProductListInfo: {
+            /**
+             * @description The description of this product list.
+             * @example Super Awesome ProductList
+             */
+            description?: string;
+            /**
+             * @description The ID of the product-list document.
+             * @example 3958739435
+             */
+            id: string;
+            /**
+             * @description The name of this product list.
+             * @example My Product List
+             */
+            name?: string;
+            /**
+             * @description The link title.
+             * @example Product List Title
+             */
+            title: string;
+            /**
+             * @description The type of the product list.
+             * @example custom_1
+             * @enum {string}
+             */
+            type: "wish_list" | "gift_registry" | "shopping_list" | "custom_1" | "custom_2" | "custom_3";
+        };
+        /** @description Result document containing an array of public product list links. */
+        PublicProductListResult: {
+            /** @description The array of product list link documents. */
+            data: components["schemas"]["PublicProductListInfo"][];
+        } & components["schemas"]["ResultBase"];
+        /**
+         * @description A `ProductListRegistrant` is typically associated with an event-related product list, such as a gift registry. It holds
+         *     information about a person associated with the event, such as a bride or groom.
+         */
+        ProductListRegistrant: {
+            /**
+             * @description The first name of the registrant.
+             * @example John
+             */
+            firstName: string;
+            /**
+             * @description The last name of the registrant.
+             * @example Smith
+             */
+            lastName: string;
+            /**
+             * @description The role of the registrant.
+             * @example CEO
+             */
+            role: string;
+        };
+        /** @description Document representing a product list item. */
+        PublicProductListItem: {
+            /**
+             * @description The ID of this product list item.
+             * @example 8745345
+             */
+            id: string;
+            /**
+             * Format: int32
+             * @description The priority of the item.
+             * @example 2
+             */
+            priority: number;
+            /** @description The product item. */
+            product?: components["schemas"]["Product"];
+            /**
+             * @description The type of the item.
+             * @example product
+             * @enum {string}
+             */
+            type: "product" | "gift_certificate";
+        };
+        /** @description Document representing a customer product list. */
+        PublicProductList: {
+            /** @description The coRegistrant of this product list. */
+            coRegistrant?: components["schemas"]["ProductListRegistrant"];
+            /**
+             * Format: date-time
+             * @description Returns the value of attribute 'creationDate'.
+             * @example 9999-12-31T00:00:00.0Z
+             */
+            creationDate?: string;
+            /**
+             * @description The description of this product list.
+             * @example Super Product List
+             */
+            description?: string;
+            /** @description The event of this product list. */
+            event?: components["schemas"]["ProductListEvent"];
+            /**
+             * @description The id of this product list.
+             * @example 873465834
+             */
+            id: string;
+            /**
+             * Format: date-time
+             * @description Returns the value of attribute 'lastModified'.
+             * @example 9999-12-31T00:00:00.0Z
+             */
+            lastModified?: string;
+            /**
+             * @description The name of this product list.
+             * @example My Product List
+             */
+            name?: string;
+            /** @description The product list items */
+            productListItems?: components["schemas"]["PublicProductListItem"][];
+            /** @description The abbreviated shipping address of this product list representing what anonymous users see. */
+            productListShippingAddress?: components["schemas"]["ProductListShippingAddress"];
+            /**
+             * @description Indicates whether the owner made this product list available for access by other customers.
+             * @example true
+             */
+            public: boolean;
+            /** @description The registrant of this product list. */
+            registrant?: components["schemas"]["ProductListRegistrant"];
+            /**
+             * @description The type of the product list.
+             * @example gift_registry
+             * @enum {string}
+             */
+            type: "wish_list" | "gift_registry" | "shopping_list" | "custom_1" | "custom_2" | "custom_3";
+        };
+        /** @description Results containing an array of public product list items. */
+        PublicProductListItemResult: components["schemas"]["ResultBase"] & {
+            /** @description The array of public product list items. */
+            data?: components["schemas"]["PublicProductListItem"][];
+        };
+    };
+    responses: never;
+    parameters: {
+        /**
+         * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+         * @example f_ecom_zzxy_prd
+         */
+        organizationId: components["schemas"]["OrganizationId"];
+        /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+        siteId: components["schemas"]["SiteId"];
+        /** @description The External ID of the customer. */
+        externalId: string;
+        /** @description The authentication Provider Id. */
+        authenticationProviderId: string;
+        /** @description The customer ID. */
+        customerId: string;
+        /**
+         * @description Expands the response with additional customer data.
+         *     - addresses (Default)
+         *     - paymentinstruments (Default)
+         *     - paymentmethodreferences (Requires Salesforce Payments integration; ignored otherwise)
+         *     - none (Excludes all expansion data)
+         */
+        expandCustomer: ("none" | "addresses" | "paymentinstruments" | "paymentmethodreferences")[];
+        /** @description The name of the address to update. */
+        addressName: string;
+        /** @description The flag indicating whether all sites should be searched. This flag is ignored unless a valid User / Agent is present with a trusted agent on behalf (TAOB) token. Without a TAOB token, only the customer's orders placed on the site specified by siteId are returned. */
+        crossSites: boolean;
+        from: string;
+        until: string;
+        status: string;
+        /**
+         * @description This parameter enhances the order result with extra data. By using `expand=som`, all orders for the current customer are loaded
+         *     directly from Salesforce Order Management (SOM). The system returns the retrieved SOM order data, along with any orders not yet
+         *     transferred to SOM. If your instance is not integrated with SOM, the `expand=som` command is disregarded.
+         */
+        expandCustomersOrders: "oms";
+        /** @description The ID of the payment instrument to be retrievedCustomer. */
+        paymentInstrumentId: string;
+        /** @description The ID of the payment method reference to delete. */
+        paymentMethodReferenceId: string;
+        /** @description The account ID used to scope payment method references. */
+        accountId: string;
+        /** @description The zone identifier for the payment configuration. */
+        zoneId: string;
+        /** @description The ID of the list. */
+        listId: string;
+        /** @description The ID of the item. */
+        itemId: string;
+        /** @description The email address of the customer the product lists belong to. */
+        email: string;
+        /** @description The first name of the customer the product lists belong to. This field is case sensitive and must be an exact match. */
+        firstName: string;
+        /** @description The last name of the customer the product lists belong to. This field is case sensitive and must be an exact match. */
+        lastName: string;
+        /** @description Expand product details. Valid values are 'product', 'images', 'availability'. For images and availability, the product must also be expanded. */
+        expandProductListsItems: ("product" | "images" | "availability")[];
+    };
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
+}
+export type $defs = Record<string, never>;
+export interface operations {
+    registerCustomer: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomerRegistration"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Customer"];
+                };
+            };
+            /** @description CustomerId URL parameter does not match the verified customer represented by the JWT token. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description In the case of type credentials, the username is unknown or the password does not match. In the case of type session, the session is no longer active or the dwsecuretoken value is invalid. In both cases, the customer is disabled or locked. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    resetPassword: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResetPasswordRequest"];
+            };
+        };
+        responses: {
+            /** @description Reset password successful. No Content. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description CustomerId URL parameter does not match the verified customer represented by the JWT token. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getResetPasswordToken: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResetPasswordTokenRequest"];
+            };
+        };
+        responses: {
+            /** @description Reset password token generated and returned successfully. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResetPasswordToken"];
+                };
+            };
+            /** @description CustomerId URL parameter does not match the verified customer represented by the JWT token. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getExternalProfile: {
+        parameters: {
+            query: {
+                /** @description The External ID of the customer. */
+                externalId: components["parameters"]["externalId"];
+                /** @description The authentication Provider Id. */
+                authenticationProviderId: components["parameters"]["authenticationProviderId"];
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerExternalProfile"];
+                };
+            };
+            /** @description Customer ExternalId URL parameter is not valid. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Requested resource not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    registerExternalProfile: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomerExtProfileRequest"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerExternalProfile"];
+                };
+            };
+            /** @description CustomerId URL parameter does not match the verified customer represented by the JWT token. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description In the case of type credentials, the username is unknown or the password does not match. In the case of type session, the session is no longer active or the dwsecuretoken value is invalid. In both cases, the customer is disabled or locked. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getCustomer: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /**
+                 * @description Expands the response with additional customer data.
+                 *     - addresses (Default)
+                 *     - paymentinstruments (Default)
+                 *     - paymentmethodreferences (Requires Salesforce Payments integration; ignored otherwise)
+                 *     - none (Excludes all expansion data)
+                 */
+                expand?: components["parameters"]["expandCustomer"];
+            };
+            header?: never;
+            path: {
+                /** @description The customer ID. */
+                customerId: components["parameters"]["customerId"];
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Customer"];
+                };
+            };
+            /** @description CustomerId URL parameter does not match the verified customer represented by the JWT token. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Requested resource not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateCustomer: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /** @description The customer ID. */
+                customerId: components["parameters"]["customerId"];
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Customer"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Customer"];
+                };
+            };
+            /** @description CustomerId URL parameter does not match the verified customer represented by the JWT token. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Requested resource not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    createCustomerAddress: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /** @description The customer ID. */
+                customerId: components["parameters"]["customerId"];
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomerAddress"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerAddress"];
+                };
+            };
+            /** @description CustomerId URL parameter does not match the verified customer represented by the JWT token. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Requested resource not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getCustomerAddress: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /** @description The name of the address to update. */
+                addressName: components["parameters"]["addressName"];
+                /** @description The customer ID. */
+                customerId: components["parameters"]["customerId"];
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerAddress"];
+                };
+            };
+            /** @description CustomerId URL parameter does not match the verified customer represented by the JWT token. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Requested resource not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    removeCustomerAddress: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /** @description The name of the address to update. */
+                addressName: components["parameters"]["addressName"];
+                /** @description The customer ID. */
+                customerId: components["parameters"]["customerId"];
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description CustomerId URL parameter does not match the verified customer represented by the JWT token. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Requested resource not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateCustomerAddress: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /** @description The name of the address to update. */
+                addressName: components["parameters"]["addressName"];
+                /** @description The customer ID. */
+                customerId: components["parameters"]["customerId"];
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomerAddress"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerAddress"];
+                };
+            };
+            /** @description CustomerId URL parameter does not match the verified customer represented by the JWT token. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Requested resource not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getCustomerBaskets: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /** @description The customer ID. */
+                customerId: components["parameters"]["customerId"];
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BasketsResult"];
+                };
+            };
+            /** @description CustomerId URL parameter does not match the verified customer represented by the JWT token. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Requested resource not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getCustomerOrders: {
+        parameters: {
+            query: {
+                /** @description The flag indicating whether all sites should be searched. This flag is ignored unless a valid User / Agent is present with a trusted agent on behalf (TAOB) token. Without a TAOB token, only the customer's orders placed on the site specified by siteId are returned. */
+                crossSites?: components["parameters"]["crossSites"];
+                from?: components["parameters"]["from"];
+                until?: components["parameters"]["until"];
+                status?: components["parameters"]["status"];
+                /**
+                 * @description This parameter enhances the order result with extra data. By using `expand=som`, all orders for the current customer are loaded
+                 *     directly from Salesforce Order Management (SOM). The system returns the retrieved SOM order data, along with any orders not yet
+                 *     transferred to SOM. If your instance is not integrated with SOM, the `expand=som` command is disregarded.
+                 */
+                expand?: components["parameters"]["expandCustomersOrders"];
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description Number of records to retrieve per request. Must be between 1 (minimum) and 50 (maximum). Defaults to 10. */
+                limit?: number;
+                /** @description Used to retrieve the results based on a particular resource offset. */
+                offset?: number;
+            };
+            header?: never;
+            path: {
+                /** @description The customer ID. */
+                customerId: components["parameters"]["customerId"];
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerOrderResult"];
+                };
+            };
+            /** @description CustomerId URL parameter does not match the verified customer represented by the JWT token. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Requested resource not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateCustomerPassword: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /** @description The customer ID. */
+                customerId: components["parameters"]["customerId"];
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PasswordChangeRequest"];
+            };
+        };
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description CustomerId URL parameter does not match the verified customer represented by the JWT token. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Requested resource not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    createCustomerPaymentInstrument: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /** @description The customer ID. */
+                customerId: components["parameters"]["customerId"];
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomerPaymentInstrumentRequest"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerPaymentInstrument"];
+                };
+            };
+            /** @description CustomerId URL parameter does not match the verified customer represented by the JWT token. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Requested resource not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getCustomerPaymentInstrument: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /** @description The ID of the payment instrument to be retrievedCustomer. */
+                paymentInstrumentId: components["parameters"]["paymentInstrumentId"];
+                /** @description The customer ID. */
+                customerId: components["parameters"]["customerId"];
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerPaymentInstrument"];
+                };
+            };
+            /** @description CustomerId URL parameter does not match the verified customer represented by the JWT token. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Requested resource not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    deleteCustomerPaymentInstrument: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /** @description The ID of the payment instrument to be retrievedCustomer. */
+                paymentInstrumentId: components["parameters"]["paymentInstrumentId"];
+                /** @description The customer ID. */
+                customerId: components["parameters"]["customerId"];
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description CustomerId URL parameter does not match the verified customer represented by the JWT token. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Requested resource not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateCustomerPaymentInstrument: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /** @description The ID of the payment instrument to be retrievedCustomer. */
+                paymentInstrumentId: components["parameters"]["paymentInstrumentId"];
+                /** @description The customer ID. */
+                customerId: components["parameters"]["customerId"];
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomerPaymentInstrumentUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerPaymentInstrument"];
+                };
+            };
+            /** @description Either the CustomerId URL parameter does not match the verified customer represented by the JWT token, or the request contains unsupported fields for update. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Requested resource not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    deleteCustomerPaymentMethodReference: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description The account ID used to scope payment method references. */
+                accountId: components["parameters"]["accountId"];
+            };
+            header?: never;
+            path: {
+                /** @description The ID of the payment method reference to delete. */
+                paymentMethodReferenceId: components["parameters"]["paymentMethodReferenceId"];
+                /** @description The customer ID. */
+                customerId: components["parameters"]["customerId"];
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    setupCustomerPaymentMethodReference: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description The zone identifier for the payment configuration. */
+                zoneId: components["parameters"]["zoneId"];
+            };
+            header?: never;
+            path: {
+                /** @description The customer ID. */
+                customerId: components["parameters"]["customerId"];
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PaymentMethodReferenceSetupRequest"];
+            };
+        };
+        responses: {
+            /** @description Payment method reference setup initiated successfully. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaymentMethodReferenceSetupResponse"];
+                };
+            };
+            /** @description CustomerId URL parameter does not match the verified customer represented by the JWT token. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Requested resource not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getCustomerProductLists: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /** @description The customer ID. */
+                customerId: components["parameters"]["customerId"];
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerProductListResult"];
+                };
+            };
+            /** @description CustomerId URL parameter does not match the verified customer represented by the JWT token. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Requested resource not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    createCustomerProductList: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /** @description The customer ID. */
+                customerId: components["parameters"]["customerId"];
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomerProductList"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerProductList"];
+                };
+            };
+            /** @description CustomerId URL parameter does not match the verified customer represented by the JWT token. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Requested resource not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getCustomerProductList: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /** @description The ID of the list. */
+                listId: components["parameters"]["listId"];
+                /** @description The customer ID. */
+                customerId: components["parameters"]["customerId"];
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerProductList"];
+                };
+            };
+            /** @description CustomerId URL parameter does not match the verified customer represented by the JWT token. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Requested resource not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    deleteCustomerProductList: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /** @description The ID of the list. */
+                listId: components["parameters"]["listId"];
+                /** @description The customer ID. */
+                customerId: components["parameters"]["customerId"];
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description CustomerId URL parameter does not match the verified customer represented by the JWT token. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Requested resource not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateCustomerProductList: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /** @description The ID of the list. */
+                listId: components["parameters"]["listId"];
+                /** @description The customer ID. */
+                customerId: components["parameters"]["customerId"];
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomerProductList"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerProductList"];
+                };
+            };
+            /** @description CustomerId URL parameter does not match the verified customer represented by the JWT token. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Requested resource not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    createCustomerProductListItem: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /** @description The ID of the list. */
+                listId: components["parameters"]["listId"];
+                /** @description The customer ID. */
+                customerId: components["parameters"]["customerId"];
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomerProductListItem"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerProductListItem"];
+                };
+            };
+            /** @description CustomerId URL parameter does not match the verified customer represented by the JWT token. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Requested resource not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getCustomerProductListItem: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /** @description The ID of the item. */
+                itemId: components["parameters"]["itemId"];
+                /** @description The ID of the list. */
+                listId: components["parameters"]["listId"];
+                /** @description The customer ID. */
+                customerId: components["parameters"]["customerId"];
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerProductListItem"];
+                };
+            };
+            /** @description CustomerId URL parameter does not match the verified customer represented by the JWT token. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Requested resource not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    deleteCustomerProductListItem: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /** @description The ID of the item. */
+                itemId: components["parameters"]["itemId"];
+                /** @description The ID of the list. */
+                listId: components["parameters"]["listId"];
+                /** @description The customer ID. */
+                customerId: components["parameters"]["customerId"];
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Requested resource not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updateCustomerProductListItem: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /** @description The ID of the item. */
+                itemId: components["parameters"]["itemId"];
+                /** @description The ID of the list. */
+                listId: components["parameters"]["listId"];
+                /** @description The customer ID. */
+                customerId: components["parameters"]["customerId"];
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomerProductListItem"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerProductListItem"];
+                };
+            };
+            /** @description Requested resource not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getPublicProductListsBySearchTerm: {
+        parameters: {
+            query: {
+                /** @description The email address of the customer the product lists belong to. */
+                email?: components["parameters"]["email"];
+                /** @description The first name of the customer the product lists belong to. This field is case sensitive and must be an exact match. */
+                firstName?: components["parameters"]["firstName"];
+                /** @description The last name of the customer the product lists belong to. This field is case sensitive and must be an exact match. */
+                lastName?: components["parameters"]["lastName"];
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicProductListResult"];
+                };
+            };
+            /** @description CustomerId URL parameter does not match the verified customer represented by the JWT token. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Indicates that the customerId URL parameter does not match the verified customer represented by the JWT token, which is not relevant when using OAuth, or indicates that the provided new address name is already in use for the customer. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Requested resource not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getPublicProductList: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /** @description The ID of the list. */
+                listId: components["parameters"]["listId"];
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicProductList"];
+                };
+            };
+            /** @description CustomerId URL parameter does not match the verified customer represented by the JWT token. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Indicates that the customerId URL parameter does not match the verified customer represented by the JWT token, which is not relevant when using OAuth, or indicates that the provided new address name is already in use for the customer. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Requested resource not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getPublicProductListItems: {
+        parameters: {
+            query: {
+                /** @description Expand product details. Valid values are 'product', 'images', 'availability'. For images and availability, the product must also be expanded. */
+                expand?: components["parameters"]["expandProductListsItems"];
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /** @description The ID of the list. */
+                listId: components["parameters"]["listId"];
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicProductListItemResult"];
+                };
+            };
+            /** @description Invalid request parameters */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The specified product list was not found or is not public. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getProductListItem: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /** @description The ID of the item. */
+                itemId: components["parameters"]["itemId"];
+                /** @description The ID of the list. */
+                listId: components["parameters"]["listId"];
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicProductListItem"];
+                };
+            };
+            /** @description CustomerId URL parameter does not match the verified customer represented by the JWT token. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Indicates that the customerId URL parameter does not match the verified customer represented by the JWT token, which is not relevant when using OAuth, or indicates that the provided new address name is already in use for the customer. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Requested resource not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+}
+type WithRequired<T, K extends keyof T> = T & {
+    [P in K]-?: T[P];
+};

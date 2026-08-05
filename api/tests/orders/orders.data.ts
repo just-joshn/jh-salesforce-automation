@@ -1,6 +1,7 @@
 import type { APIRequestContext } from '@playwright/test';
 import type { OrderableVariant } from '../../support/products';
 import { findOrderableVariants } from '../../support/products';
+import type { CustomerOrder, CustomerOrderResult } from '../../support/scapi-types';
 
 export interface RegistrationInput {
   firstName: string;
@@ -28,26 +29,8 @@ export interface Card {
   securityCode: string;
 }
 
-export interface OrderSummary {
-  orderNo?: string;
-  status?: string;
-  creationDate?: string;
-  orderTotal?: number;
-}
-
-export interface OrderHistory {
-  total: number;
-  data?: OrderSummary[];
-}
-
-export interface OrderDetail {
-  orderNo?: string;
-  status?: string;
-  orderTotal?: number;
-}
-
 // Order list; no orders → missing array.
-export const ordersOf = (history: OrderHistory): OrderSummary[] => history.data ?? [];
+export const ordersOf = (history: CustomerOrderResult): CustomerOrder[] => history.data ?? [];
 
 export const password = 'Test1234!';
 // Main product id. The in-stock size is resolved at run time.

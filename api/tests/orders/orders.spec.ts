@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
+import type { CustomerOrderResult, Order } from '../../support/scapi-types';
 import { getGuestToken, requireSession } from '../../support/slas';
 import * as Actions from './orders.actions';
-import type { OrderDetail, OrderHistory } from './orders.data';
 import { orderableVariant, ordersOf, registrant, uniqueEmail, unknownOrderNo } from './orders.data';
 
 // Orders match; shoppers can't see each other's.
@@ -22,7 +22,7 @@ test('order history and detail are correct, consistent, and access-controlled', 
   // A sees the order, status, total.
   const historyResponse = await Actions.getCustomerOrders(request, tokenA, customerIdA);
   expect(historyResponse.status()).toBe(200);
-  const history = (await historyResponse.json()) as OrderHistory;
+  const history = (await historyResponse.json()) as CustomerOrderResult;
   expect(history.total).toBeGreaterThan(0);
   const summary = ordersOf(history).find((entry) => entry.orderNo === orderNo);
   if (!summary) throw new Error('the placed order is missing from the order history');
@@ -32,7 +32,7 @@ test('order history and detail are correct, consistent, and access-controlled', 
   // Order detail matches the list.
   const detailResponse = await Actions.getOrder(request, tokenA, orderNo);
   expect(detailResponse.status()).toBe(200);
-  const detail = (await detailResponse.json()) as OrderDetail;
+  const detail = (await detailResponse.json()) as Order;
   expect(detail.orderNo).toBe(orderNo);
   expect(detail.orderTotal).toBe(summary.orderTotal);
 
@@ -44,7 +44,7 @@ test('order history and detail are correct, consistent, and access-controlled', 
   const { accessToken: tokenB, customerId: customerIdB } = requireSession(loginB, 'customer B');
   const emptyResponse = await Actions.getCustomerOrders(request, tokenB, customerIdB);
   expect(emptyResponse.status()).toBe(200);
-  expect(((await emptyResponse.json()) as OrderHistory).total).toBe(0);
+  expect(((await emptyResponse.json()) as CustomerOrderResult).total).toBe(0);
 
   // Unknown order → 404.
   expect((await Actions.getOrder(request, tokenA, unknownOrderNo)).status()).toBe(404);

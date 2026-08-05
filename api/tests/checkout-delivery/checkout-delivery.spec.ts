@@ -1,7 +1,8 @@
 import { expect, test } from '@playwright/test';
+import { required } from '../../support/scapi';
+import type { Basket, Order } from '../../support/scapi-types';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './checkout-delivery.actions';
-import type { Basket, Order } from './checkout-delivery.data';
 import {
   checkout,
   createdStatus,
@@ -21,7 +22,7 @@ test('place a guest delivery order and consume the basket', async ({ request }) 
 
   const created = (await (await Actions.createBasket(request, accessToken)).json()) as Basket;
   expect(created.basketId).toBeTruthy();
-  const id = created.basketId;
+  const id = required(created.basketId, 'basketId');
 
   // Fill each checkout step; each must save.
   expect(

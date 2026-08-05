@@ -1,0 +1,189 @@
+// Generated from the vendored SCAPI OpenAPI spec. Do not edit by hand.
+//
+// Family:  shopper-configurations (called as configuration/shopper-configurations/v1)
+// Version: 1.3.0
+// Source:  SalesforceCommerceCloud/commerce-sdk-isomorphic@main:apis/shopper-configurations-oas-1.3.0/shopper-configurations-oas-v1-public.yaml
+//
+// Regenerate with `pnpm gen:api:fetch && pnpm gen:api`.
+
+export interface paths {
+    "/organizations/{organizationId}/configurations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Retrieves configurations
+         * @description Retrieves configurations for the specified organization and site.
+         */
+        get: operations["getConfigurations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+}
+export type webhooks = Record<string, never>;
+export interface components {
+    schemas: {
+        /**
+         * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+         * @example f_ecom_zzxy_prd
+         */
+        OrganizationId: string;
+        /**
+         * @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites
+         * @example RefArch
+         */
+        SiteId: string;
+        /** @description Configuration object */
+        Configuration: {
+            /**
+             * @description identifier
+             * @example SalesforcePaymentsAllowed
+             */
+            id: string;
+            /**
+             * @description value for identifier
+             * @example true
+             */
+            value: unknown;
+            /**
+             * @description type of configuration value
+             * @example globalConfiguration
+             */
+            configurationType?: string;
+        };
+        /** @description Site Configuration object */
+        SiteConfiguration: {
+            /** @description List configurations for the instance and site */
+            configurations: components["schemas"]["Configuration"][];
+        };
+        ErrorResponse: {
+            /**
+             * @description A short, human-readable summary of the problem
+             *     type.  It will not change from occurrence to occurrence of the
+             *     problem, except for purposes of localization
+             * @example You do not have enough credit
+             */
+            title: string;
+            /**
+             * @description A URI reference [RFC3986] that identifies the
+             *     problem type.  This specification encourages that, when
+             *     dereferenced, it provide human-readable documentation for the
+             *     problem type (e.g., using HTML [W3C.REC-html5-20141028]).  When
+             *     this member is not present, its value is assumed to be
+             *     "about:blank". It accepts relative URIs; this means
+             *     that they must be resolved relative to the document's base URI, as
+             *     per [RFC3986], Section 5.
+             * @example NotEnoughMoney
+             */
+            type: string;
+            /**
+             * @description A human-readable explanation specific to this occurrence of the problem.
+             * @example Your current balance is 30, but that costs 50
+             */
+            detail: string;
+            /**
+             * @description A URI reference that identifies the specific
+             *     occurrence of the problem.  It may or may not yield further
+             *     information if dereferenced.  It accepts relative URIs; this means
+             *     that they must be resolved relative to the document's base URI, as
+             *     per [RFC3986], Section 5.
+             * @example /account/12345/msgs/abc
+             */
+            instance?: string;
+        } & {
+            [key: string]: unknown;
+        };
+    };
+    responses: never;
+    parameters: {
+        /**
+         * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+         * @example f_ecom_zzxy_prd
+         */
+        organizationId: components["schemas"]["OrganizationId"];
+        /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+        siteId: components["schemas"]["SiteId"];
+        /**
+         * @description Controls whether personalization is applied to the response. Set to `none` to opt out of personalized response handling so the response is safe to cache at the CDN layer.
+         *
+         *     When set to `none`, the server skips applying personalization to the response.
+         */
+        personalized: "none";
+    };
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
+}
+export type $defs = Record<string, never>;
+export interface operations {
+    getConfigurations: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /**
+                 * @description Controls whether personalization is applied to the response. Set to `none` to opt out of personalized response handling so the response is safe to cache at the CDN layer.
+                 *
+                 *     When set to `none`, the server skips applying personalization to the response.
+                 */
+                personalized?: components["parameters"]["personalized"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Retrieved configurations successfully. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteConfiguration"];
+                };
+            };
+            /** @description Bad request - invalid parameters provided. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Your shopper JWT is invalid and cannot be used to identify the API client. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Application context not found for the specified organization and site. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+}

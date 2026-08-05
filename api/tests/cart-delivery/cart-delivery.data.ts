@@ -1,3 +1,5 @@
+import type { Basket, BasketProductItem } from '../../support/scapi-types';
+
 export interface Variant {
   productId: string;
   orderable: boolean;
@@ -8,25 +10,6 @@ export interface Variant {
 export interface Product {
   id: string;
   variants?: Variant[];
-}
-
-export interface ProductItem {
-  itemId: string;
-  productId: string;
-  quantity: number;
-  price?: number;
-  shipmentId?: string;
-}
-
-export interface Basket {
-  basketId: string;
-  productItems?: ProductItem[];
-  shipments?: { shipmentId: string }[];
-}
-
-export interface Fault {
-  type?: string;
-  title?: string;
 }
 
 // Color/size list; missing if none.
@@ -43,10 +26,10 @@ export const firstOrderableVariant = (product: Product): Variant => {
 export const variationCount = (variant: Variant): number =>
   Object.keys(variant.variationValues ?? {}).length;
 
-export const lineItems = (basket: Basket): ProductItem[] => basket.productItems ?? [];
+export const lineItems = (basket: Basket): BasketProductItem[] => basket.productItems ?? [];
 
 // First cart line, or fail clear.
-export const firstLineItem = (basket: Basket): ProductItem => {
+export const firstLineItem = (basket: Basket): BasketProductItem => {
   const [item] = lineItems(basket);
   if (!item) throw new Error('expected the added product item');
   return item;

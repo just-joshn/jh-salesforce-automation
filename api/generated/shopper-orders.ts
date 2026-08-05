@@ -1,0 +1,3348 @@
+// Generated from the vendored SCAPI OpenAPI spec. Do not edit by hand.
+//
+// Family:  shopper-orders (called as checkout/shopper-orders/v1)
+// Version: 1.17.1
+// Source:  SalesforceCommerceCloud/commerce-sdk-isomorphic@main:apis/shopper-orders-oas-1.17.1/shopper-orders-oas-v1-public.yaml
+//
+// Regenerate with `pnpm gen:api:fetch && pnpm gen:api`.
+
+export interface paths {
+    "/organizations/{organizationId}/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Submits an order for a basket.
+         * @description Submits an order based on a prepared basket. The only considered value from the request body is basketId.
+         */
+        post: operations["createOrder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/orders/oms-meta-data": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Retrieve Order Management (OMS) configuration data needed to render cancel and return experiences.
+         * @description Retrieves configuration data from Order Management (OMS) required by the storefront to render cancel and return experiences.
+         *     The response contains the reason codes configured in OMS for cancelling an order and for returning order items.
+         *     Each reason code carries a `default` flag. When the caller omits a reason, the cancel and return endpoints (`cancelOmsOrder`, `returnOmsOrder`) apply the reason marked as `default` for that flow.
+         */
+        get: operations["getOmsMetaData"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/orders/{orderNo}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Retrieve order information.
+         * @description Gets information for an order.
+         */
+        get: operations["getOrder"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/orders/{orderNo}/lookup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Retrieve order information using a combination of non-token identifying factors.
+         * @description Retrieve order details using non-token identifiers or an authenticated shopper session.
+         *
+         *     The endpoint distinguishes between two levels of access:
+         *         - Full access: Granted using shopper authentication, an OrderViewCode, or a time-limited access code. The OrderViewCode and access code are both passed in the `orderViewCode` request-body field; the server distinguishes them by format. Returns the complete order graph.
+         *         - Partial access: Granted using a billing PostalCode paired with email or phone information. Filters sensitive data and Personally Identifiable Information (PII).
+         */
+        post: operations["guestOrderLookup"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/orders/{orderNo}/actions/fail": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Fail an Order.
+         * @description Fails an unplaced order and optionally reopens the basket when indicated.
+         *     Creates a HistoryEntry in the failed Order with provided reasonCode.
+         */
+        post: operations["failOrder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/orders/{orderNo}/actions/oms-cancel-order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cancel an order that is integrated with Order Management (OMS).
+         * @description Cancels an order that is integrated with Order Management (OMS).
+         *     The cancellation always applies to the entire order; partial cancellations are not supported.
+         */
+        post: operations["cancelOmsOrder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/orders/{orderNo}/actions/oms-return-order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Initiate the return of one or more items of an order that is integrated with Order Management (OMS).
+         * @description Initiates the return of one or more items of an order that is integrated with Order Management (OMS).
+         */
+        post: operations["returnOmsOrder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/orders/{orderNo}/actions/request-access-code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Request a time-limited access code for a guest order.
+         * @description Generates a time-limited access code and delivers it via email to the address associated with the order. The shopper can then use this
+         *     code with the lookup, cancel, and return endpoints to access the order without the original session.
+         *
+         *     The generated code is valid for 15 minutes. Too many incorrect access attempts invalidate the code early, but the 15-minute
+         *     cooldown remains — a new code cannot be generated until the original validity period has elapsed, even if the code was invalidated early.
+         *
+         *     The endpoint always returns 202 — whether the order and email combination is valid, and whether a new code was
+         *     generated. This uniform response prevents enumeration of valid orders and avoids revealing cooldown state to callers.
+         */
+        post: operations["requestOrderAccessCode"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/orders/{orderNo}/payment-instruments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add a payment instrument to an order.
+         * @description Adds a payment instrument to an order.
+         *
+         *     Details:
+         *
+         *     The payment instrument is added with the provided details. The payment method must be applicable for the order see GET
+         *     /baskets/{basketId}/payment-methods, if the payment method is 'CREDIT_CARD' a paymentCard must be specified in the request.
+         */
+        post: operations["createPaymentInstrumentForOrder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/orders/{orderNo}/payment-instruments/{paymentInstrumentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Remove a payment instrument from an order.
+         * @description Removes a payment instrument of an order.
+         */
+        delete: operations["removePaymentInstrumentFromOrder"];
+        options?: never;
+        head?: never;
+        /**
+         * Update payment instrument details for an order.
+         * @description Updates a payment instrument of an order.
+         *
+         *     Details:
+         *
+         *     The payment instrument is updated with the provided details. The payment method must be applicable for the
+         *     order see GET /baskets/{basketId}/payment-methods, if the payment method is 'CREDIT_CARD' a
+         *     paymentCard must be specified in the request.
+         */
+        patch: operations["updatePaymentInstrumentForOrder"];
+        trace?: never;
+    };
+    "/organizations/{organizationId}/orders/{orderNo}/payment-methods": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Retrieve payment instrument details for an order.
+         * @description Gets the applicable payment methods for an existing order considering the open payment amount only.
+         */
+        get: operations["getPaymentMethodsForOrder"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/orders/{orderNo}/taxes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Retrieve external taxation data for an order.
+         * @description This method gives you the external taxation data of the order transferred from the basket during
+         *     order creation. This endpoint can be called only if external taxation was used. See POST /baskets
+         *     for more information.
+         */
+        get: operations["getTaxesFromOrder"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+}
+export type webhooks = Record<string, never>;
+export interface components {
+    schemas: {
+        /**
+         * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+         * @example f_ecom_zzxy_prd
+         */
+        OrganizationId: string;
+        /**
+         * @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites
+         * @example RefArch
+         */
+        SiteId: string;
+        /**
+         * @description A concatenated version of the standard Language and Country codes, combined with a hyphen '`-`'.
+         * @example en-US
+         */
+        LanguageCountry: string;
+        /**
+         * @description A two letter lowercase language code conforming to the [ISO 639-1](https://www.iso.org/iso-639-language-codes.html) standard. Additionally, this may be used to submit requests with the header parameter `Accept-Language`, following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766).
+         * @example en
+         */
+        LanguageCode: string;
+        /**
+         * @description A specialized value indicating the system default values for locales.
+         * @default default
+         * @example default
+         */
+        DefaultFallback: string;
+        /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+        LocaleCode: components["schemas"]["LanguageCountry"] | components["schemas"]["LanguageCode"] | components["schemas"]["DefaultFallback"];
+        /**
+         * @description A two letter uppercase country code conforming to the [ISO 3166-1](https://www.iso.org/iso-3166-country-codes.html) alpha-2 standard.
+         * @example US
+         */
+        CountryCode: string;
+        /** @description Document representing an order address. */
+        OrderAddress: {
+            /**
+             * @description The first address line.
+             * @example 45 Main Rd.
+             */
+            address1?: string;
+            /**
+             * @description The second address line.
+             * @example Apartment 204
+             */
+            address2?: string;
+            /**
+             * @description The city.
+             * @example Boston
+             */
+            city?: string;
+            /**
+             * @description The company name.
+             * @example Salesforce
+             */
+            companyName?: string;
+            countryCode?: components["schemas"]["CountryCode"];
+            /**
+             * @description The first name.
+             * @example Max
+             */
+            firstName?: string;
+            /**
+             * @description The full name.
+             * @example Max Mustermann
+             */
+            fullName?: string;
+            /**
+             * @description The ID of the address.
+             * @example me
+             */
+            id?: string;
+            /**
+             * @description The job title.
+             * @example Software Engineer
+             */
+            jobTitle?: string;
+            /**
+             * @description The last name.
+             * @example Mustermann
+             */
+            lastName?: string;
+            /**
+             * @description The phone number.
+             * @example 6175555555
+             */
+            phone?: string;
+            /**
+             * @description The post office box.
+             * @example PO BOX 109
+             */
+            postBox?: string;
+            /**
+             * @description The postal code.
+             * @example 05408
+             */
+            postalCode?: string;
+            /**
+             * @description The salutation.
+             * @example Mr
+             */
+            salutation?: string;
+            /** @description The second name. */
+            secondName?: string;
+            /**
+             * @description The state code.
+             * @example MA
+             */
+            stateCode?: string;
+            /**
+             * @description The suffix.
+             * @example Sr
+             */
+            suffix?: string;
+            /**
+             * @description The suite.
+             * @example 24A
+             */
+            suite?: string;
+            /**
+             * @description The title.
+             * @example Dr.
+             */
+            title?: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /**
+         * @description The id (SKU) of the product.
+         * @example apple-ipod-classic
+         */
+        ProductId: string;
+        /** @description Document representing a link to the resource for product details. */
+        ProductDetailsLink: {
+            /**
+             * @description The description of the product.
+             * @example Nintendo DS revolutionizes handheld gameplay.
+             */
+            productDescription?: string;
+            productId: components["schemas"]["ProductId"];
+            /**
+             * @description The name of the product.
+             * @example Nintendo DS Game Console
+             */
+            productName?: string;
+            /**
+             * @description The link title.
+             * @example Nintendo DS Game Console
+             */
+            title?: string;
+        };
+        /** @description Document representing a bonus discount line item. */
+        BonusDiscountLineItem: {
+            /** @description The bonus products the customer can choose from. */
+            bonusProducts?: components["schemas"]["ProductDetailsLink"][];
+            /**
+             * @description The coupon code that triggered the promotion, if applicable.
+             * @example 5ties
+             */
+            couponCode?: string;
+            /**
+             * @description The ID of the line item. It is read only.
+             * @example 91f4dd8bfa0653d58b7783b04f
+             */
+            id?: string;
+            /**
+             * Format: int32
+             * @description The maximum number of bonus items the user can select for this promotion.
+             */
+            maxBonusItems?: number;
+            /**
+             * @description The ID of the promotion that triggered the creation of the line item.
+             * @example Buy1Get2
+             */
+            promotionId?: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /**
+         * @description The coupon item ID
+         * @example d4c9c0141e9c74c150225580f3
+         */
+        CouponItemId: string;
+        /** @description Document representing a coupon item. */
+        CouponItem: {
+            /**
+             * @description The coupon code.
+             * @example 5ties
+             */
+            code: string;
+            /** @description The coupon item ID. It is read only. */
+            couponItemId?: components["schemas"]["CouponItemId"];
+            /**
+             * @description The status of the coupon item. It is read only.
+             * @example no_applicable_promotion
+             * @enum {string}
+             */
+            statusCode?: "coupon_code_already_in_basket" | "coupon_code_already_redeemed" | "coupon_code_unknown" | "coupon_disabled" | "redemption_limit_exceeded" | "customer_redemption_limit_exceeded" | "timeframe_redemption_limit_exceeded" | "no_active_promotion" | "coupon_already_in_basket" | "no_applicable_promotion" | "applied" | "adhoc";
+            /**
+             * @description A flag indicating whether the coupon item is valid. A coupon line item is valid if
+             *     the status code is "applied" or "no_applicable_promotion". It is read only.
+             * @example true
+             */
+            valid?: boolean;
+        } & {
+            [key: string]: unknown;
+        };
+        /**
+         * @description A three letter uppercase currency code conforming to the [ISO 4217](https://www.iso.org/iso-4217-currency-codes.html) standard, or the string `N/A` indicating that a currency is not applicable.
+         * @example USD
+         */
+        CurrencyCode: string;
+        /** @description The customer information for guest or logged-in customers. */
+        CustomerInfo: {
+            /**
+             * @description The customer ID. It is read only.
+             * @example abMKqMaNYOBMnNdDNzyC5oNTi5
+             */
+            customerId?: string;
+            /**
+             * @description The customer name.
+             * @example Max Mustermann
+             */
+            customerName?: string;
+            /**
+             * @description The customer number.
+             * @example 0002352
+             */
+            customerNo?: string;
+            /**
+             * @description The customer's email address.
+             * @example no-reply@salesforce.com
+             */
+            email: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** @example 629dea6e7b61e58da629b57b21 */
+        GiftCertificateItemId: string;
+        /** @description A gift certificate item. */
+        GiftCertificateItem: {
+            /**
+             * Format: double
+             * @description The gift certificate item amount.
+             * @example 20
+             */
+            amount: number;
+            /** @description The item ID. It is read only. */
+            giftCertificateItemId?: components["schemas"]["GiftCertificateItemId"];
+            /**
+             * @description The gift certificate message.
+             * @example Birthday present.
+             */
+            message?: string;
+            /**
+             * @description The recipient email.
+             * @example no-reply@salesforce.com
+             */
+            recipientEmail: string;
+            /**
+             * @description The recipient's name.
+             * @example Daniel Mustermann
+             */
+            recipientName?: string;
+            /**
+             * @description The sender's name.
+             * @example Max Mustermann
+             */
+            senderName?: string;
+            /**
+             * @description The ID of the shipment this item belongs to.
+             * @example me
+             */
+            shipmentId?: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Document representing the grouped tax item. */
+        GroupedTaxItem: {
+            /**
+             * Format: double
+             * @description The tax rate. It is read only.
+             * @example 0.1
+             */
+            taxRate?: number;
+            /**
+             * Format: double
+             * @description The summed up tax total for the tax rate. It is read only.
+             * @example 10.03
+             */
+            taxValue?: number;
+        };
+        /** @description Document representing a discount. */
+        Discount: {
+            /**
+             * Format: double
+             * @description The discount amount for discount types that define specific discount amounts. It is read only.
+             * @example 130.88
+             */
+            amount?: number;
+            /**
+             * Format: double
+             * @description The discount percent for discount types that define percentage discounts. It is read only.
+             * @example 0.19
+             */
+            percentage?: number;
+            /**
+             * @description The price book ID that is used with some types. It is read only.
+             * @example usd-sale-prices
+             */
+            priceBookId?: string;
+            /**
+             * @description The type of discount. It is read only.
+             * @example fixed_price
+             * @enum {string}
+             */
+            type: "percentage" | "fixed_price" | "amount" | "free" | "price_book_price" | "bonus" | "total_fixed_price" | "bonus_choice" | "percentage_off_options";
+        } & {
+            [key: string]: unknown;
+        };
+        /** @example ba248424e3eee797f062161f8b */
+        PriceAdjustmentId: string;
+        /**
+         * @description Document representing a price adjustment within a basket or order. Price adjustments
+         *     can be assigned at the order, product, or shipping level.
+         */
+        PriceAdjustment: {
+            /**
+             * @description Details describing the discount this price adjustment is based on. For adjustments
+             *     not based on a discount, this value is null.
+             */
+            appliedDiscount?: components["schemas"]["Discount"];
+            /**
+             * @description The coupon code of the coupon this price adjustment is based on. For adjustments
+             *     not based on a coupon, this value is null. It is read only.
+             * @example 5ties
+             */
+            couponCode?: string;
+            /**
+             * @description The user who created the price adjustment. It is read only.
+             * @example Support
+             */
+            createdBy?: string;
+            /**
+             * Format: date-time
+             * @description The timestamp when the price adjustment was created. It is read only.
+             * @example 2015-05-19T15:23:18.000Z
+             */
+            creationDate?: string;
+            /**
+             * @description A flag indicating whether this price adjustment was created by custom logic. This
+             *     flag is set to true unless the price adjustment was created by the promotion
+             *     engine.
+             * @example true
+             */
+            custom?: boolean;
+            /** @description The text describing the item. */
+            itemText?: string;
+            /**
+             * Format: date-time
+             * @description The timestamp when the price adjustment was last modified. It is read only.
+             * @example 2021-02-25T09:58:08.715Z
+             */
+            lastModified?: string;
+            /**
+             * @description A flag indicating whether this price adjustment was created by a manual process.
+             *     If the price adjustment was created by the promotion engine, this value is always
+             *     false.
+             * @example true
+             */
+            manual?: boolean;
+            /**
+             * Format: double
+             * @description The adjustment price. It is read only.
+             * @example 120.88
+             */
+            price?: number;
+            /** @description The price adjustment ID. It is read only. */
+            priceAdjustmentId?: components["schemas"]["PriceAdjustmentId"];
+            /**
+             * @description The ID of the related promotion. Custom price adjustments
+             *     can be assigned any promotion ID so long it is not
+             *     used by a price adjustment belonging to the same item,
+             *     and is not used by a promotion defined in the promotion engine.
+             *     If not specified, a promotion ID is generated.
+             */
+            promotionId?: string;
+            /** @description The reason for the price adjustment. */
+            reasonCode?: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Document representing an object status. */
+        Status: {
+            /** @description The status code. */
+            code?: string;
+            /** @description The status message. */
+            message?: string;
+            /**
+             * Format: int32
+             * @description The status.
+             *     For more information on the status values see Status.OK and Status.ERROR.
+             */
+            status?: number;
+        };
+        /** @description Document representing a payment card. */
+        PaymentCard: {
+            /**
+             * @description The payment card type.
+             * @example Visa
+             */
+            cardType?: string;
+            /**
+             * @description A flag indicating if the credit card is expired. It is read only.
+             * @example true
+             */
+            creditCardExpired?: boolean;
+            /**
+             * @description A credit card token. If a credit card is tokenized, the token can be used to look up the credit card data
+             *     in the token store.
+             * @example E67TY8GQ27X
+             */
+            creditCardToken?: string;
+            /**
+             * Format: int32
+             * @description The month when the payment card expires.
+             * @example 3
+             */
+            expirationMonth?: number;
+            /**
+             * Format: int32
+             * @description The year when the payment card expires.
+             * @example 2025
+             */
+            expirationYear?: number;
+            /**
+             * @description The payment card holder.
+             * @example Max Mustermann
+             */
+            holder?: string;
+            /**
+             * @description The payment card issue number.
+             * @example 2
+             */
+            issueNumber?: string;
+            /**
+             * @description The masked payment card number.
+             * @example *********4422
+             */
+            maskedNumber?: string;
+            /**
+             * @description The last digits of the payment card number. It is read only.
+             * @example 4422
+             */
+            numberLastDigits?: string;
+            /**
+             * Format: int32
+             * @description The month the payment card is valid from.
+             * @example 5
+             */
+            validFromMonth?: number;
+            /**
+             * Format: int32
+             * @description The year the payment card is valid from.
+             * @example 2015
+             */
+            validFromYear?: number;
+        };
+        /** @description Document representing a gift card response. */
+        GiftCardResponse: {
+            /**
+             * @description The gift card brand.
+             * @example givex
+             */
+            brand?: string;
+            /**
+             * @description The masked gift card number.
+             * @example *********4422
+             */
+            maskedCardNumber?: string;
+            /**
+             * Format: int32
+             * @description The month when the gift card expires.
+             * @example 1
+             */
+            expirationMonth?: number;
+            /**
+             * Format: int32
+             * @description The year when the gift card expires.
+             * @example 2030
+             */
+            expirationYear?: number;
+        };
+        /**
+         * @description The payment instrument ID
+         * @example ba248424e3eee797f062162f8b
+         */
+        PaymentInstrumentId: string;
+        /** @description Document representing an order payment instrument. */
+        OrderPaymentInstrument: {
+            /**
+             * Format: double
+             * @description The payment transaction amount.
+             * @example 130.88
+             */
+            amount?: number;
+            /** @description The authorization status of the payment transaction. It is read only. */
+            authorizationStatus?: components["schemas"]["Status"];
+            /**
+             * @description The bank routing number.
+             * @example 12030000
+             */
+            bankRoutingNumber?: string;
+            /**
+             * @description The gift certificate code with the last 4 characters not masked.
+             * @example ******Gzzy
+             */
+            maskedGiftCertificateCode?: string;
+            /** @description The payment card. */
+            paymentCard?: components["schemas"]["PaymentCard"];
+            /** @description The gift card. */
+            giftCard?: components["schemas"]["GiftCardResponse"];
+            /** @description The payment instrument ID. It is read only. */
+            paymentInstrumentId?: components["schemas"]["PaymentInstrumentId"];
+            /**
+             * @description The payment method ID. It is read only.
+             * @example CREDIT_CARD
+             */
+            paymentMethodId?: string;
+            /** @description Payment reference information for various payment service providers, only when Salesforce Payments is enabled. */
+            paymentReference?: {
+                /**
+                 * @description Payment reference identifier. Can be payment intent ID for Stripe, PSP reference for Adyen, PayPal order ID for PayPal, or similar identifier for other payment providers.
+                 * @example pi_3N4B2vF0wDjebNCp1234567
+                 */
+                paymentReferenceId?: string;
+                /**
+                 * @description The payment gateway used to process the payment.
+                 * @example stripe
+                 * @enum {string}
+                 */
+                gateway?: "stripe" | "paypal" | "adyen";
+                /** @description The payment gateway specific properties. */
+                gatewayProperties?: {
+                    /**
+                     * @description # Stripe specific properties.
+                     *
+                     *     - setupFutureUsage: Indicates that you intend to make future payments with this payment method.
+                     *       - **on_session**: The payment method is intended to be used for a future payment on the same website session.
+                     *       - **off_session**: The payment method is intended to be used for a future payment on a different website session.
+                     *      - **null**: The payment method is not intended to be used for a future payment.
+                     *     - clientSecret: Secret for Stripe client-side payment confirmation. Don't store, log, or expose the client secret to anyone other than the customer, and only use it on pages where TLS is enabled.
+                     *       - type: string
+                     *       - maxLength: 256
+                     *       - example: "pi_1J4K5L2eZvKYlo2CyZ8K5L6M_secret_abc123"
+                     */
+                    stripe?: {
+                        [key: string]: unknown;
+                    };
+                    /** @description # PayPal specific properties. */
+                    paypal?: {
+                        [key: string]: unknown;
+                    };
+                    /**
+                     * @description # Adyen specific properties.
+                     *
+                     *     - adyenError: Error information returned by Adyen if the payment fails. Null on success.
+                     *     - adyenPaymentIntent: The Adyen payment intent object containing payment details and required actions.
+                     *       - resultCode: The result of the payment request (for example, "REDIRECT_SHOPPER", "AUTHORISED", "PENDING", "REFUSED").
+                     *       - accountID: The Adyen merchant account ID.
+                     *       - adyenPaymentIntentAction: The action object for payment methods requiring additional shopper interaction.
+                     *         - url: The URL for completing the payment (redirect or 3DS authentication).
+                     *         - type: The action type (for example, "redirect", "threeDS2", "voucher").
+                     *         - method: The HTTP method for the action (for example, "GET", "POST").
+                     *     - successful: A boolean indicating whether the Adyen operation is successful.
+                     */
+                    adyen?: {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+        /** @description Document representing a product item. */
+        ProductItem: {
+            /**
+             * Format: double
+             * @description The tax on the line item, including any adjustments. It is read only.
+             * @example 19
+             */
+            adjustedTax?: number;
+            /**
+             * Format: double
+             * @description The base price of the line item, which is the unit price not including
+             *     adjustments. If the taxation policy is net, it doesn't include tax. If the
+             *     taxation policy is gross, it includes tax. It is read only.
+             * @example 130
+             */
+            basePrice?: number;
+            /** @description The ID of the bonus discount line item this bonus product relates to. It is read only. */
+            bonusDiscountLineItemId?: string;
+            /**
+             * @description A flag indicating whether the product item is a bonus.
+             * @example true
+             */
+            bonusProductLineItem?: boolean;
+            /** @description The bundled product items. */
+            bundledProductItems?: components["schemas"]["ProductItem"][];
+            /**
+             * @description Returns true if the item is a gift. It is read only.
+             * @example true
+             */
+            gift?: boolean;
+            /**
+             * @description The gift message.
+             * @example Happy Birthday
+             */
+            giftMessage?: string;
+            /**
+             * @description The inventory list ID associated with this item.
+             * @example inventory
+             */
+            inventoryId?: string;
+            /**
+             * @description The product item ID. Use it to identify this item when updating its quantity or
+             *     creating a custom price adjustment for it. It is read only.
+             */
+            itemId?: components["schemas"]["ItemId"];
+            /** @description The text describing the item. */
+            itemText?: string;
+            /** @description The option items. */
+            optionItems?: components["schemas"]["OptionItem"][];
+            /**
+             * Format: double
+             * @description The price of the line item before applying any adjustments. If the line item is based on net pricing
+             *     then the net price is returned. If the line item is based on gross
+             *     pricing then the gross price is returned. It is read only.
+             */
+            price?: number;
+            /** @description The price adjustments. */
+            priceAdjustments?: components["schemas"]["PriceAdjustment"][];
+            /**
+             * Format: double
+             * @description The price of the product line item including item-level adjustments, but not
+             *     including order-level adjustments or shipping charges. If the taxation policy is
+             *     net, it doesn't include tax. If the taxation policy is gross, it includes tax. It is read only.
+             * @example 20.99
+             */
+            priceAfterItemDiscount?: number;
+            /**
+             * Format: double
+             * @description The price of the product line item including item-level adjustments and prorated
+             *     order-level adjustments, but not including shipping charges. If the taxation
+             *     policy is net, it doesn't include tax. If the taxation policy is gross, it
+             *     includes tax. It is read only.
+             * @example 15.5
+             */
+            priceAfterOrderDiscount?: number;
+            /**
+             * @description The ID of the product.
+             * @example nintendo-ds-console
+             */
+            productId?: string;
+            /**
+             * @description If this product line item was added from a product list, this value is a reference
+             *     to the corresponding product list item.
+             */
+            productListItem?: components["schemas"]["ProductListItemReference"];
+            /**
+             * @description The name of the product.
+             * @example Nintendo DS Game Console
+             */
+            productName?: string;
+            /**
+             * @description Returns the id of the ProductLineItem that qualified the basket for this bonus product.
+             *     This method is only applicable if the product line item is a bonus product line item, and if the promotion is a
+             *     product promotion with number of qualifying products granting a bonus-product discount. If these conditions
+             *     aren't met, the method returns null. If there are multiple product line items that triggered this bonus product,
+             *     this method returns the last one by position within the order.
+             */
+            qualifyingProductItemId?: string;
+            /**
+             * Format: double
+             * @description The quantity of the products represented by this item.
+             * @example 1
+             */
+            quantity?: number;
+            /**
+             * @description The ID of the shipment this item belongs to.
+             * @example me
+             */
+            shipmentId?: string;
+            /**
+             * @description If the product line item has a related shipping item, this value is its ID. A
+             *     related shipping item represents a surcharge applied to individual products using
+             *     a particular shipping method. It is read only.
+             * @example 006490dcc338feeafc71c964bf
+             */
+            shippingItemId?: string;
+            /**
+             * Format: double
+             * @description The tax for the product item, not including price adjustments. It is read only.
+             * @example 0.3
+             */
+            tax?: number;
+            /**
+             * Format: double
+             * @description The price used to calculate the tax for this product item. It is read only.
+             * @example 30
+             */
+            taxBasis?: number;
+            /**
+             * @description The tax class ID for the product item, or null
+             *     if no tax class ID is associated with the product item. It is read only.
+             */
+            taxClassId?: string;
+            /**
+             * Format: double
+             * @description The tax rate, which is the decimal tax rate to be applied
+             *     to the product represented by this item. It is read only.
+             * @example 0.9
+             */
+            taxRate?: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /**
+         * @description The item id.
+         * @example 430ef5aad3a24de59378458434
+         */
+        ItemId: string;
+        /**
+         * @description An option item represents an optional purchase related to a product item, and is always associated with that parent product
+         *     item. An option item can have different values from which to select. For example, a refrigerator item can have an option item representing an extended warranty, with a set of option item values representing different warranty lengths. When a shopper purchases the warranty option item together with the parent refrigerator item, they select one of the available warranty option item values.
+         */
+        OptionItem: {
+            /**
+             * Format: double
+             * @description The tax on the line item, including any adjustments. It is read only.
+             * @example 19
+             */
+            adjustedTax?: number;
+            /**
+             * Format: double
+             * @description The base price of the line item, which is the unit price not including adjustments.
+             *     If the taxation policy is net, it doesn't include tax. If the taxation policy is gross, it includes tax. It is read only.
+             * @example 50
+             */
+            basePrice?: number;
+            /**
+             * @description The ID of the bonus discount line item this bonus product relates to. It is read only.
+             * @example ba248414e3eee797f062162f8b
+             */
+            bonusDiscountLineItemId?: string;
+            /**
+             * @description A flag indicating whether the product item is a bonus. It is read only.
+             * @example false
+             */
+            bonusProductLineItem?: boolean;
+            /** @description The bundled product items. */
+            bundledProductItems?: components["schemas"]["ProductItem"][];
+            /**
+             * @description Returns true if the item is a gift. It is read only.
+             * @example false
+             */
+            gift?: boolean;
+            /**
+             * @description The gift message.
+             * @example Happy Birthday
+             */
+            giftMessage?: string;
+            /**
+             * @description The inventory list ID associated with this item. It is read only.
+             * @example inventory
+             */
+            inventoryId?: string;
+            /** @description The product item ID. Use it to identify this item when updating its quantity or creating a custom price adjustment for it. It is read only. */
+            itemId?: components["schemas"]["ItemId"];
+            /**
+             * @description The text describing the item.
+             * @example The item text.
+             */
+            itemText?: string;
+            /**
+             * @description The ID of the option. It is read only.
+             * @example consoleWarranty
+             */
+            optionId: string;
+            /** @description The option items. */
+            optionItems?: components["schemas"]["OptionItem"][];
+            /**
+             * @description The ID of the option value. It is read only.
+             * @example 000
+             */
+            optionValueId: string;
+            /**
+             * Format: double
+             * @description The price of the line item before applying any adjustments. If the taxation policy is net, it doesn't include tax.
+             *     If the taxation policy is gross, it includes tax. It is read only.
+             * @example 150.99
+             */
+            price?: number;
+            /** @description The price adjustments. */
+            priceAdjustments?: components["schemas"]["PriceAdjustment"][];
+            /**
+             * Format: double
+             * @description The price of the product line item including item-level adjustments, but not including order-level adjustments or
+             *     shipping charges. If the taxation policy is net, it doesn't include tax. If the taxation policy is gross, it includes tax. It is read only.
+             * @example 50.99
+             */
+            priceAfterItemDiscount?: number;
+            /**
+             * Format: double
+             * @description The price of the product line item including item-level adjustments and prorated order-level adjustments, but not
+             *     including shipping charges. If the taxation policy is net, it doesn't include tax. If the taxation policy is gross, it
+             *     includes tax. It is read only.
+             * @example 40.5
+             */
+            priceAfterOrderDiscount?: number;
+            productId?: components["schemas"]["ProductId"];
+            /** @description If this product line item was added from a product list, this value is a reference to the corresponding product list item. */
+            productListItem?: components["schemas"]["ProductListItemReference"];
+            /**
+             * @description The name of the product.
+             * @example Nintendo DS Game Console
+             */
+            productName?: string;
+            /**
+             * Format: double
+             * @description The ordered quantity of the products represented by this item.
+             * @example 1
+             */
+            quantity?: number;
+            /**
+             * @description The ID of the shipment this item belongs to.
+             * @example me
+             */
+            shipmentId?: string;
+            /**
+             * @description If the product line item has a related shipping item, this value is its ID. A related shipping item represents a
+             *     surcharge applied to individual products using a particular shipping method. It is read only.
+             * @example 006490dcc338feeafc71c964bf
+             */
+            shippingItemId?: string;
+            /**
+             * Format: double
+             * @description The tax on the line item before applying any adjustments. It is read only.
+             * @example 0
+             */
+            tax?: number;
+            /**
+             * Format: double
+             * @description The amount used to calculate the tax for this item. It is read only.
+             * @example 50
+             */
+            taxBasis?: number;
+            /**
+             * @description The tax class ID for the product item, or null
+             *     if no tax class ID is associated with the product item. It is read only.
+             */
+            taxClassId?: string;
+            /**
+             * Format: double
+             * @description The tax rate, which is the decimal tax rate to be applied
+             *     to the product represented by this item. It is read only.
+             * @example 0.19
+             */
+            taxRate?: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Document representing a link to a product list. */
+        ProductListLink: {
+            /** @description The description of this product list. */
+            description?: string;
+            /** @description The name of this product list. */
+            name?: string;
+            /**
+             * @description A flag indicating whether the owner made this product list available for access
+             *     by other customers. It is read only.
+             * @example true
+             */
+            public?: boolean;
+            /** @description The link title. */
+            title?: string;
+            /**
+             * @description The type of the product list.
+             * @example shopping_list
+             * @enum {string}
+             */
+            type?: "wish_list" | "gift_registry" | "shopping_list" | "custom_1" | "custom_2" | "custom_3";
+        };
+        /** @description Document representing product list item details. */
+        ProductListItemReference: {
+            /** @description The ID of the product list item. It is read only. */
+            id: components["schemas"]["ItemId"];
+            /**
+             * Format: int32
+             * @description The priority of the product list item.
+             * @example 1
+             */
+            priority?: number;
+            productDetailsLink?: components["schemas"]["ProductDetailsLink"];
+            /** @description A reference to the associated product list. It is read only. */
+            productList?: components["schemas"]["ProductListLink"];
+            /** @example false */
+            public?: boolean;
+            /**
+             * Format: double
+             * @description The total quantity of this item purchased from the product list.
+             * @example 0
+             */
+            purchasedQuantity?: number;
+            /**
+             * Format: double
+             * @description The number of products or gift certificates that get shipped when purchasing this product list item.
+             * @example 1
+             */
+            quantity?: number;
+            /**
+             * @description Specifies whether the item is a product or a gift certificate.
+             * @example product
+             * @enum {string}
+             */
+            type?: "product" | "gift_certificate";
+        };
+        /** @description Document representing a basket product item. */
+        BasketProductItem: components["schemas"]["ProductItem"];
+        /** @description The range describing when an item is expected to be delivered. Both bounds are RFC 3339 date-time timestamps. The API preserves sub-day precision end-to-end. */
+        DeliveryWindow: {
+            /**
+             * Format: date-time
+             * @description The earliest expected delivery time, as an RFC 3339 date-time.
+             * @example 2026-04-30T14:00:00Z
+             */
+            startAt?: string;
+            /**
+             * Format: date-time
+             * @description The latest expected delivery time, as an RFC 3339 date-time.
+             * @example 2026-04-30T18:00:00Z
+             */
+            endAt?: string;
+        };
+        /**
+         * @description The identifier of the shipment
+         * @example me
+         */
+        ShipmentId: string;
+        /** @description Document representing a shipping promotion. */
+        ShippingPromotion: {
+            /**
+             * @description The localized callout message of the promotion.
+             * @example $30 Fixed Shipping Amount Above 150
+             */
+            calloutMsg?: string;
+            /**
+             * @description The unique ID of the promotion.
+             * @example $30FixedShippingAmountAbove150
+             */
+            promotionId?: string;
+            /**
+             * @description The localized promotion name.
+             * @example $30 Fixed Shipping Amount Above 150
+             */
+            promotionName?: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Document representing a shipping method. */
+        ShippingMethod: {
+            /** @description The estimated delivery window for this shipping method. The sfcc.app.shipping.quote hook populates this value. The response omits this field if the hook doesn't return a delivery window. */
+            deliveryWindow?: components["schemas"]["DeliveryWindow"];
+            /**
+             * @description The localized description of the shipping method.
+             * @example Order received within 7-10 business days
+             */
+            description?: string;
+            /** @description The external shipping method. */
+            externalShippingMethod?: string;
+            /**
+             * @description The shipping method ID.
+             * @example 001
+             */
+            id: string;
+            /**
+             * @description The localized name of the shipping method.
+             * @example Ground
+             */
+            name?: string;
+            /**
+             * Format: date-time
+             * @description The timestamp by which an order must be placed for the deliveryWindow to apply, as an RFC 3339 date-time. The sfcc.app.shipping.quote hook populates this value. The response omits this field if the hook doesn't return a cutoff time.
+             * @example 2026-04-27T14:00:00Z
+             */
+            orderCutoffAt?: string;
+            /**
+             * Format: double
+             * @description The shipping cost total, including shipment level costs,
+             *     product level fix, and surcharge costs. It is read only.
+             * @example 15
+             */
+            price?: number;
+            /**
+             * @description The array of active customer shipping promotions for this shipping
+             *     method. This array can be empty.
+             */
+            shippingPromotions?: components["schemas"]["ShippingPromotion"][];
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Document representing a shipment. */
+        Shipment: {
+            /**
+             * Format: double
+             * @description The total tax on products in the shipment, including item-level price adjustments but not including
+             *     service charges such as shipping. If the Discount Taxation preference is set to Tax Products and
+             *     Shipping Only Based on Adjusted Price, this amount also includes prorated order-level price adjustments. It is read only.
+             * @example 4.95
+             */
+            adjustedMerchandizeTotalTax?: number;
+            /**
+             * Format: double
+             * @description The total tax on shipping charges in the shipment, including shipping price adjustments. It is read only.
+             * @example 0.3
+             */
+            adjustedShippingTotalTax?: number;
+            /** @description The estimated delivery window for the shipment. The sfcc.app.shipping.calculate hook populates this value from the selected shipping method. The response omits this field if the hook doesn't return a delivery window. This field is reserved for future use and will be supported in an upcoming release. */
+            deliveryWindow?: components["schemas"]["DeliveryWindow"];
+            /**
+             * @description A flag indicating whether the shipment is a gift. It is read only.
+             * @example true
+             */
+            gift?: boolean;
+            /**
+             * @description The gift message.
+             * @example Happy Birthday
+             */
+            giftMessage?: string;
+            /**
+             * Format: double
+             * @description The total tax on products in the shipment, not including price adjustments or service charges such as
+             *     shipping. It is read only.
+             * @example 4.95
+             */
+            merchandizeTotalTax?: number;
+            /**
+             * Format: date-time
+             * @description The timestamp by which an order must be placed for the deliveryWindow to apply, as an RFC 3339 date-time. The sfcc.app.shipping.calculate hook populates this value from the selected shipping method. The response omits this field if the hook doesn't return a cutoff time. This field is reserved for future use and will be supported in an upcoming release.
+             * @example 2026-04-27T14:00:00Z
+             */
+            orderCutoffAt?: string;
+            /**
+             * Format: double
+             * @description The total price of all products in the shipment, including item-level adjustments, but not including
+             *     order-level adjustments or shipping charges. If the taxation policy is net, it doesn't include tax. If
+             *     the taxation policy is gross, it includes tax. It is read only.
+             * @example 99
+             */
+            productSubTotal?: number;
+            /**
+             * Format: double
+             * @description The total price of all products in the shipment including item-level adjustments and prorated
+             *     order-level adjustments, but not including shipping charges. If the taxation policy is net, it doesn't
+             *     include tax. If the taxation policy is gross, it includes tax. It is read only.
+             * @example 99
+             */
+            productTotal?: number;
+            /**
+             * @description The order-specific ID of the shipment. The default value is 'me'.
+             * @default me
+             */
+            shipmentId: components["schemas"]["ShipmentId"];
+            /** @description The shipment number of this shipment. This number is automatically generated. It is read only. */
+            shipmentNo?: string;
+            /**
+             * Format: double
+             * @description The total price of all products in the shipment including item-level adjustments, shipping charges,
+             *     and tax. It is read only.
+             * @example 39.99
+             */
+            shipmentTotal?: number;
+            /** @description The shipping address. */
+            shippingAddress?: components["schemas"]["OrderAddress"];
+            shippingMethod?: components["schemas"]["ShippingMethod"];
+            /**
+             * @description The shipping status of the shipment.
+             * @example shipped
+             * @enum {string}
+             */
+            shippingStatus?: "not_shipped" | "shipped";
+            /**
+             * Format: double
+             * @description The total price of all shipping charges in the shipment, including shipping adjustments. If the
+             *     taxation policy is net, it doesn't include tax. If the taxation policy is gross, it includes tax. It is read only.
+             * @example 5.99
+             */
+            shippingTotal?: number;
+            /**
+             * Format: double
+             * @description The total tax on shipping charges in the shipment, not including shipping price adjustments. It is read only.
+             * @example 0.3
+             */
+            shippingTotalTax?: number;
+            /**
+             * Format: double
+             * @description The total tax on the shipment, including item-level price adjustments and service charges such as
+             *     shipping. If the Discount Taxation preference is set to Tax Products and Shipping Only Based on
+             *     Adjusted Price, this amount also includes prorated order-level price adjustments. It is read only.
+             * @example 1.8
+             */
+            taxTotal?: number;
+            /**
+             * @description The tracking number of the shipment.
+             * @example 1Z204E380338943508
+             */
+            trackingNumber?: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Document representing a shipping item. */
+        ShippingItem: {
+            /**
+             * Format: double
+             * @description The tax for the shipping item, including price adjustments. It is read only.
+             * @example 19
+             */
+            adjustedTax?: number;
+            /**
+             * Format: double
+             * @description The base price of the shipping item, which is the unit price not including adjustments.
+             *     If the taxation policy is net, it doesn't include tax. If the taxation policy is gross, it includes tax. It is read only.
+             * @example 50
+             */
+            basePrice?: number;
+            /**
+             * @description The shipping item ID. Use it to identify this shipping item when updating its quantity or creating a
+             *     custom price adjustment for it. It is read only.
+             * @example 430ef5aad3a24de59378458434
+             */
+            itemId?: string;
+            /**
+             * @description The text describing the shipping item.
+             * @example Shipping
+             */
+            itemText?: string;
+            /**
+             * Format: double
+             * @description The price of the line item before applying any adjustments. If the line item is based on net pricing
+             *     then the net price is returned. If the line item is based on gross
+             *     pricing then the gross price is returned. It is read only.
+             */
+            price?: number;
+            /** @description The price adjustments. */
+            priceAdjustments?: components["schemas"]["PriceAdjustment"][];
+            /**
+             * Format: double
+             * @description The price of the shipping item including item-level adjustments, but not including order-level
+             *     adjustments or shipping charges. If the taxation policy is net, it doesn't include tax.
+             *     If the taxation policy is gross, it includes tax. It is read only.
+             */
+            priceAfterItemDiscount?: number;
+            /** @description The identifier of the shipment to which this item belongs. */
+            shipmentId?: components["schemas"]["ShipmentId"];
+            /**
+             * Format: double
+             * @description The tax on the product item, not including adjustments. It is read only.
+             * @example 0.19
+             */
+            tax?: number;
+            /**
+             * Format: double
+             * @description The price used to calculate the tax for this shipping item. It is read only.
+             */
+            taxBasis?: number;
+            /**
+             * @description The tax class ID for the product item, or null
+             *     if no tax class ID is associated with the product item. It is read only.
+             */
+            taxClassId?: string;
+            /**
+             * Format: double
+             * @description The tax rate applicable to this product line item. For a 10% tax rate, the value is 0.1. It is read only.
+             */
+            taxRate?: number;
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Document representing a promotion link. */
+        PromotionLink: {
+            /**
+             * @description The unique id of the promotion.
+             * @example 10off100
+             */
+            promotionId?: string;
+            /**
+             * @description The localized name of the promotion.
+             * @example 10% off $100 orders
+             */
+            name?: string;
+            /**
+             * @description The localized call-out message of the promotion.
+             * @example Spend $10 more to save 10%!
+             */
+            calloutMsg?: string;
+            /**
+             * @description The link title.
+             * @example 10% off $100 orders
+             */
+            title?: string;
+            /**
+             * @description The URL addressing the promotion.
+             * @example /s/SiteGenesis/promotion?id=10off100
+             */
+            link?: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Document representing an approaching discount for a basket. Contains information about promotions the customer is close to qualifying for. */
+        ApproachingDiscount: {
+            /**
+             * @description The type of approaching discount (order-level or shipping-level).
+             * @example order
+             * @enum {string}
+             */
+            type: "order" | "shipping";
+            /**
+             * Format: double
+             * @description The total amount needed to receive the discount.
+             * @example 100
+             */
+            conditionThreshold?: number;
+            /**
+             * Format: double
+             * @description The amount the customer basket contributes towards the purchase condition.
+             * @example 90
+             */
+            merchandiseTotal?: number;
+            /** @description The applied discount when the order meets the threshold. */
+            discount?: components["schemas"]["Discount"];
+            /** @description Document representing a promotion link. */
+            promotionLink?: components["schemas"]["PromotionLink"];
+            /**
+             * @description The unique id of the shipment the discount relates to. Only applicable when type = shipping.
+             * @example me
+             */
+            shipmentId?: string;
+            /** @description The shipping methods the promotion relates to. Only applicable when type = shipping. */
+            shippingMethods?: components["schemas"]["ShippingMethod"][];
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Document representing a basket. */
+        Basket: {
+            /**
+             * Format: double
+             * @description The total tax on products in the shipment, including item-level price adjustments but not
+             *     including service charges such as shipping. If the Discount Taxation preference is set to Tax
+             *     Products and Shipping Only Based on Adjusted Price, this amount also includes prorated
+             *     order-level price adjustments. It is read only.
+             * @example 4.95
+             */
+            adjustedMerchandizeTotalTax?: number;
+            /**
+             * Format: double
+             * @description The total tax on shipping charges in the shipment, including shipping price adjustments. It is read only.
+             * @example 0.3
+             */
+            adjustedShippingTotalTax?: number;
+            /**
+             * @description Is the basket created by an agent? It is read only.
+             * @example true
+             */
+            agentBasket?: boolean;
+            /**
+             * @description The unique identifier for the basket. It is read only.
+             * @example e78aa5646a8efebdd9cdd38be7
+             */
+            basketId?: string;
+            /** @description The billing address. */
+            billingAddress?: components["schemas"]["OrderAddress"];
+            /** @description The bonus discount line items. */
+            bonusDiscountLineItems?: components["schemas"]["BonusDiscountLineItem"][];
+            /**
+             * @description The sales channel. It is read only.
+             * @example storefront
+             * @enum {string}
+             */
+            channelType?: "storefront" | "callcenter" | "marketplace" | "dss" | "store" | "pinterest" | "twitter" | "facebookads" | "subscriptions" | "onlinereservation" | "customerservicecenter" | "instagramcommerce" | "tiktok" | "snapchat" | "google" | "whatsapp" | "youtube" | "chatgpt" | "gemini";
+            /** @description The coupon items. */
+            couponItems?: components["schemas"]["CouponItem"][];
+            /**
+             * Format: date-time
+             * @description The timestamp when the basket was created. It is read only.
+             * @example 2015-05-19T15:23:18.000Z
+             */
+            creationDate?: string;
+            currency?: components["schemas"]["CurrencyCode"];
+            /** @description The customer information, if the customer is logged in. */
+            customerInfo?: components["schemas"]["CustomerInfo"];
+            /** @description The gift certificate line items. */
+            giftCertificateItems?: components["schemas"]["GiftCertificateItem"][];
+            /**
+             * @description Tax values that are grouped and summed based on the tax rate. The tax totals of the line items with the same
+             *     tax rate are grouped together and summed up. This does not affect the calculation in any way. It is read only.
+             */
+            groupedTaxItems?: components["schemas"]["GroupedTaxItem"][];
+            /**
+             * Format: date-time
+             * @description The expiration datetime of the inventory reservation. It is read only.
+             * @example 2015-05-19T15:30:18.000Z
+             */
+            inventoryReservationExpiry?: string;
+            /**
+             * Format: date-time
+             * @description The timestamp when the basket was last modified. It is read only.
+             * @example 2015-05-19T15:25:18.000Z
+             */
+            lastModified?: string;
+            /**
+             * Format: double
+             * @description The total products tax in the purchase currency.
+             *     Merchandise total price represents the sum of the product prices before
+             *     services (such as shipping) or adjustments from promotions have
+             *     been added. It is read only.
+             * @example 4.95
+             */
+            merchandizeTotalTax?: number;
+            /** @description The order-level price adjustments. */
+            orderPriceAdjustments?: components["schemas"]["PriceAdjustment"][];
+            /**
+             * Format: double
+             * @description The total price, including products, shipping and tax. It is read only.
+             * @example 110.24
+             */
+            orderTotal?: number;
+            /** @description The payment instruments list. */
+            paymentInstruments?: components["schemas"]["OrderPaymentInstrument"][];
+            /** @description The product items. */
+            productItems?: components["schemas"]["BasketProductItem"][];
+            /**
+             * Format: double
+             * @description The total price of all products including item-level adjustments, but not including order-level adjustments or shipping
+             *     charges. If the taxation policy is net, it doesn't include tax. If the taxation policy is gross, it includes tax. It is read only.
+             * @example 99
+             */
+            productSubTotal?: number;
+            /**
+             * Format: double
+             * @description The total price of all products including adjustments, but not including shipping charges. If the taxation policy is net,
+             *     it doesn't include tax. If the taxation policy is gross, it includes tax. It is read only.
+             * @example 88
+             */
+            productTotal?: number;
+            /** @description The shipments. */
+            shipments?: components["schemas"]["Shipment"][];
+            /** @description The shipping items. */
+            shippingItems?: components["schemas"]["ShippingItem"][];
+            /**
+             * Format: double
+             * @description The total price of all shipping charges, including shipping adjustments. If the taxation policy is net, it doesn't
+             *     include tax. If the taxation policy is gross, it includes tax. It is read only.
+             * @example 5.99
+             */
+            shippingTotal?: number;
+            /**
+             * Format: double
+             * @description The total tax on all shipping charges, not including shipping adjustments. It is read only.
+             * @example 0.3
+             */
+            shippingTotalTax?: number;
+            /**
+             * @description The source code assigned to the basket. It is read only.
+             * @example OUTDOOR1
+             */
+            sourceCode?: string;
+            /**
+             * Format: double
+             * @description The total tax amount. It is read only.
+             * @example 5.25
+             */
+            taxTotal?: number;
+            /**
+             * @description The taxation policy (gross or net). It is read only.
+             * @example net
+             * @enum {string}
+             */
+            taxation?: "gross" | "net";
+            /**
+             * @description If the tax is rounded at the group level, this is set to true. If the tax is rounded at the item or unit level, it is set to false.
+             * @example true
+             */
+            taxRoundedAtGroup?: boolean;
+            /**
+             * @description If the created basket is a temporary basket, this is set to true. Otherwise, it is set to false.
+             * @example true
+             */
+            temporaryBasket?: boolean;
+            /** @description A list of approaching discount objects for the basket. The list includes both order-level and shipping-level promotions. This field is only included when the expand query parameter contains 'approaching_discounts'. */
+            approachingDiscounts?: components["schemas"]["ApproachingDiscount"][];
+        } & {
+            [key: string]: unknown;
+        };
+        /**
+         * @description The order number
+         * @example 00000410
+         */
+        OrderNo: string;
+        /**
+         * @description Additional information retrieved from Order Management (OMS)
+         *     See https://developer.salesforce.com/docs/atlas.en-us.order_management_developer_guide.meta/order_management_developer_guide/sforce_api_objects_orderitemsummary.htm for more information.
+         *     Only available in context of an order.
+         * @example {
+         *       "status": "ordered",
+         *       "quantityAvailableToCancel": 2,
+         *       "quantityAvailableToReturn": 2,
+         *       "quantityCanceled": 0,
+         *       "quantityReturnInitiated": 0,
+         *       "quantityReturned": 0,
+         *       "quantityOrdered": 2
+         *     }
+         */
+        OmsProductData: {
+            /**
+             * @description Order Management (OMS) status
+             * @example ordered
+             * @enum {string}
+             */
+            status?: "ordered" | "returned" | "canceled" | "paid" | "reshipped" | "fulfilled" | "partially_fulfilled" | "allocated" | "partially_allocated" | "return_initiated";
+            /**
+             * Format: double
+             * @description The quantity that can be cancelled.
+             * @example 2
+             */
+            quantityAvailableToCancel?: number;
+            /**
+             * Format: double
+             * @description The quantity that can be returned.
+             * @example 2
+             */
+            quantityAvailableToReturn?: number;
+            /**
+             * Format: double
+             * @description The quantity that has been cancelled.
+             * @example 0
+             */
+            quantityCanceled?: number;
+            /**
+             * Format: double
+             * @description The quantity for which a return has been initiated.
+             * @example 0
+             */
+            quantityReturnInitiated?: number;
+            /**
+             * Format: double
+             * @description The quantity that has been returned.
+             * @example 0
+             */
+            quantityReturned?: number;
+            /**
+             * Format: double
+             * @description The quantity that was originally ordered.
+             * @example 2
+             */
+            quantityOrdered?: number;
+        };
+        /** @description Document representing an order product item. */
+        OrderProductItem: {
+            /** @description Product information retrieved from Order Management (OMS). Only available in the context of an order. */
+            omsData?: components["schemas"]["OmsProductData"];
+        } & components["schemas"]["ProductItem"];
+        /** @description Individual item within a shipment */
+        OmsShipmentItem: {
+            /**
+             * @description Unique identifier for the shipment item
+             * @example 0OBVF000006603F4AQ
+             */
+            id?: string;
+            /**
+             * @description Reference to the product item in the order
+             * @example 10uVF0000002fGnYAI
+             */
+            productItemId?: string;
+            /**
+             * Format: double
+             * @description Quantity of product items with the referenced productItemId in this shipment
+             * @example 2
+             */
+            quantity?: number;
+        };
+        /** @description Shipment information from Salesforce Order Management created during fulfillment process. See https://developer.salesforce.com/docs/atlas.en-us.230.0.order_management_developer_guide.meta/order_management_developer_guide/sforce_api_objects_fulfillmentorder.htm for more information. */
+        OmsShipment: {
+            /**
+             * @description Unique identifier for the shipment
+             * @example 0OBVF000000003F4AQ
+             */
+            id?: string;
+            /**
+             * @description Current status of the shipment
+             * @example shipped
+             */
+            status?: string;
+            /**
+             * @description Shipping provider name
+             * @example UPS
+             */
+            provider?: string;
+            /**
+             * @description Tracking number for the shipment
+             * @example 123456789
+             */
+            trackingNumber?: string;
+            /**
+             * @description URL to track the shipment
+             * @example https://www.ups.com/track?loc=en_US&tracknum=123456789
+             */
+            trackingUrl?: string;
+            /**
+             * Format: date-time
+             * @description Expected delivery date and time
+             * @example 2025-11-12T20:00:00.000+0000
+             */
+            expectedDeliveryDate?: string;
+            /**
+             * Format: date-time
+             * @description Actual delivery date and time (null if not yet delivered)
+             * @example 2025-11-12T20:00:00.000+0000
+             */
+            actualDeliveryDate?: string;
+            /** @description Items included in this shipment */
+            shipmentItems?: components["schemas"]["OmsShipmentItem"][];
+        };
+        /**
+         * @description Additional information retrieved from Order Management (OMS)
+         *     See https://developer.salesforce.com/docs/atlas.en-us.order_management_developer_guide.meta/order_management_developer_guide/sforce_api_objects_ordersummary.htm for more information.
+         */
+        OmsData: {
+            /**
+             * @description Current status of the order
+             * @example shipped
+             */
+            status?: string;
+            /** @description List of shipments associated with the order */
+            shipments?: components["schemas"]["OmsShipment"][];
+        };
+        /** @description Document representing an order. */
+        Order: {
+            /**
+             * Format: double
+             * @description The total tax on products in the order, including price adjustments, but not including service charges such as
+             *     shipping. It is read only.
+             * @example 1.5
+             */
+            adjustedMerchandizeTotalTax?: number;
+            /**
+             * Format: double
+             * @description The total tax on shipping charges in the order, including shipping price adjustments. It is read only.
+             * @example 0.3
+             */
+            adjustedShippingTotalTax?: number;
+            /** @description The billing address. */
+            billingAddress?: components["schemas"]["OrderAddress"];
+            /** @description The bonus discount line items. */
+            bonusDiscountLineItems?: components["schemas"]["BonusDiscountLineItem"][];
+            /**
+             * @description The sales channel. It is read only.
+             * @example storefront
+             * @enum {string}
+             */
+            channelType?: "storefront" | "callcenter" | "marketplace" | "dss" | "store" | "pinterest" | "twitter" | "facebookads" | "subscriptions" | "onlinereservation" | "customerservicecenter" | "instagramcommerce" | "tiktok" | "snapchat" | "google" | "whatsapp" | "youtube" | "chatgpt" | "gemini";
+            /**
+             * @description The confirmation status.
+             * @example confirmed
+             * @enum {string}
+             */
+            confirmationStatus?: "not_confirmed" | "confirmed";
+            /** @description The coupon items. It is read only. */
+            couponItems?: components["schemas"]["CouponItem"][];
+            /**
+             * @description This value depends on how the order was created. If a shopper created the order, this value is Customer.
+             *     If a job created the order, this value is System. Otherwise, this value is the name of the user who created the order. It is read only.
+             * @example Customer
+             */
+            createdBy?: string;
+            /**
+             * Format: date-time
+             * @description The timestamp when the order was created. It is read only.
+             * @example 2015-05-19T15:23:18.000Z
+             */
+            creationDate?: string;
+            /** @description The ISO 4217 mnemonic code of the currency. It is read only. */
+            currency?: components["schemas"]["CurrencyCode"];
+            /** @description The customer information for guest or logged-in customers. It is read only. */
+            customerInfo?: components["schemas"]["CustomerInfo"];
+            /**
+             * @description The customer name. It is read only.
+             * @example Max Mustermann
+             */
+            customerName?: string;
+            /**
+             * @description The export status of the order.
+             * @example exported
+             * @enum {string}
+             */
+            exportStatus?: "not_exported" | "exported" | "ready" | "failed";
+            /**
+             * @description The external status of the order.
+             * @example Submitted
+             */
+            externalOrderStatus?: string;
+            /** @description The gift certificate line items. It is read only. */
+            giftCertificateItems?: components["schemas"]["GiftCertificateItem"][];
+            /**
+             * @description The Customer 360 Global Party ID associated with the shopper. It is read only.
+             * @example GP_1234
+             */
+            globalPartyId?: string;
+            /**
+             * Format: date-time
+             * @description The timestamp when the order was last modified. It is read only.
+             * @example 2021-02-25T09:58:08.715Z
+             */
+            lastModified?: string;
+            /**
+             * Format: double
+             * @description The total products tax in the purchase currency. Merchandise total prices represent the sum of product prices
+             *     not including shipping or adjustments. It is read only.
+             * @example 1.5
+             */
+            merchandizeTotalTax?: number;
+            /**
+             * @description The order number.
+             * @example 00000410
+             */
+            orderNo?: components["schemas"]["OrderNo"];
+            /** @description The order-level price adjustments. It is read only. */
+            orderPriceAdjustments?: components["schemas"]["PriceAdjustment"][];
+            /**
+             * @description The order token used to secure the lookup of an order on base of the
+             *     plain order number. The order token contains only URL safe characters. It is read only.
+             */
+            orderToken?: string;
+            /**
+             * Format: double
+             * @description The total price, including products, shipping, and tax. It is read only.
+             * @example 110.24
+             */
+            orderTotal?: number;
+            /**
+             * @description The order view code used to secure the order lookup of an order using Order Lookup API.
+             *     The order view code contains only URL safe characters.
+             *     Warning : Order view code must not be exposed in the URL and must only be displayed to the shopper or sent as an email.
+             *     Order view code must not be logged in the code. It is read only.
+             */
+            orderViewCode?: string;
+            /** @description The payment instruments list. */
+            paymentInstruments?: components["schemas"]["OrderPaymentInstrument"][];
+            /**
+             * @description The payment status.
+             * @example paid
+             * @enum {string}
+             */
+            paymentStatus?: "not_paid" | "part_paid" | "paid";
+            /** @description The product items. It is read only. */
+            productItems?: components["schemas"]["OrderProductItem"][];
+            /**
+             * Format: double
+             * @description The total price of all products including item-level adjustments, but not including
+             *     order-level adjustments or shipping charges. If the taxation policy is net, it doesn't include tax.
+             *     If the taxation policy is gross, it includes tax. It is read only.
+             * @example 99
+             */
+            productSubTotal?: number;
+            /**
+             * Format: double
+             * @description The total price of all products in the shipment including item-level adjustments and prorated
+             *     order-level adjustments, but not including shipping charges. If the taxation policy is net,
+             *     it doesn't include tax. If the taxation policy is gross, it includes tax. It is read only.
+             * @example 99
+             */
+            productTotal?: number;
+            /**
+             * @description If the tax is rounded at the group level, this is set to true. If the tax is rounded at the item or unit level, it is set to false. It is read only.
+             * @example true
+             */
+            taxRoundedAtGroup?: boolean;
+            /** @description The shipments. It is read only. */
+            shipments?: components["schemas"]["Shipment"][];
+            /** @description The shipping items. It is read only. */
+            shippingItems?: components["schemas"]["ShippingItem"][];
+            /**
+             * @description The shipping status.
+             * @example shipped
+             * @enum {string}
+             */
+            shippingStatus?: "not_shipped" | "part_shipped" | "shipped";
+            /**
+             * Format: double
+             * @description The total price of all shipping charges, including shipping adjustments. If the taxation policy is net,
+             *     it doesn't include tax. If the taxation policy is gross, it includes tax. It is read only.
+             * @example 5.99
+             */
+            shippingTotal?: number;
+            /**
+             * Format: double
+             * @description The total tax on all shipping charges, not including shipping adjustments. It is read only.
+             * @example 0.3
+             */
+            shippingTotalTax?: number;
+            /**
+             * @description The order's site. It is read only.
+             * @example ShoppingSite
+             */
+            siteId?: components["schemas"]["SiteId"];
+            /** @description Information retrieved from Order Management (OMS) for the order. */
+            omsData?: components["schemas"]["OmsData"];
+            /**
+             * @description The source code assigned to the basket from which this order was created. It is read only.
+             * @example OUTDOOR1
+             */
+            sourceCode?: string;
+            /**
+             * @description The status.
+             * @example created
+             * @enum {string}
+             */
+            status?: "created" | "new" | "completed" | "cancelled" | "replaced" | "failed";
+            /**
+             * Format: double
+             * @description The total tax amount. It is read only.
+             * @example 5.25
+             */
+            taxTotal?: number;
+            /**
+             * @description The taxation policy (gross or net). It is read only.
+             * @example net
+             * @enum {string}
+             */
+            taxation?: "gross" | "net";
+            /**
+             * @description Tax values that are grouped and summed based on the tax rate. The tax totals of the line items with the same
+             *     tax rate are grouped together and summed up. This does not affect the calculation in any way. It is read only.
+             */
+            groupedTaxItems?: components["schemas"]["GroupedTaxItem"][];
+            /**
+             * @description The registration status of the customer. It is read only.
+             * @example true
+             */
+            guest?: boolean;
+        };
+        ErrorResponse: {
+            /**
+             * @description A short, human-readable summary of the problem
+             *     type.  It will not change from occurrence to occurrence of the
+             *     problem, except for purposes of localization
+             * @example You do not have enough credit
+             */
+            title: string;
+            /**
+             * @description A URI reference [RFC3986] that identifies the
+             *     problem type.  This specification encourages that, when
+             *     dereferenced, it provide human-readable documentation for the
+             *     problem type (e.g., using HTML [W3C.REC-html5-20141028]).  When
+             *     this member is not present, its value is assumed to be
+             *     "about:blank". It accepts relative URIs; this means
+             *     that they must be resolved relative to the document's base URI, as
+             *     per [RFC3986], Section 5.
+             * @example NotEnoughMoney
+             */
+            type: string;
+            /**
+             * @description A human-readable explanation specific to this occurrence of the problem.
+             * @example Your current balance is 30, but that costs 50
+             */
+            detail: string;
+            /**
+             * @description A URI reference that identifies the specific
+             *     occurrence of the problem.  It may or may not yield further
+             *     information if dereferenced.  It accepts relative URIs; this means
+             *     that they must be resolved relative to the document's base URI, as
+             *     per [RFC3986], Section 5.
+             * @example /account/12345/msgs/abc
+             */
+            instance?: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description A single reason code configured in Order Management (OMS). */
+        OmsReasonCode: {
+            /**
+             * @description The reason value as configured in OMS.
+             * @example Defect
+             */
+            reason: string;
+            /**
+             * @description Whether this reason is the default that the server uses when no reason is supplied on a cancel or return request.
+             * @example false
+             */
+            default: boolean;
+        };
+        /** @description Configuration data from Order Management (OMS) that the storefront requires to render cancel and return experiences. */
+        OmsMetaData: {
+            /** @description The reason codes available for cancelling an order. The server applies the reason marked with `default` when no reason is supplied on the cancel request. */
+            cancelReasonCodes: components["schemas"]["OmsReasonCode"][];
+            /** @description The reason codes available for returning order items. The server applies the reason marked with `default` when no reason is supplied on a returned item. */
+            returnReasonCodes: components["schemas"]["OmsReasonCode"][];
+        };
+        /** @description Indicates that an OMS-dependent endpoint was called for a site that does not have OMS enabled. */
+        OmsNotActiveErrorResponse: components["schemas"]["ErrorResponse"];
+        /** @description Document representing an order lookup request. */
+        OrderLookupRequest: {
+            /**
+             * @description The customer's email address associated with order to be looked up.
+             * @example no-reply@salesforce.com
+             */
+            email?: string;
+            /** @description The order view code associated with the order to be looked up. */
+            orderViewCode?: string;
+            /**
+             * @description The billing address postal code of the order to be looked up.
+             * @example 05408
+             */
+            postalCode?: string;
+            /**
+             * @description The phone number of the order to be looked up.
+             * @example 6175555555
+             */
+            phone?: string;
+        };
+        /** @description Document representing a fail order request. */
+        FailOrderRequest: {
+            /**
+             * @description The reason code for failing the order.
+             * @example payment_confirm_failure
+             * @enum {string}
+             */
+            reasonCode?: "payment_confirm_failure" | "payment_capture_failure" | "payment_auth_failure";
+        };
+        /**
+         * @description A time-limited access code that serves as an alternative access grant for guest shoppers who have lost their original session.
+         *     The code is generated by calling the `requestOrderAccessCode` endpoint, which delivers it via email to the address on the order.
+         *     The shopper provides this code to authorize the request. The code is valid for 15 minutes after generation.
+         * @example 847291
+         */
+        OrderAccessCode: string;
+        /**
+         * @description Document representing a request to cancel an order that is integrated with Order Management (OMS).
+         *     The cancellation always applies to the entire order; partial cancellations are not supported.
+         */
+        OmsCancelOrderRequest: {
+            /**
+             * @description The reason for cancelling the order. The value must match one of the `cancelReasonCodes` configured in OMS and returned by the
+             *     `getOmsMetaData` endpoint. When omitted, the default reason code configured in OMS is applied by the server.
+             * @example Not specified
+             */
+            reason?: string;
+            orderAccessCode?: components["schemas"]["OrderAccessCode"];
+        };
+        /** @description Indicates that the supplied reason code does not match any reason configured in OMS. */
+        InvalidReasonCodeErrorResponse: {
+            /**
+             * @description The reason value that the request supplied.
+             * @example Damaged in transit
+             */
+            reason?: string;
+        } & components["schemas"]["ErrorResponse"];
+        /**
+         * @description Returned when the order cannot be cancelled. This covers both the case where the
+         *     order's state no longer permits cancellation and the case where Order Management
+         *     (OMS) rejected the cancel request after ECOM accepted the input.
+         */
+        OrderCancelFailedErrorResponse: {
+            /**
+             * @description The order number from the request path.
+             * @example 00000335
+             */
+            orderNo?: string;
+        } & components["schemas"]["ErrorResponse"];
+        /** @description An individual product item to be returned as part of an `OmsReturnOrderRequest`. */
+        OmsReturnProductItem: {
+            /**
+             * @description The identifier of the product item on the order to be returned.
+             * @example 10uVF0000003W0BYAU
+             */
+            itemId: string;
+            /**
+             * Format: double
+             * @description The quantity to be returned. Can't exceed the `quantityAvailableToReturn` of the product item on the order.
+             * @example 1
+             */
+            quantity: number;
+            /**
+             * @description The reason for returning this product item. The value must match one of the `returnReasonCodes` configured in OMS and returned
+             *     by the `getOmsMetaData` endpoint. When omitted, the server applies the default reason code configured in OMS.
+             * @example Defect
+             */
+            reason?: string;
+        };
+        /** @description Document representing a request to initiate the return of one or more items of an order that is integrated with Order Management (OMS). */
+        OmsReturnOrderRequest: {
+            /** @description The product items of the order for which to initiate a return. */
+            productItems: components["schemas"]["OmsReturnProductItem"][];
+            orderAccessCode?: components["schemas"]["OrderAccessCode"];
+        };
+        /** @description Indicates that one or more `productItems[].itemId` values supplied in the return request do not match any product item of the order. */
+        UnknownProductItemIdsErrorResponse: {
+            /**
+             * @description The order number from the request path.
+             * @example 00000335
+             */
+            orderNo?: string;
+            /**
+             * @description The `productItems[].itemId` values from the request that do not match any product item of the order.
+             * @example [
+             *       "10uVF0000003W0BYAU",
+             *       "11uVF0000045W0BYAU"
+             *     ]
+             */
+            unknownItemIds?: string[];
+        } & components["schemas"]["ErrorResponse"];
+        /**
+         * @description Returned when one or more `productItems` entries in the return request specify a
+         *     quantity that exceeds the quantity available to return for that item. Issue a GET
+         *     on the order to obtain the current available quantities and resubmit with valid
+         *     values.
+         */
+        ReturnQuantityExceededErrorResponse: {
+            /**
+             * @description The order number from the request path.
+             * @example 00000335
+             */
+            orderNo?: string;
+            /**
+             * @description The `productItems[].itemId` values from the request whose requested quantity exceeded the quantity available to return.
+             * @example [
+             *       "10uVF0000003W0BYAU",
+             *       "11uVF0000045W0BYAU"
+             *     ]
+             */
+            itemIds?: string[];
+        } & components["schemas"]["ErrorResponse"];
+        /**
+         * @description Returned when the order cannot be returned. This covers both the case where the
+         *     order's state no longer permits return of the requested items and the case where
+         *     Order Management (OMS) rejected the return request after ECOM accepted the input.
+         *     Obvious input problems are reported as 400 Bad Request before the request reaches
+         *     OMS.
+         */
+        OrderReturnFailedErrorResponse: {
+            /**
+             * @description The order number from the request path.
+             * @example 00000335
+             */
+            orderNo?: string;
+        } & components["schemas"]["ErrorResponse"];
+        /** @description Represents a request to generate a time-limited access code for a guest order. */
+        RequestOrderAccessCodeRequest: {
+            /**
+             * @description The email address of the shopper. Must match the email address associated with the order for a code to be generated and sent.
+             * @example shopper@example.com
+             */
+            email: string;
+        };
+        /** @description Indicates that the request to generate an access code is invalid, for example, because the email field is missing or empty. */
+        InvalidAccessCodeRequestErrorResponse: components["schemas"]["ErrorResponse"];
+        /** @description Document representing an order payment card request. */
+        OrderPaymentCardRequest: {
+            /**
+             * @description The payment card type (for example: Visa).
+             * @example Visa
+             */
+            cardType?: string;
+            /**
+             * @description A credit card token. If a credit card is tokenized, the token can be used to look up the credit card data
+             *     in the token store.
+             * @example E67TY8GQ27X
+             */
+            creditCardToken?: string;
+            /**
+             * Format: int32
+             * @description The month when the payment card expires.
+             * @example 3
+             */
+            expirationMonth?: number;
+            /**
+             * Format: int32
+             * @description The year when the payment card expires.
+             * @example 2025
+             */
+            expirationYear?: number;
+            /**
+             * @description The payment card holder.
+             * @example Max Mustermann
+             */
+            holder?: string;
+            /**
+             * @description The payment card issue number.
+             * @example 2
+             */
+            issueNumber?: string;
+            /**
+             * @description The masked payment card number.
+             * @example *********4422
+             */
+            maskedNumber?: string;
+            /**
+             * Format: int32
+             * @description The month the payment card is valid from.
+             * @example 5
+             */
+            validFromMonth?: number;
+            /**
+             * Format: int32
+             * @description The year the payment card is valid from.
+             * @example 2019
+             */
+            validFromYear?: number;
+        };
+        /** @description Represents gift card details for a request. */
+        GiftCardRequest: {
+            /**
+             * @description The gift card type or brand (for example, givex, blackhawk).
+             * @example givex
+             */
+            brand: string;
+            /**
+             * @description The gift card number.
+             * @example 6364530000000000
+             */
+            cardNumber: string;
+            /**
+             * @description The card verification code (CVC/CVV) for the gift card.
+             * @example 123
+             */
+            cvc: string;
+            /**
+             * Format: int32
+             * @description The month when the gift card expires.
+             * @example 1
+             */
+            expirationMonth?: number;
+            /**
+             * Format: int32
+             * @description The year when the gift card expires.
+             * @example 2030
+             */
+            expirationYear?: number;
+        };
+        /** @description Properties for Payments Reference Request */
+        PaymentReferenceRequest: {
+            /**
+             * @description Payment Method Type
+             * @example card
+             */
+            paymentMethodType?: string;
+            /**
+             * @description The unique identifier for a Payments zone.
+             * @example {
+             *       "Amer-Zone": null
+             *     }
+             */
+            zoneId?: string;
+            /**
+             * @description The payment gateway used to process the payment.
+             * @example stripe
+             * @enum {string}
+             */
+            gateway?: "stripe" | "paypal" | "adyen";
+            /** @description The payment gateway specific properties. */
+            gatewayProperties?: {
+                /**
+                 * @description # Stripe specific properties.
+                 *
+                 *     - setupFutureUsage: Indicates that you intend to make future payments with this payment method.
+                 *       - **on_session**: The payment method is intended to be used for a future payment on the same website session.
+                 *       - **off_session**: The payment method is intended to be used for a future payment on a different website session.
+                 *       - **null**: The payment method is not intended to be used for a future payment.
+                 */
+                stripe?: {
+                    [key: string]: unknown;
+                };
+                /**
+                 * @description # PayPal specific properties.
+                 *
+                 *     - shippingPreference: Shipping preference for PayPal payment processing. Applicable only for basket payment instruments.
+                 *       - **GET_FROM_FILE**
+                 *       - **NO_SHIPPING**
+                 *       - **SET_PROVIDED_ADDRESS**
+                 */
+                paypal?: {
+                    [key: string]: unknown;
+                };
+                /** @description # Adyen specific properties. */
+                adyen?: {
+                    [key: string]: unknown;
+                };
+            };
+        };
+        /** @description Document representing an order payment instrument request. */
+        OrderPaymentInstrumentRequest: {
+            /**
+             * Format: double
+             * @description The payment transaction amount.
+             * @example 130.88
+             */
+            amount?: number;
+            /**
+             * @description The bank routing number.
+             * @example 12030000
+             */
+            bankRoutingNumber?: string;
+            /** @description The gift certificate code. */
+            giftCertificateCode?: string;
+            /** @description The payment card. */
+            paymentCard?: components["schemas"]["OrderPaymentCardRequest"];
+            /** @description The gift card request. */
+            giftCardRequest?: components["schemas"]["GiftCardRequest"];
+            /**
+             * @description The payment method ID.
+             * @example CREDIT_CARD
+             */
+            paymentMethodId?: string;
+            /** @description Payment reference information for various payment service providers, only when Salesforce Payments is enabled. */
+            paymentReferenceRequest?: components["schemas"]["PaymentReferenceRequest"];
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Document representing the specification for a payment card. */
+        PaymentCardSpec: {
+            /**
+             * @description The payment card type. It is read only.
+             * @example Visa
+             */
+            cardType?: string;
+            /**
+             * @description A flag indicating whether the card number is verified using the Luhn checksum algorithm. It is read only.
+             * @example true
+             */
+            checksumVerificationEnabled?: boolean;
+            /** @description The localized description of the payment card. It is read only. */
+            description?: string;
+            /** @description The URL to the image that represents the payment card. It is read only. */
+            image?: string;
+            /** @description The localized name of the payment card. It is read only. */
+            name?: string;
+            /**
+             * @description The sorted list of number lengths (individual lengths as well as
+             *     length ranges). It is read only.
+             */
+            numberLengths?: string[];
+            /**
+             * @description The sorted list of number prefixes (individual prefixes as well
+             *     as prefix ranges). It is read only.
+             */
+            numberPrefixes?: string[];
+            /**
+             * Format: int32
+             * @description The length of the security code for this card. It is read only.
+             */
+            securityCodeLength?: number;
+        };
+        /** @description Document representing a payment method. */
+        PaymentMethod: {
+            /** @description The sorted array of payment cards (included only when the system payment method is CREDIT_CARD). It is read only. */
+            cards?: components["schemas"]["PaymentCardSpec"][];
+            /** @description The localized description of the payment method or card. It is read only. */
+            description?: string;
+            /** @description The ID of the payment method or card. It is read only. */
+            id: string;
+            /** @description The URL to the image that represents the payment method or card. It is read only. */
+            image?: string;
+            /** @description The localized name of the payment method or card. It is read only. */
+            name?: string;
+            /** @description The payment processor ID. It is read only. It is read only. */
+            paymentProcessorId?: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** @description Result document of payment methods applicable for a basket. */
+        PaymentMethodResult: {
+            /** @description The applicable payment methods. It is read only. */
+            applicablePaymentMethods?: components["schemas"]["PaymentMethod"][];
+        };
+        /** @description Object representing the taxation. */
+        TaxItem: {
+            /** @description The taxation identifier. */
+            id: string;
+            /**
+             * Format: double
+             * @description The taxation rate.
+             * @example 0.13
+             */
+            rate: number;
+            /**
+             * Format: double
+             * @description The tax amount. Will be computed if not set.
+             */
+            value?: number;
+        };
+        /** @description Taxation for a line item. */
+        TaxItems: {
+            /** @description The list of tax items. It is read only. */
+            taxItems?: components["schemas"]["TaxItem"][];
+        };
+        /** @description Document representing the tax rates and (optionally) amounts for all items in a basket. */
+        Taxes: {
+            /** @description Map containing the TaxItems for the line item ids: Map<LineItemId, TaxItems []> */
+            taxes: {
+                [key: string]: components["schemas"]["TaxItems"];
+            };
+        };
+    };
+    responses: {
+        /** @description Order Management (OMS) is not active for this site. */
+        "409OmsNotActive": {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/problem+json": components["schemas"]["OmsNotActiveErrorResponse"];
+            };
+        };
+        /**
+         * @description The cancel request is invalid. Possible reasons:
+         *     - The supplied reason code is not configured in Order Management (OMS).
+         */
+        "400OmsCancelBadRequest": {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/problem+json": components["schemas"]["InvalidReasonCodeErrorResponse"];
+            };
+        };
+        /**
+         * @description The order cannot be cancelled. Possible reasons:
+         *     - The order is no longer in a state that permits cancellation.
+         *     - Order Management (OMS) rejected the cancel request after ECOM accepted the input.
+         *     - Order Management (OMS) is not active for this site.
+         */
+        "409OmsCancelConflict": {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/problem+json": components["schemas"]["OrderCancelFailedErrorResponse"] | components["schemas"]["OmsNotActiveErrorResponse"];
+            };
+        };
+        /**
+         * @description The return request is invalid. Possible reasons:
+         *     - The supplied reason code is not configured in Order Management (OMS).
+         *     - One or more of the supplied `productItems[].itemId` values do not match any product item of the order.
+         *     - The requested return quantity exceeds the quantity available to return for one or more items.
+         */
+        "400OmsReturnBadRequest": {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/problem+json": components["schemas"]["InvalidReasonCodeErrorResponse"] | components["schemas"]["UnknownProductItemIdsErrorResponse"] | components["schemas"]["ReturnQuantityExceededErrorResponse"];
+            };
+        };
+        /**
+         * @description The order cannot be returned. Possible reasons:
+         *     - The order is no longer in a state that permits return of the requested items.
+         *     - Order Management (OMS) rejected the return after ECOM accepted the input.
+         *     - Order Management (OMS) is not active for this site.
+         */
+        "409OmsReturnConflict": {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/problem+json": components["schemas"]["OrderReturnFailedErrorResponse"] | components["schemas"]["OmsNotActiveErrorResponse"];
+            };
+        };
+        /**
+         * @description The access code request is invalid. Possible reasons:
+         *     - The email field is missing or empty.
+         */
+        "400RequestAccessCodeBadRequest": {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/problem+json": components["schemas"]["InvalidAccessCodeRequestErrorResponse"];
+            };
+        };
+    };
+    parameters: {
+        /**
+         * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+         * @example f_ecom_zzxy_prd
+         */
+        organizationId: components["schemas"]["OrganizationId"];
+        /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+        siteId: components["schemas"]["SiteId"];
+        /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+        locale: components["schemas"]["LocaleCode"];
+        /** @description The order number of the order to be modified. */
+        orderNo: components["schemas"]["OrderNo"];
+        /**
+         * @description When you select 'oms' expand, data is loaded from Order Management (OMS), if available.
+         *     When OMS data is available, the expand parameter has the following behavior:
+         *     "expand=oms": order and related order entities (product & shipping items, delivery groups and price adjustments) are returned.
+         *     "expand=oms_shipments": order and fulfillment (shipment) data is returned.
+         *     "expand=oms,oms_shipments": order, related order entities and fulfillment (shipment) data are returned.
+         *     If your instance is not integrated with OMS or the order data is not available, the `expand=oms` command is disregarded.
+         * @example oms,oms_shipments
+         */
+        expandOrders: ("oms" | "oms_shipments")[];
+        /**
+         * @description Set to true to reopen basket from the order.
+         *     A basket can only be reopened if no other basket for the customer exists at the moment of the call to fail Order,
+         *     since a customer is limited to 1 storefront basket at a time.
+         */
+        reopenBasket: boolean;
+        /**
+         * @description When you specify `expand=oms`, the integrated Order Management System (OMS) is included during the email validation.
+         *     If your instance isn't integrated with OMS or the order data isn't available, B2C Commerce ignores the `expand=oms` parameter.
+         * @example oms
+         */
+        expandOms: "oms"[];
+        paymentInstrumentId: components["schemas"]["PaymentInstrumentId"];
+    };
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
+}
+export type $defs = Record<string, never>;
+export interface operations {
+    createOrder: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["Basket"];
+            };
+        };
+        responses: {
+            /** @description Success, the response body contains the submitted order. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Order"];
+                };
+            };
+            /**
+             * @description Possible reasons:
+             *     - a failure during the creation of a gift certificate
+             *     for a gift certificate item.
+             *     - the basket ID in the request body is null or
+             *     empty.
+             *     - an invalid product item.
+             *     - an option with the specified option ID is
+             *     unknown.
+             *     - an option with the specified option value ID
+             *     is unknown.
+             *     - a product item is not available.
+             *     - the customer assigned to the basket does not
+             *     match the verified customer represented by the JWT token.
+             *     - the basket contains flashes (validation errors that prevent order placement).
+             */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The basket with the given basket ID is unknown. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getOmsMetaData: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success, the response body contains the OMS meta data. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OmsMetaData"];
+                };
+            };
+            409: components["responses"]["409OmsNotActive"];
+        };
+    };
+    getOrder: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+                /**
+                 * @description When you select 'oms' expand, data is loaded from Order Management (OMS), if available.
+                 *     When OMS data is available, the expand parameter has the following behavior:
+                 *     "expand=oms": order and related order entities (product & shipping items, delivery groups and price adjustments) are returned.
+                 *     "expand=oms_shipments": order and fulfillment (shipment) data is returned.
+                 *     "expand=oms,oms_shipments": order, related order entities and fulfillment (shipment) data are returned.
+                 *     If your instance is not integrated with OMS or the order data is not available, the `expand=oms` command is disregarded.
+                 * @example oms,oms_shipments
+                 */
+                expand?: components["parameters"]["expandOrders"];
+            };
+            header?: never;
+            path: {
+                /** @description The order number of the order to be modified. */
+                orderNo: components["parameters"]["orderNo"];
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success, the response body contains the order. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Order"];
+                };
+            };
+            /** @description The order with the given order number is unknown. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    guestOrderLookup: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+                /**
+                 * @description When you select 'oms' expand, data is loaded from Order Management (OMS), if available.
+                 *     When OMS data is available, the expand parameter has the following behavior:
+                 *     "expand=oms": order and related order entities (product & shipping items, delivery groups and price adjustments) are returned.
+                 *     "expand=oms_shipments": order and fulfillment (shipment) data is returned.
+                 *     "expand=oms,oms_shipments": order, related order entities and fulfillment (shipment) data are returned.
+                 *     If your instance is not integrated with OMS or the order data is not available, the `expand=oms` command is disregarded.
+                 * @example oms,oms_shipments
+                 */
+                expand?: components["parameters"]["expandOrders"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The order number of the order to be modified. */
+                orderNo: components["parameters"]["orderNo"];
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["OrderLookupRequest"];
+            };
+        };
+        responses: {
+            /** @description Success, the response returns the order, though sensitive details may be filtered based on access level. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Order"];
+                };
+            };
+            /**
+             * @description Possible reasons:
+             *     - The combination of identifying information is not sufficient for any access level.
+             */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /**
+             * @description Order was not found. Possible reasons:
+             *     - the order with the given order number is unknown.
+             *     - the combination of identifying information you provided, such as email or postal code, does not match the order record.
+             *     - the provided access code is invalid or has expired.
+             */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    failOrder: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+                /**
+                 * @description Set to true to reopen basket from the order.
+                 *     A basket can only be reopened if no other basket for the customer exists at the moment of the call to fail Order,
+                 *     since a customer is limited to 1 storefront basket at a time.
+                 */
+                reopenBasket?: components["parameters"]["reopenBasket"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The order number of the order to be modified. */
+                orderNo: components["parameters"]["orderNo"];
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["FailOrderRequest"];
+            };
+        };
+        responses: {
+            /** @description Order failed successfully. No content returned. */
+            201: {
+                headers: {
+                    /** @description The location for accessing the reopened basket if one exists. */
+                    Location?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Order failed successfully. No content returned. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /**
+             * @description Possible reasons:
+             *       - Invalid request parameters.
+             */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The order with the given order number is unknown for the shopper. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The order is in invalid status. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    cancelOmsOrder: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The order number of the order to be modified. */
+                orderNo: components["parameters"]["orderNo"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OmsCancelOrderRequest"];
+            };
+        };
+        responses: {
+            /** @description Success, the response body contains the updated order retrieved from Order Management (OMS). */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Order"];
+                };
+            };
+            400: components["responses"]["400OmsCancelBadRequest"];
+            /**
+             * @description Order was not found. Possible reasons:
+             *     - the order with the given order number is unknown.
+             *     - the provided access code is invalid or has expired.
+             */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            409: components["responses"]["409OmsCancelConflict"];
+        };
+    };
+    returnOmsOrder: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The order number of the order to be modified. */
+                orderNo: components["parameters"]["orderNo"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OmsReturnOrderRequest"];
+            };
+        };
+        responses: {
+            /** @description Success, the response body contains the updated order retrieved from Order Management (OMS). */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Order"];
+                };
+            };
+            400: components["responses"]["400OmsReturnBadRequest"];
+            /**
+             * @description Order was not found. Possible reasons:
+             *     - the order with the given order number is unknown.
+             *     - the provided access code is invalid or has expired.
+             */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            409: components["responses"]["409OmsReturnConflict"];
+        };
+    };
+    requestOrderAccessCode: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+                /**
+                 * @description When you specify `expand=oms`, the integrated Order Management System (OMS) is included during the email validation.
+                 *     If your instance isn't integrated with OMS or the order data isn't available, B2C Commerce ignores the `expand=oms` parameter.
+                 * @example oms
+                 */
+                expand?: components["parameters"]["expandOms"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The order number of the order to be modified. */
+                orderNo: components["parameters"]["orderNo"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RequestOrderAccessCodeRequest"];
+            };
+        };
+        responses: {
+            /**
+             * @description Accepted. Always returned, regardless of whether the order and email combination is valid, to prevent enumeration of valid orders.
+             *     If the combination is valid, a new access code is generated and delivered via email.
+             */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["400RequestAccessCodeBadRequest"];
+        };
+    };
+    createPaymentInstrumentForOrder: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The order number of the order to be modified. */
+                orderNo: components["parameters"]["orderNo"];
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["OrderPaymentInstrumentRequest"];
+            };
+        };
+        responses: {
+            /** @description Success, the response body contains the order with the added payment instrument. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Order"];
+                };
+            };
+            /**
+             * @description Possible reasons:
+             *     - the given order number is invalid.
+             *     - the provided payment method is invalid or not applicable.
+             */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The order with the given order number is unknown. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    removePaymentInstrumentFromOrder: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                paymentInstrumentId: components["parameters"]["paymentInstrumentId"];
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The order number of the order to be modified. */
+                orderNo: components["parameters"]["orderNo"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success, the response body contains the order without the deleted payment instrument. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Order"];
+                };
+            };
+            /**
+             * @description Possible reasons:
+             *     - The order with the given order number is unknown.
+             *     - The payment instrument with the given order payment
+             *     instrument ID is unknown.
+             */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    updatePaymentInstrumentForOrder: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                paymentInstrumentId: components["parameters"]["paymentInstrumentId"];
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The order number of the order to be modified. */
+                orderNo: components["parameters"]["orderNo"];
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["OrderPaymentInstrumentRequest"];
+            };
+        };
+        responses: {
+            /** @description Success, the response body contains the order with the updated payment instrument. When Salesforce Payments is enabled, the paymentReference object will be included in the paymentInstruments. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Order"];
+                };
+            };
+            /**
+             * @description Possible reasons:
+             *     - the basket payment instrument with the given
+             *     ID already is permanently masked.
+             *     - the provided payment method is invalid or not applicable.
+             */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /**
+             * @description Possible reasons:
+             *     - The order with the given order number is unknown.
+             *     - The payment instrument with the given payment
+             *     instrument ID is unknown.
+             */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getPaymentMethodsForOrder: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The order number of the order to be modified. */
+                orderNo: components["parameters"]["orderNo"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success, the response body contains the applicable payment methods for the order. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaymentMethodResult"];
+                };
+            };
+            /**
+             * @description The customer assigned to the order does not
+             *     match the verified customer represented by the JSON Web Token (JWT).
+             */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The order with the given order number is unknown. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getTaxesFromOrder: {
+        parameters: {
+            query: {
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+                /** @description The order number of the order to be modified. */
+                orderNo: components["parameters"]["orderNo"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /**
+             * @description Success, the response body contains the external taxation from all items from the referenced
+             *     order.
+             */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Taxes"];
+                };
+            };
+            /** @description The order with the given order number is unknown. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /**
+             * @description Possible Reasons:
+             *       - The tax mode of the referenced basket is not set to EXTERNAL.
+             */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+}

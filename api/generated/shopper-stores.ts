@@ -1,0 +1,379 @@
+// Generated from the vendored SCAPI OpenAPI spec. Do not edit by hand.
+//
+// Family:  shopper-stores (called as store/shopper-stores/v1)
+// Version: 1.3.0
+// Source:  SalesforceCommerceCloud/commerce-sdk-isomorphic@main:apis/shopper-stores-oas-1.3.0/shopper-stores-oas-v1-public.yaml
+//
+// Regenerate with `pnpm gen:api:fetch && pnpm gen:api`.
+
+export interface paths {
+    "/organizations/{organizationId}/stores": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Return stores identified by the IDs provided as input. */
+        get: operations["getStores"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/{organizationId}/store-search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Retrieve a list of stores for the given site that are within a configured distance of a geolocation.
+         * @description - The distance is interpreted either in miles or kilometers, depending on the `distanceUnit` input parameter.
+         *     - The location is specified by either directly providing a latitude and longitude coordinate pair, or by providing a country and a postal code. If a postal code is passed, the resource looks in the system's geolocation mappings in Business Manager to find the coordinates for this postal code. If no matching geolocation is found, the resource returns an empty list of stores. If coordinates are passed, the values for country and postal code are ignored.
+         *
+         *       To verify site latitude and longitude information in Business Manager:
+         *       - Navigate to **Merchant Tools -> Online Marketing -> Stores**.
+         *       - Select the applicable site.
+         *       - In the **Address** tab, verify that valid information is provided in the following fields: **Address**, **City**, **Postal Code**, **State**, and **Country**. For latitude and longitude values, you can manually enter values or provide all field values to auto-populate **Latitude** and **Longitude**. You must provide valid values for all of the previous fields for latitude and longitude to auto-populate **Latitude** and **Longitude** values.
+         */
+        get: operations["searchStores"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+}
+export type webhooks = Record<string, never>;
+export interface components {
+    schemas: {
+        /**
+         * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+         * @example f_ecom_zzxy_prd
+         */
+        OrganizationId: string;
+        /**
+         * @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites
+         * @example RefArch
+         */
+        SiteId: string;
+        /**
+         * @description A concatenated version of the standard Language and Country codes, combined with a hyphen '`-`'.
+         * @example en-US
+         */
+        LanguageCountry: string;
+        /**
+         * @description A two letter lowercase language code conforming to the [ISO 639-1](https://www.iso.org/iso-639-language-codes.html) standard. Additionally, this may be used to submit requests with the header parameter `Accept-Language`, following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766).
+         * @example en
+         */
+        LanguageCode: string;
+        /**
+         * @description A specialized value indicating the system default values for locales.
+         * @default default
+         * @example default
+         */
+        DefaultFallback: string;
+        /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+        LocaleCode: components["schemas"]["LanguageCountry"] | components["schemas"]["LanguageCode"] | components["schemas"]["DefaultFallback"];
+        /**
+         * Format: int32
+         * @description The total number of hits that match the search's criteria. This can be greater than the number of results returned as search results are pagenated.
+         * @default 0
+         * @example 10
+         */
+        Total: number;
+        /**
+         * @description Schema defining generic list result. Each response schema of a resource requiring a list response should extend this schema.
+         *     Additionally it needs to be defined what data is returned.
+         */
+        ResultBase: {
+            /**
+             * Format: int32
+             * @description Maximum records to retrieve per request. The limit with its constraints (minimum, maximum, default) is defined by the request parameter `limit` of the endpoint returning this schema.
+             * @example 10
+             */
+            limit: number;
+            total: components["schemas"]["Total"];
+        };
+        /**
+         * @description A two letter uppercase country code conforming to the [ISO 3166-1](https://www.iso.org/iso-3166-country-codes.html) alpha-2 standard.
+         * @example US
+         */
+        CountryCode: string;
+        /**
+         * Format: double
+         * @description The distance to the given geolocation where the stores will be searched, using the unit given in the attribute 'DistanceUnit' (miles or kilometers).
+         */
+        Distance: number;
+        /**
+         * @description The unit the distance attribute is measured in (either in miles or kilometers).
+         * @enum {string}
+         */
+        DistanceUnit: "km" | "mi";
+        /**
+         * Format: double
+         * @description The latitude of the store.
+         */
+        Latitude: number;
+        /**
+         * Format: double
+         * @description The longitude of the store.
+         */
+        Longitude: number;
+        /** @description The postal code of the store. */
+        PostalCode: string;
+        /** @description Document representing a store. */
+        Store: {
+            /** @description The primary address of the store. */
+            address1?: string;
+            /** @description The secondary address of the store. */
+            address2?: string;
+            /** @description The city of the store. */
+            city?: string;
+            countryCode?: components["schemas"]["CountryCode"];
+            distance?: components["schemas"]["Distance"];
+            distanceUnit?: components["schemas"]["DistanceUnit"];
+            /** @description The email address of the store. */
+            email?: string;
+            /** @description The fax number of the store. */
+            fax?: string;
+            /** @description The id of the store. */
+            id: string;
+            /** @description The store image. */
+            image?: string;
+            /** @description The inventory list id associated with this store. */
+            inventoryId?: string;
+            latitude?: components["schemas"]["Latitude"];
+            longitude?: components["schemas"]["Longitude"];
+            /** @description The store name. */
+            name?: string;
+            /** @description The phone number of the store. */
+            phone?: string;
+            /** @description Whether this store uses Store Point-of-Sale. */
+            posEnabled?: boolean;
+            /** @description The postal code of the store. */
+            postalCode?: components["schemas"]["PostalCode"];
+            /** @description The state code of the store. */
+            stateCode?: string;
+            /** @description The store events. */
+            storeEvents?: string;
+            /** @description The opening hours of the store. */
+            storeHours?: string;
+            /** @description Whether this store should show up in store locator results. */
+            storeLocatorEnabled?: boolean;
+        };
+        /** @description Result object containing an array of stores. */
+        StoreResult: {
+            /** @description The list of stores in the search result. */
+            data?: components["schemas"]["Store"][];
+        } & components["schemas"]["ResultBase"];
+        ErrorResponse: {
+            /**
+             * @description A short, human-readable summary of the problem
+             *     type.  It will not change from occurrence to occurrence of the
+             *     problem, except for purposes of localization
+             * @example You do not have enough credit
+             */
+            title: string;
+            /**
+             * @description A URI reference [RFC3986] that identifies the
+             *     problem type.  This specification encourages that, when
+             *     dereferenced, it provide human-readable documentation for the
+             *     problem type (e.g., using HTML [W3C.REC-html5-20141028]).  When
+             *     this member is not present, its value is assumed to be
+             *     "about:blank". It accepts relative URIs; this means
+             *     that they must be resolved relative to the document's base URI, as
+             *     per [RFC3986], Section 5.
+             * @example NotEnoughMoney
+             */
+            type: string;
+            /**
+             * @description A human-readable explanation specific to this occurrence of the problem.
+             * @example Your current balance is 30, but that costs 50
+             */
+            detail: string;
+            /**
+             * @description A URI reference that identifies the specific
+             *     occurrence of the problem.  It may or may not yield further
+             *     information if dereferenced.  It accepts relative URIs; this means
+             *     that they must be resolved relative to the document's base URI, as
+             *     per [RFC3986], Section 5.
+             * @example /account/12345/msgs/abc
+             */
+            instance?: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /**
+         * Format: int32
+         * @description The zero-based index of the first hit/data to include in the result.
+         * @default 0
+         * @example 0
+         */
+        Offset: number;
+        /**
+         * @description Schema defining generic pageable result. Each response schema of a resource requiring pagination should extend this schema.
+         *     If you use this extend this schema directly, it needs to be defined what data is returned. Allowed names for the data field is `data`.
+         */
+        PaginatedResultBase: {
+            offset: components["schemas"]["Offset"];
+        } & WithRequired<components["schemas"]["ResultBase"], "limit" | "total">;
+        /** @description Result object containing an paginated array of stores. */
+        Stores: {
+            /** @description The list of stores in the search result. */
+            data?: components["schemas"]["Store"][];
+        } & components["schemas"]["PaginatedResultBase"];
+    };
+    responses: never;
+    parameters: {
+        /**
+         * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+         * @example f_ecom_zzxy_prd
+         */
+        organizationId: components["schemas"]["OrganizationId"];
+        /** @description The IDs of a requested stores (comma separated, max 50 IDs). */
+        ids: string;
+        /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+        siteId: components["schemas"]["SiteId"];
+        /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+        locale: components["schemas"]["LocaleCode"];
+        /**
+         * @description Controls whether personalization is applied to the response. Set to `none` to opt out of personalized response handling so the response is safe to cache at the CDN layer.
+         *
+         *     When set to `none`, the server skips applying personalization to the response.
+         */
+        personalized: "none";
+        /** @description The two letter ISO country code, such as "US". This value is required when a postalCode is provided. */
+        countryCode: components["schemas"]["CountryCode"];
+        /** @description The distance unit. Supported values are "mi" (miles) and "km" (kilometers). The default is "km". */
+        distanceUnit: components["schemas"]["DistanceUnit"];
+        /** @description The geographical latitude to search for stores (value range -90.00 .. 90.00). This value is required when a longitude is provided. */
+        latitude: components["schemas"]["Latitude"];
+        /** @description The geographical longitude to search for stores (value range -180.00 .. 180.00). You must provide a longitude when a latitude is provided. */
+        longitude: components["schemas"]["Longitude"];
+        /** @description The area (radius) in distanceUnit where stores will be searched. */
+        maxDistance: components["schemas"]["Distance"];
+        /** @description The postal code, such as "84121". You must provide a countryCode when a postalCode is provided. */
+        postalCode: components["schemas"]["PostalCode"];
+    };
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
+}
+export type $defs = Record<string, never>;
+export interface operations {
+    getStores: {
+        parameters: {
+            query: {
+                /** @description The IDs of a requested stores (comma separated, max 50 IDs). */
+                ids: components["parameters"]["ids"];
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+                /**
+                 * @description Controls whether personalization is applied to the response. Set to `none` to opt out of personalized response handling so the response is safe to cache at the CDN layer.
+                 *
+                 *     When set to `none`, the server skips applying personalization to the response.
+                 */
+                personalized?: components["parameters"]["personalized"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Returned details for specific stores. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoreResult"];
+                };
+            };
+            /** @description A value constraint for query parameters was violated. Or, a combination of latitude and longitude, a combination of country code and postal code, or an invalid distance_unit was provided. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    searchStores: {
+        parameters: {
+            query: {
+                /** @description The two letter ISO country code, such as "US". This value is required when a postalCode is provided. */
+                countryCode?: components["parameters"]["countryCode"];
+                /** @description The distance unit. Supported values are "mi" (miles) and "km" (kilometers). The default is "km". */
+                distanceUnit?: components["parameters"]["distanceUnit"];
+                /** @description The geographical latitude to search for stores (value range -90.00 .. 90.00). This value is required when a longitude is provided. */
+                latitude?: components["parameters"]["latitude"];
+                /** @description The geographical longitude to search for stores (value range -180.00 .. 180.00). You must provide a longitude when a latitude is provided. */
+                longitude?: components["parameters"]["longitude"];
+                /** @description The area (radius) in distanceUnit where stores will be searched. */
+                maxDistance?: components["parameters"]["maxDistance"];
+                /** @description The postal code, such as "84121". You must provide a countryCode when a postalCode is provided. */
+                postalCode?: components["parameters"]["postalCode"];
+                /** @description The identifier of the site that a request is being made in the context of. Attributes might have site specific values, and some objects may only be assigned to specific sites. */
+                siteId: components["parameters"]["siteId"];
+                /** @description A descriptor for a geographical region by both a language and country code. By combining these two, regional differences in a language can be addressed, such as with the request header parameter `Accept-Language` following [RFC 2616](https://tools.ietf.org/html/rfc2616) & [RFC 1766](https://tools.ietf.org/html/rfc1766). This can also just refer to a language code, also RFC 2616/1766 compliant, as a default if there is no specific match for a country. Finally, can also be used to define default behavior if there is no locale specified. */
+                locale?: components["parameters"]["locale"];
+                /** @description Number of records to retrieve per request. Must be between 1 (minimum) and 200 (maximum). Defaults to 25. */
+                limit?: number;
+                /** @description Used to retrieve the results based on a particular resource offset. */
+                offset?: number;
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description An identifier for the Salesforce Commerce Cloud organization the request is being made by. It consists of a prefix 'f_ecom_' followed by a 4-character [realm identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#realm-id) and a 3-character [instance type identifier](https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html#instance-id).
+                 * @example f_ecom_zzxy_prd
+                 */
+                organizationId: components["parameters"]["organizationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Returned a list of stores for the given search parameters, up to the paging size, including their distance from the given geolocation and additional information on the pagination of objects. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Stores"];
+                };
+            };
+            /** @description A value constraint for query parameters was violated. Or, a combination of latitude and longitude, a combination of country code and postal code, or an invalid distance_unit was provided. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+}
+type WithRequired<T, K extends keyof T> = T & {
+    [P in K]-?: T[P];
+};

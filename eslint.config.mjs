@@ -10,6 +10,10 @@ export default tseslint.config(
       'test-results',
       'blob-report',
       'playwright/.auth',
+      // Vendored SCAPI specs and the types generated from them. Machine output;
+      // regenerate with `pnpm gen:api:fetch && pnpm gen:api` instead of editing.
+      'api/specs',
+      'api/generated',
     ],
   },
   {

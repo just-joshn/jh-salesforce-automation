@@ -45,3 +45,28 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
+
+  spec-drift:
+    name: SCAPI spec drift
+    # Re-fetches the specs from upstream, so it answers "did Salesforce change
+    # the contract", not "is this PR correct". Nightly and on demand only.
+    if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+      - uses: pnpm/action-setup@v6
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm gen:api:fetch && pnpm gen:api
+        env:
+          # Lifts the unauthenticated GitHub API rate limit for the one call
+          # that lists published spec versions.
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Which families moved
+        if: ${{ !cancelled() }}
+        run: git --no-pager diff -- api/specs/MANIFEST.json
+      - name: Fail if the vendored contract is stale
+        run: git diff --exit-code --stat -- api/specs api/generated

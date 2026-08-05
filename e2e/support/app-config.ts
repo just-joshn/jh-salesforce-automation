@@ -32,10 +32,56 @@ export interface LoginConfig {
   passwordless?: PasswordlessConfig;
 }
 
+/**
+ * The Commerce Agent settings the storefront ships, which is what decides whether
+ * the shopper-assistance journey exists on a deployment. Every flag is a string
+ * rather than a boolean because the template parses them out of one environment
+ * variable, so `'false'` is a value the agent reads and `''` is a missing one.
+ */
+export interface CommerceAgentConfig {
+  enabled?: string;
+  askAgentOnSearch?: string;
+  /** `miaw` (Embedded Messaging, the default) or `commerce-client`. */
+  provider?: string;
+  embeddedServiceName?: string;
+  embeddedServiceEndpoint?: string;
+  scriptSourceUrl?: string;
+  scrt2Url?: string;
+  salesforceOrgId?: string;
+  commerceOrgId?: string;
+  /** The agent platform's own site id, which is not the shop's siteId. */
+  siteId?: string;
+  enableConversationContext?: string;
+  conversationContext?: unknown[];
+  enableAgentFromHeader?: string;
+  enableAgentFromFloatingButton?: string;
+  enableAgentFromSearchSuggestions?: string;
+  /** Bundle version the Commerce Client provider builds its CDN URL from. */
+  cc_cdnVersion?: string;
+  /** A whole Commerce Client bundle URL, used instead of `cc_cdnVersion`. */
+  commerceClientScriptSourceUrl?: string;
+  cc_esDeveloperName?: string;
+}
+
+export interface EinsteinApiConfig {
+  host?: string;
+  einsteinId?: string;
+  /** Einstein's own site id, which is not the shop's siteId. */
+  siteId?: string;
+}
+
+export interface DataCloudApiConfig {
+  appSourceId?: string;
+  tenantId?: string;
+}
+
 export interface StorefrontAppConfig {
   oneClickCheckout?: OneClickCheckoutConfig;
   sfPayments?: SfPaymentsConfig;
   login?: LoginConfig;
+  commerceAgent?: CommerceAgentConfig;
+  einsteinAPI?: EinsteinApiConfig;
+  dataCloudAPI?: DataCloudApiConfig;
 }
 
 interface MobifyData {

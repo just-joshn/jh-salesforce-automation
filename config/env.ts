@@ -9,7 +9,13 @@ export const env = {
   siteAlias: process.env.E2E_SITE_ALIAS ?? 'global',
   locale: process.env.E2E_LOCALE ?? 'en-US',
 
-  /** Shop API settings (public, safe to commit). */
+  /**
+   * Shop API settings (public, safe to commit), taken from the config the demo
+   * serves in #mobify-data. Two values look wrong but are not: the upstream
+   * template defaults shortCode to 8o7m175y, which this deployment overrides;
+   * and the client the storefront runs on is private (401 "incorrect client
+   * type") so tests use the public PKCE client instead.
+   */
   scapi: {
     shortCode: process.env.SFCC_SHORT_CODE ?? 'kv7kzm78',
     organizationId: process.env.SFCC_ORG_ID ?? 'f_ecom_zzrf_001',

@@ -5,17 +5,6 @@ export interface RegistrationInput {
   password: string;
 }
 
-export interface Customer {
-  customerId?: string;
-  customerNo?: string;
-  login?: string;
-  email?: string;
-}
-
-export interface Fault {
-  type?: string;
-}
-
 export const password = 'Test1234!';
 
 // New email every run.

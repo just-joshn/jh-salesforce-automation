@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
+import type { Customer } from '../../support/scapi-types';
 import { getGuestToken, requireSession } from '../../support/slas';
 import * as Actions from './signin.actions';
-import type { Customer } from './signin.data';
 import { registrant, uniqueEmail, wrongPassword } from './signin.data';
 
 // Sign in, check session, reject bad password.

@@ -1,29 +1,17 @@
-import type { Basket, BasketProductItem } from '../../support/scapi-types';
-
-export interface Variant {
-  productId: string;
-  orderable: boolean;
-  price?: number;
-  variationValues?: Record<string, string>;
-}
-
-export interface Product {
-  id: string;
-  variants?: Variant[];
-}
+import type { Basket, BasketProductItem, Product, ProductVariant } from '../../support/scapi-types';
 
 // Color/size list; missing if none.
-export const variantsOf = (product: Product): Variant[] => product.variants ?? [];
+export const variantsOf = (product: Product): ProductVariant[] => product.variants ?? [];
 
 // First size that can be bought, or fail clear.
-export const firstOrderableVariant = (product: Product): Variant => {
+export const firstOrderableVariant = (product: Product): ProductVariant => {
   const variant = variantsOf(product).find((candidate) => candidate.orderable);
   if (!variant) throw new Error('expected an orderable variant');
   return variant;
 };
 
 // How many options (color, size, …) are set.
-export const variationCount = (variant: Variant): number =>
+export const variationCount = (variant: ProductVariant): number =>
   Object.keys(variant.variationValues ?? {}).length;
 
 export const lineItems = (basket: Basket): BasketProductItem[] => basket.productItems ?? [];

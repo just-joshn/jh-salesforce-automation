@@ -2,6 +2,7 @@ import type { APIRequestContext, Request } from '@playwright/test';
 import type { UiOrderableVariant } from '../../../../api/support/products';
 import { findUiOrderableVariant } from '../../../../api/support/products';
 import { bearer, shopperApiUrl, withSite } from '../../../../api/support/scapi';
+import type { SiteConfiguration } from '../../../../api/support/scapi-types';
 import { getGuestToken } from '../../../../api/support/slas';
 import type { SfPaymentsConfig } from '../../../support/app-config';
 import { readStorefrontAppConfig } from '../../../support/app-config';
@@ -40,15 +41,6 @@ export interface Address {
   stateCode: string;
   postalCode: string;
   countryCode: string;
-}
-
-interface ConfigurationEntry {
-  id?: string;
-  value?: unknown;
-}
-
-interface ConfigurationsResource {
-  configurations?: ConfigurationEntry[];
 }
 
 /** Commerce-side permission the Salesforce Payments hook requires. */
@@ -94,7 +86,7 @@ const siteConfigurations = async (request: APIRequestContext): Promise<Map<strin
   }
   if (!response.ok()) return new Map();
 
-  const resource = (await response.json()) as ConfigurationsResource;
+  const resource = (await response.json()) as SiteConfiguration;
   return new Map(
     (resource.configurations ?? []).flatMap((entry) =>
       entry.id === undefined ? [] : [[entry.id, entry.value] as const],

@@ -21,3 +21,9 @@ export function required<T>(value: T | undefined, field: string): T {
   if (value === undefined) throw new Error(`SCAPI response is missing ${field}`);
   return value;
 }
+
+// SCAPI allows any `c_`-prefixed custom attribute, so the spec types them as
+// unknown. Checked at runtime rather than asserted.
+export function customString(value: unknown): string | undefined {
+  return typeof value === 'string' ? value : undefined;
+}

@@ -1,51 +1,17 @@
-import type { APIRequestContext } from '@playwright/test';
 import { bearer, shopperApiUrl, withSite } from './scapi';
+import type {
+  Product,
+  ProductInventory,
+  ProductResult,
+  ProductSearchResult,
+  ProductVariant,
+  ProductVariationAttribute,
+} from './scapi-types';
+import type { APIRequestContext } from '@playwright/test';
 
 // Find products still in stock. Don't hardcode sizes — stock runs out.
 // "Master" = parent product. "Variant" = one color/size you can buy.
-
-interface VariationAttributeValue {
-  name?: string;
-  value?: string;
-}
-
-interface VariationAttribute {
-  id?: string;
-  values?: VariationAttributeValue[];
-}
-
-interface MasterVariant {
-  productId?: string;
-  variationValues?: Record<string, string>;
-}
-
-interface MasterProduct {
-  name?: string;
-  variants?: MasterVariant[];
-  variationAttributes?: VariationAttribute[];
-}
-
-interface Inventory {
-  id?: string;
-  orderable?: boolean;
-  ats?: number;
-}
-
-interface VariantDetail {
-  id?: string;
-  inventory?: Inventory;
-  /** Per-store stock, returned only when the call asks for inventory ids. */
-  inventories?: Inventory[];
-}
-
-interface ProductsResult {
-  data?: VariantDetail[];
-}
-
-interface SearchResult {
-  total?: number;
-  hits?: { productId?: string }[];
-}
+// Both are the spec's Product; SCAPI does not split them.
 
 export interface OrderableVariant {
   masterId: string;
@@ -80,7 +46,7 @@ interface VariantEntry {
 }
 
 const displayName = (
-  attributes: VariationAttribute[],
+  attributes: ProductVariationAttribute[],
   attributeId: string,
   value: string | undefined,
 ): string | undefined => {
@@ -101,7 +67,7 @@ const matchesColorFilter = (
   return variationValues.color === firstColor;
 };
 
-const firstColorValue = (attributes: VariationAttribute[]): string | undefined => {
+const firstColorValue = (attributes: ProductVariationAttribute[]): string | undefined => {
   const colorAttribute = attributes.find((attribute) => attribute.id === 'color');
   if (colorAttribute === undefined) return undefined;
   if (colorAttribute.values === undefined) return undefined;
@@ -111,7 +77,7 @@ const firstColorValue = (attributes: VariationAttribute[]): string | undefined =
 };
 
 const toVariantEntry = (
-  variant: MasterVariant,
+  variant: ProductVariant,
   firstColorOnly: boolean,
   firstColor: string | undefined,
 ): VariantEntry[] => {
@@ -120,14 +86,14 @@ const toVariantEntry = (
   return [{ productId: variant.productId, variationValues: variant.variationValues }];
 };
 
-const variantEntriesOf = (master: MasterProduct, firstColorOnly: boolean): VariantEntry[] => {
+const variantEntriesOf = (master: Product, firstColorOnly: boolean): VariantEntry[] => {
   const attributes = master.variationAttributes ?? [];
   const firstColor = firstColorValue(attributes);
   const variants = master.variants ?? [];
   return variants.flatMap((variant) => toVariantEntry(variant, firstColorOnly, firstColor));
 };
 
-const stockByIdFrom = (details: ProductsResult): Map<string, VariantDetail['inventory']> => {
+const stockByIdFrom = (details: ProductResult): Map<string, Product['inventory']> => {
   const rows = details.data ?? [];
   return new Map(
     rows.flatMap((detail) => {
@@ -137,13 +103,13 @@ const stockByIdFrom = (details: ProductsResult): Map<string, VariantDetail['inve
   );
 };
 
-const atsOf = (stock: VariantDetail['inventory'] | undefined): number => {
+const atsOf = (stock: Product['inventory'] | undefined): number => {
   if (stock === undefined) return 0;
   if (stock.ats === undefined) return 0;
   return stock.ats;
 };
 
-const isComfortablyOrderable = (stock: VariantDetail['inventory'] | undefined): boolean => {
+const isComfortablyOrderable = (stock: Product['inventory'] | undefined): boolean => {
   if (stock === undefined) return false;
   if (stock.orderable !== true) return false;
   return atsOf(stock) >= MIN_ATS;
@@ -159,10 +125,10 @@ const variationValue = (
 
 const toOrderable = (
   variant: VariantEntry,
-  stockById: Map<string, VariantDetail['inventory']>,
+  stockById: Map<string, Product['inventory']>,
   masterId: string,
   productName: string,
-  attributes: VariationAttribute[],
+  attributes: ProductVariationAttribute[],
 ): OrderableVariant[] => {
   const stock = stockById.get(variant.productId);
   if (!isComfortablyOrderable(stock)) return [];
@@ -178,7 +144,7 @@ const toOrderable = (
   ];
 };
 
-const productNameOf = (master: MasterProduct, masterId: string): string => {
+const productNameOf = (master: Product, masterId: string): string => {
   if (master.name === undefined) return masterId;
   return master.name;
 };
@@ -187,13 +153,13 @@ const fetchMaster = async (
   request: APIRequestContext,
   accessToken: string,
   masterId: string,
-): Promise<MasterProduct | undefined> => {
+): Promise<Product | undefined> => {
   const response = await request.get(
     shopperApiUrl('product/shopper-products/v1', `products/${encodeURIComponent(masterId)}`),
     { params: withSite({ allImages: 'false' }), headers: bearer(accessToken) },
   );
   if (!response.ok()) return undefined;
-  return (await response.json()) as MasterProduct;
+  return (await response.json()) as Product;
 };
 
 const fetchVariantDetails = async (
@@ -201,7 +167,7 @@ const fetchVariantDetails = async (
   accessToken: string,
   variants: VariantEntry[],
   inventoryId?: string,
-): Promise<ProductsResult | undefined> => {
+): Promise<ProductResult | undefined> => {
   const response = await request.get(shopperApiUrl('product/shopper-products/v1', 'products'), {
     params: withSite({
       ids: variants.map((variant) => variant.productId).join(','),
@@ -211,7 +177,7 @@ const fetchVariantDetails = async (
     headers: bearer(accessToken),
   });
   if (!response.ok()) return undefined;
-  return (await response.json()) as ProductsResult;
+  return (await response.json()) as ProductResult;
 };
 
 // In-stock variants for one product, most stock first.
@@ -250,7 +216,7 @@ const fallbackMasterIds = async (
     headers: bearer(accessToken),
   });
   if (!response.ok()) return [];
-  const result = (await response.json()) as SearchResult;
+  const result = (await response.json()) as ProductSearchResult;
   const ids = (result.hits ?? []).flatMap((hit) =>
     hit.productId !== undefined && hit.productId !== excludeMasterId ? [hit.productId] : [],
   );
@@ -355,19 +321,6 @@ export const findUiOrderableVariant = async (
 const MAX_IDS = 24;
 const PROMO_SEARCH_LIMIT = '25';
 
-interface PromotionEntry {
-  calloutMsg?: string;
-}
-
-interface PromotedMaster {
-  id?: string;
-  productPromotions?: PromotionEntry[];
-}
-
-interface PromotedResult {
-  data?: PromotedMaster[];
-}
-
 // A product the shop advertises, plus the size the product page can add to a cart.
 export interface PromotedUiVariant extends UiOrderableVariant {
   calloutMessages: string[];
@@ -383,7 +336,7 @@ const searchMasterIds = async (
     headers: bearer(accessToken),
   });
   if (!response.ok()) return [];
-  const result = (await response.json()) as SearchResult;
+  const result = (await response.json()) as ProductSearchResult;
   const ids = (result.hits ?? []).flatMap((hit) =>
     hit.productId === undefined ? [] : [hit.productId],
   );
@@ -395,7 +348,7 @@ const fetchPromotedMasters = async (
   request: APIRequestContext,
   accessToken: string,
   ids: string[],
-): Promise<PromotedMaster[]> => {
+): Promise<Product[]> => {
   if (ids.length === 0) return [];
   const response = await request.get(shopperApiUrl('product/shopper-products/v1', 'products'), {
     params: withSite({
@@ -406,11 +359,11 @@ const fetchPromotedMasters = async (
     headers: bearer(accessToken),
   });
   if (!response.ok()) return [];
-  const result = (await response.json()) as PromotedResult;
+  const result = (await response.json()) as ProductResult;
   return result.data ?? [];
 };
 
-const calloutsOf = (master: PromotedMaster): string[] =>
+const calloutsOf = (master: Product): string[] =>
   (master.productPromotions ?? []).flatMap((promotion) =>
     promotion.calloutMsg === undefined ? [] : [promotion.calloutMsg],
   );
@@ -465,7 +418,7 @@ export const findCategoryProductsInStore = async (
     );
   }
 
-  const result = (await response.json()) as SearchResult;
+  const result = (await response.json()) as ProductSearchResult;
   const masterIds = (result.hits ?? []).flatMap((hit) =>
     hit.productId === undefined ? [] : [hit.productId],
   );
@@ -482,15 +435,15 @@ export interface StoreVariant {
   ats: number;
 }
 
-const storeStockOf = (detail: VariantDetail, inventoryId: string): Inventory | undefined =>
+const storeStockOf = (detail: Product, inventoryId: string): ProductInventory | undefined =>
   (detail.inventories ?? []).find((entry) => entry.id === inventoryId);
 
 const toStoreVariant = (
   variant: VariantEntry,
-  stock: Inventory | undefined,
+  stock: ProductInventory | undefined,
   masterId: string,
   productName: string,
-  attributes: VariationAttribute[],
+  attributes: ProductVariationAttribute[],
 ): StoreVariant[] => {
   if (stock?.orderable !== true) return [];
   const colorName = displayName(
@@ -512,9 +465,9 @@ const toStoreVariant = (
 };
 
 const storeStockById = (
-  details: ProductsResult,
+  details: ProductResult,
   inventoryId: string,
-): Map<string, Inventory | undefined> =>
+): Map<string, ProductInventory | undefined> =>
   new Map(
     (details.data ?? []).flatMap((detail) =>
       detail.id === undefined ? [] : [[detail.id, storeStockOf(detail, inventoryId)] as const],

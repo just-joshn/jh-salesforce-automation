@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
+import type { Customer, Fault } from '../../support/scapi-types';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './register.actions';
-import type { Customer, Fault } from './register.data';
 import { duplicateLoginFaultType, invalidEmail, registrant, uniqueEmail } from './register.data';
 
 // Sign up once; reject duplicate and bad email.

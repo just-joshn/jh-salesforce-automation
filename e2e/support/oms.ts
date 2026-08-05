@@ -1,5 +1,11 @@
 import type { APIRequestContext } from '@playwright/test';
 import { bearer, shopperApiUrl, withSite } from '../../api/support/scapi';
+import type {
+  OmsMetaData,
+  OmsReasonCode,
+  Order,
+  OrderProductItem,
+} from '../../api/support/scapi-types';
 import { getGuestToken, loginRegisteredShopper } from '../../api/support/slas';
 import { env } from '../../config/env';
 
@@ -27,69 +33,11 @@ export interface ShopperCredentials {
   password: string;
 }
 
-/** A reason the shop offers for cancelling an order or returning an item. */
-export interface OmsReasonCode {
-  reason: string;
-  default?: boolean;
-}
-
-interface OmsMetaDataResource {
-  returnReasonCodes?: OmsReasonCode[];
-  cancelReasonCodes?: OmsReasonCode[];
-}
-
-/** One OMS shipment, as Shopper Orders returns it under `expand=oms_shipments`. */
-export interface OmsShipment {
-  id?: string;
-  status?: string;
-  provider?: string;
-  trackingNumber?: string;
-  /** Raw carrier URL, which the order detail page sanitizes before exposing. */
-  trackingUrl?: string;
-  expectedDeliveryDate?: string;
-  actualDeliveryDate?: string;
-}
-
-/** OMS state attached to one order line. */
-export interface OmsItemData {
-  status?: string;
-  quantityOrdered?: number;
-  quantityAvailableToCancel?: number;
-  quantityAvailableToReturn?: number;
-}
-
-/** OMS state attached to the order itself. */
-export interface OmsOrderData {
-  status?: string;
-  shipments?: OmsShipment[];
-}
-
-export interface OrderItemResource {
-  itemId?: string;
-  productId?: string;
-  productName?: string;
-  quantity?: number;
-  omsData?: OmsItemData;
-}
-
-interface EcomShipmentResource {
-  shippingMethod?: { name?: string };
-  shippingStatus?: string;
-}
-
-export interface OrderResource {
-  orderNo?: string;
-  /** ECOM order state, which the page falls back to without OMS state. */
-  status?: string;
-  currency?: string;
-  orderTotal?: number;
-  shippingStatus?: string;
-  customerInfo?: { customerId?: string; email?: string };
-  productItems?: OrderItemResource[];
-  shipments?: EcomShipmentResource[];
-  /** Present only on an order Order Management has ingested. */
-  omsData?: OmsOrderData;
-}
+// The payloads below come from the Shopper Orders spec. `Resource` names are kept
+// because that is how the journeys refer to what the order detail page reads.
+export type { OmsReasonCode, OmsShipment } from '../../api/support/scapi-types';
+export type OrderItemResource = OrderProductItem;
+export type OrderResource = Order;
 
 /** Whether Order Management is connected to the site under test. */
 export interface OmsActivation {
@@ -120,7 +68,7 @@ const inactive = (): OmsActivation => ({
   cancelReasonCodes: [],
 });
 
-const activeFrom = (meta: OmsMetaDataResource): OmsActivation => ({
+const activeFrom = (meta: OmsMetaData): OmsActivation => ({
   active: true,
   reason: 'Order Management is active for this site',
   returnReasonCodes: meta.returnReasonCodes ?? [],
@@ -142,7 +90,7 @@ export async function readOmsActivation(request: APIRequestContext): Promise<Oms
     params: withSite(),
     headers: bearer(accessToken),
   });
-  if (response.ok()) return activeFrom((await response.json()) as OmsMetaDataResource);
+  if (response.ok()) return activeFrom((await response.json()) as OmsMetaData);
 
   const body = await response.text();
   if (response.status() === 409 && body.includes('oms-not-active')) return inactive();

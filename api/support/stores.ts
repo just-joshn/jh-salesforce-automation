@@ -1,19 +1,9 @@
-import type { APIRequestContext } from '@playwright/test';
 import { bearer, shopperApiUrl, withSite } from './scapi';
+import type { StockKeepingStore, Store, StoreResult } from './scapi-types';
+import type { APIRequestContext } from '@playwright/test';
 
 // Find a pickup store and the stock ("inventory") id that goes with it.
 // The storefront needs that id to ask whether a product is on the shelf there.
-
-interface StoreEntry {
-  id?: string;
-  name?: string;
-  inventoryId?: string;
-}
-
-interface StoreSearchResult {
-  total?: number;
-  data?: StoreEntry[];
-}
 
 export interface StoreQuery {
   countryCode: string;
@@ -28,8 +18,16 @@ export interface NearbyStore {
   inventoryId: string;
 }
 
-const isUsable = (entry: StoreEntry): entry is Required<StoreEntry> =>
-  entry.id !== undefined && entry.name !== undefined && entry.inventoryId !== undefined;
+// A store worth asking about availability at all.
+export const stocksInventory = (store: Store): store is StockKeepingStore =>
+  store.inventoryId !== undefined;
+
+// The spec guarantees `id`; a store is only usable here if it also names itself
+// and carries its own stock id.
+type UsableStore = StockKeepingStore & { name: string };
+
+const isUsable = (entry: Store): entry is UsableStore =>
+  entry.name !== undefined && stocksInventory(entry);
 
 // Nearest store that has an id, a name and its own stock id.
 export const findNearbyStore = async (
@@ -45,7 +43,7 @@ export const findNearbyStore = async (
     throw new Error(`store search near ${query.postalCode} failed with ${response.status()}`);
   }
 
-  const result = (await response.json()) as StoreSearchResult;
+  const result = (await response.json()) as StoreResult;
   const store = (result.data ?? []).find(isUsable);
   if (store === undefined) {
     throw new Error(

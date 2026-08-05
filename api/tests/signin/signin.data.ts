@@ -5,11 +5,6 @@ export interface RegistrationInput {
   password: string;
 }
 
-export interface Customer {
-  customerId?: string;
-  login?: string;
-}
-
 export const password = 'Test1234!';
 export const wrongPassword = 'WrongPass999!';
 

@@ -337,8 +337,12 @@ A few things worth knowing:
 - Nothing fetches at test time. The committed spec is the pin; `pnpm gen:api:fetch` runs when you
   decide, or nightly in CI to detect drift.
 
-Einstein, Data Cloud, the storefront's own `#mobify-data` config and the OMS metadata resource have
-no published spec, so those stay hand-written.
+Order Management needs no separate spec: OMS state reaches the tests through Shopper Orders' `oms`
+and `oms_shipments` expansions, so `OmsShipment`, `OmsReasonCode` and `OmsMetaData` are generated
+alongside `Order`, and the per-line and per-order state hangs off `omsData` on each.
+
+Einstein, Data Cloud and the storefront's own `#mobify-data` config are not SCAPI and have no
+published spec, so those stay hand-written.
 
 ## Layout
 

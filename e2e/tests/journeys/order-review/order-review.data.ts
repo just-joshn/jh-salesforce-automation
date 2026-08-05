@@ -4,7 +4,14 @@ import {
   findOrderableVariants,
   findStoreOrderableVariant,
 } from '../../../../api/support/products';
-import { bearer, shopperApiUrl, withSite } from '../../../../api/support/scapi';
+import { bearer, customString, shopperApiUrl, withSite } from '../../../../api/support/scapi';
+import type {
+  Order,
+  OrderProductItem,
+  OrderShipment,
+  Store,
+  StoreResult,
+} from '../../../../api/support/scapi-types';
 import {
   getGuestToken,
   loginRegisteredShopper,
@@ -119,43 +126,11 @@ interface Authed {
   headers: Record<string, string>;
 }
 
-interface OrderItemResource {
-  productId?: string;
-  productName?: string;
-  quantity?: number;
-  price?: number;
-}
-
-interface ShipmentResource {
-  shippingMethod?: { name?: string };
-  shippingAddress?: { fullName?: string };
-  c_fromStoreId?: string;
-}
-
-interface OrderResource {
-  orderNo?: string;
-  status?: string;
-  currency?: string;
-  orderTotal?: number;
-  productSubTotal?: number;
-  taxTotal?: number;
-  shippingStatus?: string;
-  productItems?: OrderItemResource[];
-  shipments?: ShipmentResource[];
-}
-
-interface StoreResource {
-  id?: string;
-  name?: string;
-  address1?: string;
-  city?: string;
-  stateCode?: string;
-  postalCode?: string;
-}
-
-interface StoresResult {
-  data?: StoreResource[];
-}
+type OrderItemResource = OrderProductItem;
+type ShipmentResource = OrderShipment;
+type OrderResource = Order;
+type StoreResource = Store;
+type StoresResult = StoreResult;
 
 /** How the order is fulfilled, which decides how its shipment is set up. */
 interface OrderPlan {
@@ -342,7 +317,7 @@ const toPlacedOrder = (order: OrderResource): PlacedOrder => {
     shippingStatus: required(order.shippingStatus, 'a shipping status'),
     fulfillmentName: required(shipment.shippingMethod?.name, 'a shipping method name'),
     recipientName: required(shipment.shippingAddress?.fullName, 'a recipient name'),
-    pickupStoreId: shipment.c_fromStoreId,
+    pickupStoreId: customString(shipment.c_fromStoreId),
   };
 };
 

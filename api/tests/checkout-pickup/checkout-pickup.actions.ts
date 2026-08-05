@@ -1,7 +1,9 @@
 import type { APIRequestContext, APIResponse } from '@playwright/test';
 import type { OrderableVariant } from '../../support/products';
 import { bearer, withSite } from '../../support/scapi';
-import type { Address, Card, Product, Store, StoreSearchQuery } from './checkout-pickup.data';
+import type { Product, StockKeepingStore, Store } from '../../support/scapi-types';
+import { stocksInventory } from '../../support/stores';
+import type { Address, Card, StoreSearchQuery } from './checkout-pickup.data';
 import { orderableInStore, paymentMethodId } from './checkout-pickup.data';
 import * as Endpoints from './checkout-pickup.endpoints';
 
@@ -38,8 +40,8 @@ export const findStoreWithStock = async (
   accessToken: string,
   variantId: string,
   stores: Store[],
-): Promise<Store | undefined> => {
-  for (const store of stores) {
+): Promise<StockKeepingStore | undefined> => {
+  for (const store of stores.filter(stocksInventory)) {
     const response = await getProductAtStore(request, accessToken, variantId, store.inventoryId);
     if (
       response.status() === 200 &&
@@ -57,7 +59,7 @@ export const findStockedStoreVariant = async (
   accessToken: string,
   variants: OrderableVariant[],
   stores: Store[],
-): Promise<{ store: Store; variantId: string }> => {
+): Promise<{ store: StockKeepingStore; variantId: string }> => {
   for (const candidate of variants) {
     const store = await findStoreWithStock(request, accessToken, candidate.variantId, stores);
     if (store) return { store, variantId: candidate.variantId };

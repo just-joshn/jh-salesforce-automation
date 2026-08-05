@@ -1,6 +1,7 @@
 import type { APIRequestContext } from '@playwright/test';
 import { createHash, randomBytes } from 'crypto';
 import { env, scapiBaseUrl } from '../../config/env';
+import type { TokenResponse } from './scapi-types';
 
 // Login helpers (SLAS = shop login API).
 // Demo login is public: get a one-time code, trade it for a token.
@@ -10,13 +11,6 @@ export interface GuestToken {
   usid: string;
   customerId: string;
   expiresIn: number;
-}
-
-interface TokenResponse {
-  access_token: string;
-  usid: string;
-  customer_id: string;
-  expires_in: number;
 }
 
 function base64url(input: Buffer): string {

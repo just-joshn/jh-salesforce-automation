@@ -1,33 +1,21 @@
 import type { APIRequestContext } from '@playwright/test';
 import type { OrderableVariant } from '../../support/products';
 import { findOrderableVariants } from '../../support/products';
-import type { Basket, Order, OrderProductItem, OrderShipment } from '../../support/scapi-types';
+import type {
+  Basket,
+  Order,
+  OrderProductItem,
+  OrderShipment,
+  Product,
+  ProductInventory,
+  Store,
+  StoreResult,
+} from '../../support/scapi-types';
 
 export interface StoreSearchQuery {
   countryCode: string;
   postalCode: string;
   maxDistance: string;
-}
-
-export interface Store {
-  id: string;
-  inventoryId: string;
-}
-
-export interface StoreSearchResult {
-  total: number;
-  data?: Store[];
-}
-
-export interface Inventory {
-  id: string;
-  orderable?: boolean;
-}
-
-export interface Product {
-  id: string;
-  inventory?: Inventory;
-  inventories?: Inventory[];
 }
 
 export interface Address {
@@ -63,11 +51,11 @@ export interface MixedCheckoutFixture {
 }
 
 // Store list; missing array = no stores.
-export const storesOf = (result: StoreSearchResult): Store[] => result.data ?? [];
+export const storesOf = (result: StoreResult): Store[] => result.data ?? [];
 
 // True if store can sell this size.
 export const orderableInStore = (product: Product, inventoryId: string): boolean => {
-  const stock =
+  const stock: ProductInventory | undefined =
     (product.inventories ?? []).find((entry) => entry.id === inventoryId) ?? product.inventory;
   return Boolean(stock?.orderable);
 };

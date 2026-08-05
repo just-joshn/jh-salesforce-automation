@@ -34,8 +34,7 @@ export const wishlistHeading = (page: Page): Locator =>
   wishlistPage(page).getByRole('heading', { name: 'Wishlist', exact: true });
 
 // Skeleton while the customer product list is still loading.
-export const wishlistSkeleton = (page: Page): Locator =>
-  page.getByTestId('sf-wishlist-skeleton');
+export const wishlistSkeleton = (page: Page): Locator => page.getByTestId('sf-wishlist-skeleton');
 
 export const emptyWishlist = (page: Page): Locator =>
   wishlistPage(page).getByText('No Wishlist Items', { exact: true });
@@ -71,8 +70,7 @@ export const modalSizeOption = (page: Page, size: string): Locator =>
 export const modalAddToCart = (page: Page): Locator =>
   optionsModal(page).getByRole('button', { name: /^add to cart$/i });
 
-export const addedToCartToast = (page: Page): Locator =>
-  page.getByText(/added to cart/i).first();
+export const addedToCartToast = (page: Page): Locator => page.getByText(/added to cart/i).first();
 
 // --- Basket ---
 export const cartItem = (page: Page, variantId: string): Locator =>

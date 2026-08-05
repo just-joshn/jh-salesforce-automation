@@ -1,9 +1,8 @@
 import { expect, test } from '@playwright/test';
 import { required } from '../../support/scapi';
-import type { Basket, Fault } from '../../support/scapi-types';
+import type { Basket, Fault, Product } from '../../support/scapi-types';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './cart-delivery.actions';
-import type { Product } from './cart-delivery.data';
 import {
   deliveryProduct,
   firstLineItem,

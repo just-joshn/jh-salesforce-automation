@@ -1,9 +1,8 @@
 import { expect, test } from '@playwright/test';
 import { required } from '../../support/scapi';
-import type { Basket } from '../../support/scapi-types';
+import type { Basket, StoreResult } from '../../support/scapi-types';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './cart-pickup.actions';
-import type { StoreSearchResult } from './cart-pickup.data';
 import {
   lineItems,
   orderableVariants,
@@ -22,7 +21,7 @@ test('select an in-stock store and add the product to the basket for pickup', as
 
   const storeResponse = await Actions.searchStores(request, accessToken, pickup.nearby);
   expect(storeResponse.status()).toBe(200);
-  const stores = (await storeResponse.json()) as StoreSearchResult;
+  const stores = (await storeResponse.json()) as StoreResult;
   expect(stores.total).toBeGreaterThan(0);
   const { store: selectedStore, variantId } = await Actions.findStockedStoreVariant(
     request,
@@ -75,7 +74,7 @@ test('select an in-stock store and add the product to the basket for pickup', as
   // No nearby stores → empty list.
   const emptyResponse = await Actions.searchStores(request, accessToken, pickup.empty);
   expect(emptyResponse.status()).toBe(200);
-  const empty = (await emptyResponse.json()) as StoreSearchResult;
+  const empty = (await emptyResponse.json()) as StoreResult;
   expect(empty.total).toBe(0);
   expect(storesOf(empty)).toHaveLength(0);
 });

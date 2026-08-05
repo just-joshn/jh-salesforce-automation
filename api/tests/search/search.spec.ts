@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
+import type { Product, ProductSearchResult } from '../../support/scapi-types';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './search.actions';
-import type { ProductDetail, ProductSearchResult } from './search.data';
 import { commonQuery, firstHit, hitsOf, noMatchQuery } from './search.data';
 
 // Search hits open correctly; no match = empty, not error.
@@ -30,7 +30,7 @@ test('search returns matching products that open correctly; a no-match search is
   // First hit opens that product.
   const productResponse = await Actions.getProduct(request, accessToken, topHit.productId);
   expect(productResponse.status()).toBe(200);
-  const product = (await productResponse.json()) as ProductDetail;
+  const product = (await productResponse.json()) as Product;
   expect(product.id).toBe(topHit.productId);
   expect(product.name).toBe(topHit.productName);
 

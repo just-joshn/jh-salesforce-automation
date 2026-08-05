@@ -5,7 +5,7 @@ import { getGuestToken } from '../../support/slas';
 import * as Actions from './checkout-delivery.actions';
 import {
   checkout,
-  createdStatus,
+  placedStatuses,
   lineItems,
   orderNumber,
   orderTotalOf,
@@ -70,7 +70,7 @@ test('place a guest delivery order and consume the basket', async ({ request }) 
   expect(orderResponse.status()).toBe(200);
   const order = (await orderResponse.json()) as Order;
   expect(order.orderNo).toBeTruthy();
-  expect(order.status).toBe(createdStatus);
+  expect(placedStatuses).toContain(order.status);
   expect(lineItems(order).some((item) => item.productId === variant.variantId)).toBe(true);
   const shipment = shipmentById(order, checkout.shipmentId);
   expect(shippingMethodId(shipment)).toBe(checkout.shippingMethodId);

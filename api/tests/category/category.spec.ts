@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
+import type { Category, Product, ProductSearchResult } from '../../support/scapi-types';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './category.actions';
-import type { CategoryDetail, ProductDetail, ProductSearchResult } from './category.data';
 import { firstHit, hitsOf, invalidCategory, validCategory } from './category.data';
 
 // Category list, open product, unknown id → 404.
@@ -12,7 +12,7 @@ test('a category returns its details and product list; an unknown category is no
 
   const categoryResponse = await Actions.getCategory(request, accessToken, validCategory.id);
   expect(categoryResponse.status()).toBe(200);
-  const category = (await categoryResponse.json()) as CategoryDetail;
+  const category = (await categoryResponse.json()) as Category;
   expect(category.id).toBe(validCategory.id);
   expect(category.name).toBeTruthy();
 
@@ -36,7 +36,7 @@ test('a category returns its details and product list; an unknown category is no
   // Open hit → same product.
   const productResponse = await Actions.getProduct(request, accessToken, topHit.productId);
   expect(productResponse.status()).toBe(200);
-  const product = (await productResponse.json()) as ProductDetail;
+  const product = (await productResponse.json()) as Product;
   expect(product.id).toBe(topHit.productId);
 
   // Unknown category → 404.

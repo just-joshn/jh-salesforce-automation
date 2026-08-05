@@ -1,9 +1,8 @@
 import { expect, test } from '@playwright/test';
 import { required } from '../../support/scapi';
-import type { Basket, Order } from '../../support/scapi-types';
+import type { Basket, Order, StoreResult } from '../../support/scapi-types';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './checkout-mixed.actions';
-import type { StoreSearchResult } from './checkout-mixed.data';
 import {
   checkout,
   lineItems,
@@ -26,7 +25,7 @@ test('place one order that splits into delivery and pickup shipments', async ({ 
 
   const stores = (await (
     await Actions.searchStores(request, accessToken, checkout.storeQuery)
-  ).json()) as StoreSearchResult;
+  ).json()) as StoreResult;
   const { store, variant: pickupVariant } = await Actions.findStockedStoreVariant(
     request,
     accessToken,

@@ -6,10 +6,7 @@ import { accountUrlPattern } from './wishlist.data';
 import * as Locators from './wishlist.locators';
 
 // Sign in through the real login form; the login module owns those selectors.
-export const signInShopper = async (
-  page: Page,
-  credentials: ShopperCredentials,
-): Promise<void> => {
+export const signInShopper = async (page: Page, credentials: ShopperCredentials): Promise<void> => {
   await Login.openLogin(page);
   await Login.signIn(page, credentials);
   await page.waitForURL(accountUrlPattern, { timeout: 20000 });

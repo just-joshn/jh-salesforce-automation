@@ -91,8 +91,10 @@ export const checkout: CheckoutFixture = {
 // The only payment method the demo store takes.
 export const paymentMethodId = 'CREDIT_CARD';
 
-// Status a freshly placed order reports.
-export const createdStatus = 'created';
+// A freshly placed order reports `new` here; a site that holds orders before
+// processing them reports `created`. Typed against the spec's own status union,
+// so dropping either value upstream fails the build rather than a run.
+export const placedStatuses: Order['status'][] = ['new', 'created'];
 
 // A size that is in stock right now; the demo store's stock keeps moving.
 export const orderableVariant = async (

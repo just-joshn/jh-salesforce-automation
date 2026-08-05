@@ -2,6 +2,7 @@ import type { APIRequestContext, Request, Response } from '@playwright/test';
 import type { UiOrderableVariant } from '../../../../api/support/products';
 import { findUiOrderableVariant } from '../../../../api/support/products';
 import { bearer, shopperApiUrl, withSite } from '../../../../api/support/scapi';
+import type { Customer, Order, OrderAddress } from '../../../../api/support/scapi-types';
 import {
   getGuestToken,
   loginRegisteredShopper,
@@ -57,37 +58,11 @@ export interface OrderIdentity {
   uniqueAddressCount: number;
 }
 
-interface OrderAddressResource {
-  firstName?: string;
-  lastName?: string;
-  phone?: string;
-  address1?: string;
-  city?: string;
-  stateCode?: string;
-  postalCode?: string;
-  countryCode?: string;
-}
-
-interface OrderShipmentResource {
-  shippingAddress?: OrderAddressResource;
-  /** Set on a shipment the shopper collects, which is never saved as an address. */
-  c_fromStoreId?: string;
-}
-
-interface OrderResource {
-  orderNo?: string;
-  customerInfo?: { email?: string };
-  billingAddress?: OrderAddressResource;
-  shipments?: OrderShipmentResource[];
-}
-
-interface CustomerAddressResource extends OrderAddressResource {
-  addressId?: string;
-}
-
-interface CustomerResource {
-  addresses?: CustomerAddressResource[];
-}
+// A shipment carrying `c_fromStoreId` is one the shopper collects, so its address
+// is never saved. That is a SCAPI custom attribute, hence unknown on the shipment.
+type OrderAddressResource = OrderAddress;
+type OrderResource = Order;
+type CustomerResource = Customer;
 
 // Two different products, so the basket can hold two lines that ship separately.
 const firstMasterId = '25591139M';

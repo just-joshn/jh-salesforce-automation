@@ -1,20 +1,4 @@
-export interface ProductSearchHit {
-  productId: string;
-  productName: string;
-  price?: number;
-  orderable?: boolean;
-}
-
-// Search body; no hits if empty.
-export interface ProductSearchResult {
-  total: number;
-  hits?: ProductSearchHit[];
-}
-
-export interface ProductDetail {
-  id: string;
-  name?: string;
-}
+import type { ProductSearchHit, ProductSearchResult } from '../../support/scapi-types';
 
 export interface SearchQuery {
   term: string;

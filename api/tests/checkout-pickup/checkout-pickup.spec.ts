@@ -1,9 +1,8 @@
 import { expect, test } from '@playwright/test';
 import { required } from '../../support/scapi';
-import type { Basket, Order } from '../../support/scapi-types';
+import type { Basket, Order, StoreResult } from '../../support/scapi-types';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './checkout-pickup.actions';
-import type { StoreSearchResult } from './checkout-pickup.data';
 import {
   checkout,
   lineItems,
@@ -23,7 +22,7 @@ test('place a pickup order assigned to the correct store', async ({ request }) =
   // Find a store that stocks one size.
   const stores = (await (
     await Actions.searchStores(request, accessToken, checkout.storeQuery)
-  ).json()) as StoreSearchResult;
+  ).json()) as StoreResult;
   expect(stores.total).toBeGreaterThan(0);
   const { store, variantId } = await Actions.findStockedStoreVariant(
     request,

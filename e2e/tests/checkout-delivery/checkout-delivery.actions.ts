@@ -47,15 +47,10 @@ export const fillShippingAddress = async (page: Page, address: Address): Promise
 
 // Pickup already has store/method — may skip shipping. Fill address only if shown.
 export const fillShippingAddressIfPresent = async (page: Page, address: Address): Promise<void> => {
-  // After contact: address form or payment. Fill address only if it shows.
+  // Whichever step renders next wins the race: the address form or payment.
   const addressForm = Locators.shipFirstName(page);
-  await Promise.race([
-    addressForm.waitFor().catch(() => undefined),
-    Locators.cardNumber(page)
-      .waitFor()
-      .catch(() => undefined),
-  ]);
-  if (await addressForm.isVisible().catch(() => false)) {
+  await addressForm.or(Locators.cardNumber(page)).first().waitFor({ timeout: 30000 });
+  if (await addressForm.isVisible()) {
     await fillShippingAddress(page, address);
   }
 };

@@ -1,8 +1,6 @@
-import { findUiOrderableVariant } from '../../../api/support/products';
-import { getGuestToken } from '../../../api/support/slas';
 import { expect, test } from '../../support/fixtures';
 import * as Actions from './checkout-delivery.actions';
-import { checkout } from './checkout-delivery.data';
+import { checkout, confirmationUrlPattern, orderableVariant } from './checkout-delivery.data';
 import * as Locators from './checkout-delivery.locators';
 
 // Guest delivery buy through order confirmation.
@@ -10,9 +8,7 @@ test('complete a guest delivery purchase and see order confirmation', async ({ p
   // Guest checkout is slow — extra time.
   test.setTimeout(120000);
 
-  // Pick a size that is in stock right now.
-  const { accessToken } = await getGuestToken(request);
-  const variant = await findUiOrderableVariant(request, accessToken, checkout.masterId);
+  const variant = await orderableVariant(request);
 
   await Actions.openProduct(page, variant.masterId);
   await Actions.selectVariation(page, 'Color');
@@ -31,5 +27,5 @@ test('complete a guest delivery purchase and see order confirmation', async ({ p
   await expect(Locators.confirmationContainer(page)).toBeVisible({ timeout: 20000 });
   await expect(Locators.thankYouHeading(page)).toBeVisible();
   await expect(Locators.orderNumber(page)).toBeVisible();
-  await expect(page).toHaveURL(/\/checkout\/confirmation\/\d+/);
+  await expect(page).toHaveURL(confirmationUrlPattern);
 });

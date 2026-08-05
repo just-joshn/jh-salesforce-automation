@@ -15,3 +15,6 @@ export const registrant = (email: string): RegistrationInput => ({
   email,
   password: 'Test1234!',
 });
+
+// A completed registration lands on the account landing route.
+export const accountUrlPattern = /\/account\/?$/;

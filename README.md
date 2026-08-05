@@ -59,8 +59,9 @@ A few things that aren't obvious from the list:
 - The order-history test is really an access-control test. A shopper sees their own order, a second
   shopper gets an empty list, a missing order number returns 404, and reading the first shopper's
   orders as the second one is refused.
-- The `login` files have no test of their own. They hold the sign-in steps the auth setup reuses, so
-  those selectors live in one place.
+- The `login` files hold the sign-in steps the auth setup reuses, so those selectors live in one
+  place. Its own spec asserts the same journey and skips itself when no shopper account is
+  configured.
 
 ## Requirements
 
@@ -136,7 +137,7 @@ e2e/
     site.ts                  # buildPath('/product/x') -> /global/en-US/product/x
     fixtures.ts              # sets the consent cookie so the pop-up never interrupts a test
   tests/
-    login/                   # sign-in steps reused by auth.setup (no spec)
+    login/                   # sign-in steps reused by auth.setup (spec skips without an account)
     <feature>/               # <feature>.{locators,actions,data,spec}.ts
 api/
   support/

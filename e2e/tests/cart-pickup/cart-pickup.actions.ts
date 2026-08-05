@@ -38,13 +38,14 @@ export const selectFirstStore = async (page: Page): Promise<void> => {
 // Close store finder so it doesn't block Add to Cart.
 export const closeStoreModal = async (page: Page): Promise<void> => {
   const modal = Locators.storeModal(page);
-  if (!(await modal.isVisible().catch(() => false))) return;
+  if (!(await modal.isVisible())) return;
 
   const close = Locators.storeModalClose(page);
-  if (await close.isVisible().catch(() => false)) {
-    await close.click().catch(() => undefined);
+  if (await close.isVisible()) {
+    await close.click();
   }
-  if (await modal.isVisible().catch(() => false)) {
+  // Escape is the fallback when the dialog renders without a close button.
+  if (await modal.isVisible()) {
     await page.keyboard.press('Escape');
   }
 

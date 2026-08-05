@@ -1,6 +1,6 @@
 import { expect, test } from '../../support/fixtures';
 import * as Actions from './category.actions';
-import { validCategory } from './category.data';
+import { productUrl, validCategory } from './category.data';
 import * as Locators from './category.locators';
 
 // Open category → product → right product page.
@@ -25,5 +25,5 @@ test('browse a category and open the selected product detail page', async ({ pag
   expect(productId).not.toBe('');
 
   await expect(Locators.productDetail(page)).toBeVisible();
-  await expect(page).toHaveURL((url) => url.pathname.includes(`/product/${productId}`));
+  await expect(page).toHaveURL(productUrl(productId));
 });

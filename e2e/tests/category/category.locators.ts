@@ -2,15 +2,14 @@ import type { Locator, Page } from '@playwright/test';
 
 export const productList = (page: Page): Locator => page.getByTestId('sf-product-list-page');
 
-// Title is an <h1> (not found by accessible name).
+// The category title is the page's only level-1 heading.
 export const heading = (page: Page): Locator =>
-  page.getByTestId('sf-product-list-page').locator('h1').first();
+  productList(page).getByRole('heading', { level: 1 }).first();
 
+// Each tile is rendered as the product anchor, so the tile is the link.
 export const productTiles = (page: Page): Locator => page.getByTestId(/^sf-product-tile-/);
 
-export const productLinks = (page: Page): Locator => page.locator('a[href*="/product/"]');
-
-export const firstProductLink = (page: Page): Locator => productLinks(page).first();
+export const firstProductLink = (page: Page): Locator => productTiles(page).first();
 
 // Any price on a tile ($ or 12.34).
 export const anyTilePrice = (page: Page): Locator =>

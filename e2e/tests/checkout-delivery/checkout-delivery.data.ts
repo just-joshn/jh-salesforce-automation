@@ -1,3 +1,8 @@
+import type { APIRequestContext } from '@playwright/test';
+import type { UiOrderableVariant } from '../../../api/support/products';
+import { findUiOrderableVariant } from '../../../api/support/products';
+import { getGuestToken } from '../../../api/support/slas';
+
 export interface Address {
   firstName: string;
   lastName: string;
@@ -44,3 +49,12 @@ export const checkout: CheckoutFixture = {
     holder: 'Test Shopper',
   },
 };
+
+// Pick a size that is in stock right now; the demo store's stock keeps moving.
+export const orderableVariant = async (request: APIRequestContext): Promise<UiOrderableVariant> => {
+  const { accessToken } = await getGuestToken(request);
+  return findUiOrderableVariant(request, accessToken, checkout.masterId);
+};
+
+// A placed order lands on the numbered confirmation route.
+export const confirmationUrlPattern = /\/checkout\/confirmation\/\d+/;

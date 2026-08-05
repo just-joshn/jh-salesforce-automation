@@ -1,8 +1,6 @@
-import { findUiOrderableVariant } from '../../../api/support/products';
-import { getGuestToken } from '../../../api/support/slas';
 import { expect, test } from '../../support/fixtures';
 import * as Actions from './cart.actions';
-import { cartProduct } from './cart.data';
+import { checkoutUrl, orderableVariant } from './cart.data';
 import * as Locators from './cart.locators';
 
 // Build cart, raise qty, go to checkout. Remove/empty/totals = API test.
@@ -10,9 +8,7 @@ test('review a cart, update quantity, and proceed to checkout', async ({ page, r
   // Full flow is slow — extra time.
   test.setTimeout(90000);
 
-  // Pick a size that is in stock right now.
-  const { accessToken } = await getGuestToken(request);
-  const variant = await findUiOrderableVariant(request, accessToken, cartProduct.masterId);
+  const variant = await orderableVariant(request);
 
   await Actions.openProduct(page, variant.masterId);
   await Actions.selectVariation(page, 'Color');
@@ -30,6 +26,6 @@ test('review a cart, update quantity, and proceed to checkout', async ({ page, r
   await expect(Locators.itemQuantity(page, variant.variantId)).toHaveValue('2');
 
   await Actions.proceedToCheckout(page);
-  await expect(page).toHaveURL((url) => url.pathname.endsWith('/checkout'));
+  await expect(page).toHaveURL(checkoutUrl);
   await expect(Locators.checkoutContainer(page)).toBeVisible({ timeout: 15000 });
 });

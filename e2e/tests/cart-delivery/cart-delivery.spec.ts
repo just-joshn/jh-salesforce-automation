@@ -1,17 +1,13 @@
-import { findUiOrderableVariant } from '../../../api/support/products';
-import { getGuestToken } from '../../../api/support/slas';
 import { expect, test } from '../../support/fixtures';
 import * as Actions from './cart-delivery.actions';
-import { deliveryProduct } from './cart-delivery.data';
+import { orderableVariant, quantityLabel } from './cart-delivery.data';
 import * as Locators from './cart-delivery.locators';
 
 // Pick size, add to cart, cart keeps that item.
 test('configure a variant and add it to the cart for delivery', async ({ page, request }) => {
   test.setTimeout(90000);
 
-  // Pick a size that is in stock right now.
-  const { accessToken } = await getGuestToken(request);
-  const variant = await findUiOrderableVariant(request, accessToken, deliveryProduct.masterId);
+  const variant = await orderableVariant(request);
 
   await Actions.openProduct(page, variant.masterId);
 
@@ -25,7 +21,7 @@ test('configure a variant and add it to the cart for delivery', async ({ page, r
   await expect(confirmation).toContainText(variant.productName);
   await expect(confirmation).toContainText(variant.colorName);
   await expect(confirmation).toContainText(variant.sizeName);
-  await expect(confirmation).toContainText('Qty');
+  await expect(confirmation).toContainText(quantityLabel);
 
   await Actions.openCart(page);
   await expect(Locators.cartContainer(page)).toBeVisible();

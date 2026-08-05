@@ -9,11 +9,10 @@ export const resultsHeading = (page: Page): Locator =>
 
 export const productList = (page: Page): Locator => page.getByTestId('sf-product-list-page');
 
+// Each tile is rendered as the product anchor, so the tile is the link.
 export const productTiles = (page: Page): Locator => page.getByTestId(/^sf-product-tile-/);
 
-export const productLinks = (page: Page): Locator => page.locator('a[href*="/product/"]');
-
-export const firstProductLink = (page: Page): Locator => productLinks(page).first();
+export const firstProductLink = (page: Page): Locator => productTiles(page).first();
 
 // Any price on a result tile.
 export const anyTilePrice = (page: Page): Locator => productTiles(page).getByText(/[$£€]/).first();

@@ -1,8 +1,6 @@
-import { findUiOrderableVariant } from '../../../api/support/products';
-import { getGuestToken } from '../../../api/support/slas';
 import { expect, test } from '../../support/fixtures';
 import * as Actions from './signin.actions';
-import { password, product, uniqueEmail } from './signin.data';
+import { newCredentials, orderableVariant, provisionCustomer } from './signin.data';
 import * as Locators from './signin.locators';
 
 // Sign-in keeps the guest cart item. Bad-password checks live in the API test.
@@ -11,14 +9,12 @@ test('sign in preserves the guest cart and authenticates the shopper', async ({
   request,
 }) => {
   test.setTimeout(120000);
-  const credentials = { email: uniqueEmail(), password };
+  const credentials = newCredentials();
 
   // Make account via API; browser stays guest until sign-in.
-  await Actions.provisionViaApi(request, credentials);
+  await provisionCustomer(request, credentials);
 
-  // Pick a size that is in stock right now.
-  const { accessToken } = await getGuestToken(request);
-  const variant = await findUiOrderableVariant(request, accessToken, product.masterId);
+  const variant = await orderableVariant(request);
 
   await Actions.addProductToCart(page, variant.masterId, variant.sizeName);
   await Actions.openCart(page);

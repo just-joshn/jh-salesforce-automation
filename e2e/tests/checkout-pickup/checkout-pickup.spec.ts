@@ -1,8 +1,6 @@
-import { findUiOrderableVariant } from '../../../api/support/products';
-import { getGuestToken } from '../../../api/support/slas';
 import { expect, test } from '../../support/fixtures';
 import * as Actions from './checkout-pickup.actions';
-import { checkout, pickupProduct } from './checkout-pickup.data';
+import { confirmationUrlPattern, orderableVariant, pickupCheckout } from './checkout-pickup.data';
 import * as Locators from './checkout-pickup.locators';
 
 // Guest pickup buy through order confirmation.
@@ -10,15 +8,13 @@ import * as Locators from './checkout-pickup.locators';
 test('complete a guest pickup purchase and see order confirmation', async ({ page, request }) => {
   test.setTimeout(150000);
 
-  // Pick a size that is in stock right now.
-  const { accessToken } = await getGuestToken(request);
-  const variant = await findUiOrderableVariant(request, accessToken, pickupProduct.masterId);
+  const variant = await orderableVariant(request);
 
   await Actions.openProduct(page, variant.masterId);
   await Actions.selectVariation(page, 'Color');
   await Actions.selectSize(page, variant.sizeName);
   await Actions.openStoreSelection(page);
-  await Actions.searchStore(page, pickupProduct.storeCountry, pickupProduct.storePostalCode);
+  await Actions.searchStore(page, pickupCheckout.storeCountry, pickupCheckout.storePostalCode);
   await Actions.selectFirstStore(page);
   await Actions.closeStoreModal(page);
   await Actions.addToCart(page);
@@ -26,13 +22,13 @@ test('complete a guest pickup purchase and see order confirmation', async ({ pag
   await expect(Locators.addConfirmation(page).first()).toBeVisible({ timeout: 15000 });
 
   await Actions.openCheckout(page);
-  await Actions.fillContact(page, checkout.email);
+  await Actions.fillContact(page, pickupCheckout.email);
   // Pickup skips shipping; goes to payment.
-  await Actions.fillShippingAddressIfPresent(page, checkout.address);
-  await Actions.fillPayment(page, checkout.card);
+  await Actions.fillShippingAddressIfPresent(page, pickupCheckout.address);
+  await Actions.fillPayment(page, pickupCheckout.card);
   await Actions.placeOrder(page);
 
   await expect(Locators.confirmationContainer(page)).toBeVisible({ timeout: 20000 });
   await expect(Locators.orderNumber(page)).toBeVisible();
-  await expect(page).toHaveURL(/\/checkout\/confirmation\/\d+/);
+  await expect(page).toHaveURL(confirmationUrlPattern);
 });

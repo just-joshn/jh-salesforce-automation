@@ -1,30 +1,7 @@
-import type { APIRequestContext, Page } from '@playwright/test';
-import { bearer, shopperApiUrl, withSite } from '../../../api/support/scapi';
-import { getGuestToken } from '../../../api/support/slas';
+import type { Page } from '@playwright/test';
 import { buildPath } from '../../support/site';
 import type { Credentials } from './signin.data';
 import * as Locators from './signin.locators';
-
-// Make account via API so the browser is still a guest. Then sign-in merges the cart.
-export const provisionViaApi = async (
-  request: APIRequestContext,
-  credentials: Credentials,
-): Promise<void> => {
-  const { accessToken } = await getGuestToken(request);
-  await request.post(shopperApiUrl('customer/shopper-customers/v1', 'customers'), {
-    params: withSite(),
-    headers: bearer(accessToken),
-    data: {
-      customer: {
-        firstName: 'Test',
-        lastName: 'Portfolio',
-        email: credentials.email,
-        login: credentials.email,
-      },
-      password: credentials.password,
-    },
-  });
-};
 
 // Color change rebuilds sizes — wait longer for the click.
 const selectVariation = async (page: Page, attribute: string): Promise<void> => {

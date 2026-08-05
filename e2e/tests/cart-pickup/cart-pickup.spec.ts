@@ -1,8 +1,6 @@
-import { findUiOrderableVariant } from '../../../api/support/products';
-import { getGuestToken } from '../../../api/support/slas';
 import { expect, test } from '../../support/fixtures';
 import * as Actions from './cart-pickup.actions';
-import { pickupProduct } from './cart-pickup.data';
+import { orderableVariant, pickupProduct } from './cart-pickup.data';
 import * as Locators from './cart-pickup.locators';
 
 // Pick store, add item, cart shows pickup item.
@@ -12,9 +10,7 @@ test('select a pickup store and add the product to the cart for pickup', async (
 }) => {
   test.setTimeout(90000);
 
-  // Pick a size that is in stock right now.
-  const { accessToken } = await getGuestToken(request);
-  const variant = await findUiOrderableVariant(request, accessToken, pickupProduct.masterId);
+  const variant = await orderableVariant(request);
 
   await Actions.openProduct(page, variant.masterId);
 

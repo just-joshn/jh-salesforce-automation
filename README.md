@@ -37,24 +37,28 @@ stays in another.
 
 Same journey on both layers unless noted:
 
-| Journey                                            | Browser | API |
-| -------------------------------------------------- | :-----: | :-: |
-| Browse a category and open a product               |    ✓    |  ✓  |
-| Search and open a product                          |    ✓    |  ✓  |
-| Configure a product and add it for delivery        |    ✓    |  ✓  |
-| Pick a store and add a product for pickup          |    ✓    |  ✓  |
-| Review and edit the cart                           |    ✓    |  ✓  |
-| Guest delivery order through to confirmation       |    ✓    |  ✓  |
-| Guest pickup order through to confirmation         |    ✓    |  ✓  |
-| One order split across delivery and pickup         |         |  ✓  |
-| Register an account                                |    ✓    |  ✓  |
-| Sign in                                            |    ✓    |  ✓  |
-| Order history and detail, with access control      |    ✓    |  ✓  |
-| Discover a product from an Einstein recommendation |    ✓    |     |
-| Claim a bonus product earned by a promotion        |    ✓    |     |
-| One-click checkout from saved identity data        |   ✓†    |     |
-| Pay through Salesforce Payments                    |   ✓†    |     |
-| Create an account after a guest purchase           |    ✓    |     |
+| Journey                                                 | Browser | API |
+| ------------------------------------------------------- | :-----: | :-: |
+| Browse a category and open a product                    |    ✓    |  ✓  |
+| Search and open a product                               |    ✓    |  ✓  |
+| Configure a product and add it for delivery             |    ✓    |  ✓  |
+| Pick a store and add a product for pickup               |    ✓    |  ✓  |
+| Review and edit the cart                                |    ✓    |  ✓  |
+| Guest delivery order through to confirmation            |    ✓    |  ✓  |
+| Guest pickup order through to confirmation              |    ✓    |  ✓  |
+| One order split across delivery and pickup              |         |  ✓  |
+| Register an account                                     |    ✓    |  ✓  |
+| Sign in                                                 |    ✓    |  ✓  |
+| Order history and detail, with access control           |    ✓    |  ✓  |
+| Discover a product from an Einstein recommendation      |    ✓    |     |
+| Claim a bonus product earned by a promotion             |    ✓    |     |
+| One-click checkout from saved identity data             |   ✓†    |     |
+| Pay through Salesforce Payments                         |   ✓†    |     |
+| Create an account after a guest purchase                |    ✓    |     |
+| Track a shipment through its carrier                    |   ✓†    |     |
+| Cancel an eligible Order Management order               |   ✓†    |     |
+| Return eligible order items                             |   ✓†    |     |
+| An un-ingested order offers no Order Management actions |    ✓    |     |
 
 † Written and gated, but the public demo is not configured for it, so the run skips it with the
 reason rather than executing it. See the conditional journeys below.
@@ -70,7 +74,7 @@ A few things that aren't obvious from the list:
 - The `login` files hold the sign-in steps the auth setup reuses, so those selectors live in one
   place. Its own spec asserts the same journey and skips itself when no shopper account is
   configured.
-- The last five journeys are conditional: they only exist while the store is configured for them, so
+- The last nine journeys are conditional: they only exist while the store is configured for them, so
   each one proves its own condition before the browser starts and skips with a reason when it isn't
   met. The recommendation journey asks Einstein whether it has anything to recommend; the bonus
   journey puts a qualifying product in a throwaway basket and looks for the bonus discount line item.
@@ -104,6 +108,61 @@ A few things that aren't obvious from the list:
   (`catalog-object-impression` keyed by the recommender). It covers both endings the journey allows,
   opening the recommended product and saving it to the wishlist.
 
+### The Order Management journeys
+
+Tracking a shipment, cancelling an order and returning items are the three shopper actions the
+storefront offers on an order that Salesforce Order Management (SOM) has ingested. They are
+conditional in a different way from the checkout journeys: there is no flag to read. The storefront
+gates all three purely on OMS state being attached to the order, so the only thing that turns them
+on is a connected Order Management org enriching it. In the storefront's own words: "There is no
+feature flag. Each action is gated entirely on data and shopper identity... B2C Commerce-only orders
+(no `omsData`) never expose the return or cancel flows."
+
+So the condition is read from the commerce service instead. `e2e/support/oms.ts` asks Shopper Orders
+for the OMS metadata resource the order detail page reads its return reasons from, and a site
+Order Management is not connected to answers `409 oms-not-active`. That is what each skip quotes,
+naming the settings that aren't met: a SOM org linked to the B2C Commerce instance,
+**Administration > Global Preferences > Salesforce Order Management Integration Administration** set
+to Active, and **Merchant Tools > Site Preferences > Order > Order Management Settings > Include in
+Order Management** set to Yes. Anything other than "here are the reason codes" or "OMS is not active"
+raises a store fault rather than skipping.
+
+The orders these journeys use are named by `E2E_OMS_*` rather than placed by the test, because
+placing one cannot reach the states they need. A shipment only carries a carrier URL once the order
+is fulfilled and a line is only returnable once it has shipped, OMS ingestion is not retroactive, and
+there is no on-demand way to advance an order. Cancellation is the opposite problem: it needs an
+order nothing has been allocated against yet, which a freshly placed order races. Seed the three
+order numbers against an OMS-active storefront and all three execute with no code change.
+
+A few details worth knowing:
+
+- The tracking journey reimplements the storefront's carrier-URL hardening rather than calling it, so
+  the set of tracking actions it expects is derived from the order payload on its own terms —
+  otherwise the test could only assert that the page agrees with itself. It also asserts the
+  filtering half: every raw URL that fails to externalize must have no matching link on the page.
+- Cancellation eligibility is checked more strictly than the page checks it. The page compares
+  `quantityAvailableToCancel` against `quantityOrdered` directly, so a line carrying neither field
+  reads as equal and would enable a cancellation Order Management then refuses; the condition
+  requires real numbers.
+- The stale-quantity and unknown-item recoveries the return journey allows for are not asserted.
+  Reaching them means making Order Management answer 400 with a specific error code, which can only
+  be forced by faking the service the journey exists to exercise. What is asserted instead is the
+  validation standing between the shopper and those failures: a quantity above the limit OMS
+  currently reports cannot leave the modal.
+
+The public demo has Order Management switched off, so all three skip. Their steps are written against
+the deployed app's own contract but have never run — treat them as unproven until an OMS-active
+storefront says otherwise.
+
+The fourth journey is the complement, and the only part of this the public demo can prove: an order
+Order Management has not ingested must offer none of the three actions, must ask Order Management for
+nothing, and must fall back to its own ECOM status everywhere. It places a real order, reads it back
+under both OMS expansions to show it carries no OMS state, then checks the page renders no actions
+block, no carrier link, and the ECOM shipment state instead. It is what keeps the other three honest:
+their skip says "the action is not here", and this says "and that is correct" — without it an absent
+button could equally mean a broken page. It skips in the other direction, on a storefront that does
+ingest into OMS and therefore has no un-ingested order to assert against.
+
 ## Requirements
 
 - Node 22.13+ (pnpm 11 needs it; pinned in `.nvmrc` / `package.json` engines; CI uses the Playwright image's Node).
@@ -121,13 +180,14 @@ There's a working default for everything except a real shopper login, so guest b
 public API tests run with no `.env` at all. `.env` is gitignored; keep real credentials out of
 anything git tracks.
 
-| Setting                                      | Purpose                                    | Default            |
-| -------------------------------------------- | ------------------------------------------ | ------------------ |
-| `E2E_BASE_URL`                               | Storefront under test                      | the live demo      |
-| `E2E_SITE_ALIAS` / `E2E_LOCALE`              | Path prefix, e.g. `/global/en-US`          | `global` / `en-US` |
-| `SFCC_*`                                     | SCAPI connection (non-secret, public demo) | demo values        |
-| `EINSTEIN_*` / `DATACLOUD_*`                 | Recommendation and web-event services      | demo values        |
-| `E2E_ACCOUNT_EMAIL` / `E2E_ACCOUNT_PASSWORD` | Shopper login for the signed-in journeys   | empty (guest only) |
+| Setting                                      | Purpose                                         | Default            |
+| -------------------------------------------- | ----------------------------------------------- | ------------------ |
+| `E2E_BASE_URL`                               | Storefront under test                           | the live demo      |
+| `E2E_SITE_ALIAS` / `E2E_LOCALE`              | Path prefix, e.g. `/global/en-US`               | `global` / `en-US` |
+| `SFCC_*`                                     | SCAPI connection (non-secret, public demo)      | demo values        |
+| `EINSTEIN_*` / `DATACLOUD_*`                 | Recommendation and web-event services           | demo values        |
+| `E2E_ACCOUNT_EMAIL` / `E2E_ACCOUNT_PASSWORD` | Shopper login for the signed-in journeys        | empty (guest only) |
+| `E2E_OMS_*_ORDER_NO`                         | Seeded orders for the Order Management journeys | empty (they skip)  |
 
 ## Running
 
@@ -178,9 +238,12 @@ e2e/
   support/
     site.ts                  # buildPath('/product/x') -> /global/en-US/product/x
     fixtures.ts              # sets the consent cookie so the pop-up never interrupts a test
+    app-config.ts            # the storefront's own shipped config, read from #mobify-data
+    oms.ts                   # whether Order Management is connected, and reading a seeded order
   tests/
     login/                   # sign-in steps reused by auth.setup (spec skips without an account)
     <feature>/               # <feature>.{locators,actions,data,spec}.ts
+    journeys/<feature>/      # same four files, one folder per cross-service journey
 api/
   support/
     slas.ts                  # guest token (SLAS + PKCE)

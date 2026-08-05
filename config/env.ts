@@ -23,6 +23,20 @@ export const env = {
     password: process.env.E2E_ACCOUNT_PASSWORD ?? '',
   },
 
+  /**
+   * Orders the account above owns, already in the state each OMS journey needs.
+   * Seeded rather than placed by the test because OMS ingestion is not
+   * retroactive and cannot advance an order on demand. Empty = journey skips.
+   */
+  oms: {
+    /** Order with at least one OMS shipment carrying a carrier tracking URL. */
+    trackingOrderNo: process.env.E2E_OMS_TRACKING_ORDER_NO ?? '',
+    /** Order still cancellable in full, i.e. nothing allocated yet. */
+    cancelOrderNo: process.env.E2E_OMS_CANCEL_ORDER_NO ?? '',
+    /** Order with at least one line holding a returnable quantity. */
+    returnOrderNo: process.env.E2E_OMS_RETURN_ORDER_NO ?? '',
+  },
+
   /** Einstein recommendations (public demo values, safe to commit). */
   einstein: {
     host: process.env.EINSTEIN_HOST ?? 'https://api.cquotient.com',

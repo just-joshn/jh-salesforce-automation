@@ -37,19 +37,21 @@ stays in another.
 
 Same journey on both layers unless noted:
 
-| Journey                                       | Browser | API |
-| --------------------------------------------- | :-----: | :-: |
-| Browse a category and open a product          |    ✓    |  ✓  |
-| Search and open a product                     |    ✓    |  ✓  |
-| Configure a product and add it for delivery   |    ✓    |  ✓  |
-| Pick a store and add a product for pickup     |    ✓    |  ✓  |
-| Review and edit the cart                      |    ✓    |  ✓  |
-| Guest delivery order through to confirmation  |    ✓    |  ✓  |
-| Guest pickup order through to confirmation    |    ✓    |  ✓  |
-| One order split across delivery and pickup    |         |  ✓  |
-| Register an account                           |    ✓    |  ✓  |
-| Sign in                                       |    ✓    |  ✓  |
-| Order history and detail, with access control |    ✓    |  ✓  |
+| Journey                                            | Browser | API |
+| -------------------------------------------------- | :-----: | :-: |
+| Browse a category and open a product               |    ✓    |  ✓  |
+| Search and open a product                          |    ✓    |  ✓  |
+| Configure a product and add it for delivery        |    ✓    |  ✓  |
+| Pick a store and add a product for pickup          |    ✓    |  ✓  |
+| Review and edit the cart                           |    ✓    |  ✓  |
+| Guest delivery order through to confirmation       |    ✓    |  ✓  |
+| Guest pickup order through to confirmation         |    ✓    |  ✓  |
+| One order split across delivery and pickup         |         |  ✓  |
+| Register an account                                |    ✓    |  ✓  |
+| Sign in                                            |    ✓    |  ✓  |
+| Order history and detail, with access control      |    ✓    |  ✓  |
+| Discover a product from an Einstein recommendation |    ✓    |     |
+| Claim a bonus product earned by a promotion        |    ✓    |     |
 
 A few things that aren't obvious from the list:
 
@@ -62,6 +64,16 @@ A few things that aren't obvious from the list:
 - The `login` files hold the sign-in steps the auth setup reuses, so those selectors live in one
   place. Its own spec asserts the same journey and skips itself when no shopper account is
   configured.
+- The last two journeys are conditional: they only exist while the store is configured for them, so
+  each one proves its own condition over the commerce API before the browser starts and skips with a
+  reason when it isn't met. The recommendation journey asks Einstein whether it has anything to
+  recommend; the bonus journey puts a qualifying product in a throwaway basket and looks for the
+  bonus discount line item. A store fault is raised rather than skipped, so a broken shop never
+  reads as "this journey doesn't apply here".
+- The recommendation journey also asserts the tracking, not just the tiles: the impression and the
+  click are matched in both Einstein (`viewReco` / `clickReco`) and Data Cloud
+  (`catalog-object-impression` keyed by the recommender). It covers both endings the journey allows,
+  opening the recommended product and saving it to the wishlist.
 
 ## Requirements
 
@@ -85,6 +97,7 @@ anything git tracks.
 | `E2E_BASE_URL`                               | Storefront under test                      | the live demo      |
 | `E2E_SITE_ALIAS` / `E2E_LOCALE`              | Path prefix, e.g. `/global/en-US`          | `global` / `en-US` |
 | `SFCC_*`                                     | SCAPI connection (non-secret, public demo) | demo values        |
+| `EINSTEIN_*` / `DATACLOUD_*`                 | Recommendation and web-event services      | demo values        |
 | `E2E_ACCOUNT_EMAIL` / `E2E_ACCOUNT_PASSWORD` | Shopper login for the signed-in journeys   | empty (guest only) |
 
 ## Running
@@ -143,6 +156,7 @@ api/
   support/
     slas.ts                  # guest token (SLAS + PKCE)
     scapi.ts                 # URL and header helpers
+    einstein.ts              # recommendation host, paths, and a recs call
   tests/
     <feature>/               # <feature>.{endpoints,actions,data,spec}.ts
 playwright.config.ts         # projects: setup, e2e-chromium, api

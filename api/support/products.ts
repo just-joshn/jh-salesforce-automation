@@ -323,6 +323,15 @@ const fallbackUiVariant = async (
   return anySized;
 };
 
+// The variant a product page's first color swatch can add for this exact
+// product. Unlike findUiOrderableVariant it never substitutes another product,
+// which matters when the product itself is what the test is about.
+export const findUiVariantOnMaster = async (
+  request: APIRequestContext,
+  accessToken: string,
+  masterId: string,
+): Promise<UiOrderableVariant | undefined> => uiVariantOf(request, accessToken, masterId);
+
 // Best UI product: S/M/L on main product, else search, else any size.
 export const findUiOrderableVariant = async (
   request: APIRequestContext,

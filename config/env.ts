@@ -22,6 +22,21 @@ export const env = {
     email: process.env.E2E_ACCOUNT_EMAIL ?? '',
     password: process.env.E2E_ACCOUNT_PASSWORD ?? '',
   },
+
+  /** Einstein recommendations (public demo values, safe to commit). */
+  einstein: {
+    host: process.env.EINSTEIN_HOST ?? 'https://api.cquotient.com',
+    /** Sent as x-cq-client-id, the same way the storefront sends it. */
+    clientId: process.env.EINSTEIN_ID ?? '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+    /** Einstein's own site id, which is not the shop's siteId. */
+    siteId: process.env.EINSTEIN_SITE_ID ?? 'aaij-MobileFirst',
+  },
+
+  /** Data Cloud web events the storefront sends alongside Einstein. */
+  dataCloud: {
+    appSourceId: process.env.DATACLOUD_APP_SOURCE_ID ?? '7ae070a6-f4ec-4def-a383-d9cacc3f20a1',
+    tenantId: process.env.DATACLOUD_TENANT_ID ?? 'g82wgnrvm-ywk9dggrrw8mtggy.pc-rnd',
+  },
 } as const;
 
 /** Shop API host (not the website host). */

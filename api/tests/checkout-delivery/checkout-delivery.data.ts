@@ -1,3 +1,7 @@
+import type { APIRequestContext } from '@playwright/test';
+import type { OrderableVariant } from '../../support/products';
+import { findOrderableVariants } from '../../support/products';
+
 export interface Address {
   firstName: string;
   lastName: string;
@@ -71,6 +75,7 @@ export const orderNumber = (order: Order): string => {
 export interface CheckoutFixture {
   masterId: string;
   email: string;
+  quantity: number;
   shipmentId: string;
   shippingMethodId: string;
   address: Address;
@@ -81,6 +86,7 @@ export interface CheckoutFixture {
 export const checkout: CheckoutFixture = {
   masterId: '25591139M',
   email: 'test.shopper@gmail.com',
+  quantity: 1,
   shipmentId: 'me',
   shippingMethodId: 'GBP001',
   address: {
@@ -100,4 +106,23 @@ export const checkout: CheckoutFixture = {
     holder: 'Test Shopper',
     securityCode: '123',
   },
+};
+
+// The only payment method the demo store takes.
+export const paymentMethodId = 'CREDIT_CARD';
+
+// Status a freshly placed order reports.
+export const createdStatus = 'created';
+
+// A size that is in stock right now; the demo store's stock keeps moving.
+export const orderableVariant = async (
+  request: APIRequestContext,
+  accessToken: string,
+): Promise<OrderableVariant> => {
+  const [variant] = await findOrderableVariants(request, accessToken, {
+    masterId: checkout.masterId,
+    minCount: 1,
+  });
+  if (!variant) throw new Error('expected an orderable variant');
+  return variant;
 };

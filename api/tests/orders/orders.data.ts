@@ -1,4 +1,10 @@
-export interface Credentials {
+import type { APIRequestContext } from '@playwright/test';
+import type { OrderableVariant } from '../../support/products';
+import { findOrderableVariants } from '../../support/products';
+
+export interface RegistrationInput {
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
 }
@@ -44,13 +50,22 @@ export interface OrderDetail {
 export const ordersOf = (history: OrderHistory): OrderSummary[] => history.data ?? [];
 
 export const password = 'Test1234!';
-// Main product id. Spec picks an in-stock size at run time.
+// Main product id. The in-stock size is resolved at run time.
 export const masterId = '25591139M';
+export const quantity = 1;
 export const shippingMethodId = 'GBP001';
+export const paymentMethodId = 'CREDIT_CARD';
 export const unknownOrderNo = 'BOGUS00000';
 
 export const uniqueEmail = (): string =>
   `qa.portfolio.${Date.now()}${Math.floor(Math.random() * 100000)}@gmail.com`;
+
+export const registrant = (email: string): RegistrationInput => ({
+  firstName: 'Test',
+  lastName: 'Portfolio',
+  email,
+  password,
+});
 
 export const address: Address = {
   firstName: 'Test',
@@ -69,4 +84,14 @@ export const card: Card = {
   expirationYear: 2030,
   holder: 'Test Portfolio',
   securityCode: '123',
+};
+
+// A size that is in stock right now; the demo store's stock keeps moving.
+export const orderableVariant = async (
+  request: APIRequestContext,
+  accessToken: string,
+): Promise<OrderableVariant> => {
+  const [variant] = await findOrderableVariants(request, accessToken, { masterId, minCount: 1 });
+  if (!variant) throw new Error('expected an orderable variant');
+  return variant;
 };

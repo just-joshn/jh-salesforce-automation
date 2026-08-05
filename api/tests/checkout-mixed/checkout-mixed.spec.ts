@@ -1,54 +1,31 @@
-import type { APIRequestContext } from '@playwright/test';
 import { expect, test } from '@playwright/test';
-import type { OrderableVariant } from '../../support/products';
-import { findOrderableVariants } from '../../support/products';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './checkout-mixed.actions';
-import type { Basket, Order, Store, StoreSearchResult } from './checkout-mixed.data';
+import type { Basket, Order, StoreSearchResult } from './checkout-mixed.data';
 import {
   checkout,
   lineItems,
   orderNumber,
   orderTotalOf,
+  orderableVariants,
+  requireDeliveryVariant,
   shipmentById,
   shippingMethodId,
   storesOf,
 } from './checkout-mixed.data';
-
-const pickPickupPair = async (
-  request: APIRequestContext,
-  accessToken: string,
-  candidates: OrderableVariant[],
-  stores: Store[],
-): Promise<{ store: Store; pickupVariant: OrderableVariant }> => {
-  for (const candidate of candidates) {
-    const store = await Actions.findStoreWithStock(
-      request,
-      accessToken,
-      candidate.variantId,
-      stores,
-    );
-    if (store) return { store, pickupVariant: candidate };
-  }
-  throw new Error('expected a store with the pickup item in stock');
-};
 
 // One order: some items ship, some pick up.
 test('place one order that splits into delivery and pickup shipments', async ({ request }) => {
   const { accessToken } = await getGuestToken(request);
 
   // Two in-stock sizes: one to ship, one a store also has for pickup.
-  const variants = await findOrderableVariants(request, accessToken, {
-    masterId: checkout.masterId,
-    minCount: 2,
-  });
-  const deliveryVariant = variants[0];
-  if (!deliveryVariant) throw new Error('expected an orderable delivery variant');
+  const variants = await orderableVariants(request, accessToken);
+  const deliveryVariant = requireDeliveryVariant(variants);
 
   const stores = (await (
     await Actions.searchStores(request, accessToken, checkout.storeQuery)
   ).json()) as StoreSearchResult;
-  const { store, pickupVariant } = await pickPickupPair(
+  const { store, variant: pickupVariant } = await Actions.findStockedStoreVariant(
     request,
     accessToken,
     variants.slice(1),
@@ -60,14 +37,16 @@ test('place one order that splits into delivery and pickup shipments', async ({ 
 
   // Ship item on main shipment; pickup on second.
   expect(
-    (await Actions.addItem(request, accessToken, id, deliveryVariant.variantId, 1)).status(),
+    (
+      await Actions.addItem(request, accessToken, id, deliveryVariant.variantId, checkout.quantity)
+    ).status(),
   ).toBe(200);
   expect(
     (await Actions.createShipment(request, accessToken, id, checkout.pickupShipmentId)).status(),
   ).toBe(200);
   expect(
     (
-      await Actions.addItem(request, accessToken, id, pickupVariant.variantId, 1, {
+      await Actions.addItem(request, accessToken, id, pickupVariant.variantId, checkout.quantity, {
         inventoryId: store.inventoryId,
         shipmentId: checkout.pickupShipmentId,
       })

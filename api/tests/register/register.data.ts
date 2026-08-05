@@ -25,6 +25,9 @@ export const uniqueEmail = (): string =>
 // example.com emails are always invalid here.
 export const invalidEmail = 'qa.portfolio.invalid@example.com';
 
+// Reusing an email fails with this fault.
+export const duplicateLoginFaultType = 'login-already-in-use';
+
 export const registrant = (email: string): RegistrationInput => ({
   firstName: 'Test',
   lastName: 'Portfolio',

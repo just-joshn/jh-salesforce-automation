@@ -1,3 +1,7 @@
+import type { APIRequestContext } from '@playwright/test';
+import type { OrderableVariant } from '../../support/products';
+import { findOrderableVariants } from '../../support/products';
+
 export interface StoreSearchQuery {
   countryCode: string;
   postalCode: string;
@@ -69,6 +73,7 @@ export interface Basket {
 
 export interface MixedCheckoutFixture {
   masterId: string;
+  quantity: number;
   deliveryShipmentId: string;
   pickupShipmentId: string;
   deliveryMethodId: string;
@@ -110,9 +115,10 @@ export const orderNumber = (order: Order): string => {
   return order.orderNo;
 };
 
-// Main product. Spec picks two in-stock sizes (ship + pickup).
+// Main product. Two in-stock sizes (ship + pickup) are resolved at run time.
 export const checkout: MixedCheckoutFixture = {
   masterId: '25591139M',
+  quantity: 1,
   deliveryShipmentId: 'me',
   pickupShipmentId: 'pickup',
   deliveryMethodId: 'GBP001',
@@ -136,4 +142,21 @@ export const checkout: MixedCheckoutFixture = {
     holder: 'Test Shopper',
     securityCode: '123',
   },
+};
+
+// The only payment method the demo store takes.
+export const paymentMethodId = 'CREDIT_CARD';
+
+// Two sizes that are in stock right now; the demo store's stock keeps moving.
+export const orderableVariants = (
+  request: APIRequestContext,
+  accessToken: string,
+): Promise<OrderableVariant[]> =>
+  findOrderableVariants(request, accessToken, { masterId: checkout.masterId, minCount: 2 });
+
+// The size that ships, or fail clear.
+export const requireDeliveryVariant = (variants: OrderableVariant[]): OrderableVariant => {
+  const [variant] = variants;
+  if (!variant) throw new Error('expected an orderable delivery variant');
+  return variant;
 };

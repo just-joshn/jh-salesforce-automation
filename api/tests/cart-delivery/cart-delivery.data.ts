@@ -32,6 +32,13 @@ export interface Fault {
 // Color/size list; missing if none.
 export const variantsOf = (product: Product): Variant[] => product.variants ?? [];
 
+// First size that can be bought, or fail clear.
+export const firstOrderableVariant = (product: Product): Variant => {
+  const variant = variantsOf(product).find((candidate) => candidate.orderable);
+  if (!variant) throw new Error('expected an orderable variant');
+  return variant;
+};
+
 // How many options (color, size, …) are set.
 export const variationCount = (variant: Variant): number =>
   Object.keys(variant.variationValues ?? {}).length;
@@ -49,11 +56,16 @@ export interface DeliveryFixture {
   masterId: string;
   quantity: number;
   overQuantity: number;
+  defaultShipmentId: string;
 }
 
-// Product that can ship.
+// Product that can ship. "me" is the shipment a new basket ships from by default.
 export const deliveryProduct: DeliveryFixture = {
   masterId: '25591139M',
   quantity: 2,
   overQuantity: 999999,
+  defaultShipmentId: 'me',
 };
+
+// Ordering more units than exist fails with this fault.
+export const unavailableFaultType = 'product-item-not-available';

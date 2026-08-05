@@ -1,13 +1,14 @@
 import { expect, test } from '@playwright/test';
-import { findOrderableVariants } from '../../support/products';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './checkout-delivery.actions';
 import type { Basket, Order } from './checkout-delivery.data';
 import {
   checkout,
+  createdStatus,
   lineItems,
   orderNumber,
   orderTotalOf,
+  orderableVariant,
   paymentInstrumentsOf,
   shipmentById,
   shippingMethodId,
@@ -16,22 +17,18 @@ import {
 // Guest delivery order, then prove the cart can't order again.
 test('place a guest delivery order and consume the basket', async ({ request }) => {
   const { accessToken } = await getGuestToken(request);
-
-  // Order a size that is in stock right now.
-  const [variant] = await findOrderableVariants(request, accessToken, {
-    masterId: checkout.masterId,
-    minCount: 1,
-  });
-  if (!variant) throw new Error('expected an orderable variant');
+  const variant = await orderableVariant(request, accessToken);
 
   const created = (await (await Actions.createBasket(request, accessToken)).json()) as Basket;
   expect(created.basketId).toBeTruthy();
   const id = created.basketId;
 
   // Fill each checkout step; each must save.
-  expect((await Actions.addItem(request, accessToken, id, variant.variantId, 1)).status()).toBe(
-    200,
-  );
+  expect(
+    (
+      await Actions.addItem(request, accessToken, id, variant.variantId, checkout.quantity)
+    ).status(),
+  ).toBe(200);
   expect((await Actions.setCustomer(request, accessToken, id, checkout.email)).status()).toBe(200);
   expect(
     (
@@ -72,7 +69,7 @@ test('place a guest delivery order and consume the basket', async ({ request }) 
   expect(orderResponse.status()).toBe(200);
   const order = (await orderResponse.json()) as Order;
   expect(order.orderNo).toBeTruthy();
-  expect(order.status).toBe('created');
+  expect(order.status).toBe(createdStatus);
   expect(lineItems(order).some((item) => item.productId === variant.variantId)).toBe(true);
   const shipment = shipmentById(order, checkout.shipmentId);
   expect(shippingMethodId(shipment)).toBe(checkout.shippingMethodId);

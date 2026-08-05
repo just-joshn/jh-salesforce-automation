@@ -5,8 +5,9 @@ import type { Basket, Fault, Product } from './cart-delivery.data';
 import {
   deliveryProduct,
   firstLineItem,
+  firstOrderableVariant,
   lineItems,
-  variantsOf,
+  unavailableFaultType,
   variationCount,
 } from './cart-delivery.data';
 
@@ -18,8 +19,7 @@ test('configure a variant and add it to the basket for delivery', async ({ reque
   const productResponse = await Actions.getProduct(request, accessToken, deliveryProduct.masterId);
   expect(productResponse.status()).toBe(200);
   const product = (await productResponse.json()) as Product;
-  const variant = variantsOf(product).find((candidate) => candidate.orderable);
-  if (!variant) throw new Error('expected an orderable variant');
+  const variant = firstOrderableVariant(product);
   expect(variationCount(variant)).toBeGreaterThan(0);
   expect(typeof variant.price).toBe('number');
 
@@ -42,7 +42,7 @@ test('configure a variant and add it to the basket for delivery', async ({ reque
   expect(item.productId).toBe(variant.productId);
   expect(item.quantity).toBe(deliveryProduct.quantity);
   expect(typeof item.price).toBe('number');
-  expect(item.shipmentId).toBe('me'); // "me" is the default delivery shipment
+  expect(item.shipmentId).toBe(deliveryProduct.defaultShipmentId);
 
   // Reload cart — item should stick.
   const refetchResponse = await Actions.getBasket(request, accessToken, basket.basketId);
@@ -63,5 +63,5 @@ test('configure a variant and add it to the basket for delivery', async ({ reque
   );
   expect(overResponse.status()).toBe(400);
   const fault = (await overResponse.json()) as Fault;
-  expect(fault.type).toContain('product-item-not-available');
+  expect(fault.type).toContain(unavailableFaultType);
 });

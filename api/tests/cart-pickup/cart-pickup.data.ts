@@ -1,3 +1,7 @@
+import type { APIRequestContext } from '@playwright/test';
+import type { OrderableVariant } from '../../support/products';
+import { findOrderableVariants } from '../../support/products';
+
 export interface StoreSearchQuery {
   countryCode: string;
   postalCode: string;
@@ -90,3 +94,10 @@ export const pickup: PickupFixture = {
   nearby: { countryCode: 'US', postalCode: '01801', maxDistance: '100' },
   empty: { countryCode: 'US', postalCode: '99950', maxDistance: '5' },
 };
+
+// Sizes that are in stock right now; the demo store's stock keeps moving.
+export const orderableVariants = (
+  request: APIRequestContext,
+  accessToken: string,
+): Promise<OrderableVariant[]> =>
+  findOrderableVariants(request, accessToken, { masterId: pickup.masterId, minCount: 1 });

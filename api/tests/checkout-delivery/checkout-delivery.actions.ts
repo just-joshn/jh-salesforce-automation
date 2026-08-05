@@ -1,6 +1,7 @@
 import type { APIRequestContext, APIResponse } from '@playwright/test';
 import { bearer, withSite } from '../../support/scapi';
 import type { Address, Card } from './checkout-delivery.data';
+import { paymentMethodId } from './checkout-delivery.data';
 import * as Endpoints from './checkout-delivery.endpoints';
 
 const authed = (accessToken: string, data?: unknown) => ({
@@ -69,7 +70,7 @@ export const addPayment = (
 ): Promise<APIResponse> =>
   request.post(
     Endpoints.paymentInstruments(basketId),
-    authed(accessToken, { paymentMethodId: 'CREDIT_CARD', paymentCard: card, amount }),
+    authed(accessToken, { paymentMethodId, paymentCard: card, amount }),
   );
 
 export const createOrder = (

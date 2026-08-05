@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './register.actions';
 import type { Customer, Fault } from './register.data';
-import { invalidEmail, registrant, uniqueEmail } from './register.data';
+import { duplicateLoginFaultType, invalidEmail, registrant, uniqueEmail } from './register.data';
 
 // Sign up once; reject duplicate and bad email.
 test('register a new account, and reject duplicate and invalid emails', async ({ request }) => {
@@ -19,7 +19,7 @@ test('register a new account, and reject duplicate and invalid emails', async ({
   // Same email again → reject.
   const duplicate = await Actions.registerCustomer(request, accessToken, registrant(email));
   expect(duplicate.status()).toBe(400);
-  expect(((await duplicate.json()) as Fault).type).toContain('login-already-in-use');
+  expect(((await duplicate.json()) as Fault).type).toContain(duplicateLoginFaultType);
 
   // Bad email → reject.
   const invalid = await Actions.registerCustomer(request, accessToken, registrant(invalidEmail));

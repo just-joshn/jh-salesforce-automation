@@ -1,4 +1,5 @@
 import type { APIRequestContext, APIResponse } from '@playwright/test';
+import type { OrderableVariant } from '../../support/products';
 import { bearer, withSite } from '../../support/scapi';
 import type { Product, Store, StoreSearchQuery } from './cart-pickup.data';
 import { orderableInStore } from './cart-pickup.data';
@@ -42,6 +43,20 @@ export const findStoreWithStock = async (
     }
   }
   return undefined;
+};
+
+// Walk the candidate sizes until one of them is stocked by one of the stores.
+export const findStockedStoreVariant = async (
+  request: APIRequestContext,
+  accessToken: string,
+  variants: OrderableVariant[],
+  stores: Store[],
+): Promise<{ store: Store; variantId: string }> => {
+  for (const candidate of variants) {
+    const store = await findStoreWithStock(request, accessToken, candidate.variantId, stores);
+    if (store) return { store, variantId: candidate.variantId };
+  }
+  throw new Error('expected a store with an orderable variant in stock');
 };
 
 export const createBasket = (

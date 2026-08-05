@@ -1,28 +1,24 @@
 import { expect, test } from '@playwright/test';
-import { findOrderableVariants } from '../../support/products';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './cart.actions';
 import type { Basket, Fault } from './cart.data';
-import { cart, firstLineItem, lineItems, lineItemsTotal, subtotal } from './cart.data';
-
-const requireDefined = <T>(value: T | undefined, message: string): T => {
-  if (value === undefined) throw new Error(message);
-  return value;
-};
+import {
+  cart,
+  firstLineItem,
+  lineItemByProductId,
+  lineItems,
+  lineItemsTotal,
+  orderableVariantPair,
+  subtotal,
+  unavailableFaultType,
+} from './cart.data';
 
 // Add/update/remove cart; totals stick; over-stock fails.
 test('reconcile a basket (update quantity, remove) with consistent, persisted totals', async ({
   request,
 }) => {
   const { accessToken } = await getGuestToken(request);
-
-  // Pick two sizes that are in stock right now.
-  const found = await findOrderableVariants(request, accessToken, {
-    masterId: cart.masterId,
-    minCount: 2,
-  });
-  const variantA = requireDefined(found[0], 'expected two orderable variants');
-  const variantB = requireDefined(found[1], 'expected two orderable variants');
+  const [variantA, variantB] = await orderableVariantPair(request, accessToken);
 
   const createResponse = await Actions.createBasket(request, accessToken);
   expect(createResponse.status()).toBe(200);
@@ -39,14 +35,8 @@ test('reconcile a basket (update quantity, remove) with consistent, persisted to
   // Line prices sum to subtotal.
   expect(lineItemsTotal(added)).toBeCloseTo(subtotal(afterAdd), 2);
 
-  const itemA = requireDefined(
-    added.find((item) => item.productId === variantA.variantId),
-    'expected both items in the basket',
-  );
-  const itemB = requireDefined(
-    added.find((item) => item.productId === variantB.variantId),
-    'expected both items in the basket',
-  );
+  const itemA = lineItemByProductId(afterAdd, variantA.variantId);
+  const itemB = lineItemByProductId(afterAdd, variantB.variantId);
 
   // Change quantity.
   const updateResponse = await Actions.updateItemQuantity(
@@ -98,7 +88,7 @@ test('reconcile a basket (update quantity, remove) with consistent, persisted to
   );
   expect(overResponse.status()).toBe(400);
   const fault = (await overResponse.json()) as Fault;
-  expect(fault.type).toContain('product-item-not-available');
+  expect(fault.type).toContain(unavailableFaultType);
 
   // Empty cart → no items, total 0.
   const emptyResponse = await Actions.removeItem(

@@ -1,7 +1,8 @@
 import type { APIRequestContext, APIResponse } from '@playwright/test';
+import type { OrderableVariant } from '../../support/products';
 import { bearer, withSite } from '../../support/scapi';
 import type { Address, Card, Product, Store, StoreSearchQuery } from './checkout-pickup.data';
-import { orderableInStore } from './checkout-pickup.data';
+import { orderableInStore, paymentMethodId } from './checkout-pickup.data';
 import * as Endpoints from './checkout-pickup.endpoints';
 
 const authed = (accessToken: string, data?: unknown) => ({
@@ -48,6 +49,20 @@ export const findStoreWithStock = async (
     }
   }
   return undefined;
+};
+
+// Walk the candidate sizes until one of them is stocked by one of the stores.
+export const findStockedStoreVariant = async (
+  request: APIRequestContext,
+  accessToken: string,
+  variants: OrderableVariant[],
+  stores: Store[],
+): Promise<{ store: Store; variantId: string }> => {
+  for (const candidate of variants) {
+    const store = await findStoreWithStock(request, accessToken, candidate.variantId, stores);
+    if (store) return { store, variantId: candidate.variantId };
+  }
+  throw new Error('expected a store with an orderable variant in stock');
 };
 
 export const createBasket = (
@@ -115,7 +130,7 @@ export const addPayment = (
 ): Promise<APIResponse> =>
   request.post(
     Endpoints.paymentInstruments(basketId),
-    authed(accessToken, { paymentMethodId: 'CREDIT_CARD', paymentCard: card, amount }),
+    authed(accessToken, { paymentMethodId, paymentCard: card, amount }),
   );
 
 export const createOrder = (

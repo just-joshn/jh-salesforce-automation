@@ -1,3 +1,7 @@
+import type { APIRequestContext } from '@playwright/test';
+import type { OrderableVariant } from '../../support/products';
+import { findOrderableVariants } from '../../support/products';
+
 export interface StoreSearchQuery {
   countryCode: string;
   postalCode: string;
@@ -104,6 +108,7 @@ export const orderNumber = (order: Order): string => {
 export interface PickupCheckoutFixture {
   masterId: string;
   email: string;
+  quantity: number;
   shipmentId: string;
   pickupMethodId: string;
   storeQuery: StoreSearchQuery;
@@ -111,10 +116,11 @@ export interface PickupCheckoutFixture {
   card: Card;
 }
 
-// Spec picks an in-stock size at run time.
+// The in-stock size is resolved at run time.
 export const checkout: PickupCheckoutFixture = {
   masterId: '25591139M',
   email: 'test.shopper@gmail.com',
+  quantity: 1,
   shipmentId: 'me',
   pickupMethodId: 'GBP005',
   storeQuery: { countryCode: 'US', postalCode: '01801', maxDistance: '100' },
@@ -136,3 +142,13 @@ export const checkout: PickupCheckoutFixture = {
     securityCode: '123',
   },
 };
+
+// The only payment method the demo store takes.
+export const paymentMethodId = 'CREDIT_CARD';
+
+// Sizes that are in stock right now; the demo store's stock keeps moving.
+export const orderableVariants = (
+  request: APIRequestContext,
+  accessToken: string,
+): Promise<OrderableVariant[]> =>
+  findOrderableVariants(request, accessToken, { masterId: checkout.masterId, minCount: 1 });

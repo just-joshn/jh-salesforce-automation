@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './category.actions';
 import type { CategoryDetail, ProductDetail, ProductSearchResult } from './category.data';
-import { hitsOf, invalidCategory, validCategory } from './category.data';
+import { firstHit, hitsOf, invalidCategory, validCategory } from './category.data';
 
 // Category list, open product, unknown id → 404.
 test('a category returns its details and product list; an unknown category is not found', async ({
@@ -30,15 +30,14 @@ test('a category returns its details and product list; an unknown category is no
     expect(hit.productName).toBeTruthy();
   }
   expect(hits.some((hit) => typeof hit.price === 'number' && hit.price > 0)).toBe(true);
-  const firstHit = hits[0];
-  if (!firstHit) throw new Error('expected at least one category hit');
-  expect(typeof firstHit.orderable).toBe('boolean');
+  const topHit = firstHit(result);
+  expect(typeof topHit.orderable).toBe('boolean');
 
   // Open hit → same product.
-  const productResponse = await Actions.getProduct(request, accessToken, firstHit.productId);
+  const productResponse = await Actions.getProduct(request, accessToken, topHit.productId);
   expect(productResponse.status()).toBe(200);
   const product = (await productResponse.json()) as ProductDetail;
-  expect(product.id).toBe(firstHit.productId);
+  expect(product.id).toBe(topHit.productId);
 
   // Unknown category → 404.
   const invalidResponse = await Actions.getCategory(request, accessToken, invalidCategory.id);

@@ -2,26 +2,26 @@ import type { APIRequestContext, APIResponse } from '@playwright/test';
 import { bearer, withSite } from '../../support/scapi';
 import type { RegisteredLogin } from '../../support/slas';
 import { loginRegisteredShopper } from '../../support/slas';
-import type { Credentials } from './orders.data';
-import { address, card, shippingMethodId } from './orders.data';
+import type { RegistrationInput } from './orders.data';
+import { address, card, paymentMethodId, quantity, shippingMethodId } from './orders.data';
 import * as Endpoints from './orders.endpoints';
 
 export const registerCustomer = (
   request: APIRequestContext,
   guestToken: string,
-  credentials: Credentials,
+  input: RegistrationInput,
 ): Promise<APIResponse> =>
   request.post(Endpoints.customers(), {
     params: withSite(),
     headers: bearer(guestToken),
     data: {
       customer: {
-        firstName: 'Test',
-        lastName: 'Portfolio',
-        email: credentials.email,
-        login: credentials.email,
+        firstName: input.firstName,
+        lastName: input.lastName,
+        email: input.email,
+        login: input.email,
       },
-      password: credentials.password,
+      password: input.password,
     },
   });
 
@@ -46,7 +46,7 @@ export const placeOrder = async (
   const id = created.basketId;
   const added = await request.post(Endpoints.basketItems(id), {
     ...authed,
-    data: [{ productId: variantId, quantity: 1 }],
+    data: [{ productId: variantId, quantity }],
   });
   if (!added.ok()) {
     throw new Error(
@@ -62,7 +62,7 @@ export const placeOrder = async (
   };
   await request.post(Endpoints.paymentInstruments(id), {
     ...authed,
-    data: { paymentMethodId: 'CREDIT_CARD', paymentCard: card, amount: priced.orderTotal },
+    data: { paymentMethodId, paymentCard: card, amount: priced.orderTotal },
   });
   const orderResponse = await request.post(Endpoints.orders(), {
     ...authed,

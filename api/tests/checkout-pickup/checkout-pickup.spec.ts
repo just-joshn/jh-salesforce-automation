@@ -1,54 +1,29 @@
-import type { APIRequestContext } from '@playwright/test';
 import { expect, test } from '@playwright/test';
-import type { OrderableVariant } from '../../support/products';
-import { findOrderableVariants } from '../../support/products';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './checkout-pickup.actions';
-import type { Basket, Order, Store, StoreSearchResult } from './checkout-pickup.data';
+import type { Basket, Order, StoreSearchResult } from './checkout-pickup.data';
 import {
   checkout,
   lineItems,
   orderNumber,
   orderTotalOf,
+  orderableVariants,
   shipmentById,
   shippingMethodId,
   storesOf,
 } from './checkout-pickup.data';
 
-const pickInStockPair = async (
-  request: APIRequestContext,
-  accessToken: string,
-  variants: OrderableVariant[],
-  stores: Store[],
-): Promise<{ store: Store; variantId: string }> => {
-  for (const candidate of variants) {
-    const store = await Actions.findStoreWithStock(
-      request,
-      accessToken,
-      candidate.variantId,
-      stores,
-    );
-    if (store) return { store, variantId: candidate.variantId };
-  }
-  throw new Error('expected a store with an orderable variant in stock');
-};
-
 // Guest pickup order at the store; cart is empty after.
 test('place a pickup order assigned to the correct store', async ({ request }) => {
   const { accessToken } = await getGuestToken(request);
-
-  // Pick sizes that are in stock right now.
-  const variants = await findOrderableVariants(request, accessToken, {
-    masterId: checkout.masterId,
-    minCount: 1,
-  });
+  const variants = await orderableVariants(request, accessToken);
 
   // Find a store that stocks one size.
   const stores = (await (
     await Actions.searchStores(request, accessToken, checkout.storeQuery)
   ).json()) as StoreSearchResult;
   expect(stores.total).toBeGreaterThan(0);
-  const { store, variantId } = await pickInStockPair(
+  const { store, variantId } = await Actions.findStockedStoreVariant(
     request,
     accessToken,
     variants,
@@ -60,7 +35,16 @@ test('place a pickup order assigned to the correct store', async ({ request }) =
 
   // Add using store stock, set pickup.
   expect(
-    (await Actions.addItem(request, accessToken, id, variantId, 1, store.inventoryId)).status(),
+    (
+      await Actions.addItem(
+        request,
+        accessToken,
+        id,
+        variantId,
+        checkout.quantity,
+        store.inventoryId,
+      )
+    ).status(),
   ).toBe(200);
   expect(
     (

@@ -1,24 +1,21 @@
 import { expect, test } from '@playwright/test';
-import { findOrderableVariants } from '../../support/products';
 import { getGuestToken, requireSession } from '../../support/slas';
 import * as Actions from './orders.actions';
 import type { OrderDetail, OrderHistory } from './orders.data';
-import { masterId, ordersOf, password, uniqueEmail, unknownOrderNo } from './orders.data';
+import { orderableVariant, ordersOf, registrant, uniqueEmail, unknownOrderNo } from './orders.data';
 
 // Orders match; shoppers can't see each other's.
 test('order history and detail are correct, consistent, and access-controlled', async ({
   request,
 }) => {
   // Shopper A places one order.
-  const accountA = { email: uniqueEmail(), password };
+  const accountA = registrant(uniqueEmail());
   const { accessToken: guestA } = await getGuestToken(request);
   expect((await Actions.registerCustomer(request, guestA, accountA)).status()).toBe(200);
   const loginA = await Actions.signIn(request, accountA.email, accountA.password);
   expect(loginA.loginStatus).toBe(303);
   const { accessToken: tokenA, customerId: customerIdA } = requireSession(loginA, 'customer A');
-  // Order a size that is in stock right now.
-  const [variant] = await findOrderableVariants(request, tokenA, { masterId, minCount: 1 });
-  if (!variant) throw new Error('expected an orderable variant');
+  const variant = await orderableVariant(request, tokenA);
   const orderNo = await Actions.placeOrder(request, tokenA, accountA.email, variant.variantId);
   expect(orderNo).toBeTruthy();
 
@@ -40,7 +37,7 @@ test('order history and detail are correct, consistent, and access-controlled', 
   expect(detail.orderTotal).toBe(summary.orderTotal);
 
   // Shopper B has no orders.
-  const accountB = { email: uniqueEmail(), password };
+  const accountB = registrant(uniqueEmail());
   const { accessToken: guestB } = await getGuestToken(request);
   expect((await Actions.registerCustomer(request, guestB, accountB)).status()).toBe(200);
   const loginB = await Actions.signIn(request, accountB.email, accountB.password);

@@ -9,6 +9,7 @@ export const openProduct = async (page: Page, masterId: string): Promise<void> =
 
 export const openCart = async (page: Page): Promise<void> => {
   await page.goto(buildPath('/cart'));
+  await Locators.cartContainer(page).waitFor({ timeout: 40000 });
 };
 
 // Build the basket the shopper arrives at the cart with. Color change rebuilds

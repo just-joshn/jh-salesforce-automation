@@ -230,7 +230,9 @@ test('a guest sends two items to two different addresses in one order', async ({
   page,
   request,
 }) => {
-  test.setTimeout(300000);
+  // Two destinations mean two shipping-method writes, and checkout stays busy
+  // until both land, so this journey is given longer than the single-shipment ones.
+  test.setTimeout(420000);
   const [first, second] = await twoDeliveryVariants(request);
 
   await Actions.openProduct(page, first.masterId);

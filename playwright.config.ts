@@ -9,13 +9,13 @@ const baseURL = process.env.E2E_BASE_URL ?? 'https://pwa-kit.mobify-storefront.c
 
 export default defineConfig({
   testDir: '.',
-  fullyParallel: true,
+  fullyParallel: false,
   /* Fail CI if someone left test.only in. */
   forbidOnly: !!process.env.CI,
   /* Retry flaky live-demo fails. 1 try here, 2 on CI. */
   retries: process.env.CI ? 2 : 1,
   /* One worker on CI so we don't overload the demo shop. */
-  workers: process.env.CI ? 1 : undefined,
+  workers: 1,
   reporter: process.env.CI ? [['github'], ['html'], ['list']] : [['html'], ['list']],
   use: {
     baseURL,

@@ -1,6 +1,6 @@
 import type { Page, Response } from '@playwright/test';
 import { buildPath } from '../../support/site';
-import * as Login from '../../login/login.actions';
+import * as Login from '../login/login.actions';
 import type { ShopperCredentials } from './wishlist.data';
 import { accountUrlPattern } from './wishlist.data';
 import * as Locators from './wishlist.locators';
@@ -95,4 +95,5 @@ export const addOptionsToCart = async (page: Page): Promise<void> => {
 
 export const openCart = async (page: Page): Promise<void> => {
   await page.goto(buildPath('/cart'));
+  await Locators.cartContainer(page).waitFor({ timeout: 40000 });
 };

@@ -73,6 +73,7 @@ export const modalAddToCart = (page: Page): Locator =>
 export const addedToCartToast = (page: Page): Locator => page.getByText(/added to cart/i).first();
 
 // --- Basket ---
+export const cartContainer = (page: Page): Locator => page.getByTestId('sf-cart-container');
 export const cartItem = (page: Page, variantId: string): Locator =>
   page.getByTestId(`sf-cart-item-${variantId}`);
 

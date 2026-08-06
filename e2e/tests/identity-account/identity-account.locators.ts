@@ -31,6 +31,7 @@ export const addToCartButton = (page: Page): Locator =>
   page.getByRole('button', { name: /^add to cart$/i });
 export const addConfirmation = (page: Page): Locator =>
   page.getByRole('dialog').filter({ hasText: /added to cart/i });
+export const cartContainer = (page: Page): Locator => page.getByTestId('sf-cart-container');
 export const cartItem = (page: Page, variantId: string): Locator =>
   page.getByTestId(`sf-cart-item-${variantId}`);
 

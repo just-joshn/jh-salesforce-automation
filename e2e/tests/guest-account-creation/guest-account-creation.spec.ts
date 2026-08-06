@@ -36,7 +36,9 @@ test('a guest turns a finished purchase into an account carrying the order addre
   page,
   request,
 }) => {
-  test.setTimeout(300000);
+  // The order carries two shipments, so checkout stays busy through two
+  // shipping-method writes before it will leave that step.
+  test.setTimeout(420000);
 
   const condition = await guestAccountCondition(request);
   test.skip(!condition.met, condition.reason);

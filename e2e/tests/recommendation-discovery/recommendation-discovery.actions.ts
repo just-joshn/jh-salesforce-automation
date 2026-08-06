@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test';
 import { buildPath } from '../../support/site';
-import * as Login from '../../login/login.actions';
+import * as Login from '../login/login.actions';
 import type { RecommendationEvents, ShopperCredentials } from './recommendation-discovery.data';
 import {
   accountUrlPattern,

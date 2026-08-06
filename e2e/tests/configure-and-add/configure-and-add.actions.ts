@@ -28,4 +28,5 @@ export const addToCart = async (page: Page): Promise<void> => {
 
 export const openCart = async (page: Page): Promise<void> => {
   await page.goto(buildPath('/cart'));
+  await Locators.cartContainer(page).waitFor({ timeout: 40000 });
 };

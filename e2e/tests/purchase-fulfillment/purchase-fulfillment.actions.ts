@@ -123,16 +123,39 @@ export const continueWithMultipleAddresses = async (page: Page): Promise<void> =
 };
 
 // The step applies the default method to every shipment and then collapses, so
-// reopening it is what puts the shopper back on the method choice itself.
+// reopening it is what puts the shopper back on the method choice itself. Its
+// summary is also the only signal that no method write is still in flight: while
+// one is, the step covers itself and swallows the press that leaves it. An order
+// split across destinations takes one write per shipment and stays covered for
+// well over a minute under load, so this waits far longer than a single-shipment
+// order needs.
 export const openShippingMethods = async (page: Page): Promise<void> => {
-  await Locators.editShippingOptions(page).waitFor({ timeout: 60000 });
+  await Locators.editShippingOptions(page).waitFor({ timeout: 180000 });
   await Locators.editShippingOptions(page).click();
   await Locators.shippingOptionsForm(page).waitFor({ timeout: 40000 });
 };
 
+const paymentReached = async (page: Page): Promise<boolean> => {
+  try {
+    await Locators.cardNumber(page).waitFor({ timeout: 15000 });
+  } catch {
+    return false;
+  }
+  return true;
+};
+
+// Reopening the step restarts a method write per shipment, and the step covers
+// itself while one is in flight, so a press landing in that window is swallowed.
+// The last write then completes the step on its own and takes the button with
+// it. So the press is only made while the button is still offered, and payment
+// being reached is what ends it however the shopper got there.
 export const continueToPayment = async (page: Page): Promise<void> => {
-  await Locators.continueToPayment(page).click();
-  await Locators.cardNumber(page).waitFor({ timeout: 60000 });
+  const button = Locators.continueToPayment(page);
+  for (let attempt = 0; attempt < 6; attempt += 1) {
+    if (await button.isVisible()) await button.click({ timeout: 10000 }).catch(() => undefined);
+    if (await paymentReached(page)) return;
+  }
+  throw new Error('checkout never reached the payment step after the shipping options were set');
 };
 
 export const enterPayment = async (page: Page, card: Card): Promise<void> => {

@@ -50,6 +50,14 @@ export const selectStoreVariant = async (page: Page, product: StoreVariant): Pro
   }
 };
 
+// The fulfillment choice is served rendered and stays pressable for a moment
+// before hydration attaches its handler, so an early press is dropped with no
+// sign of it. Pressing a radio is idempotent, so the press repeats until the
+// input itself holds the choice.
 export const choosePickup = async (page: Page): Promise<void> => {
-  await Locators.pickupOption(page).click();
+  for (let attempt = 0; attempt < 6; attempt += 1) {
+    await Locators.pickupOption(page).click({ timeout: 30000 });
+    if (await Locators.pickupRadio(page).isChecked()) return;
+  }
+  throw new Error('the product page never held the store-pickup choice after it was pressed');
 };

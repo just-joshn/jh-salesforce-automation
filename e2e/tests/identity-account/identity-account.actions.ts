@@ -42,6 +42,7 @@ export const addProductToCart = async (
 
 export const openCart = async (page: Page): Promise<void> => {
   await page.goto(buildPath('/cart'));
+  await Locators.cartContainer(page).waitFor({ timeout: 40000 });
 };
 
 // Inline editor on the account landing page: current, new, confirm, save.

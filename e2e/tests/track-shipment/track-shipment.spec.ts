@@ -16,16 +16,17 @@ import {
 } from './track-shipment.data';
 import * as Locators from './track-shipment.locators';
 
-// CUJ 21 — Track shipment through carrier: a shopper opens an eligible order,
-// picks a shipment, and is handed off to the right carrier page for it. The order
-// is retrieved from Shopper Orders with its OMS shipments, every carrier URL is
-// validated and externalized before any tracking action is exposed, and the
-// journey ends at the carrier service.
+// CUJ 21 — Track shipment through carrier.
 //
-// Conditional journey: the storefront ships no flag for it — the action exists
-// only while Order Management has ingested the order — so the condition is proven
-// against the commerce services before the browser starts, and the test skips
-// with the exact unmet setting when it is not.
+// A shopper opens an eligible order, picks a shipment, and is handed off to the
+// right carrier page for it. The order is retrieved from Shopper Orders with its
+// OMS shipments. Every carrier URL is validated and externalized before any
+// tracking action is exposed, and the journey ends at the carrier service.
+//
+// Conditional journey. The storefront ships no flag for it: the action exists
+// only while OMS has ingested the order. So the condition is proven against the
+// commerce services before the browser starts, and the test skips naming the
+// exact unmet setting.
 test('a shopper tracks a shipment through its carrier', async ({ page, request }) => {
   test.setTimeout(300000);
 
@@ -46,8 +47,8 @@ test('a shopper tracks a shipment through its carrier', async ({ page, request }
   await Actions.openOrder(page, orderNumberLabel(orderNo));
   await expect(page).toHaveURL(orderDetailUrlPattern(orderNo));
 
-  // The order is retrieved with its OMS shipments, which is what carries the
-  // carrier details the journey depends on.
+  // The order is retrieved with its OMS shipments. Those carry the carrier
+  // details the journey depends on.
   expect(expandValues(await detailCall)).toEqual(['oms', 'oms_shipments']);
   await expect(Locators.orderDetailHeading(page, orderDetailTitle)).toBeVisible();
   await expect(Locators.detailText(page, orderNumberLabel(orderNo))).toBeVisible();
@@ -56,7 +57,7 @@ test('a shopper tracks a shipment through its carrier', async ({ page, request }
   await expect(Locators.orderActions(page, orderActionsHeading)).toBeVisible();
   await expect(Locators.trackShipment(page)).toBeVisible();
 
-  // Select the shipment. One trackable shipment is linked directly; several are
+  // Select the shipment. One trackable shipment is linked directly. Several are
   // offered as named options, one per shipment, each labelled by its tracking
   // number where OMS holds one.
   let carrier: Page;
@@ -83,7 +84,7 @@ test('a shopper tracks a shipment through its carrier', async ({ page, request }
   }
 
   // Success: the carrier page for the shipment the shopper picked. Which page was
-  // opened is the assertion; whether the carrier answers is the carrier's own
+  // opened is the assertion. Whether the carrier answers is the carrier's own
   // business, so the tab is never waited on.
   await expect.poll(() => carrier.url(), { timeout: 30000 }).toBe(intended.url);
   await carrier.close();

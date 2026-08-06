@@ -16,11 +16,12 @@ export interface AgentEntryPoints {
 /**
  * Whether this storefront is configured for the shopper-assistance journey.
  *
- * Both halves of the journey's condition are read from the app's own shipped
- * configuration: the flag that decides whether the agent mounts at all, and the
- * provider settings its own validation requires before it will initialize. The
- * provider decides which set of settings that is, so an unmet condition names the
- * provider it was judged against.
+ * Both halves of the condition come from the app's own shipped configuration.
+ * One is the flag that decides whether the agent mounts at all. The other is the
+ * provider settings its own validation requires before it will initialize.
+ *
+ * Which settings those are depends on the provider, so an unmet condition names
+ * the provider it was judged against.
  */
 export interface ShopperAssistanceCondition {
   met: boolean;
@@ -60,9 +61,9 @@ export const providerGlobals = {
 } as const;
 
 /**
- * Names that only an agent provider's own bundle carries. Used to say that no
- * provider was loaded at all, which the storefront's configuration cannot be asked
- * because an unconfigured storefront has no bundle URL to compare against.
+ * Names that only an agent provider's own bundle carries. They are how "no
+ * provider was loaded at all" is proven: an unconfigured storefront has no bundle
+ * URL to compare against.
  */
 const providerScriptMarkers = ['embeddedservice', 'cimulate'];
 
@@ -144,9 +145,10 @@ const conditionReason = (reasons: string[], provider: AgentProvider): string =>
 
 /**
  * The journey only exists while the storefront is configured for it, so the
- * condition is established from the app's own configuration before the browser
- * starts. A storefront that will not serve its configuration raises rather than
- * skips, so a broken shop never reads as "this journey does not apply here".
+ * condition is read from the app's own configuration before the browser starts.
+ *
+ * A storefront that will not serve its configuration throws rather than skips.
+ * A broken shop must never read as "this journey does not apply here".
  */
 export const shopperAssistanceCondition = async (
   request: APIRequestContext,
@@ -197,8 +199,8 @@ export const isTokenBridgeCall = (request: Request): boolean =>
 
 /**
  * The Commerce identity the storefront hands the agent platform. The SLAS access
- * token travels in the same request unless the storefront keeps its session in
- * HttpOnly cookies, in which case the server side supplies it instead.
+ * token travels in the same request. The exception is a storefront that keeps its
+ * session in HttpOnly cookies, where the server side supplies it instead.
  */
 export const toTokenBridgeHandover = (request: Request): TokenBridgeHandover => {
   const body = JSON.parse(request.postData() ?? '{}') as Record<string, unknown>;

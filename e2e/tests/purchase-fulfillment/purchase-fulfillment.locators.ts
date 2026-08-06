@@ -18,9 +18,9 @@ export const sizeOption = (page: Page, size: string): Locator =>
 export const storeStockMessage = (page: Page, message: string): Locator =>
   page.getByText(message, { exact: true }).first();
 
-// The fulfillment choices render the Chakra visually-hidden input pattern (a 1px
-// clipped radio with no accessible name), so the label text is the clickable
-// handle while the input carries the state worth asserting.
+// The fulfillment choices use the Chakra visually-hidden input pattern: a 1px
+// clipped radio with no accessible name. The label text is the clickable handle,
+// and the input carries the state worth asserting.
 export const pickupOption = (page: Page, label: string): Locator =>
   page.getByText(label, { exact: true }).first();
 
@@ -62,7 +62,7 @@ export const storePostalCode = (page: Page): Locator =>
 export const storeFind = (page: Page): Locator =>
   storeModal(page).getByRole('button', { name: /^find$/i });
 
-// Same visually-hidden radio pattern as the pickup choice: the wrapping label is
+// Same visually-hidden radio pattern as the pickup choice. The wrapping label is
 // the clickable handle, and its input value is the store id the Stores API gave.
 export const storeChoice = (page: Page, storeId: string): Locator =>
   storeModal(page).locator(`label.chakra-radio:has(input[value="${storeId}"])`).first();
@@ -84,7 +84,7 @@ export const cartText = (page: Page, text: string): Locator =>
 export const cartItem = (page: Page, variantId: string): Locator =>
   page.getByTestId(`sf-cart-item-${variantId}`);
 
-// Each line keeps its own fulfillment picker; the cart renders one per breakpoint.
+// Each line keeps its own fulfillment picker. The cart renders one per breakpoint.
 export const itemFulfillment = (page: Page, variantId: string): Locator =>
   cartItem(page, variantId).getByTestId('delivery-option-select').filter({ visible: true }).first();
 
@@ -96,8 +96,8 @@ export const proceedToCheckout = (page: Page): Locator =>
 
 export const checkoutContainer = (page: Page): Locator => page.getByTestId('sf-checkout-container');
 
-// Every checkout step is a toggle card, and a mixed pickup-and-delivery order
-// renders two cards under the same step id, so a card is found by its heading.
+// Every checkout step is a toggle card. A mixed pickup-and-delivery order renders
+// two cards under the same step id, so a card is found by its heading.
 export const stepCard = (page: Page, title: string): Locator =>
   page
     .locator('[data-testid^="sf-toggle-card-step-"]')
@@ -162,7 +162,7 @@ export const continueToShippingMethod = (page: Page): Locator =>
 export const savedAddressCard = (page: Page, index: number): Locator =>
   page.getByTestId(`sf-checkout-shipping-address-${index}`);
 
-// The saved-address cards are the same visually-hidden radio pattern; the input
+// The saved-address cards are the same visually-hidden radio pattern. The input
 // value is the address id the customer's address book holds.
 export const savedAddressRadio = (page: Page, addressId: string): Locator =>
   page.locator(`input[type="radio"][value="${addressId}"]`).first();

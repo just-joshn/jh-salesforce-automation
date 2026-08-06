@@ -17,8 +17,8 @@ import * as Locators from './tracking-consent.locators';
 
 /**
  * Start collecting the consent and analytics traffic the storefront sends for
- * itself. Recording begins before the first navigation so the session's opening
- * DNT declaration is never missed; the returned record grows as the test runs.
+ * itself. Recording begins before the first navigation, so the session's opening
+ * DNT declaration is never missed. The returned record grows as the test runs.
  */
 export const recordConsentTraffic = (page: Page): ConsentTraffic => {
   const traffic: ConsentTraffic = { tokens: [], einstein: [], dataCloud: [] };
@@ -48,12 +48,12 @@ export const shopperSessionId = async (page: Page): Promise<string | undefined> 
 
 /**
  * What the shopper's choice currently amounts to: the preference the storefront
- * has stored, and the DNT the SLAS session it holds was last authorized with.
+ * has stored, and the DNT its SLAS session was last authorized with.
  *
  * Reading the two together is what makes the choice's arrival observable. The
  * storefront deletes a stored preference that disagrees with the DNT its current
- * access token carries, so the preference is written, deleted and written again
- * around the reauthorization, and only the pair agreeing means the choice is in
+ * access token carries. So the preference is written, deleted and written again
+ * around the reauthorization. Only the pair agreeing means the choice is in
  * effect rather than about to be discarded.
  */
 export const consentState = async (
@@ -91,12 +91,16 @@ const choiceButton = (page: Page, choice: TrackingChoice): Locator =>
 const storedInBrowser = (want: string): boolean => document.cookie.split('; ').includes(want);
 
 /**
- * Whether the choice has landed: the preference is stored and the form has stopped
- * asking. Both halves are needed because the form closing on its own proves
- * nothing — it is rendered into a portal that detaches while the page hydrates,
- * and it reopens whenever the storefront deletes a preference that disagrees with
- * the DNT its access token carries. The preference is read once more afterwards so
- * a value seen only in that gap is not mistaken for a settled one.
+ * Whether the choice has landed: the preference is stored, and the form has
+ * stopped asking.
+ *
+ * Both halves are needed, because the form closing on its own proves nothing. It
+ * is rendered into a portal that detaches while the page hydrates. It also
+ * reopens whenever the storefront deletes a preference that disagrees with the
+ * DNT its access token carries.
+ *
+ * The preference is read once more afterwards, so a value seen only in that gap
+ * is not mistaken for a settled one.
  */
 const choiceHasLanded = async (page: Page, preference: string): Promise<boolean> => {
   try {
@@ -114,8 +118,8 @@ const choiceHasLanded = async (page: Page, preference: string): Promise<boolean>
  * Answer the consent form, pressing again until the choice has landed.
  *
  * The form is served rendered and stays pressable for several seconds before
- * hydration attaches its handler, so an early press is dropped silently and has to
- * be repeated. The press is only offered while the form is actually asking, so a
+ * hydration attaches its handler. An early press is dropped silently, so it has
+ * to be repeated. The press is only made while the form is actually asking, so a
  * choice that has landed is never answered twice.
  */
 export const chooseTracking = async (page: Page, choice: TrackingChoice): Promise<void> => {

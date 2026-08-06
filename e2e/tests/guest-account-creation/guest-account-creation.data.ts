@@ -33,9 +33,10 @@ export interface Registrant {
 }
 
 /**
- * Whether this storefront is configured for the journey. The confirmation page
- * renders its account form only when one-click checkout is off, so that flag
- * being off is the journey's condition rather than an incidental detail.
+ * Whether this storefront is configured for the journey.
+ *
+ * The confirmation page renders its account form only when one-click checkout is
+ * off. So that flag being off is the journey's condition, not a detail.
  */
 export interface GuestAccountCondition {
   met: boolean;
@@ -54,8 +55,6 @@ export interface OrderIdentity {
   uniqueAddressCount: number;
 }
 
-// A shipment carrying `c_fromStoreId` is one the shopper collects, so its address
-// is never saved. That is a SCAPI custom attribute, hence unknown on the shipment.
 type OrderAddressResource = OrderAddress;
 type OrderResource = Order;
 type CustomerResource = Customer;
@@ -112,7 +111,7 @@ export const uniqueEmail = (): string =>
 
 export const registrant = (): Registrant => ({ email: uniqueEmail(), password });
 
-// Sizes are resolved at run time; the demo store's stock keeps moving.
+// Sizes are resolved at run time. The demo store's stock keeps moving.
 export const twoDeliveryVariants = async (
   request: APIRequestContext,
 ): Promise<[UiOrderableVariant, UiOrderableVariant]> => {
@@ -168,7 +167,10 @@ const toAddress = (resource: OrderAddressResource): Address => ({
   countryCode: text(resource.countryCode),
 });
 
-/** Shipments a shopper collects hold no delivery address to save. */
+/**
+ * Shipments a shopper collects hold no delivery address to save. They are the
+ * ones carrying `c_fromStoreId`, a SCAPI custom attribute.
+ */
 const deliveryAddressesOf = (order: OrderResource): Address[] =>
   (order.shipments ?? []).flatMap((shipment) => {
     if (shipment.c_fromStoreId !== undefined) return [];
@@ -185,10 +187,11 @@ const countUniqueAddresses = (addresses: Address[]): number => {
 };
 
 /**
- * What the confirmation page derives the account from, taken from the very
- * Shopper Orders response it read. Reading the same payload the page read is what
- * makes "the form is filled from the order" a claim about the order rather than
- * about values this test happened to type earlier.
+ * What the confirmation page derives the account from, taken from the same
+ * Shopper Orders response the page read.
+ *
+ * Reading that payload is what makes "the form is filled from the order" a claim
+ * about the order, rather than about values this test typed earlier.
  */
 const shopperOn = (
   order: OrderResource,
@@ -252,9 +255,11 @@ const singleOrderPath = /\/orders\/[^/]+$/;
 
 /**
  * Shopper Orders, carrying the order the confirmation page derives the account
- * from. The page reads that order through the same query the create call seeds,
- * so it issues no separate read of its own on a freshly placed order; whichever
- * of the two carries the order resource is therefore the one taken.
+ * from.
+ *
+ * The page reads that order through the same query the create call seeds, so on
+ * a freshly placed order it issues no separate read. Whichever of the two carries
+ * the order resource is the one taken.
  */
 export const orderResourceResponse = (response: Response): boolean => {
   const path = new URL(response.url()).pathname;

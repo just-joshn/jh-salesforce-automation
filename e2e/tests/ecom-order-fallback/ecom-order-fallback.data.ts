@@ -7,15 +7,15 @@ import type { OrderResource, ShopperCredentials } from '../../support/oms';
 import { orderExpand, readOmsActivation } from '../../support/oms';
 
 // The other side of the three Order Management journeys, and the only side the
-// public demo can prove: what an order that Order Management has NOT ingested is
-// allowed to do.
+// public demo can prove: what an order OMS has NOT ingested is allowed to do.
 //
-// The storefront ships no flag for the OMS actions — they are gated purely on OMS
-// state being attached to the order — so an order without it must expose none of
-// them and must fall back to its own ECOM status everywhere. That is a real
-// cross-service claim about Shopper Orders and the OMS expansion, and it is what
-// keeps the gate honest: without it, "no buttons rendered" could equally mean the
-// page is broken.
+// The storefront ships no flag for the OMS actions. They are gated purely on OMS
+// state being attached to the order. So an order without that state must expose
+// none of them, and must fall back to its own ECOM status everywhere.
+//
+// That is a real cross-service claim about Shopper Orders and the OMS expansion.
+// It also keeps the gate honest: without it, "no buttons rendered" could equally
+// mean the page is broken.
 
 const BASKETS = 'checkout/shopper-baskets/v1';
 const ORDERS = 'checkout/shopper-orders/v1';
@@ -234,9 +234,8 @@ const ingestedReason = (orderNo: string): string =>
   'Management and no ECOM-only order exists here to assert the fallback against';
 
 /**
- * A registered shopper whose freshly placed order Order Management has not
- * ingested, proven by reading the order back exactly the way the order detail
- * page does.
+ * A registered shopper whose freshly placed order OMS has not ingested. Proven
+ * by reading the order back exactly the way the order detail page reads it.
  */
 export const ecomOnlyOrder = async (request: APIRequestContext): Promise<EcomFallbackCondition> => {
   const credentials: ShopperCredentials = { email: uniqueEmail(), password };

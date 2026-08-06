@@ -2,11 +2,12 @@ import type { APIRequestContext } from '@playwright/test';
 import { env } from '../../config/env';
 import { buildPath } from './site';
 
-// The storefront's own shipped configuration, which is what decides whether the
-// conditional checkout journeys exist on a given deployment at all. PWA Kit
-// serializes it into every server-rendered page as `#mobify-data`, so reading it
-// asks the app under test what it is configured to do rather than guessing from
-// what happens to render.
+// The storefront's own shipped configuration. It decides whether the conditional
+// checkout journeys exist on a given deployment.
+//
+// PWA Kit serializes it into every server-rendered page as `#mobify-data`.
+// Reading it asks the app under test what it is configured to do, instead of
+// guessing from what happens to render.
 
 export interface OneClickCheckoutConfig {
   enabled?: boolean;
@@ -33,10 +34,12 @@ export interface LoginConfig {
 }
 
 /**
- * The Commerce Agent settings the storefront ships, which is what decides whether
- * the shopper-assistance journey exists on a deployment. Every flag is a string
- * rather than a boolean because the template parses them out of one environment
- * variable, so `'false'` is a value the agent reads and `''` is a missing one.
+ * The Commerce Agent settings the storefront ships. They decide whether the
+ * shopper-assistance journey exists on a deployment.
+ *
+ * Every flag is a string, not a boolean: the template parses them all out of one
+ * environment variable. So `'false'` is a value the agent reads, and `''` is a
+ * missing one.
  */
 export interface CommerceAgentConfig {
   enabled?: string;
@@ -91,12 +94,11 @@ interface MobifyData {
 const mobifyData = /<script id="mobify-data"[^>]*>([\s\S]*?)<\/script>/;
 
 /**
- * The app config the storefront under test is running with.
+ * The `#mobify-data` JSON the page carries.
  *
  * A storefront that will not serve its own configuration is a store fault, not a
- * journey whose condition is unmet, so it is raised rather than folded into an
- * empty result: a broken shop must never read as "this journey does not apply
- * here".
+ * journey whose condition is unmet. So this throws instead of returning nothing:
+ * a broken shop must never read as "this journey does not apply here".
  */
 const embeddedJson = (body: string, url: string): string => {
   const embedded = mobifyData.exec(body)?.[1];

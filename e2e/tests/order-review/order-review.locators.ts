@@ -32,8 +32,8 @@ export const viewDetails = (card: Locator): Locator =>
 
 export const cardText = (card: Locator, text: string | RegExp): Locator => card.getByText(text);
 
-// The image only appears once the line has been hydrated from Shopper Products;
-// its alt text opens with the product's own name.
+// The image only appears once the line has been hydrated from Shopper Products.
+// Its alt text opens with the product's own name.
 export const productImage = (scope: Locator, productName: string): Locator =>
   scope.getByRole('img', { name: productName });
 

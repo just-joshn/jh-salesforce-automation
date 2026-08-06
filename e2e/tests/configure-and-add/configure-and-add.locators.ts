@@ -14,7 +14,7 @@ export const colorOption = (page: Page, color: string): Locator =>
 export const sizeOption = (page: Page, size: string): Locator =>
   variationGroup(page, 'size').getByRole('radio', { name: size, exact: true });
 
-// The stepper renders once per breakpoint; use the one on screen.
+// The stepper renders once per breakpoint. Use the one on screen.
 export const quantityInput = (page: Page): Locator =>
   productDetail(page).getByLabel('Quantity', { exact: true }).filter({ visible: true }).first();
 
@@ -55,6 +55,6 @@ export const itemQuantity = (page: Page, variantId: string): Locator =>
     .filter({ visible: true })
     .first();
 
-// Each line keeps its own fulfillment picker; the cart renders one per breakpoint.
+// Each line keeps its own fulfillment picker. The cart renders one per breakpoint.
 export const itemFulfillment = (page: Page, variantId: string): Locator =>
   cartItem(page, variantId).getByTestId('delivery-option-select').filter({ visible: true }).first();

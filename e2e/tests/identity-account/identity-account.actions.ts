@@ -27,7 +27,7 @@ export const signIn = async (page: Page, credentials: ShopperCredentials): Promi
   await page.waitForURL(/\/account/, { timeout: 20000 });
 };
 
-// Color change rebuilds sizes — wait longer for the click.
+// A color change rebuilds the sizes, so these clicks get a longer timeout.
 export const addProductToCart = async (
   page: Page,
   masterId: string,

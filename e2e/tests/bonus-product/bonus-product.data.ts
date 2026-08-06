@@ -5,9 +5,11 @@ import { bearer, shopperApiUrl, withSite } from '../../../api/support/scapi';
 import { getGuestToken } from '../../../api/support/slas';
 
 /**
- * A product that puts a bonus discount line item in the basket, plus what that
- * line item entitles the shopper to. Resolved against the commerce API, because
- * a bonus entitlement only exists once a qualifying product is in a basket.
+ * A product that puts a bonus discount line item in the basket, and what that
+ * line item entitles the shopper to.
+ *
+ * Resolved against the commerce API: a bonus entitlement only exists once a
+ * qualifying product is in a basket.
  */
 export interface BonusEntitlement {
   qualifier: UiOrderableVariant;
@@ -54,7 +56,7 @@ const SEARCH = 'search/shopper-search/v1';
 const CANDIDATE_LIMIT = '24';
 
 // Terms wide enough to surface a product one of the store's bonus promotions
-// advertises; only the promotion id is taken from them.
+// advertises. Only the promotion id is taken from the results.
 const promotionSearches = ['top', 'shirt'];
 
 // How many qualifying products to try per promotion. The qualifying list arrives
@@ -73,9 +75,9 @@ const productSearchUrl = (params: Record<string, string>, refinements: string[])
 };
 
 /**
- * A store fault must never read as "this journey does not apply here", so a
- * server error is raised rather than folded into an empty result. The retries in
- * the Playwright config then absorb a passing blip on the shared demo store.
+ * Throws on a server error instead of returning nothing, so a store fault never
+ * reads as "this journey does not apply here". The retries in the Playwright
+ * config absorb a passing blip on the shared demo store.
  */
 const searchResult = async (
   request: APIRequestContext,
@@ -111,9 +113,11 @@ const bonusEntriesOf = (promotions: PromotionEntry[]): [string, string][] =>
   });
 
 /**
- * Bonus promotions the catalog advertises. Search carries each hit's promotions
- * itself, so this needs no second call into Shopper Products, whose response
- * hook on the demo store trips its circuit breaker from time to time.
+ * Bonus promotions the catalog advertises.
+ *
+ * Search carries each hit's promotions itself, so no second call into Shopper
+ * Products is needed. That matters: its response hook on the demo store trips
+ * the circuit breaker from time to time.
  */
 const bonusPromotions = async (
   request: APIRequestContext,
@@ -132,9 +136,10 @@ const bonusPromotions = async (
 };
 
 /**
- * Products that earn the promotion, as opposed to the ones it gives away. Both
- * sides advertise the same promotion, so `pmpt=qualifying` is what tells them
- * apart without putting every candidate through a basket.
+ * Products that earn the promotion, not the ones it gives away.
+ *
+ * Both sides advertise the same promotion. `pmpt=qualifying` tells them apart,
+ * so every candidate does not have to go through a basket.
  */
 const qualifyingMasters = async (
   request: APIRequestContext,
@@ -150,12 +155,12 @@ const qualifyingMasters = async (
 
 /**
  * Add the variant to a throwaway basket and report the bonus discount line item
- * the promotion creates, then discard that basket so the shared demo store keeps
- * no leftovers.
+ * the promotion creates. The basket is then deleted, so the shared demo store
+ * keeps no leftovers.
  *
- * Each probe takes its own guest so a candidate that earns nothing cannot use up
- * the next candidate's basket allowance: a shopper may hold only so many baskets
- * at once, and reusing one guest across probes made this resolution flaky.
+ * Each probe takes its own guest. A shopper may hold only so many baskets at
+ * once, so reusing one guest let a candidate that earns nothing use up the next
+ * candidate's allowance. That made this flaky.
  */
 const bonusLineItemFor = async (
   request: APIRequestContext,
@@ -205,8 +210,9 @@ const entitlementForPromotion = async (
 /**
  * The journey only exists while a basket promotion hands out a bonus product, so
  * the condition is proven over the commerce API before the browser starts.
+ *
  * `undefined` means no promotion on this store produces a bonus discount line
- * item today, which is this journey's condition going unmet.
+ * item today. That is this journey's condition going unmet.
  */
 export const bonusEntitlement = async (
   request: APIRequestContext,
@@ -240,8 +246,8 @@ const queryOf = (request: Request): URLSearchParams => new URL(request.url()).se
 
 /**
  * Shopper Search: how the chooser resolves which products the promotion allows.
- * `pmid` names the promotion and `pmpt=bonus` asks for its giveaway side, which
- * is what makes a rule-based entitlement enumerable at all.
+ * `pmid` names the promotion, and `pmpt=bonus` asks for its giveaway side. That
+ * pair is what makes a rule-based entitlement enumerable.
  */
 export const eligibleProductsCall =
   (promotionId: string) =>
@@ -273,9 +279,9 @@ export interface BonusItemPayload {
 }
 
 /**
- * What the storefront sent to add the bonus product. Reading it back is how the
- * chosen variant becomes known without the test guessing which candidate the
- * chooser happened to list first.
+ * What the storefront sent to add the bonus product. Reading it back names the
+ * chosen variant, so the test never has to guess which candidate the chooser
+ * listed first.
  */
 export const bonusItemPayload = (request: Request): BonusItemPayload => {
   const lines = JSON.parse(request.postData() ?? '[]') as BonusItemPayload[];

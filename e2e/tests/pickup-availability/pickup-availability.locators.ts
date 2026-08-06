@@ -36,10 +36,10 @@ export const storeFind = (page: Page): Locator =>
 export const storeResult = (page: Page, storeName: string): Locator =>
   storeModal(page).getByText(storeName).first();
 
-// Store radios render the Chakra visually-hidden input pattern (a 1px clipped
-// <input type="radio"> with no accessible name), so the input can be checked but
-// not clicked. The wrapping <label> is the clickable handle; its input's value
-// is the store id the Stores API returned, so no store-order guessing.
+// Store radios use the Chakra visually-hidden input pattern: a 1px clipped
+// <input type="radio"> with no accessible name. The input can be checked but not
+// clicked, so the wrapping <label> is the clickable handle. Its input value is
+// the store id the Stores API returned, so no store ordering has to be guessed.
 export const storeChoice = (page: Page, storeId: string): Locator =>
   storeModal(page).locator(`label.chakra-radio:has(input[value="${storeId}"])`).first();
 
@@ -50,7 +50,7 @@ export const storeModalClose = (page: Page): Locator =>
   storeModal(page).getByRole('button', { name: 'Close', exact: true }).first();
 
 // The applied store filter shows up as a removable chip. Desktop and mobile both
-// render the section; only one is on screen.
+// render the section. Only one is on screen.
 export const selectedFilter = (page: Page, name: string): Locator =>
   page.getByRole('button', { name }).filter({ visible: true }).first();
 

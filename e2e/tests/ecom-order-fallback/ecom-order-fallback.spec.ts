@@ -23,14 +23,16 @@ import {
 import * as Locators from './ecom-order-fallback.locators';
 
 // The complement of CUJ 21, 22 and 23, and the only part of them the public demo
-// can prove: an order Order Management has not ingested must expose none of the
-// three OMS actions, must ask Order Management for nothing, and must fall back to
-// its own ECOM state everywhere.
+// can prove.
 //
-// This is what keeps the three conditional journeys honest. Their skip says "the
-// action is not here"; this test says "and that is correct, because the order
-// carries no OMS state" — otherwise an absent button could equally mean a broken
-// page. Services: Shopper Orders/ECOM, and the OMS expansion being disregarded.
+// An order OMS has not ingested must expose none of the three OMS actions, must
+// ask Order Management for nothing, and must fall back to its own ECOM state
+// everywhere.
+//
+// This keeps the three conditional journeys honest. Their skip says "the action
+// is not here". This test says "and that is correct, because the order carries
+// no OMS state". Without it, an absent button could equally mean a broken page.
+// Services: Shopper Orders/ECOM, with the OMS expansion disregarded.
 test('an order Order Management has not ingested exposes no OMS actions', async ({
   page,
   request,
@@ -43,9 +45,9 @@ test('an order Order Management has not ingested exposes no OMS actions', async 
   const { credentials, order, payload } = condition;
 
   // The order was asked for under both OMS expansions and came back with no OMS
-  // state at all — neither on the order nor on any of its lines. On a site Order
-  // Management is not connected to, the expansion is disregarded rather than
-  // failing, which is what the fallback rests on.
+  // state at all, neither on the order nor on any of its lines. On a site OMS is
+  // not connected to, the expansion is disregarded rather than failing. That is
+  // what the fallback rests on.
   expect(payload.omsData).toBeUndefined();
   expect(itemsWithOmsState(payload)).toBe(0);
 
@@ -65,12 +67,12 @@ test('an order Order Management has not ingested exposes no OMS actions', async 
   await Actions.openOrder(page, orderNumberLabel(order.orderNo));
   await expect(page).toHaveURL(orderDetailUrlPattern(order.orderNo));
 
-  // The page does ask for the OMS view; the site simply has none to give.
+  // The page does ask for the OMS view. The site simply has none to give.
   expect(expandValues(await detailCall)).toEqual(['oms', 'oms_shipments']);
   await expect(Locators.orderDetailHeading(page, orderDetailTitle)).toBeVisible();
   await expect(Locators.detailText(page, orderNumberLabel(order.orderNo))).toBeVisible();
 
-  // No OMS state, so no order actions exist — not a disabled Track Shipment, not
+  // No OMS state, so no order actions exist. Not a disabled Track Shipment, not
   // an inert Cancel Order, not a hidden Return Items. The whole block is absent.
   await expect(Locators.orderActions(page, orderActionsHeading)).toHaveCount(0);
   await expect(Locators.trackShipment(page)).toHaveCount(0);

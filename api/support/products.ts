@@ -9,7 +9,7 @@ import type {
 } from './scapi-types';
 import type { APIRequestContext } from '@playwright/test';
 
-// Find products still in stock. Don't hardcode sizes — stock runs out.
+// Find products still in stock. Sizes are never hardcoded, because stock runs out.
 // "Master" = parent product. "Variant" = one color/size you can buy.
 // Both are the spec's Product; SCAPI does not split them.
 
@@ -290,8 +290,8 @@ const fallbackUiVariant = async (
 };
 
 // The variant a product page's first color swatch can add for this exact
-// product. Unlike findUiOrderableVariant it never substitutes another product,
-// which matters when the product itself is what the test is about.
+// product. Unlike findUiOrderableVariant, it never substitutes another product.
+// Use it when the product itself is what the test is about.
 export const findUiVariantOnMaster = async (
   request: APIRequestContext,
   accessToken: string,

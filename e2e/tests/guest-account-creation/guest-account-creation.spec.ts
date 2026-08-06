@@ -21,15 +21,16 @@ import {
 } from './guest-account-creation.data';
 import * as Locators from './guest-account-creation.locators';
 
-// CUJ 20 — Create account after guest purchase and preserve order addresses: a
-// guest finishes checking out, the confirmation offers to turn that purchase into
-// an account, and registering derives the customer and their address book from
-// the order itself — duplicate delivery addresses collapsing to one saved entry
-// (Shopper Orders + Shopper Customers + SLAS).
+// CUJ 20 — Create account after guest purchase, preserving order addresses.
 //
-// Conditional journey: the confirmation page renders the account form only while
-// one-click checkout is disabled, so that condition is proven from the app's own
-// shipped configuration before the browser starts and the test skips with the
+// A guest finishes checking out. The confirmation offers to turn that purchase
+// into an account. Registering derives the customer and their address book from
+// the order itself, with duplicate delivery addresses collapsing to one saved
+// entry. Services: Shopper Orders, Shopper Customers, SLAS.
+//
+// Conditional journey. The confirmation page renders the account form only while
+// one-click checkout is disabled. So that condition is proven from the app's own
+// shipped configuration before the browser starts, and the test skips naming the
 // exact reason when it is not met.
 test('a guest turns a finished purchase into an account carrying the order addresses', async ({
   page,
@@ -106,8 +107,8 @@ test('a guest turns a finished purchase into an account carrying the order addre
   expect(order.lastName).toBe(sharedAddress.lastName);
   await expect(Locators.accountPassword(page)).toHaveValue('');
 
-  // The order really does repeat its delivery address, which is what makes the
-  // deduplication assertion below a test of behaviour rather than of arithmetic.
+  // The order really does repeat its delivery address. That is what makes the
+  // deduplication assertion below a test of behaviour, not of a counter.
   expect(order.deliveryAddresses.length).toBeGreaterThanOrEqual(1);
   expect(order.uniqueAddressCount).toBe(1);
 

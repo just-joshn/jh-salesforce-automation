@@ -49,7 +49,7 @@ export const bonusItem = (page: Page, variantId: string): Locator =>
 /** Every bonus line the cart is holding, to weigh against the allowance. */
 export const bonusItems = (page: Page): Locator => cart(page).getByTestId(/^bonus-product-/);
 
-// The bold tag holds the visible price; an aria-live twin repeats it hidden.
+// The bold tag holds the visible price. An aria-live twin repeats it hidden.
 export const bonusItemPrice = (page: Page, variantId: string): Locator =>
   bonusItem(page, variantId)
     .locator('b[aria-label*="current price"]')

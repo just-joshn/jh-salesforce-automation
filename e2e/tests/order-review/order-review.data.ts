@@ -113,7 +113,7 @@ const CUSTOMERS = 'customer/shopper-customers/v1';
 const STORES = 'store/shopper-stores/v1';
 
 // The order detail page asks for the OMS view of an order alongside its
-// fulfillment shipments; the fixture reads the order back the same way, so it
+// fulfillment shipments. The fixture reads the order back the same way, so it
 // holds exactly the payload the page rendered from.
 const orderExpand = 'oms, oms_shipments';
 
@@ -194,7 +194,7 @@ const createBasketWithItem = async (
 };
 
 // A pickup shipment carries the store it is collected from, so it is patched as
-// one change; a delivery shipment only needs its method.
+// one change. A delivery shipment only needs its method.
 const assignFulfillment = async (
   request: APIRequestContext,
   authed: Authed,

@@ -13,9 +13,9 @@ export const consentHeading = (page: Page): Locator =>
   consentForm(page).getByRole('heading', { name: 'Tracking Consent', exact: true });
 
 // Both choices carry an assistive label instead of taking their accessible name
-// from the visible word, and the responsive layout renders one pair per
-// breakpoint. Matching the role and that label is therefore what resolves to the
-// single pair a shopper can actually reach.
+// from the visible word. The responsive layout also renders one pair per
+// breakpoint. Matching the role and that label resolves to the single pair a
+// shopper can actually reach.
 export const acceptTracking = (page: Page): Locator =>
   consentForm(page).getByRole('button', { name: 'Accept tracking', exact: true });
 

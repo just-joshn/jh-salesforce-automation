@@ -1,15 +1,14 @@
 // Vendors the SCAPI OpenAPI specs this repo tests against into api/specs/.
 //
-// Salesforce documents SCAPI as OpenAPI 3, but the download button on the docs
-// portal needs a browser and the Schemas API needs OAuth with the
-// sfcc.scapi-schemas scope. Salesforce's own SDK repo commits the same specs in
-// public, so that is what we read: no credentials, works in CI with no secrets.
+// Where they come from: Salesforce's own SDK repo. The docs portal download
+// needs a browser, and the Schemas API needs OAuth with the sfcc.scapi-schemas
+// scope. The SDK repo is public, so this runs in CI with no secrets.
 //
-// One directory per API version is published (shopper-baskets-oas-1.11.0), so
-// the newest directory for the major version we call is resolved at fetch time
-// rather than pinned here. That is what makes the drift check meaningful: when
-// Salesforce publishes a new version, the fetched bytes change, the generated
-// types change, and the nightly `git diff --exit-code` goes red.
+// Why the version is not pinned here: each version is published as its own
+// directory (shopper-baskets-oas-1.11.0), and the newest one is resolved at
+// fetch time. That is what makes the drift check work. A new upstream version
+// changes the fetched bytes, then the generated types, then turns the nightly
+// `git diff --exit-code` red.
 //
 // The committed spec is the pin. Nothing fetches at test time.
 
@@ -35,8 +34,8 @@ const FAMILIES = [
   { name: 'auth', major: 1, callAs: 'shopper/auth/v1' },
 ];
 
-// GitHub's unauthenticated API allows 60 calls an hour per IP. This makes one.
-// A token is used when present so a busy CI runner cannot be rate limited.
+// GitHub allows 60 unauthenticated calls an hour per IP, and this makes one.
+// A token is used when present, so a busy CI runner cannot be rate limited.
 function githubHeaders() {
   const headers = { Accept: 'application/vnd.github+json' };
   const token = process.env.GITHUB_TOKEN ?? '';
@@ -117,8 +116,8 @@ async function main() {
   await mkdir(SPEC_DIR, { recursive: true });
   const directories = await listApiDirectories();
 
-  // Sequential on purpose: eight small files, and a clean failure line beats a
-  // rejected-promise pile-up when Salesforce moves something.
+  // Sequential on purpose. Eight small files, and one clear failure line beats a
+  // pile of rejected promises when Salesforce moves something.
   const manifest = [];
   for (const family of FAMILIES) {
     const entry = await vendorFamily(directories, family);
@@ -126,8 +125,8 @@ async function main() {
     console.log(`  ${entry.family.padEnd(24)} ${entry.version.padEnd(9)} ${entry.bytes} bytes`);
   }
 
-  // The manifest is what makes a drift failure readable: the yaml diff is tens
-  // of thousands of lines, this is one line per family.
+  // The manifest makes a drift failure readable. The yaml diff runs to tens of
+  // thousands of lines. This is one line per family.
   await writeFile(
     join(SPEC_DIR, 'MANIFEST.json'),
     `${JSON.stringify({ repo: REPO, ref: REF, specs: manifest }, null, 2)}\n`,

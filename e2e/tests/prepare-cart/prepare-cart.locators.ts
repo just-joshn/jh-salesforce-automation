@@ -40,28 +40,28 @@ export const cartItem = (page: Page, variantId: string): Locator =>
 export const itemName = (page: Page, variantId: string, name: string): Locator =>
   cartItem(page, variantId).getByRole('heading', { name });
 
-// The bold tag holds the visible price; an aria-live twin repeats it hidden.
+// The bold tag holds the visible price. An aria-live twin repeats it hidden.
 export const itemPrice = (page: Page, variantId: string): Locator =>
   cartItem(page, variantId)
     .locator('b[aria-label*="current price"]')
     .filter({ visible: true })
     .first();
 
-// Each line renders its stepper once per breakpoint; use the one on screen.
+// Each line renders its stepper once per breakpoint. Use the one on screen.
 export const itemQuantity = (page: Page, variantId: string): Locator =>
   cartItem(page, variantId)
     .getByLabel('Quantity', { exact: true })
     .filter({ visible: true })
     .first();
 
-// Each line's stepper buttons name the product; the cart renders one per breakpoint.
+// Each line's stepper buttons name the product. The cart renders one per breakpoint.
 export const itemQuantityIncrement = (page: Page, variantId: string, name: string): Locator =>
   cartItem(page, variantId)
     .getByRole('button', { name: `Increment Quantity for ${name}` })
     .filter({ visible: true })
     .first();
 
-// Each line keeps its own fulfillment picker; the cart renders one per breakpoint.
+// Each line keeps its own fulfillment picker. The cart renders one per breakpoint.
 export const itemFulfillment = (page: Page, variantId: string): Locator =>
   cartItem(page, variantId).getByTestId('delivery-option-select').filter({ visible: true }).first();
 

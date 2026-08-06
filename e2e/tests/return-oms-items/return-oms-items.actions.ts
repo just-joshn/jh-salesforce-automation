@@ -36,7 +36,7 @@ export const selectLine = async (row: Locator): Promise<void> => {
 };
 
 /**
- * Types a quantity and commits it by leaving the field, which is what applies the
+ * Type a quantity and commit it by leaving the field. That is what applies the
  * stepper's own clamping to the latest returnable limit.
  */
 export const enterQuantity = async (row: Locator, quantity: number): Promise<void> => {

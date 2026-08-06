@@ -15,10 +15,12 @@ import {
 } from './bonus-product.data';
 import * as Locators from './bonus-product.locators';
 
-// CUJ 17 — Claim earned bonus product: a basket promotion creates a bonus
-// discount line item, the chooser resolves the products that entitlement allows,
-// the chosen one is hydrated and configured, and it enters the basket as a free
-// bonus line under that promotion (Shopper Baskets V2 + Shopper Search/Products).
+// CUJ 17 — Claim earned bonus product.
+//
+// A basket promotion creates a bonus discount line item. The chooser resolves
+// the products that entitlement allows. The chosen one is hydrated, configured,
+// and enters the basket as a free bonus line under that promotion.
+// Services: Shopper Baskets V2, Shopper Search, Shopper Products.
 test('claim a bonus product earned by a basket promotion', async ({ page, request }) => {
   test.setTimeout(150000);
 
@@ -41,7 +43,7 @@ test('claim a bonus product earned by a basket promotion', async ({ page, reques
   await expect(Locators.selectBonusProducts(page)).toBeVisible();
   await expect(Locators.bonusItems(page)).toHaveCount(0);
 
-  // Retrieve the eligible products: the chooser asks Shopper Search for the
+  // Retrieve the eligible products. The chooser asks Shopper Search for the
   // promotion's bonus side, which is how a rule-based entitlement is resolved.
   const eligible = page.waitForRequest(eligibleProductsCall(promotionId), { timeout: 60000 });
   await Actions.openBonusChooser(page);
@@ -60,8 +62,8 @@ test('claim a bonus product earned by a basket promotion', async ({ page, reques
   await expect(Locators.candidateName(page)).toBeVisible();
   await expect(Locators.candidatePromoCallout(page)).toContainText(calloutMsg);
 
-  // Select quantity and options. The quantity stepper is exercised and returned
-  // to one, so the claim stays a single item well inside the allowance.
+  // Select quantity and options. The stepper is exercised and returned to one,
+  // so the claim stays a single item, well inside the allowance.
   await Actions.selectFirstCandidateSize(page);
   await Actions.raiseCandidateQuantity(page);
   await Actions.lowerCandidateQuantity(page);

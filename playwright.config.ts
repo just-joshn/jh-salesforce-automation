@@ -24,7 +24,7 @@ export default defineConfig({
     video: 'retain-on-failure',
   },
   projects: [
-    // Log in once; other tests reuse the session. Skip if no login set.
+    // Log in once. Other tests reuse the session. Skipped if no login is set.
     {
       name: 'setup',
       testDir: './e2e/setup',
@@ -43,7 +43,8 @@ export default defineConfig({
       testDir: './api/tests',
     },
 
-    // Logged-in tests can reuse the saved session, or enable this project later:
+    // Signed-in tests opt into the saved session themselves. Enable this project
+    // instead once that suite grows:
     // {
     //   name: 'e2e-authenticated',
     //   testDir: './e2e/tests',

@@ -15,10 +15,11 @@ import {
 import * as Locators from './shopper-assistance.locators';
 
 /**
- * Open the agent the way this storefront is configured to offer it. The header
- * entry is preferred when both exist because it is reachable from anywhere; the
- * search entry is the other one a storefront can own, and carries the shopper's
- * query as the conversation's opening context.
+ * Open the agent the way this storefront is configured to offer it.
+ *
+ * The header entry is preferred when both exist, because it is reachable from
+ * anywhere. The search entry is the other one a storefront can own, and it
+ * carries the shopper's query as the conversation's opening context.
  */
 const openAgent = async (page: Page, condition: ShopperAssistanceCondition): Promise<void> => {
   if (condition.entryPoints.header) {
@@ -41,24 +42,27 @@ const expectProviderLoaded = async (
     .toMatchObject(loaded);
 };
 
-// CUJ 25 — Obtain shopping assistance from an automated or human agent: the
-// configured provider is loaded, the Commerce session and configuration it needs
-// are retrieved, and opening the agent hands the shopper's Commerce identity to the
-// agent platform so a contextual conversation can start (SLAS/Commerce session +
-// Shopper Configurations + Embedded Messaging or Commerce Client + token bridge).
+// CUJ 25 — Obtain shopping assistance from an automated or human agent.
 //
-// Conditional journey: the agent only exists while the storefront is configured for
-// it, so the condition is proven from the app's own shipped configuration before the
-// browser starts and the test skips naming every setting that is not met.
+// The configured provider is loaded. The Commerce session and configuration it
+// needs are retrieved. Opening the agent then hands the shopper's Commerce
+// identity to the agent platform, so a contextual conversation can start.
+// Services: SLAS/Commerce session, Shopper Configurations, Embedded Messaging or
+// Commerce Client, and the token bridge.
 //
-// Scope worth knowing: the conversation window is the provider's own surface — an
+// Conditional journey. The agent only exists while the storefront is configured
+// for it. So the condition is proven from the app's own shipped configuration
+// before the browser starts, and the test skips naming every unmet setting.
+//
+// Scope worth knowing. The conversation window is the provider's own surface: an
 // Embedded Messaging iframe, or the Commerce Client widget injected into the
-// storefront's container — and the site, locale, currency, USID and auth type are
-// passed to it through that provider's pre-chat API. What is asserted here is
-// therefore the storefront's own half of the contract: the provider it loads, the
-// Commerce configuration it reads, and the identity handover it makes. Typing into
-// the provider's conversation, and escalation to a human agent, are that provider's
-// behaviour rather than this storefront's, and are not asserted as if they were.
+// storefront's container. Site, locale, currency, USID and auth type all reach it
+// through that provider's pre-chat API.
+//
+// So what is asserted here is the storefront's own half of the contract: the
+// provider it loads, the Commerce configuration it reads, and the identity
+// handover it makes. Typing into the conversation, and escalation to a human
+// agent, are the provider's behaviour and are not asserted here.
 test('a shopper opens the shopping agent and it receives their Commerce session', async ({
   page,
   request,
@@ -99,13 +103,15 @@ test('a shopper opens the shopping agent and it receives their Commerce session'
   expect(handover?.authLinkKey).toBeTruthy();
 });
 
-// The complement of CUJ 25, and the only part of it the public demo can prove: a
-// storefront with no Commerce Agent configured must offer a shopper no way to reach
-// one, must load neither provider, and must hand nothing to an agent platform.
+// The complement of CUJ 25, and the only part of it the public demo can prove.
 //
-// This is what keeps the conditional journey above honest. Its skip says "the agent
-// is not here"; this says "and that is correct" — without it an absent button could
-// equally mean a broken header or a provider that failed to load.
+// A storefront with no Commerce Agent configured must offer a shopper no way to
+// reach one, must load neither provider, and must hand nothing to an agent
+// platform.
+//
+// This keeps the conditional journey above honest. Its skip says "the agent is
+// not here". This says "and that is correct". Without it, an absent button could
+// equally mean a broken header, or a provider that failed to load.
 test('a storefront with no Commerce Agent offers a shopper no way to reach one', async ({
   page,
   request,

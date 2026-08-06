@@ -10,9 +10,9 @@ import { configuredShopper, omsPreflight, readOwnedOrder } from '../../support/o
 
 // CUJ 23 — Return eligible order items.
 //
-// Returnability is Order Management's answer, not the storefront's guess: a line
-// is returnable exactly while OMS reports a positive quantityAvailableToReturn,
-// and the shopper's chosen quantity is validated against that same limit before
+// Returnability is Order Management's answer, not the storefront's guess. A line
+// is returnable exactly while OMS reports a positive quantityAvailableToReturn.
+// The shopper's chosen quantity is validated against that same limit before
 // anything is submitted.
 
 const ORDERS = 'checkout/shopper-orders/v1';
@@ -110,9 +110,9 @@ const readyCondition = (
 
 /**
  * Whether this storefront can run the journey, proven against the commerce
- * services before the browser starts: Order Management connected to the site, a
- * seeded order the configured shopper owns holding a returnable quantity, and
- * reasons for the shopper to pick from.
+ * services before the browser starts. It needs three things: Order Management
+ * connected to the site, a seeded order the configured shopper owns that holds a
+ * returnable quantity, and reasons for the shopper to pick from.
  */
 export const returnItemsCondition = async (
   request: APIRequestContext,

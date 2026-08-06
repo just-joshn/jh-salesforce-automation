@@ -12,9 +12,9 @@ import {
 } from './pickup-availability.data';
 import * as Locators from './pickup-availability.locators';
 
-// The shopper's question is "what can I pick up near me?" — pick the store, the
-// list shrinks to what that store's stock actually holds, and a product from it
-// turns out to be on the shelf for a sellable size.
+// The shopper's question is "what can I pick up near me?". Pick the store, and
+// the list shrinks to what that store's stock holds. A product from it then
+// turns out to be on the shelf in a sellable size.
 test('filter a category to a nearby store and confirm the shelf there', async ({
   page,
   request,

@@ -37,7 +37,7 @@ test('review a two item cart, fix it up, and take it to checkout', async ({ page
   await Actions.openPromoCode(page);
   await expect(Locators.promoCodeInput(page)).toBeVisible();
 
-  // Handover stays as delivery; collecting in store needs a store first.
+  // Handover stays as delivery. Collecting in store needs a store first.
   await expect(Locators.itemFulfillment(page, kept.variantId)).toHaveValue(deliveryOption);
   await expect(Locators.itemPickupChoice(page, kept.variantId)).toBeDisabled();
 

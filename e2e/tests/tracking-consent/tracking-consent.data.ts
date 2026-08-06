@@ -9,9 +9,8 @@ export type TrackingChoice = 'accept' | 'decline';
 
 /**
  * What a choice must produce once it is in effect. Both values are the
- * storefront's own contract rather than a preference of this test: one is what the
- * stored `dw_dnt` preference may hold, the other is what the SLAS token request
- * must declare.
+ * storefront's own contract, not a preference of this test. One is what the stored
+ * `dw_dnt` preference may hold. The other is what the SLAS token request declares.
  */
 export interface ConsentOutcome {
   preference: string;
@@ -121,9 +120,10 @@ const conditionReason = (reasons: string[]): string =>
 /**
  * The journey only exists where there are analytics layers for the preference to
  * reach, so the condition is read from the app's own shipped configuration before
- * the browser starts. A storefront that will not serve its configuration raises
- * rather than skips, so a broken shop never reads as "this journey does not apply
- * here".
+ * the browser starts.
+ *
+ * A storefront that will not serve its configuration throws rather than skips.
+ * A broken shop must never read as "this journey does not apply here".
  */
 export const trackingConsentCondition = async (
   request: APIRequestContext,

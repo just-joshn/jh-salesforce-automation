@@ -10,11 +10,14 @@ export const env = {
   locale: process.env.E2E_LOCALE ?? 'en-US',
 
   /**
-   * Shop API settings (public, safe to commit), taken from the config the demo
-   * serves in #mobify-data. Two values look wrong but are not: the upstream
-   * template defaults shortCode to 8o7m175y, which this deployment overrides;
-   * and the client the storefront runs on is private (401 "incorrect client
-   * type") so tests use the public PKCE client instead.
+   * Shop API settings. Public values, safe to commit. Read from the config the
+   * demo serves in #mobify-data.
+   *
+   * Two values look wrong but are right:
+   * - shortCode: the upstream template defaults to 8o7m175y. This deployment
+   *   overrides it.
+   * - clientId: the storefront's own client is private and answers 401
+   *   "incorrect client type". Tests use the public PKCE client instead.
    */
   scapi: {
     shortCode: process.env.SFCC_SHORT_CODE ?? 'kv7kzm78',
@@ -30,9 +33,9 @@ export const env = {
   },
 
   /**
-   * Orders the account above owns, already in the state each OMS journey needs.
-   * Seeded rather than placed by the test because OMS ingestion is not
-   * retroactive and cannot advance an order on demand. Empty = journey skips.
+   * Orders the account above owns, each already in the state its journey needs.
+   * Seeded, not placed here: OMS ingestion is not retroactive, and an order
+   * cannot be advanced on demand. Empty = that journey skips.
    */
   oms: {
     /** Order with at least one OMS shipment carrying a carrier tracking URL. */

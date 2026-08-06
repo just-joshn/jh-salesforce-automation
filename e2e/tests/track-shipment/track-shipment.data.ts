@@ -7,15 +7,14 @@ import { configuredShopper, omsPreflight, readOwnedOrder } from '../../support/o
 //
 // The order detail page does not link a raw OMS tracking URL. It runs every
 // `omsData.shipments[].trackingUrl` through the same hardening its tracking-number
-// links use, and drops the shipments whose URL does not survive: a scheme-less
-// host is upgraded to https, and anything relative or unsafe is discarded so the
-// shopper is never sent inside the app by a link that claims to be a carrier.
+// links use, and drops the shipments whose URL does not survive. A scheme-less
+// host is upgraded to https. Anything relative or unsafe is discarded, so the
+// shopper is never sent inside the app by a link claiming to be a carrier.
 //
-// `carrierUrl` below is an independent reimplementation of that documented
-// contract, not a call into the storefront. It exists so the expected set of
-// exposed tracking actions is derived from the order payload on its own terms —
-// otherwise the test would only be able to assert that the page agrees with
-// itself.
+// `carrierUrl` below reimplements that documented contract independently. It does
+// not call into the storefront. That way the expected set of tracking actions is
+// derived from the order payload itself. Otherwise the test could only assert
+// that the page agrees with itself.
 
 const ORDERS = 'checkout/shopper-orders/v1';
 
@@ -170,8 +169,8 @@ const seedReason =
 
 /**
  * Whether this storefront can run the journey, proven against the commerce
- * services before the browser starts: Order Management has to be connected to
- * the site, and the seeded order has to actually hold a trackable shipment.
+ * services before the browser starts. Order Management has to be connected to the
+ * site, and the seeded order has to hold a trackable shipment.
  */
 export const trackShipmentCondition = async (
   request: APIRequestContext,

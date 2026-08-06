@@ -15,9 +15,11 @@ export interface ShopperCredentials {
 }
 
 /**
- * The recommendation zone under test. `recommenderName` is what the storefront
- * asks Einstein for; `title` is the heading that zone renders, and is the only
- * thing separating it from the other zones on the same page.
+ * The recommendation zone under test.
+ *
+ * `recommenderName` is what the storefront asks Einstein for. `title` is the
+ * heading that zone renders, and is the only thing separating it from the other
+ * zones on the same page.
  */
 export interface RecommendationZone {
   recommenderName: string;
@@ -111,8 +113,9 @@ const seedCandidates = async (
 /**
  * The journey only exists when Einstein has recommendations to give, so the
  * condition is checked by asking Einstein directly before the browser starts.
+ *
  * `undefined` means the recommender is configured but empty for every candidate,
- * which is the shape of "not meaningful to the merchant experience".
+ * so it has nothing meaningful to offer on this store today.
  */
 export const recommendationSeed = async (
   request: APIRequestContext,

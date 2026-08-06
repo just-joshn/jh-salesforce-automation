@@ -1,11 +1,11 @@
 // Generates TypeScript types from the vendored SCAPI specs in api/specs/.
 //
-// Output is committed. That keeps `pnpm test` a single step with no codegen in
-// front of it, makes an upstream shape change show up as a reviewable diff, and
-// is what the nightly drift check compares against.
+// The output is committed. That keeps `pnpm test` a single step with no codegen
+// in front of it. It also makes an upstream shape change arrive as a reviewable
+// diff, and gives the nightly drift check something to compare against.
 //
-// Plain .ts rather than .d.ts so the files import like any other module and
-// tsc checks them along with everything else.
+// Plain .ts rather than .d.ts, so the files import like any other module and
+// tsc checks them with everything else.
 
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';

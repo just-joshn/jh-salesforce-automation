@@ -15,8 +15,8 @@ import * as Locators from './recommendation-discovery.locators';
 
 /**
  * Start collecting the personalization traffic the storefront sends for itself.
- * Recording begins before the first navigation so an impression that fires
- * during hydration is never missed; the returned record grows as the test runs.
+ * Recording begins before the first navigation, so an impression that fires
+ * during hydration is never missed. The returned record grows as the test runs.
  */
 export const recordRecommendationEvents = (page: Page): RecommendationEvents => {
   const events: RecommendationEvents = { einstein: [], dataCloud: [] };
@@ -60,7 +60,7 @@ export const openWishlist = async (page: Page): Promise<void> => {
 };
 
 // Visiting the wishlist while signed in makes Shopper Customers create the
-// wish_list product list before any item write, so a heart click cannot race
+// wish_list product list before any item write. So a heart click cannot race
 // list creation and silently store nothing.
 export const ensureWishlistReady = async (page: Page): Promise<void> => {
   await openWishlist(page);
@@ -68,9 +68,11 @@ export const ensureWishlistReady = async (page: Page): Promise<void> => {
 };
 
 /**
- * Save the first recommended product from the zone. The server-rendered heart is
- * clickable before hydration attaches its handler and a click landing in that gap
- * is dropped, so the click repeats until Shopper Customers confirms the write.
+ * Save the first recommended product from the zone.
+ *
+ * The server-rendered heart is clickable before hydration attaches its handler,
+ * and a click landing in that gap is dropped. So the click repeats until Shopper
+ * Customers confirms the write.
  */
 export const saveRecommendedProduct = async (page: Page, title: string): Promise<void> => {
   const heart = Locators.recommendedTileWishlist(page, title);

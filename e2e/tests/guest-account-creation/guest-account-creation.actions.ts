@@ -64,8 +64,8 @@ export const shipToMultipleAddresses = async (page: Page): Promise<void> => {
 
 /**
  * Send every line to one destination. The first address saved is applied to each
- * line, so entering it once is what puts the same address on both shipments —
- * which is the repeat the confirmation page later has to collapse.
+ * line, so entering it once puts the same address on both shipments. That repeat
+ * is what the confirmation page later has to collapse.
  */
 export const addSharedAddress = async (
   page: Page,

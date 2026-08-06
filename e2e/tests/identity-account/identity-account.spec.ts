@@ -22,7 +22,8 @@ test('create a shopper account and reach the account area', async ({ page }) => 
   await Actions.openRegistration(page);
   await Actions.register(page, registrant(uniqueEmail()));
 
-  // Log Out proves the registered session. May sit in a menu — check attached.
+  // Log Out proves the registered session. It may sit in a menu, so it is
+  // checked as attached rather than visible.
   await expect(page).toHaveURL(accountUrlPattern, { timeout: 20000 });
   await expect(Locators.logout(page).first()).toBeAttached();
   await expect(Locators.profileCard(page)).toBeVisible({ timeout: 20000 });
@@ -52,9 +53,10 @@ test('sign in recovers the existing shopping session', async ({ page, request })
   await expect(Locators.cartItem(page, variant.variantId)).toBeVisible({ timeout: 15000 });
 });
 
-// CUJ 7 — Change password without losing the session: Shopper Customers updates
-// the credential, the old login stops working, SLAS reauthenticates with the new
-// password, and the current session stays signed in.
+// CUJ 7 — Change password without losing the session.
+//
+// Shopper Customers updates the credential. The old login stops working, and SLAS
+// reauthenticates with the new password. The current session stays signed in.
 test('change password without losing the session', async ({ page, request }) => {
   test.setTimeout(120000);
   const credentials = newCredentials();
@@ -63,10 +65,11 @@ test('change password without losing the session', async ({ page, request }) => 
   await Actions.openLogin(page);
   await Actions.signIn(page, credentials);
 
-  // Sign-in already landed on the account area; a second goto races the app's
+  // Sign-in already landed on the account area. A second goto races the app's
   // hydration and leaves the password form without working handlers.
-  // Wait for real customer data (not the loading skeleton) or the Edit form
-  // detaches mid-flow and Save never submits.
+  //
+  // Wait for real customer data rather than the loading skeleton. Otherwise the
+  // Edit form detaches mid-flow and Save never submits.
   await expect(Locators.profileCard(page)).toContainText(provisionedName, { timeout: 20000 });
   await expect(Locators.passwordCard(page)).toContainText(maskedPassword, { timeout: 20000 });
   await Actions.changePassword(page, credentials, changedPassword);

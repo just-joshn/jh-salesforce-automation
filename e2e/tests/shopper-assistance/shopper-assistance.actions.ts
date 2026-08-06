@@ -10,10 +10,13 @@ import {
 import * as Locators from './shopper-assistance.locators';
 
 /**
- * Start collecting the traffic that would carry this journey: the Commerce
- * configuration the agent reads, the provider bundles the page pulls in, and every
- * handover of the shopper's Commerce identity to the agent platform. Recording
- * begins before the first navigation because all three happen during load.
+ * Start collecting the traffic that would carry this journey:
+ * - the Commerce configuration the agent reads.
+ * - the provider bundles the page pulls in.
+ * - every handover of the shopper's Commerce identity to the agent platform.
+ *
+ * Recording begins before the first navigation, because all three happen during
+ * load.
  */
 export const recordAgentTraffic = (page: Page): AgentTraffic => {
   const traffic: AgentTraffic = { configurationCalls: 0, providerScripts: [], handovers: [] };

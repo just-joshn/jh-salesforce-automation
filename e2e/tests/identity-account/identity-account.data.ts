@@ -44,7 +44,7 @@ export const maskedPassword = '••••••••';
 // Main product id. The in-stock size is resolved at run time.
 export const product = { masterId: '25591139M' };
 
-// Pick a size that is in stock right now; the demo store's stock keeps moving.
+// Pick a size that is in stock right now. The demo store's stock keeps moving.
 export const orderableVariant = async (request: APIRequestContext): Promise<UiOrderableVariant> => {
   const { accessToken } = await getGuestToken(request);
   return findUiOrderableVariant(request, accessToken, product.masterId);

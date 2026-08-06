@@ -77,8 +77,8 @@ export const homeAddress: Address = {
   countryCode: 'US',
 };
 
-// Second destination for the multi-shipment journey; a different recipient makes
-// each shipment tellable apart on the confirmation.
+// Second destination for the multi-shipment journey. A different recipient makes
+// each shipment easy to tell apart on the confirmation.
 export const secondAddress: Address = {
   firstName: 'Second',
   lastName: 'Recipient',
@@ -110,7 +110,7 @@ const pickupCategoryPageSize = 25;
 // Address book entry the registered journey checks out with.
 export const savedAddressId = 'home';
 
-// Sizes are resolved at run time; the demo store's stock keeps moving.
+// Sizes are resolved at run time. The demo store's stock keeps moving.
 export const deliveryVariant = async (request: APIRequestContext): Promise<UiOrderableVariant> => {
   const { accessToken } = await getGuestToken(request);
   return findUiOrderableVariant(request, accessToken, deliveryMasterId);
@@ -133,9 +133,10 @@ export const twoDeliveryVariants = async (
   return [first, second];
 };
 
-// Three systems meet here: which store is nearby (Shopper Stores), what it stocks
-// in the category (Shopper Search on its stock id), and a variant actually on the
-// shelf there (Shopper Products against that same stock id).
+// Three systems meet here:
+// - Shopper Stores: which store is nearby.
+// - Shopper Search: what that store stocks in the category, by its stock id.
+// - Shopper Products: a variant actually on the shelf, against that same stock id.
 export const pickupSelection = async (request: APIRequestContext): Promise<PickupSelection> => {
   const { accessToken } = await getGuestToken(request);
   const store = await findNearbyStore(request, accessToken, {
@@ -239,7 +240,7 @@ export const cartHeading = (count: number): string => `Cart (${count} ${items(co
 
 export const cartBadgeLabel = (count: number): string => `My cart, number of items: ${count}`;
 
-// The cart groups its lines by how they are handed over; the plural is fixed.
+// The cart groups its lines by how they are handed over. The plural is fixed.
 export const deliveryGroupLabel = (inGroup: number, total: number): string =>
   `Delivery - ${inGroup} out of ${total} items`;
 

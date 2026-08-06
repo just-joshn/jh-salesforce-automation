@@ -5,17 +5,17 @@ import type { ShopperCredentials } from './wishlist.data';
 import { accountUrlPattern } from './wishlist.data';
 import * as Locators from './wishlist.locators';
 
-// Sign in through the real login form; the login module owns those selectors.
+// Sign in through the real login form. The login module owns those selectors.
 export const signInShopper = async (page: Page, credentials: ShopperCredentials): Promise<void> => {
   await Login.openLogin(page);
   await Login.signIn(page, credentials);
   await page.waitForURL(accountUrlPattern, { timeout: 20000 });
 };
 
-// Visiting wishlist while signed in forces Shopper Customers to create the
-// wish_list product list before any item write. Without this, the product-page
-// heart can fire createCustomerProductListItem before listId exists and the
-// toast/list-create race leaves an empty wishlist.
+// Visiting the wishlist while signed in forces Shopper Customers to create the
+// wish_list product list before any item write. Without it, the product-page
+// heart can fire createCustomerProductListItem before listId exists, and that
+// race leaves an empty wishlist.
 export const ensureWishlistReady = async (page: Page): Promise<void> => {
   await page.goto(buildPath('/account/wishlist'));
   await Locators.wishlistHeading(page).waitFor({ state: 'visible', timeout: 20000 });
@@ -28,7 +28,7 @@ export const openProduct = async (page: Page, masterId: string): Promise<void> =
   await page.goto(buildPath(`/product/${masterId}`));
 };
 
-// Color change rebuilds sizes — wait longer for the click.
+// A color change rebuilds the sizes, so this click gets a longer timeout.
 export const selectColor = async (page: Page, color: string): Promise<void> => {
   await Locators.colorOption(page, color).click({ timeout: 30000 });
 };

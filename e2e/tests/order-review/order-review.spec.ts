@@ -34,16 +34,19 @@ import {
 } from './order-review.data';
 import * as Locators from './order-review.locators';
 
-// CUJ 15 — Review order history and order details: a registered shopper looks
-// back at what they bought. The history is retrieved from the shopper's own
-// order list with the OMS expansion asked for, and each line's product is
-// hydrated separately; opening one order asks for that order with its OMS
-// shipments, hydrates its products, and resolves the store a pickup shipment is
-// collected from. The demo shop does not ingest orders into OMS, so the OMS
-// expansion returns no OMS state and every page falls back to the ECOM order —
-// which is what each rendered value is checked against here. For the same
-// reason the OMS metadata call, which the page only makes for an OMS-backed
-// order, does not happen.
+// CUJ 15 — Review order history and order details.
+//
+// A registered shopper looks back at what they bought. The history comes from
+// the shopper's own order list, asked for with the OMS expansion, and each
+// line's product is hydrated separately.
+//
+// Opening one order asks for that order with its OMS shipments, hydrates its
+// products, and resolves the store a pickup shipment is collected from.
+//
+// The demo shop does not ingest orders into OMS. So the OMS expansion returns no
+// OMS state, every page falls back to the ECOM order, and that is what each
+// rendered value is checked against. For the same reason the OMS metadata call
+// never happens: the page only makes it for an OMS-backed order.
 test('a registered shopper reviews their order history and opens each order in detail', async ({
   page,
   request,

@@ -2,8 +2,8 @@ import type { Locator, Page } from '@playwright/test';
 
 // Two kinds of contract meet on this page. Everything the storefront owns is
 // found by its own test ids and headings. The payment sheet's inside is built by
-// the Salesforce Payments SDK, so it is reached through the container the
-// storefront hands the SDK, and never by a selector this repo invents.
+// the Salesforce Payments SDK. It is reached through the container the storefront
+// hands that SDK, never by a selector this repo invents.
 
 export const productDetail = (page: Page): Locator => page.getByTestId('product-details-page');
 
@@ -117,8 +117,8 @@ export const paymentStep = (page: Page): Locator =>
   page.getByTestId('sf-toggle-card-step-3-content');
 
 /**
- * The sheet's own controls live in whatever elements the SDK mounts, so what this
- * repo owns is the container the storefront hands over — never a selector for the
+ * The sheet's own controls live in whatever elements the SDK mounts. So what this
+ * repo owns is the container the storefront hands over, never a selector for the
  * provider's insides.
  */
 export const sheetFrames = (page: Page): Locator => paymentStep(page).locator('iframe');

@@ -12,8 +12,8 @@ export const openCart = async (page: Page): Promise<void> => {
   await Locators.cart(page).waitFor({ state: 'visible', timeout: 40000 });
 };
 
-// Put the qualifying product in the basket, which is what earns the promotion.
-// A color change rebuilds the sizes, so those clicks get longer than the default.
+// Put the qualifying product in the basket. That is what earns the promotion.
+// A color change rebuilds the sizes, so those clicks get a longer timeout.
 export const addQualifierToCart = async (
   page: Page,
   qualifier: UiOrderableVariant,
@@ -30,8 +30,8 @@ export const openBonusChooser = async (page: Page): Promise<void> => {
   await Locators.selectBonusProducts(page).click({ timeout: 30000 });
 };
 
-// Picking a candidate swaps the chooser's list for that product's own view, where
-// its options are resolved.
+// Picking a candidate swaps the chooser's list for that product's own view.
+// Its options are resolved there.
 export const chooseFirstCandidate = async (page: Page): Promise<void> => {
   await Locators.candidateSelect(page).click({ timeout: 30000 });
   await Locators.candidateView(page).waitFor({ state: 'visible', timeout: 30000 });

@@ -102,7 +102,7 @@ export const shipToMultipleAddresses = async (page: Page): Promise<void> => {
   await Locators.multiShippingCards(page).first().waitFor({ timeout: 40000 });
 };
 
-// The first address saved is applied to every line; later ones land on the line
+// The first address saved is applied to every line. Later ones land on the line
 // whose card they were entered from.
 export const addAddressForProduct = async (
   page: Page,

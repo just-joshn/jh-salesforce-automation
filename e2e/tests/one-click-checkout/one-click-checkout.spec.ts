@@ -13,15 +13,17 @@ import {
 } from './one-click-checkout.data';
 import * as Locators from './one-click-checkout.locators';
 
-// CUJ 18 — Complete one-click checkout using saved identity data: a returning
-// shopper reaches checkout with a valid basket, the enabled feature replaces the
-// whole checkout implementation with a page that coordinates the account's own
-// data, and the order is placed from saved or newly saved checkout data
-// (SLAS + Shopper Customers + Shopper Baskets V2 + Shopper Orders).
+// CUJ 18 — Complete one-click checkout using saved identity data.
 //
-// Conditional journey: the one-click route only exists while the storefront is
-// configured for it, so the condition is proven from the app's own shipped
-// configuration before the browser starts and the test skips with the exact
+// A returning shopper reaches checkout with a valid basket. The enabled feature
+// replaces the whole checkout implementation with a page that coordinates the
+// account's own data. The order is then placed from saved, or newly saved,
+// checkout data. Services: SLAS, Shopper Customers, Shopper Baskets V2,
+// Shopper Orders.
+//
+// Conditional journey. The one-click route only exists while the storefront is
+// configured for it. So the condition is proven from the app's own shipped
+// configuration before the browser starts, and the test skips naming the exact
 // reason when it is not met.
 test('a returning shopper places an order through one-click checkout', async ({
   page,

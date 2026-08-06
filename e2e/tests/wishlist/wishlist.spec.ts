@@ -9,10 +9,10 @@ import {
 } from './wishlist.data';
 import * as Locators from './wishlist.locators';
 
-// CUJ 8 — Save product for later: a registered shopper picks the wishlist
-// action on the product surface and the chosen variant lands in the customer
-// product list, hydrated back with current product details on the wishlist
-// page (Shopper Customers + Shopper Products).
+// CUJ 8 — Save product for later. A registered shopper picks the wishlist action
+// on the product surface, and the chosen variant lands in the customer product
+// list. The wishlist page hydrates it back with current product details.
+// Services: Shopper Customers, Shopper Products.
 test('save a product for later in the wishlist', async ({ page, request }) => {
   test.setTimeout(120000);
   const credentials = newCredentials();
@@ -39,10 +39,10 @@ test('save a product for later in the wishlist', async ({ page, request }) => {
   await expect(Locators.itemAddToCart(page)).toBeVisible();
 });
 
-// CUJ 9 — Resume purchase from wishlist: a returning shopper opens the saved
-// master product, resolves its options in the View Options modal, and the
-// correct variant enters the active basket (Shopper Customers + Shopper
-// Products + Shopper Baskets).
+// CUJ 9 — Resume purchase from wishlist. A returning shopper opens the saved
+// master product and resolves its options in the View Options modal. The correct
+// variant then enters the active basket.
+// Services: Shopper Customers, Shopper Products, Shopper Baskets.
 test('resume a purchase from the wishlist', async ({ page, request }) => {
   test.setTimeout(120000);
   const credentials = newCredentials();

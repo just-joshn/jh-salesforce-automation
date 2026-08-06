@@ -1,6 +1,6 @@
 import type { Locator, Page } from '@playwright/test';
 
-// Header and mobile drawer both hold a search box; use the one on screen.
+// Header and mobile drawer both hold a search box. Use the one on screen.
 export const searchInput = (page: Page): Locator =>
   page.getByPlaceholder('Search for products...').filter({ visible: true }).first();
 
@@ -17,7 +17,7 @@ export const productDetail = (page: Page): Locator => page.getByTestId('product-
 export const productHeading = (page: Page, name: string): Locator =>
   productDetail(page).getByRole('heading', { name });
 
-// The bold tag holds the visible price; the page renders one per breakpoint.
+// The bold tag holds the visible price. The page renders one per breakpoint.
 export const currentPrice = (page: Page): Locator =>
   productDetail(page).locator('b[aria-label*="current price"]').filter({ visible: true }).first();
 
@@ -38,7 +38,7 @@ export const colorOption = (page: Page, color: string): Locator =>
 export const sizeOption = (page: Page, size: string): Locator =>
   variationGroup(page, 'size').getByRole('radio', { name: size, exact: true });
 
-// Desktop and mobile buttons both exist; only one is on screen.
+// Desktop and mobile buttons both exist. Only one is on screen.
 export const addToCart = (page: Page): Locator =>
   page
     .getByRole('button', { name: /^add to cart$/i })

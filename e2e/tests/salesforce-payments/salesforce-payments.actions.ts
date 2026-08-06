@@ -108,8 +108,8 @@ export const confirmPaymentAndPlaceOrder = async (page: Page): Promise<void> => 
 
 /**
  * Wait out whichever ending the provider chose. A provider that finishes the
- * payment itself sends the shopper through the processing route first, so both
- * endings are allowed to win the race and only the confirmation is required.
+ * payment itself sends the shopper through its processing route first. Both
+ * endings may win the race, so only the confirmation is required.
  */
 export const awaitOrderConfirmation = async (page: Page): Promise<void> => {
   await Locators.confirmationContainer(page).waitFor({ timeout: 180000 });

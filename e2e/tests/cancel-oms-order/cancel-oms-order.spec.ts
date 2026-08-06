@@ -24,15 +24,17 @@ import {
 } from './cancel-oms-order.data';
 import * as Locators from './cancel-oms-order.locators';
 
-// CUJ 22 — Cancel eligible OMS order: a registered shopper who owns an OMS-backed
-// order stops fulfilment before it reaches a terminal state. Identity, ownership
-// and per-line eligibility are all read off the order, the cancellation goes to
-// Order Management, and the page reports what OMS answered.
+// CUJ 22 — Cancel eligible OMS order.
 //
-// Conditional journey: the storefront ships no flag for it — the action exists
-// only while Order Management has ingested the order and every line is still
-// cancellable in full — so the condition is proven against the commerce services
-// before the browser starts, and the test skips with the exact unmet setting.
+// A registered shopper who owns an OMS-backed order stops fulfilment before it
+// reaches a terminal state. Identity, ownership and per-line eligibility are all
+// read off the order. The cancellation goes to Order Management, and the page
+// reports what OMS answered.
+//
+// Conditional journey. The storefront ships no flag for it: the action exists
+// only while OMS has ingested the order and every line is still cancellable in
+// full. So the condition is proven against the commerce services before the
+// browser starts, and the test skips naming the exact unmet setting.
 test('a registered shopper cancels an eligible OMS order', async ({ page, request }) => {
   test.setTimeout(300000);
 
@@ -57,9 +59,9 @@ test('a registered shopper cancels an eligible OMS order', async ({ page, reques
   await expect(Locators.orderDetailHeading(page, orderDetailTitle)).toBeVisible();
   await expect(Locators.detailText(page, orderNumberLabel(orderNo))).toBeVisible();
 
-  // Identity and eligibility both held, so the action is offered rather than
-  // shown inert: the button stays focusable when it is unavailable, so being
-  // enabled is what proves eligibility, not merely being present.
+  // Identity and eligibility both held, so the action is offered, not shown
+  // inert. The button stays focusable when unavailable, so being enabled is what
+  // proves eligibility. Being present is not enough.
   await expect(Locators.orderActions(page, orderActionsHeading)).toBeVisible();
   await expect(Locators.cancelOrder(page, cancelOrderLabel)).toBeVisible();
   await expect(Locators.cancelOrder(page, cancelOrderLabel)).toHaveAttribute(

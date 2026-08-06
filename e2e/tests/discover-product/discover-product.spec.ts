@@ -10,8 +10,9 @@ import {
 } from './discover-product.data';
 import * as Locators from './discover-product.locators';
 
-// Search hands the shopper a product; the product page has to answer "is this
-// the right thing, and can I buy it?" — variant, price, image, promotion, stock.
+// Search hands the shopper a product. The product page then has to answer "is
+// this the right thing, and can I buy it?". It answers with the variant, price,
+// image, promotion and stock.
 test('search for a product and evaluate it down to a sellable size', async ({ page, request }) => {
   test.setTimeout(90000);
 

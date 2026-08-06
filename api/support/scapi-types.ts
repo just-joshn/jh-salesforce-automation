@@ -4,8 +4,8 @@
 // Response shapes only. Request bodies and expected values stay in each
 // feature's *.data.ts, where the Functional Page Model keeps test inputs.
 //
-// Family-prefixed where two families disagree: a basket line item and an order
-// line item are different shapes and are not interchangeable.
+// Names are family-prefixed where two families disagree. A basket line item and
+// an order line item are different shapes, and are not interchangeable.
 
 import type { components as AuthSchemas } from '../generated/auth';
 import type { components as BasketSchemas } from '../generated/shopper-baskets';
@@ -31,9 +31,9 @@ export type OrderAddress = OrderSchemas['schemas']['OrderAddress'];
 export type CustomerOrderResult = CustomerSchemas['schemas']['CustomerOrderResult'];
 export type CustomerOrder = CustomerSchemas['schemas']['Order'];
 
-// Order Management state, reached through Shopper Orders' `oms` and
-// `oms_shipments` expansions rather than a separate API. Order['omsData'] and
-// OrderProductItem['omsData'] reach the rest.
+// Order Management state. It arrives through Shopper Orders' `oms` and
+// `oms_shipments` expansions, not a separate API. The rest hangs off
+// Order['omsData'] and OrderProductItem['omsData'].
 export type OmsShipment = OrderSchemas['schemas']['OmsShipment'];
 export type OmsReasonCode = OrderSchemas['schemas']['OmsReasonCode'];
 export type OmsMetaData = OrderSchemas['schemas']['OmsMetaData'];

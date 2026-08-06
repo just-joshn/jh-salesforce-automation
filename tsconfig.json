@@ -10,8 +10,10 @@
     "noImplicitOverride": true,
     "noFallthroughCasesInSwitch": true,
     "esModuleInterop": true,
-    // Enforce explicit type-only imports/exports (pairs with the ESLint consistent-type-imports rule)
-    // and guarantee each file transpiles safely on its own, which is how Playwright processes tests.
+    // verbatimModuleSyntax: enforce explicit type-only imports and exports.
+    // Pairs with the ESLint consistent-type-imports rule.
+    // isolatedModules: every file must transpile on its own. That is how
+    // Playwright processes tests.
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
     "resolveJsonModule": true,

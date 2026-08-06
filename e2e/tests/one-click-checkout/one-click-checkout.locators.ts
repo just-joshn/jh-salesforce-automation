@@ -1,9 +1,8 @@
 import type { Locator, Page } from '@playwright/test';
 
-// The one-click page reuses the checkout container test id, so what tells the two
-// implementations apart is the controls inside it: one-click carries its own
-// place-order button and saved-payment controls instead of numbered toggle-card
-// steps.
+// The one-click page reuses the checkout container test id. What tells the two
+// implementations apart is the controls inside it. One-click carries its own
+// place-order button and saved-payment controls, not numbered toggle-card steps.
 
 export const oneClickContainer = (page: Page): Locator => page.getByTestId('sf-checkout-container');
 

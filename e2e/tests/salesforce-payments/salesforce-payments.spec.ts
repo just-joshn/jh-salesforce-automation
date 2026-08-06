@@ -16,17 +16,19 @@ import {
 } from './salesforce-payments.data';
 import * as Locators from './salesforce-payments.locators';
 
-// CUJ 19 — Complete purchase through Salesforce Payments: the payment SDK and its
-// metadata are loaded, the basket is prepared, the payment is confirmed, and one
-// Commerce order is created — with the provider allowed to take the shopper
-// through its own processing leg on the way (Shopper Configuration + Salesforce
-// Payments SDK/backend + Shopper Baskets V2 + Shopper Orders).
+// CUJ 19 — Complete purchase through Salesforce Payments.
 //
-// Conditional journey: the feature hook requires both local and server
-// enablement, so both are proven before the browser starts — the app's own
-// configuration for the flag, SDK URL and metadata URL, and Shopper
-// Configuration for the Commerce-side permission — and the test skips with the
-// exact reason when any of them is missing.
+// The payment SDK and its metadata are loaded, the basket is prepared, the
+// payment is confirmed, and one Commerce order is created. The provider may take
+// the shopper through its own processing leg on the way.
+// Services: Shopper Configuration, Salesforce Payments SDK/backend,
+// Shopper Baskets V2, Shopper Orders.
+//
+// Conditional journey. The feature hook requires both local and server
+// enablement, so both are proven before the browser starts:
+// - the app's own configuration, for the flag, SDK URL and metadata URL.
+// - Shopper Configuration, for the Commerce-side permission.
+// The test skips naming the exact reason when any of them is missing.
 test('a shopper pays through Salesforce Payments and one order is created', async ({
   page,
   request,
@@ -47,10 +49,11 @@ test('a shopper pays through Salesforce Payments and one order is created', asyn
     if (orderCreateCall(candidate)) orderCalls.push(candidate);
   });
 
-  // Load the payment SDK and its metadata. Both are read as the storefront's own
-  // traffic: the configured SDK bundle, the metadata proxy that fronts the
-  // Salesforce Payments backend, and the Shopper Configuration read the feature
-  // hook gates itself on.
+  // Load the payment SDK and its metadata. Three pieces of the storefront's own
+  // traffic are read:
+  // - the configured SDK bundle.
+  // - the metadata proxy fronting the Salesforce Payments backend.
+  // - the Shopper Configuration call the feature hook gates itself on.
   const configuration = page.waitForRequest(configurationCall, { timeout: 90000 });
   const sdkLoaded = page.waitForResponse(sdkUrl, { timeout: 90000 });
   const metadata = page.waitForRequest(paymentMetadataCall, { timeout: 90000 });
@@ -111,7 +114,7 @@ test('a shopper pays through Salesforce Payments and one order is created', asyn
   await Actions.awaitOrderConfirmation(page);
 
   // Success: the payment is confirmed, and exactly one Commerce order exists for
-  // it — a provider redirect must not create a second.
+  // it. A provider redirect must not create a second.
   await expect(page).toHaveURL(confirmationUrlPattern);
   await expect(Locators.thankYouHeading(page)).toBeVisible();
   await expect(Locators.orderNumberLine(page)).toBeVisible();

@@ -6,7 +6,7 @@ import * as Locators from './one-click-checkout.locators';
 
 /**
  * Authenticate the returning shopper. The journey's identity step is a verified
- * SLAS session; a shopper who already has one does not re-verify a token, which
+ * SLAS session. A shopper who already has one never re-verifies a token, which
  * is what makes this the returning-shopper path through the one-click page.
  */
 export const signIn = async (page: Page, shopper: SavedDataShopper): Promise<void> => {
@@ -67,8 +67,8 @@ export const applyShippingMethod = async (page: Page): Promise<void> => {
 
 /**
  * Enter a card and ask the shop to keep it. This is the journey's optional
- * save-a-new-payment-instrument branch, which is the branch that proves newly
- * saved checkout data can carry an order.
+ * save-a-new-payment-instrument branch. It proves that newly saved checkout data
+ * can carry an order.
  */
 export const enterAndSaveNewPayment = async (page: Page, card: Card): Promise<void> => {
   await Locators.cardNumber(page).waitFor({ timeout: 60000 });

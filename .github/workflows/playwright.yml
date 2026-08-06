@@ -36,7 +36,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm test
         env:
-          # No login secrets → guest-only. Public demo needs no secrets.
+          # Without these the run is guest-only. The public demo needs no secrets.
           E2E_ACCOUNT_EMAIL: ${{ secrets.E2E_ACCOUNT_EMAIL }}
           E2E_ACCOUNT_PASSWORD: ${{ secrets.E2E_ACCOUNT_PASSWORD }}
       - uses: actions/upload-artifact@v7

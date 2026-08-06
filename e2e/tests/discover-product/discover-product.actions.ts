@@ -17,7 +17,7 @@ export const openProduct = async (page: Page, masterId: string): Promise<void> =
   await Locators.productTile(page, masterId).click();
 };
 
-// Color change rebuilds sizes — wait longer for the click.
+// A color change rebuilds the sizes, so this click gets a longer timeout.
 export const selectColor = async (page: Page, color: string): Promise<void> => {
   await Locators.colorOption(page, color).click({ timeout: 30000 });
 };

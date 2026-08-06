@@ -26,7 +26,7 @@ export const storeArea: StoreArea = {
   maxDistance: '100',
 };
 
-// Category the store filter is exercised on; big enough to see the result shrink.
+// Category the store filter is exercised on. Big enough to see the result shrink.
 export const category = { id: 'newarrivals', name: 'New Arrivals' };
 
 // Product list page size: how many of the API's results fit on the first page.
@@ -39,9 +39,10 @@ export interface PickupAvailability {
   product: StoreVariant;
 }
 
-// Three systems meet here: which store is nearby (Shopper Stores), what it has
-// in the category (Shopper Search on its stock id), and a size actually on the
-// shelf (Shopper Products against that same stock id).
+// Three systems meet here:
+// - Shopper Stores: which store is nearby.
+// - Shopper Search: what that store has in the category, by its stock id.
+// - Shopper Products: a size actually on the shelf, against that same stock id.
 export const pickupAvailability = async (
   request: APIRequestContext,
 ): Promise<PickupAvailability> => {

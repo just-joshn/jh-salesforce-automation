@@ -1,9 +1,9 @@
 import type { Locator, Page } from '@playwright/test';
 
 // --- The storefront's own ways in to the shopping agent ---
-// Only these are storefront DOM. The conversation window itself belongs to the
-// provider — an Embedded Messaging iframe or the Commerce Client widget injected
-// into the container below — so nothing here reaches inside it.
+// Only these are storefront DOM. The conversation window belongs to the provider:
+// an Embedded Messaging iframe, or the Commerce Client widget injected into the
+// container below. Nothing here reaches inside it.
 
 export const headerAgentButton = (page: Page): Locator =>
   page.getByRole('button', { name: 'Ask Shopping Agent', exact: true });

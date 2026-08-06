@@ -24,7 +24,7 @@ export const accountUrlPattern = /\/account\/?$/;
 // Main product id. The in-stock color/size is resolved at run time.
 export const product = { masterId: '25591139M' };
 
-// Pick a color/size that is in stock right now; the demo store's stock keeps moving.
+// Pick a color and size that are in stock right now. The demo store's stock moves.
 export const orderableVariant = async (request: APIRequestContext): Promise<UiOrderableVariant> => {
   const { accessToken } = await getGuestToken(request);
   return findUiOrderableVariant(request, accessToken, product.masterId);

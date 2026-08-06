@@ -10,7 +10,7 @@ export interface DiscoveryQuery {
 // Search word with plenty of hits, some of them on promotion.
 export const discoveryQuery: DiscoveryQuery = { term: 'shirt' };
 
-// Search picks the product; the product call says what the page should show and
+// Search picks the product. The product call says what the page should show, and
 // which size can actually be bought. Nothing is hardcoded: demo stock moves.
 export const promotedProduct = async (request: APIRequestContext): Promise<PromotedUiVariant> => {
   const { accessToken } = await getGuestToken(request);

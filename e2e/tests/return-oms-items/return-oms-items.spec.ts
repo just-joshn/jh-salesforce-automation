@@ -24,23 +24,23 @@ import {
 } from './return-oms-items.data';
 import * as Locators from './return-oms-items.locators';
 
-// CUJ 23 — Return eligible order items: a registered shopper who owns an
-// OMS-backed order initiates a return for the lines Order Management still
-// accepts one for. Returnability and its per-line limit are OMS's answer, the
-// chosen quantity is validated against that limit before anything is submitted,
-// and the return goes to Order Management.
+// CUJ 23 — Return eligible order items.
 //
-// Conditional journey: the storefront ships no flag for it — the action exists
-// only while Order Management has ingested the order and reports a returnable
-// quantity on it — so the condition is proven against the commerce services
-// before the browser starts, and the test skips with the exact unmet setting.
+// A registered shopper who owns an OMS-backed order returns the lines Order
+// Management still accepts a return for. Returnability and its per-line limit are
+// OMS's answer. The chosen quantity is validated against that limit before
+// anything is submitted, and the return then goes to Order Management.
 //
-// The stale-quantity and unknown-item recoveries the journey allows for are not
-// asserted here: reaching them means making Order Management answer 400 with a
-// specific errorCode, which can only be forced by faking the service the journey
-// exists to exercise. What is asserted instead is the validation that stands
-// between the shopper and those failures — the quantity cannot leave the modal
-// above the limit OMS currently reports.
+// Conditional journey. The storefront ships no flag for it: the action exists
+// only while OMS has ingested the order and reports a returnable quantity on it.
+// So the condition is proven against the commerce services before the browser
+// starts, and the test skips naming the exact unmet setting.
+//
+// Not asserted here: the stale-quantity and unknown-item recoveries. Reaching
+// them means making OMS answer 400 with a specific errorCode, which can only be
+// forced by faking the service this journey exists to exercise. What is asserted
+// instead is the validation standing between the shopper and those failures: the
+// quantity cannot leave the modal above the limit OMS currently reports.
 test('a registered shopper returns eligible items from an OMS order', async ({ page, request }) => {
   test.setTimeout(300000);
 

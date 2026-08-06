@@ -38,9 +38,9 @@ export function dataCloudEventsPath(): string {
 }
 
 /**
- * Ask Einstein what it would recommend beside one product, the same call the
- * storefront's recommendation zone makes. An empty list is a valid answer and
- * means the recommender has nothing for this product.
+ * Ask Einstein what it would recommend beside one product. This is the same call
+ * the storefront's recommendation zone makes. An empty list is a valid answer:
+ * the recommender has nothing for this product.
  */
 export async function fetchRecommendations(
   request: APIRequestContext,

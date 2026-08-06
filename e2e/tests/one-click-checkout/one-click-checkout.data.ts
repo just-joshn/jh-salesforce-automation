@@ -36,9 +36,9 @@ export interface SavedDataShopper {
 /**
  * Whether this storefront is configured for the one-click checkout journey.
  *
- * Both halves of the condition are read from the app's own shipped
- * configuration: the feature flag that switches the `/checkout` route, and the
- * passwordless setup the one-click page's identity verification is built on.
+ * Both halves of the condition come from the app's own shipped configuration.
+ * One is the feature flag that switches the `/checkout` route. The other is the
+ * passwordless setup the page's identity verification is built on.
  */
 export interface OneClickCondition {
   met: boolean;
@@ -101,9 +101,10 @@ const conditionReason = (reasons: string[]): string =>
 
 /**
  * The journey only exists while the storefront is configured for it, so the
- * condition is established from the app's own configuration before the browser
- * starts. A storefront that will not serve its configuration raises rather than
- * skips, so a broken shop never reads as "this journey does not apply here".
+ * condition is read from the app's own configuration before the browser starts.
+ *
+ * A storefront that will not serve its configuration throws rather than skips.
+ * A broken shop must never read as "this journey does not apply here".
  */
 export const oneClickCondition = async (request: APIRequestContext): Promise<OneClickCondition> => {
   const app = await readStorefrontAppConfig(request);
@@ -175,7 +176,7 @@ export const savedDataShopper = async (request: APIRequestContext): Promise<Save
   return { email, password, address: savedAddress };
 };
 
-// Sizes are resolved at run time; the demo store's stock keeps moving.
+// Sizes are resolved at run time. The demo store's stock keeps moving.
 export const deliveryVariant = async (request: APIRequestContext): Promise<UiOrderableVariant> => {
   const { accessToken } = await getGuestToken(request);
   return findUiOrderableVariant(request, accessToken, deliveryMasterId);

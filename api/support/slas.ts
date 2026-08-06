@@ -35,7 +35,8 @@ export async function getGuestToken(request: APIRequestContext): Promise<GuestTo
   const authorizeUrl = `${scapiBaseUrl()}/shopper/auth/v1/organizations/${org}/oauth2/authorize`;
   const tokenUrl = `${scapiBaseUrl()}/shopper/auth/v1/organizations/${org}/oauth2/token`;
 
-  // Ask for one-time code (in redirect header; don't follow the redirect).
+  // Ask for the one-time code. It arrives in the redirect header, so the
+  // redirect itself is not followed.
   const authorize = await request.get(authorizeUrl, {
     params: {
       client_id: env.scapi.clientId,

@@ -11,9 +11,11 @@ import { configuredShopper, omsPreflight, readOwnedOrder } from '../../support/o
 // CUJ 22 — Cancel eligible OMS order.
 //
 // Cancellation is offered on identity and eligibility, both read from the order
-// itself: the shopper has to be registered and own it, and every line has to
-// still be cancellable in full. Order Management is the authority — the storefront
-// submits the cancellation and surfaces what OMS answered.
+// itself. The shopper has to be registered and own it, and every line has to be
+// cancellable in full.
+//
+// Order Management is the authority. The storefront submits the cancellation and
+// shows what OMS answered.
 
 const ORDERS = 'checkout/shopper-orders/v1';
 
@@ -38,10 +40,10 @@ const unmet = (reason: string): CancelOrderCondition => ({
 /**
  * A line is cancellable in full when OMS has not committed any of it yet.
  *
- * The quantities are required to be real numbers, which is stricter than the
- * page's own gate: it compares the two fields directly, so a line carrying
- * neither would read as equal and enable a cancellation Order Management would
- * then refuse. The journey needs one that actually succeeds.
+ * Both quantities must be real numbers. That is stricter than the page's own
+ * gate, which compares the two fields directly. A line carrying neither reads as
+ * equal there, so the page would offer a cancellation that OMS then refuses.
+ * This journey needs one that succeeds.
  */
 const cancellableInFull = (item: OrderItemResource): boolean => {
   const oms = item.omsData;
@@ -88,8 +90,9 @@ const seedReason =
 
 /**
  * Whether this storefront can run the journey, proven against the commerce
- * services before the browser starts: Order Management connected to the site, and
- * a seeded order the configured shopper owns that is still fully cancellable.
+ * services before the browser starts. It needs two things: Order Management
+ * connected to the site, and a seeded order the configured shopper owns that is
+ * still fully cancellable.
  */
 export const cancelOrderCondition = async (
   request: APIRequestContext,

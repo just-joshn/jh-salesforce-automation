@@ -20,10 +20,10 @@ export interface ExpressPlacements {
 /**
  * Whether this storefront is configured for the Salesforce Payments journey.
  *
- * The feature hook requires both local and server enablement, so the condition
- * is read from both sides: the app's own shipped configuration for the flag, SDK
- * URL and metadata URL, and Shopper Configuration for the Commerce-side
- * permission the same hook reads.
+ * The feature hook requires both local and server enablement, so the condition is
+ * read from both sides:
+ * - the app's own shipped configuration, for the flag, SDK URL and metadata URL.
+ * - Shopper Configuration, for the Commerce-side permission the same hook reads.
  */
 export interface SalesforcePaymentsCondition {
   met: boolean;
@@ -68,9 +68,10 @@ export const homeAddress: Address = {
 
 /**
  * Shopper Configuration, the service the storefront's own payments hook reads its
- * server-side enablement from. A server fault is raised rather than folded into
- * an empty result, so a broken shop never reads as "this journey does not apply
- * here".
+ * server-side enablement from.
+ *
+ * A server fault throws instead of returning nothing, so a broken shop never
+ * reads as "this journey does not apply here".
  */
 const siteConfigurations = async (request: APIRequestContext): Promise<Map<string, unknown>> => {
   const { accessToken } = await getGuestToken(request);
@@ -155,7 +156,7 @@ export const salesforcePaymentsCondition = async (
   };
 };
 
-// Sizes are resolved at run time; the demo store's stock keeps moving.
+// Sizes are resolved at run time. The demo store's stock keeps moving.
 export const deliveryVariant = async (request: APIRequestContext): Promise<UiOrderableVariant> => {
   const { accessToken } = await getGuestToken(request);
   return findUiOrderableVariant(request, accessToken, deliveryMasterId);

@@ -9,18 +9,18 @@ import type {
 import { getGuestToken, loginRegisteredShopper } from '../../api/support/slas';
 import { env } from '../../config/env';
 
-// Salesforce Order Management, which is what decides whether the three OMS order
-// journeys exist on a given deployment at all.
+// Salesforce Order Management. It decides whether the three OMS order journeys
+// exist on a given deployment.
 //
-// The storefront ships no flag for them. Every one of Track Shipment, Cancel
-// Order and Return Items is gated purely on OMS state being attached to the
-// order, so the only thing that turns them on is a connected Order Management
-// org enriching the order — see the storefront's own note: "There is no feature
-// flag. Each action is gated entirely on data and shopper identity... B2C
-// Commerce-only orders (no omsData) never expose the return or cancel flows."
+// The storefront ships no flag for them. Track Shipment, Cancel Order and Return
+// Items are each gated purely on OMS state being attached to the order. So the
+// only thing that turns them on is a connected Order Management org enriching
+// that order. The storefront's own note: "There is no feature flag. Each action
+// is gated entirely on data and shopper identity... B2C Commerce-only orders
+// (no omsData) never expose the return or cancel flows."
 //
-// So the condition is read from the commerce service itself rather than inferred
-// from what renders: Shopper Orders answers the OMS metadata resource with
+// The condition is therefore read from the commerce service, not inferred from
+// what renders. Shopper Orders answers the OMS metadata resource with
 // oms-not-active on a site Order Management is not connected to.
 
 const ORDERS = 'checkout/shopper-orders/v1';
@@ -33,8 +33,8 @@ export interface ShopperCredentials {
   password: string;
 }
 
-// The payloads below come from the Shopper Orders spec. `Resource` names are kept
-// because that is how the journeys refer to what the order detail page reads.
+// The payloads below come from the Shopper Orders spec. The `Resource` names are
+// kept because that is how the journeys refer to what the order detail page reads.
 export type { OmsReasonCode, OmsShipment } from '../../api/support/scapi-types';
 export type OrderItemResource = OrderProductItem;
 export type OrderResource = Order;
@@ -48,10 +48,7 @@ export interface OmsActivation {
   cancelReasonCodes: OmsReasonCode[];
 }
 
-/**
- * Names the exact settings that are not met, so a skip is a statement about the
- * deployment rather than a shrug.
- */
+/** Names the exact settings that are not met, so a skip says what to fix. */
 const notActiveReason =
   'Shopper Orders answered oms-not-active for this site, so Order Management is not connected: ' +
   'the journey needs a Salesforce Order Management org linked to this B2C Commerce instance, ' +
@@ -76,13 +73,13 @@ const activeFrom = (meta: OmsMetaData): OmsActivation => ({
 });
 
 /**
- * Whether Order Management is active, read from the OMS metadata resource the
- * order detail page itself reads its return reasons from.
+ * Whether Order Management is active. Read from the OMS metadata resource the
+ * order detail page reads its return reasons from.
  *
  * A shop that answers neither "here are the reason codes" nor "OMS is not
- * active" is a store fault, not a journey whose condition is unmet, so it is
- * raised rather than folded into an inactive result: a broken shop must never
- * read as "this journey does not apply here".
+ * active" is a store fault, not a journey whose condition is unmet. So this
+ * throws instead of reporting inactive: a broken shop must never read as "this
+ * journey does not apply here".
  */
 export async function readOmsActivation(request: APIRequestContext): Promise<OmsActivation> {
   const { accessToken } = await getGuestToken(request);
@@ -111,8 +108,8 @@ const noSession = (email: string): OrderLookup => ({
 });
 
 /**
- * One order, read exactly the way the order detail page reads it — as its owner,
- * with both OMS expansions — so what the test expects traces back to the payload
+ * One order, read exactly the way the order detail page reads it: as its owner,
+ * with both OMS expansions. So what the test expects traces back to the payload
  * the page rendered from.
  */
 export async function readOwnedOrder(
@@ -141,7 +138,7 @@ export async function readOwnedOrder(
   };
 }
 
-/** Whether the shopper who owns the seeded orders is configured. */
+/** The shopper who owns the seeded orders, as configured in the environment. */
 export const configuredShopper = (): ShopperCredentials => ({
   email: env.account.email,
   password: env.account.password,
@@ -153,7 +150,7 @@ export const credentialsReason =
 const credentialsMissing = (credentials: ShopperCredentials): boolean =>
   credentials.email === '' || credentials.password === '';
 
-/** Everything the three OMS journeys need in common before a browser is worth starting. */
+/** What all three OMS journeys need before a browser is worth starting. */
 export type OmsPreflight =
   | { ready: true; credentials: ShopperCredentials; orderNo: string; activation: OmsActivation }
   | { ready: false; reason: string };

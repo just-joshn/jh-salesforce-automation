@@ -52,7 +52,7 @@ export const itemRows = (page: Page): Locator =>
 
 export const itemCheckbox = (row: Locator): Locator => row.getByRole('checkbox');
 
-// A row only renders its quantity and reason controls once it is checked, which
+// A row only renders its quantity and reason controls once it is checked. That
 // is what makes one of each per row unique.
 export const itemQuantity = (row: Locator): Locator => row.getByRole('spinbutton');
 

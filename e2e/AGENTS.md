@@ -1,0 +1,70 @@
+# e2e — BROWSER LAYER
+
+Chromium journeys against the storefront, organised as a Functional Page Model. 19 feature modules,
+4 shared support helpers, 1 setup project.
+
+## STRUCTURE
+
+```
+setup/auth.setup.ts      # signs in once -> playwright/.auth/user.json; skips when no account
+support/                 # cross-feature helpers, imported by feature modules
+tests/<feature>/         # 19 modules, 4 files each
+```
+
+## THE QUARTET (mandatory, no exceptions)
+
+Every feature is exactly four sibling files sharing one stem:
+
+| File              | Owns                                                    | Must not contain               |
+| ----------------- | ------------------------------------------------------- | ------------------------------ |
+| `<f>.locators.ts` | locator factories, one per element                      | actions, data, assertions      |
+| `<f>.actions.ts`  | shopper steps; composes `Locators.x(page)`              | selectors, test data, `test()` |
+| `<f>.data.ts`     | inputs, expected values, condition probes, skip reasons | selectors, `test()`            |
+| `<f>.spec.ts`     | `test()` blocks + assertions                            | reusable selectors/flows/data  |
+
+- All exports are `export const` arrow functions. Current count: **461 in `*.locators.ts`, zero
+  `export function`.** Match it.
+- First parameter is `page: Page`. Actions take module-typed data after it.
+- Specs compose namespaces: `import * as Actions` / `import * as Locators` (19 modules do exactly
+  this), plus named imports from `./<f>.data`.
+- Navigation is an action, never inline in a spec.
+- Adding a feature means adding all four files. Renaming means renaming all four.
+- No page-object classes anywhere. Do not introduce one.
+
+## WHERE TO LOOK
+
+| Need                       | File                                                        |
+| -------------------------- | ----------------------------------------------------------- |
+| Shared `test` / `expect`   | `support/fixtures.ts` — 19 files import it                  |
+| Path prefixing             | `support/site.ts` — `buildPath`, 64 callers                 |
+| Storefront feature flags   | `support/app-config.ts` — `readStorefrontAppConfig`         |
+| OMS gating + seeded orders | `support/oms.ts` — `omsPreflight`, `readOwnedOrder`         |
+| SCAPI calls from a journey | `../api/support/*` — imported directly, this is intentional |
+
+## CONVENTIONS
+
+- **`support/fixtures.ts` is the default import**, not `@playwright/test`. It presets the `dw_dnt=0`
+  consent cookie so the pop-up never interrupts a journey.
+  - **One deliberate exception:** `tests/tracking-consent/tracking-consent.spec.ts` imports
+    Playwright's own fixtures, because that journey must arrive with the prompt unanswered. Do not
+    "fix" it to use the shared fixture.
+- Locator strategy, by current usage: `getByRole` (214) > `getByTestId` (141) > `getByLabel` (69) >
+  `getByText` (50). Only 2 `page.locator()` calls exist; do not add more. Filter for uniqueness
+  (`getByRole('dialog').filter({ has: ... })`) rather than reaching for CSS.
+- Conditional journeys: probe the condition in `*.data.ts`, then skip on it as the first statement
+  of the test — `test.skip(!condition.met, condition.reason)`, 16 call sites. The reason names the
+  exact unmet setting.
+- Timeouts are inline per test: `test.setTimeout(180000)` (29 call sites), and per assertion where a
+  live page is slow. Nothing global.
+- Polling uses `expect.poll(...)` with an explicit timeout. No sleeps.
+- Tests are unauthenticated by default. A signed-in spec opts in itself via
+  `test.use({ storageState: 'playwright/.auth/user.json' })`; the `e2e-authenticated` project stays
+  commented out in `playwright.config.ts` until that suite grows.
+
+## ANTI-PATTERNS
+
+- Do not put a selector in an action, a `test()` in an action, or feature data in `support/`.
+- Do not add a shared factory or a generic base module. Data stays feature-local by design.
+- Do not turn a store fault into a skip. Unmet condition → skip; shop that will not answer → throw.
+- Do not assert placeholder demo copy (the consent form ships `Lorem ipsum`); assert that the choice
+  is offered and explained.

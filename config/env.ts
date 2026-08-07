@@ -67,6 +67,17 @@ export function scapiBaseUrl(): string {
   return `https://${env.scapi.shortCode}.api.commercecloud.salesforce.com`;
 }
 
+/**
+ * Add /global/en-US in front of paths. Lives here rather than in a layer because
+ * both layers need it: the browser layer to navigate, and the API layer to read
+ * the storefront's own shipped configuration off a rendered page.
+ */
+export function buildPath(path: string): string {
+  const prefix = `/${env.siteAlias}/${env.locale}`;
+  const suffix = path.startsWith('/') ? path : `/${path}`;
+  return `${prefix}${suffix}`;
+}
+
 /** True if we have a test login. */
 export function hasAccountCredentials(): boolean {
   return env.account.email.length > 0 && env.account.password.length > 0;

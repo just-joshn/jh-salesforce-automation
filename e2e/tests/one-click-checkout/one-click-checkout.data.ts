@@ -3,8 +3,8 @@ import type { UiOrderableVariant } from '../../../api/support/products';
 import { findUiOrderableVariant } from '../../../api/support/products';
 import { bearer, shopperApiUrl, withSite } from '../../../api/support/scapi';
 import { getGuestToken, loginRegisteredShopper, requireSession } from '../../../api/support/slas';
-import type { StorefrontAppConfig } from '../../support/app-config';
-import { readStorefrontAppConfig } from '../../support/app-config';
+import type { StorefrontAppConfig } from '../../../api/support/app-config';
+import { readStorefrontAppConfig } from '../../../api/support/app-config';
 
 const CUSTOMERS = 'customer/shopper-customers/v1';
 

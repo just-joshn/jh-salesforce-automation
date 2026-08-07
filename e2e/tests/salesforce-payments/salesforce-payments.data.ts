@@ -4,8 +4,8 @@ import { findUiOrderableVariant } from '../../../api/support/products';
 import { bearer, shopperApiUrl, withSite } from '../../../api/support/scapi';
 import type { SiteConfiguration } from '../../../api/support/scapi-types';
 import { getGuestToken } from '../../../api/support/slas';
-import type { SfPaymentsConfig } from '../../support/app-config';
-import { readStorefrontAppConfig } from '../../support/app-config';
+import type { SfPaymentsConfig } from '../../../api/support/app-config';
+import { readStorefrontAppConfig } from '../../../api/support/app-config';
 
 const CONFIGURATIONS = 'configuration/shopper-configurations/v1';
 

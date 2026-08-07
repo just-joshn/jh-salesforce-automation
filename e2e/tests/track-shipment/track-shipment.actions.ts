@@ -1,5 +1,5 @@
 import type { Locator, Page } from '@playwright/test';
-import type { ShopperCredentials } from '../../support/oms';
+import type { ShopperCredentials } from '../../../api/support/oms';
 import { buildPath } from '../../support/site';
 import * as Locators from './track-shipment.locators';
 

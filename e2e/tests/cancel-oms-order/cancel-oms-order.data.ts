@@ -5,8 +5,8 @@ import type {
   OrderItemResource,
   OrderResource,
   ShopperCredentials,
-} from '../../support/oms';
-import { configuredShopper, omsPreflight, readOwnedOrder } from '../../support/oms';
+} from '../../../api/support/oms';
+import { configuredShopper, omsPreflight, readOwnedOrder } from '../../../api/support/oms';
 
 // CUJ 22 — Cancel eligible OMS order.
 //

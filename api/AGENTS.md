@@ -1,8 +1,10 @@
-# api — SCAPI CONTRACT + CLIENT HELPERS
+# api — SCAPI CONTRACT + CLIENT HELPERS + API TESTS
 
-Salesforce Commerce API layer: vendored OpenAPI specs, types generated from them, and hand-written
-request helpers. **There are no tests here** — `api/tests/` was deleted in `50bc4cf`. Everything in
-this directory is consumed by the browser layer.
+Salesforce Commerce API layer: vendored OpenAPI specs, types generated from them, hand-written
+request helpers, and the API test suite. `support/` is consumed by both layers.
+
+`tests/` holds 20 feature modules, 30 tests — one module per `e2e/tests/<feature>/`, same stem, same
+journey, same step order, asserted against SCAPI instead of a browser. See THE API QUARTET below.
 
 ## THE THREE-WAY SPLIT
 
@@ -35,6 +37,8 @@ shopper-search, shopper-stores.
 | Product, variant, inventory lookups          | `products.ts`                                  | largest helper, 526 lines                               |
 | Pickup store + its inventory id              | `stores.ts`                                    |                                                         |
 | Recommendations, activity + Data Cloud paths | `einstein.ts`                                  | separate host, `x-cq-client-id` header                  |
+| Storefront feature flags                     | `app-config.ts` → `readStorefrontAppConfig`    | parses `#mobify-data`; both layers gate on it           |
+| OMS gating + seeded orders                   | `oms.ts` → `omsPreflight`, `readOwnedOrder`    | no flag exists, state-gated; both layers gate on it     |
 
 ## CONVENTIONS
 
@@ -51,7 +55,30 @@ shopper-search, shopper-stores.
 - Helpers throw with a diagnostic naming the likely cause ("the demo store's store stock has likely
   changed") rather than returning empty. A shop that cannot answer is a fault, not a negative result.
 - Only response shapes are generated. Request bodies and expected values live in each feature's
-  `*.data.ts` in the browser layer.
+  `*.data.ts` — in both layers.
+
+## THE API QUARTET (mandatory, no exceptions)
+
+Every `tests/<feature>/` is exactly four sibling files sharing one stem. `<f>.endpoints.ts` is this
+layer's replacement for the browser layer's `<f>.locators.ts`:
+
+| File               | Owns                                                                              | Must not contain                            |
+| ------------------ | --------------------------------------------------------------------------------- | ------------------------------------------- |
+| `<f>.endpoints.ts` | one URL builder per resource, via `shopperApiUrl`                                 | requests, data, assertions                  |
+| `<f>.actions.ts`   | one HTTP operation per export; composes `Endpoints.x()`                           | inline URLs, test data, `test()`            |
+| `<f>.data.ts`      | request bodies, expected values, response readers, condition probes, skip reasons | inline URLs in the journey itself, `test()` |
+| `<f>.spec.ts`      | `test()` blocks + every assertion                                                 | reusable URLs/operations/data               |
+
+- All exports are `export const` arrow functions. No `export function` in `tests/`.
+- Actions take `(request: APIRequestContext, accessToken: string, ...)` and return `Promise<APIResponse>`.
+- Specs import `{ expect, test }` from `@playwright/test` — never the browser layer's shared fixtures.
+- Provisioning and condition probes may call SCAPI from `*.data.ts`; the browser layer does the same
+  in 10 of its own data files. The journey's own operations still belong in `*.actions.ts`.
+- **A browser-only assertion becomes the nearest API-observable claim, in the same position, with a
+  comment naming the assertion it replaces.** Where nothing can substitute (a rendered iframe, a
+  `window` global, a browser beacon), comment and assert nothing — never invent an endpoint.
+- `page.waitForRequest` has no counterpart: here you are the caller. Assert the params you send and
+  the response you got.
 - Einstein and Data Cloud are not SCAPI, have no published spec, and stay hand-written.
 
 ## ANTI-PATTERNS
@@ -59,5 +86,7 @@ shopper-search, shopper-stores.
 - Never fetch or regenerate a spec at test time. The committed spec is the pin; regeneration is a
   deliberate, reviewable commit.
 - Never widen a generated type by editing `generated/`. Narrow at the call site instead.
-- Never reintroduce `api/tests/` without also fixing the `api` project in `playwright.config.ts` —
-  it still points at that missing directory and currently exits `No tests found`.
+- Never let an API module drift from its `e2e/tests/<feature>/` counterpart. They share a stem
+  because they are the same journey; a step added to one belongs in both.
+- Never weaken an assertion to make a conditional journey green. An unmet condition **skips** with a
+  reason naming the exact unmet setting; a shop that will not answer **throws**.

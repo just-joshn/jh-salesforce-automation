@@ -3,8 +3,8 @@ import { findOrderableVariants } from '../../../api/support/products';
 import { bearer, shopperApiUrl, withSite } from '../../../api/support/scapi';
 import { getGuestToken, loginRegisteredShopper } from '../../../api/support/slas';
 import { env } from '../../../config/env';
-import type { OrderResource, ShopperCredentials } from '../../support/oms';
-import { orderExpand, readOmsActivation } from '../../support/oms';
+import type { OrderResource, ShopperCredentials } from '../../../api/support/oms';
+import { orderExpand, readOmsActivation } from '../../../api/support/oms';
 
 // The other side of the three Order Management journeys, and the only side the
 // public demo can prove: what an order OMS has NOT ingested is allowed to do.

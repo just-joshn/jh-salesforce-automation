@@ -1,7 +1,7 @@
 import type { APIRequestContext, Request } from '@playwright/test';
 import { env } from '../../../config/env';
-import type { OmsShipment, OrderResource, ShopperCredentials } from '../../support/oms';
-import { configuredShopper, omsPreflight, readOwnedOrder } from '../../support/oms';
+import type { OmsShipment, OrderResource, ShopperCredentials } from '../../../api/support/oms';
+import { configuredShopper, omsPreflight, readOwnedOrder } from '../../../api/support/oms';
 
 // CUJ 21 — Track shipment through carrier.
 //

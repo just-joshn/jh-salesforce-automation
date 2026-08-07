@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test';
-import type { ShopperCredentials } from '../../support/oms';
+import type { ShopperCredentials } from '../../../api/support/oms';
 import { buildPath } from '../../support/site';
 import { cancelOrderLabel, confirmCancellationLabel } from './cancel-oms-order.data';
 import * as Locators from './cancel-oms-order.locators';

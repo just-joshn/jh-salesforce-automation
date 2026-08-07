@@ -1,8 +1,8 @@
 import type { APIRequestContext, Request } from '@playwright/test';
 import { dataCloudEventsPath, einsteinActivityPath } from '../../../api/support/einstein';
 import { env } from '../../../config/env';
-import type { DataCloudApiConfig, EinsteinApiConfig } from '../../support/app-config';
-import { readStorefrontAppConfig } from '../../support/app-config';
+import type { DataCloudApiConfig, EinsteinApiConfig } from '../../../api/support/app-config';
+import { readStorefrontAppConfig } from '../../../api/support/app-config';
 
 /** Which way the shopper answers the tracking-consent form. */
 export type TrackingChoice = 'accept' | 'decline';

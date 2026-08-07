@@ -1,12 +1,7 @@
 import type { APIRequestContext } from '@playwright/test';
-import { bearer, shopperApiUrl, withSite } from '../../api/support/scapi';
-import type {
-  OmsMetaData,
-  OmsReasonCode,
-  Order,
-  OrderProductItem,
-} from '../../api/support/scapi-types';
-import { getGuestToken, loginRegisteredShopper } from '../../api/support/slas';
+import { bearer, shopperApiUrl, withSite } from './scapi';
+import type { OmsMetaData, OmsReasonCode, Order, OrderProductItem } from './scapi-types';
+import { getGuestToken, loginRegisteredShopper } from './slas';
 import { env } from '../../config/env';
 
 // Salesforce Order Management. It decides whether the three OMS order journeys
@@ -35,7 +30,7 @@ export interface ShopperCredentials {
 
 // The payloads below come from the Shopper Orders spec. The `Resource` names are
 // kept because that is how the journeys refer to what the order detail page reads.
-export type { OmsReasonCode, OmsShipment } from '../../api/support/scapi-types';
+export type { OmsReasonCode, OmsShipment } from './scapi-types';
 export type OrderItemResource = OrderProductItem;
 export type OrderResource = Order;
 

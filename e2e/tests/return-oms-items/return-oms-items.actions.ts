@@ -1,5 +1,5 @@
 import type { Locator, Page } from '@playwright/test';
-import type { ShopperCredentials } from '../../support/oms';
+import type { ShopperCredentials } from '../../../api/support/oms';
 import { buildPath } from '../../support/site';
 import { returnModalTitle } from './return-oms-items.data';
 import * as Locators from './return-oms-items.locators';

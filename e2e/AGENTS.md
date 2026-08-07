@@ -1,7 +1,8 @@
 # e2e — BROWSER LAYER
 
-Chromium journeys against the storefront, organised as a Functional Page Model. 19 feature modules,
-4 shared support helpers, 1 setup project.
+Chromium journeys against the storefront, organised as a Functional Page Model. 20 feature modules,
+30 tests, 2 shared support helpers, 1 setup project. Each module has an API counterpart of the same
+name under `api/tests/<feature>/` — same journey, same step order, no browser.
 
 ## STRUCTURE
 
@@ -33,13 +34,17 @@ Every feature is exactly four sibling files sharing one stem:
 
 ## WHERE TO LOOK
 
-| Need                       | File                                                        |
-| -------------------------- | ----------------------------------------------------------- |
-| Shared `test` / `expect`   | `support/fixtures.ts` — 19 files import it                  |
-| Path prefixing             | `support/site.ts` — `buildPath`, 64 callers                 |
-| Storefront feature flags   | `support/app-config.ts` — `readStorefrontAppConfig`         |
-| OMS gating + seeded orders | `support/oms.ts` — `omsPreflight`, `readOwnedOrder`         |
-| SCAPI calls from a journey | `../api/support/*` — imported directly, this is intentional |
+| Need                       | File                                                         |
+| -------------------------- | ------------------------------------------------------------ |
+| Shared `test` / `expect`   | `support/fixtures.ts` — 19 files import it                   |
+| Path prefixing             | `support/site.ts` — re-exports `buildPath` from `config/env` |
+| Storefront feature flags   | `../api/support/app-config.ts` — `readStorefrontAppConfig`   |
+| OMS gating + seeded orders | `../api/support/oms.ts` — `omsPreflight`, `readOwnedOrder`   |
+| SCAPI calls from a journey | `../api/support/*` — imported directly, this is intentional  |
+
+`app-config.ts` and `oms.ts` live in `api/support/` because both layers gate on them and neither
+touches a browser. `buildPath` moved to `config/env.ts` for the same reason; `support/site.ts`
+re-exports it so the 20 action files that import it are unchanged.
 
 ## CONVENTIONS
 

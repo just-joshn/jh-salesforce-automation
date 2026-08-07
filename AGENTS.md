@@ -15,10 +15,14 @@ application code — tests only. Target defaults to the live public demo
 ```
 config/env.ts            # every env read in the repo; public-demo defaults for all but credentials
 e2e/                     # browser layer (Functional Page Model) — see e2e/AGENTS.md
-api/                     # SCAPI specs, generated types, request helpers — see api/AGENTS.md
+api/                     # SCAPI specs, generated types, request helpers, API tests — see api/AGENTS.md
 scripts/*.mjs            # spec fetch + type codegen; plain Node ESM, not TypeScript
 playwright.config.ts     # projects: setup -> e2e-chromium, api
 ```
+
+Every journey is covered twice. `e2e/tests/<feature>/` and `api/tests/<feature>/` share a stem, a
+journey and a step order; 20 modules and 30 tests on each side. The browser quartet ends in
+`*.locators.ts`, the API quartet in `*.endpoints.ts`.
 
 No `src/`. No workspaces (single private pnpm package). Depth never exceeds 3.
 
@@ -27,9 +31,10 @@ No `src/`. No workspaces (single private pnpm package). Depth never exceeds 3.
 | Task                           | Location                               | Notes                                        |
 | ------------------------------ | -------------------------------------- | -------------------------------------------- |
 | Add/modify a browser journey   | `e2e/tests/<feature>/`                 | 4-file quartet; see `e2e/AGENTS.md`          |
-| Change a URL path              | `e2e/support/site.ts`                  | `buildPath` prefixes `/<siteAlias>/<locale>` |
-| Read a storefront feature flag | `e2e/support/app-config.ts`            | parses `#mobify-data` from the SSR page      |
-| Gate on Order Management       | `e2e/support/oms.ts`                   | `omsPreflight`; no flag exists, state-gated  |
+| Add/modify an API journey      | `api/tests/<feature>/`                 | 4-file quartet; see `api/AGENTS.md`          |
+| Change a URL path              | `config/env.ts`                        | `buildPath` prefixes `/<siteAlias>/<locale>` |
+| Read a storefront feature flag | `api/support/app-config.ts`            | parses `#mobify-data` from the SSR page      |
+| Gate on Order Management       | `api/support/oms.ts`                   | `omsPreflight`; no flag exists, state-gated  |
 | Add an env var                 | `config/env.ts` **and** `.env.example` | both, or the default is invisible            |
 | SCAPI auth / URLs / types      | `api/support/`                         | see `api/AGENTS.md`                          |
 | CI behaviour                   | `.github/workflows/playwright.yml`     | `test` job + nightly `spec-drift` job        |
@@ -38,14 +43,14 @@ No `src/`. No workspaces (single private pnpm package). Depth never exceeds 3.
 
 Centrality from the codegraph index.
 
-| Symbol                                     | Type      | Location                        | Refs                 | Role                                              |
-| ------------------------------------------ | --------- | ------------------------------- | -------------------- | ------------------------------------------------- |
-| `buildPath`                                | function  | `e2e/support/site.ts:4`         | 64                   | site/locale path prefix; every navigation         |
-| `test` / `expect`                          | fixture   | `e2e/support/fixtures.ts`       | 19 files             | shared fixture; presets `dw_dnt=0` consent cookie |
-| `readStorefrontAppConfig`                  | function  | `e2e/support/app-config.ts:122` | conditional journeys | app's own shipped config                          |
-| `omsPreflight`                             | function  | `e2e/support/oms.ts:158`        | 4 OMS journeys       | credentials + seed + activation gate              |
-| `shopperApiUrl` / `bearer` / `withSite`    | functions | `api/support/scapi.ts`          | cross-layer          | e2e support calls API support directly            |
-| `getGuestToken` / `loginRegisteredShopper` | functions | `api/support/slas.ts`           | auth                 | SLAS + PKCE public client                         |
+| Symbol                                     | Type      | Location                    | Refs                 | Role                                              |
+| ------------------------------------------ | --------- | --------------------------- | -------------------- | ------------------------------------------------- |
+| `buildPath`                                | function  | `config/env.ts`             | 64                   | site/locale path prefix; every navigation         |
+| `test` / `expect`                          | fixture   | `e2e/support/fixtures.ts`   | 19 files             | shared fixture; presets `dw_dnt=0` consent cookie |
+| `readStorefrontAppConfig`                  | function  | `api/support/app-config.ts` | conditional journeys | app's own shipped config                          |
+| `omsPreflight`                             | function  | `api/support/oms.ts`        | 4 OMS journeys x2    | credentials + seed + activation gate              |
+| `shopperApiUrl` / `bearer` / `withSite`    | functions | `api/support/scapi.ts`      | cross-layer          | e2e support calls API support directly            |
+| `getGuestToken` / `loginRegisteredShopper` | functions | `api/support/slas.ts`       | auth                 | SLAS + PKCE public client                         |
 
 ## CONVENTIONS
 
@@ -101,23 +106,16 @@ pnpm gen:api:fetch && pnpm gen:api    # re-vendor specs, then regenerate types
 
 ## NOTES
 
-- **HEAD is currently broken — the whole suite collects `0 tests in 0 files`.** Commit `50bc4cf`
-  ("Reorganize and consolidate test suites") deleted `e2e/tests/login/` and the whole `api/tests/`
-  tree, but left three imports pointing at the removed login module:
-  - `e2e/setup/auth.setup.ts:3,4` → `../tests/login/login.data`, `../tests/login/login.actions`
-  - `e2e/tests/wishlist/wishlist.actions.ts:3` → `../../login/login.actions`
-  - `e2e/tests/recommendation-discovery/recommendation-discovery.actions.ts:3` → same
-
-  A module-resolution failure in the setup project aborts collection for everything.
-  `pnpm typecheck` reports the same four errors. Fix the imports before trusting any run.
-
-- **`playwright.config.ts` still declares an `api` project with `testDir: './api/tests'`, which no
-  longer exists.** `pnpm test:api` exits `Error: No tests found`. `api/support`, `api/specs` and
-  `api/generated` survived and are still used — by the browser layer.
-- **README.md is ahead of the tree.** It documents an API test layer, `*.endpoints.ts` files,
-  `e2e/tests/login/` and `e2e/tests/journeys/<feature>/`, plus an API column in the coverage table.
-  None exist at this commit. Trust the tree and this file; treat the README's architecture prose as
-  intent.
+- Collection is healthy: `61 tests in 41 files` — 30 browser, 30 API, 1 auth setup. `pnpm typecheck`,
+  `pnpm lint` and `pnpm format:check` all exit 0.
+- **On the public demo, 7 of the 30 API tests skip, and the browser layer skips the same journeys**
+  for the same reasons: no `E2E_ACCOUNT_*` credentials (login, and the 3 OMS journeys, which check
+  credentials before OMS activation), `app.oneClickCheckout.enabled` off, `app.sfPayments` off plus
+  `SalesforcePaymentsAllowed=false`, and `app.commerceAgent.enabled` `"false"` with every MIAW
+  identifier empty. Each skip names the exact unmet setting.
+- **README.md documents `e2e/tests/journeys/<feature>/`, which does not exist** — journey modules live
+  directly under `e2e/tests/<feature>/`. Everything else its architecture prose describes (the API
+  layer, `*.endpoints.ts`, `e2e/tests/login/`, the API coverage column) is now real.
 - CI runs everything in one `pnpm test` inside the pinned `mcr.microsoft.com/playwright:v1.61.1-noble`
   container, single worker, 2 retries. Locally: 1 retry, default workers.
 - Nightly `spec-drift` re-fetches upstream specs and fails if `api/specs` or `api/generated` differ

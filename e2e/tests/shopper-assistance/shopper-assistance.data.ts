@@ -1,7 +1,7 @@
 import type { APIRequestContext, Request } from '@playwright/test';
 import { env } from '../../../config/env';
-import type { CommerceAgentConfig } from '../../support/app-config';
-import { readStorefrontAppConfig } from '../../support/app-config';
+import type { CommerceAgentConfig } from '../../../api/support/app-config';
+import { readStorefrontAppConfig } from '../../../api/support/app-config';
 
 /** The two providers the storefront can load the shopping agent from. */
 export type AgentProvider = 'miaw' | 'commerce-client';

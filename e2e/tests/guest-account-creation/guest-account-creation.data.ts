@@ -4,7 +4,7 @@ import { findUiOrderableVariant } from '../../../api/support/products';
 import { bearer, shopperApiUrl, withSite } from '../../../api/support/scapi';
 import type { Customer, Order, OrderAddress } from '../../../api/support/scapi-types';
 import { getGuestToken, loginRegisteredShopper, requireSession } from '../../../api/support/slas';
-import { readStorefrontAppConfig } from '../../support/app-config';
+import { readStorefrontAppConfig } from '../../../api/support/app-config';
 
 const CUSTOMERS = 'customer/shopper-customers/v1';
 

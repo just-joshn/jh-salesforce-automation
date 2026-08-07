@@ -1,6 +1,5 @@
 import type { APIRequestContext } from '@playwright/test';
-import { env } from '../../config/env';
-import { buildPath } from './site';
+import { buildPath, env } from '../../config/env';
 
 // The storefront's own shipped configuration. It decides whether the conditional
 // checkout journeys exist on a given deployment.

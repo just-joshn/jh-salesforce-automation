@@ -63,7 +63,7 @@ const everyTileWasRecommended = (hrefs: string[], recommendedIds: string[]): boo
   hrefs.length > 0 &&
   hrefs.every((href) => recommendedIds.some((id) => href.includes(`/product/${id}`)));
 
-// CUJ 16 — Discover product through personalized recommendation.
+// CUJ 16: Discover product through personalized recommendation.
 //
 // The zone asks Einstein for recommendations. Shopper Products turns those ids
 // into rendered product records. Both Einstein and Data Cloud then record the
@@ -136,7 +136,7 @@ test('discover and open a product from a personalized recommendation', async ({
     .toBeGreaterThan(0);
 });
 
-// CUJ 16, saved rather than opened. The same zone offers the wishlist action, so
+// CUJ 16, saved without being opened. The same zone offers the wishlist action, so
 // a registered shopper can keep a recommended product for later. That covers the
 // journey's optional step and its second success condition (Shopper Customers).
 test('save a personalized recommendation to the wishlist', async ({ page, request }) => {

@@ -18,7 +18,7 @@ export const openOrderHistory = async (page: Page): Promise<void> => {
 };
 
 // The shopper opens one order from its own history entry, the way the page
-// offers it, rather than by knowing the order's address.
+// offers it, never by knowing the order's address.
 export const openOrder = async (page: Page, orderNumberText: string): Promise<void> => {
   await Locators.viewDetails(Locators.orderCard(page, orderNumberText)).click();
   await Locators.orderDetailPage(page).waitFor({ timeout: 60000 });

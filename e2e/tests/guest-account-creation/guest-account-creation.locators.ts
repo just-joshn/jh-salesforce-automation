@@ -30,7 +30,7 @@ export const addConfirmationClose = (page: Page): Locator =>
   addConfirmation(page).getByRole('button', { name: 'Close' }).first();
 
 // The header basket button counts what the shop has actually stored, so it is
-// the signal that an add finished rather than that its dialog rendered.
+// the signal that an add finished; a rendered dialog cannot say that.
 export const miniCart = (page: Page, label: string): Locator =>
   page.getByRole('button', { name: label }).first();
 
@@ -175,7 +175,7 @@ export const createAccountButton = (page: Page): Locator =>
 // --- The registered session the journey ends in ---
 
 // Log Out means a registered session is active. It may sit in a menu, so it is
-// asserted as attached rather than visible.
+// asserted as attached, never as visible.
 export const logout = (page: Page): Locator => page.getByText(/log out/i);
 
 export const profileCard = (page: Page): Locator => page.getByTestId('sf-toggle-card-my-profile');

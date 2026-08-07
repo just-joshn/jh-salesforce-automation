@@ -24,7 +24,7 @@ import {
 } from './return-oms-items.data';
 import * as Locators from './return-oms-items.locators';
 
-// CUJ 23 — Return eligible order items.
+// CUJ 23: Return eligible order items.
 //
 // A registered shopper who owns an OMS-backed order returns the lines Order
 // Management still accepts a return for. Returnability and its per-line limit are
@@ -65,7 +65,7 @@ test('a registered shopper returns eligible items from an OMS order', async ({ p
   await expect(Locators.orderDetailHeading(page, orderDetailTitle)).toBeVisible();
   await expect(Locators.detailText(page, orderNumberLabel(orderNo))).toBeVisible();
 
-  // Start: the shopper selects Return Items. The action is offered rather than
+  // Start: the shopper selects Return Items. The action is offered, never
   // shown inert, which is what proves OMS reported something as returnable.
   await expect(Locators.orderActions(page, orderActionsHeading)).toBeVisible();
   await expect(Locators.startReturn(page)).toHaveAttribute('aria-disabled', 'false');

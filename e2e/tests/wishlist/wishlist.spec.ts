@@ -9,7 +9,7 @@ import {
 } from './wishlist.data';
 import * as Locators from './wishlist.locators';
 
-// CUJ 8 — Save product for later. A registered shopper picks the wishlist action
+// CUJ 8: Save product for later. A registered shopper picks the wishlist action
 // on the product surface, and the chosen variant lands in the customer product
 // list. The wishlist page hydrates it back with current product details.
 // Services: Shopper Customers, Shopper Products.
@@ -39,7 +39,7 @@ test('save a product for later in the wishlist', async ({ page, request }) => {
   await expect(Locators.itemAddToCart(page)).toBeVisible();
 });
 
-// CUJ 9 — Resume purchase from wishlist. A returning shopper opens the saved
+// CUJ 9: Resume purchase from wishlist. A returning shopper opens the saved
 // master product and resolves its options in the View Options modal. The correct
 // variant then enters the active basket.
 // Services: Shopper Customers, Shopper Products, Shopper Baskets.

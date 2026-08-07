@@ -122,7 +122,7 @@ const conditionReason = (reasons: string[]): string =>
  * reach, so the condition is read from the app's own shipped configuration before
  * the browser starts.
  *
- * A storefront that will not serve its configuration throws rather than skips.
+ * A storefront that will not serve its configuration always throws.
  * A broken shop must never read as "this journey does not apply here".
  */
 export const trackingConsentCondition = async (
@@ -146,7 +146,7 @@ const formField = (request: Request, field: string): string | undefined =>
 
 /**
  * SLAS: the token request that declares the session's DNT. The storefront reaches
- * SLAS through its own proxy, so the path is matched by its tail rather than by a
+ * SLAS through its own proxy, so the path is matched by its tail instead of by a
  * full commerce API host.
  */
 export const isSlasTokenRequest = (request: Request): boolean =>

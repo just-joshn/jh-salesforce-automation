@@ -20,7 +20,7 @@ export const chooseVariant = async (
 };
 
 // Leaving the page before the shop has stored the line loses it, so this waits
-// for the basket count rather than for the confirmation dialog alone.
+// for the basket count instead of the confirmation dialog alone.
 export const addToCart = async (page: Page, itemsInBasket: number): Promise<void> => {
   await Locators.addToCartButton(page).click();
   await Locators.addConfirmation(page).waitFor({ timeout: 40000 });
@@ -99,8 +99,8 @@ export const reviewOrder = async (page: Page): Promise<void> => {
 
 /**
  * Confirm the payment and create the order. The storefront's own place-order
- * control is what asks the sheet to confirm, so this drives the app rather than
- * the provider.
+ * control is what asks the sheet to confirm, so this drives the app. It never
+ * drives the provider.
  */
 export const confirmPaymentAndPlaceOrder = async (page: Page): Promise<void> => {
   await Locators.placeOrder(page).click();

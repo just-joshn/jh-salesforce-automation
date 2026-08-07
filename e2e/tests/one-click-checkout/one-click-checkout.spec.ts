@@ -13,7 +13,7 @@ import {
 } from './one-click-checkout.data';
 import * as Locators from './one-click-checkout.locators';
 
-// CUJ 18 — Complete one-click checkout using saved identity data.
+// CUJ 18: Complete one-click checkout using saved identity data.
 //
 // A returning shopper reaches checkout with a valid basket. The enabled feature
 // replaces the whole checkout implementation with a page that coordinates the
@@ -54,7 +54,7 @@ test('a returning shopper places an order through one-click checkout', async ({
   await retrieved;
 
   // The identity is already verified, so the page offers a session to leave
-  // rather than a token to enter.
+  // instead of a token to enter.
   await expect(Locators.signOut(page)).toBeVisible({ timeout: 60000 });
   await expect(Locators.contactInfoHeading(page)).toBeVisible();
   await expect(Locators.savedAddressText(page, shopper.email)).toBeVisible();

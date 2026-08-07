@@ -38,7 +38,7 @@ export const addConfirmationClose = (page: Page): Locator =>
   addConfirmation(page).getByRole('button', { name: 'Close' }).first();
 
 // The header basket button counts what the shop has actually stored, so it is
-// the signal that an add finished rather than that its dialog rendered.
+// the signal that an add finished. A rendered dialog alone is not.
 export const miniCart = (page: Page, label: string): Locator =>
   page.getByRole('button', { name: label }).first();
 
@@ -78,7 +78,7 @@ export const shippingOptionsForm = (page: Page): Locator =>
 export const continueToPayment = (page: Page): Locator =>
   page.getByRole('button', { name: 'Continue to Payment' });
 
-// Payment: the one-click page renders one payment component rather than a
+// Payment: the one-click page renders one payment component with no
 // numbered step, and offers to keep whatever card is entered.
 export const paymentComponent = (page: Page): Locator => page.getByTestId('payment-component');
 

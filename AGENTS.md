@@ -1,7 +1,7 @@
 # PROJECT KNOWLEDGE BASE
 
-**Generated:** 2026-08-05
-**Commit:** 85d72a8
+**Generated:** 2026-08-07
+**Commit:** 2280a82
 **Branch:** main
 
 ## OVERVIEW
@@ -41,16 +41,22 @@ No `src/`. No workspaces (single private pnpm package). Depth never exceeds 3.
 
 ## CODE MAP
 
-Centrality from the codegraph index.
+Caller counts from the codegraph index. Both layers converge on `api/support/` — that is the
+architecture, not a leak.
 
-| Symbol                                     | Type      | Location                    | Refs                 | Role                                              |
-| ------------------------------------------ | --------- | --------------------------- | -------------------- | ------------------------------------------------- |
-| `buildPath`                                | function  | `config/env.ts`             | 64                   | site/locale path prefix; every navigation         |
-| `test` / `expect`                          | fixture   | `e2e/support/fixtures.ts`   | 19 files             | shared fixture; presets `dw_dnt=0` consent cookie |
-| `readStorefrontAppConfig`                  | function  | `api/support/app-config.ts` | conditional journeys | app's own shipped config                          |
-| `omsPreflight`                             | function  | `api/support/oms.ts`        | 4 OMS journeys x2    | credentials + seed + activation gate              |
-| `shopperApiUrl` / `bearer` / `withSite`    | functions | `api/support/scapi.ts`      | cross-layer          | e2e support calls API support directly            |
-| `getGuestToken` / `loginRegisteredShopper` | functions | `api/support/slas.ts`       | auth                 | SLAS + PKCE public client                         |
+| Symbol                    | Type     | Location                        | Callers  | Role                                              |
+| ------------------------- | -------- | ------------------------------- | -------- | ------------------------------------------------- |
+| `shopperApiUrl`           | function | `api/support/scapi.ts:4`        | 195      | every SCAPI URL in the repo                       |
+| `withSite`                | function | `api/support/scapi.ts:9`        | 103      | `siteId` on every SCAPI call                      |
+| `getGuestToken`           | function | `api/support/slas.ts:30`        | 75       | guest token; SLAS + PKCE public client            |
+| `buildPath`               | function | `config/env.ts:75`              | 67       | site/locale path prefix; every navigation         |
+| `loginRegisteredShopper`  | function | `api/support/slas.ts:106`       | 28       | registered sign-in; also feeds `readOwnedOrder`   |
+| `env`                     | constant | `config/env.ts:4`               | 27       | the only place `process.env` is read              |
+| `readStorefrontAppConfig` | function | `api/support/app-config.ts:121` | 22       | app's own shipped config; gates 4 journeys        |
+| `omsPreflight`            | function | `api/support/oms.ts:153`        | 12       | credentials + seed + activation gate              |
+| `customString`            | function | `api/support/scapi.ts:27`       | 11       | runtime-checked `c_` custom attribute             |
+| `findNearbyStore`         | function | `api/support/stores.ts:33`      | 10       | pickup store + its inventory id                   |
+| `test` / `expect`         | fixture  | `e2e/support/fixtures.ts`       | 20 files | shared fixture; presets `dw_dnt=0` consent cookie |
 
 ## CONVENTIONS
 
@@ -61,8 +67,13 @@ Centrality from the codegraph index.
   established pattern (`const [first] = xs; if (first === undefined) throw`).
 - ESLint `complexity: max 5`, type-aware via `projectService`. Extract helpers rather than branch.
 - No path aliases. Deep relative imports (`../../support/site`) are correct here.
-- Prettier: single quotes, width 100.
+- Prettier: single quotes, width 100, trailing commas everywhere.
 - Env: every setting has a working public-demo default except `E2E_ACCOUNT_*` and `E2E_OMS_*`.
+- **The suite is serial everywhere**: `fullyParallel: false` and `workers: 1` are unconditional in
+  `playwright.config.ts`, not CI-only — one shared live demo store cannot take concurrency. Do not
+  "restore" parallelism.
+- `tsconfig.json` includes `api`, so `api/generated/` **is** typechecked even though ESLint and
+  Prettier ignore it. A bad regeneration fails `pnpm typecheck`, not `pnpm lint`.
 
 ## ANTI-PATTERNS (THIS PROJECT)
 
@@ -81,7 +92,7 @@ Centrality from the codegraph index.
 ## UNIQUE STYLES
 
 - **Functional Page Model.** Four sibling files per feature, no page-object classes. Locators and
-  actions are `export const` arrow functions — 461 of them, zero `export function` in
+  actions are `export const` arrow functions — 468 of them, zero `export function` in
   `*.locators.ts`. Actions compose locators as `Locators.x(page)`.
 - **Conditional journeys skip with a reason that names the exact unmet setting**, e.g.
   `app.oneClickCheckout.enabled`, or the SOM admin path. A skip is a statement about the deployment.
@@ -89,8 +100,9 @@ Centrality from the codegraph index.
   answers an unexpected status raises — a broken shop must never read as "does not apply here".
 - **Conditions are proven before the browser starts**, from the app's shipped config or the commerce
   service, not inferred from what renders.
-- Timeouts are per-test and inline (29 `test.setTimeout`, typically 60s–300s). No global `timeout`
-  or `expect.timeout` is configured.
+- Timeouts are per-test and inline (30 `test.setTimeout` per layer, typically 60s–300s). No global
+  `timeout` or `expect.timeout` is configured.
+- No `test.describe` anywhere, on either layer. Specs are flat.
 
 ## COMMANDS
 
@@ -98,6 +110,7 @@ Centrality from the codegraph index.
 pnpm install && pnpm exec playwright install chromium
 pnpm test              # all projects
 pnpm test:e2e          # browser only      pnpm test:headed / test:ui / report
+pnpm test:api          # API only, no browser
 pnpm typecheck         # required; Playwright will not do it
 pnpm lint              # pnpm lint:fix
 pnpm format:check      # pnpm format
@@ -108,16 +121,20 @@ pnpm gen:api:fetch && pnpm gen:api    # re-vendor specs, then regenerate types
 
 - Collection is healthy: `61 tests in 41 files` — 30 browser, 30 API, 1 auth setup. `pnpm typecheck`,
   `pnpm lint` and `pnpm format:check` all exit 0.
+- `.prettierignore` does not list `.vscode`, so an untracked `.vscode/settings.json` will fail
+  `pnpm format:check` even though the tracked tree is clean. Read the filename Prettier reports
+  before reformatting anything.
 - **On the public demo, 7 of the 30 API tests skip, and the browser layer skips the same journeys**
   for the same reasons: no `E2E_ACCOUNT_*` credentials (login, and the 3 OMS journeys, which check
   credentials before OMS activation), `app.oneClickCheckout.enabled` off, `app.sfPayments` off plus
   `SalesforcePaymentsAllowed=false`, and `app.commerceAgent.enabled` `"false"` with every MIAW
   identifier empty. Each skip names the exact unmet setting.
-- **README.md documents `e2e/tests/journeys/<feature>/`, which does not exist** — journey modules live
-  directly under `e2e/tests/<feature>/`. Everything else its architecture prose describes (the API
-  layer, `*.endpoints.ts`, `e2e/tests/login/`, the API coverage column) is now real.
+- **README.md carries three paths that do not exist**: `e2e/tests/journeys/<feature>/` (journey
+  modules live directly under `e2e/tests/<feature>/`), `e2e/support/app-config.ts` and
+  `e2e/support/oms.ts` (both moved to `api/support/`, because both layers gate on them). Everything
+  else its architecture prose describes is real.
 - CI runs everything in one `pnpm test` inside the pinned `mcr.microsoft.com/playwright:v1.61.1-noble`
-  container, single worker, 2 retries. Locally: 1 retry, default workers.
+  container. Retries are the only CI/local difference: 2 on CI, 1 locally.
 - Nightly `spec-drift` re-fetches upstream specs and fails if `api/specs` or `api/generated` differ
   from what is committed. It never runs on PRs — it answers "did Salesforce change", not "is this
   branch correct".

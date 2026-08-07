@@ -3,7 +3,7 @@ import { env } from '../../../config/env';
 import type { OmsShipment, OrderResource, ShopperCredentials } from '../../../api/support/oms';
 import { configuredShopper, omsPreflight, readOwnedOrder } from '../../../api/support/oms';
 
-// CUJ 21 — Track shipment through carrier.
+// CUJ 21: Track shipment through carrier.
 //
 // The order detail page does not link a raw OMS tracking URL. It runs every
 // `omsData.shipments[].trackingUrl` through the same hardening its tracking-number
@@ -164,7 +164,7 @@ const fromOrder = (
 
 const seedReason =
   'E2E_OMS_TRACKING_ORDER_NO is empty. This journey needs an order whose OMS shipment already ' +
-  'carries a carrier tracking URL, which only exists once the order is fulfilled — OMS ingestion ' +
+  'carries a carrier tracking URL, which only exists once the order is fulfilled. OMS ingestion ' +
   'is not retroactive and cannot advance an order on demand, so the order is seeded, not placed here';
 
 /**

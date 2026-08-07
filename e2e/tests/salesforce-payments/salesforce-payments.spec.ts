@@ -16,7 +16,7 @@ import {
 } from './salesforce-payments.data';
 import * as Locators from './salesforce-payments.locators';
 
-// CUJ 19 — Complete purchase through Salesforce Payments.
+// CUJ 19: Complete purchase through Salesforce Payments.
 //
 // The payment SDK and its metadata are loaded, the basket is prepared, the
 // payment is confirmed, and one Commerce order is created. The provider may take
@@ -42,7 +42,7 @@ test('a shopper pays through Salesforce Payments and one order is created', asyn
   const sdkUrl = await sdkScriptUrl(request);
   const variant = await deliveryVariant(request);
 
-  // Success is "created once", so every order call is counted rather than the
+  // Success is "created once", so every order call is counted instead of the
   // first one being waited for.
   const orderCalls: Request[] = [];
   page.on('request', (candidate) => {

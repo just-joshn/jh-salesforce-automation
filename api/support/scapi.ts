@@ -23,7 +23,7 @@ export function required<T>(value: T | undefined, field: string): T {
 }
 
 // SCAPI allows any `c_`-prefixed custom attribute, so the spec types them as
-// unknown. Checked at runtime rather than asserted.
+// unknown. Checked at runtime, not asserted.
 export function customString(value: unknown): string | undefined {
   return typeof value === 'string' ? value : undefined;
 }

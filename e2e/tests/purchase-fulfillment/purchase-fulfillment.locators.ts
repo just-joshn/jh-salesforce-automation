@@ -43,7 +43,7 @@ export const addConfirmationClose = (page: Page): Locator =>
   addConfirmation(page).getByRole('button', { name: 'Close' }).first();
 
 // The header basket button counts what the shop has actually stored, so it is
-// the signal that an add finished rather than that its dialog rendered.
+// the signal that an add finished instead of its dialog rendering.
 export const miniCart = (page: Page, label: string): Locator =>
   page.getByRole('button', { name: label }).first();
 

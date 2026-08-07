@@ -54,7 +54,7 @@ export const shopperSessionId = async (page: Page): Promise<string | undefined> 
  * storefront deletes a stored preference that disagrees with the DNT its current
  * access token carries. So the preference is written, deleted and written again
  * around the reauthorization. Only the pair agreeing means the choice is in
- * effect rather than about to be discarded.
+ * effect, never about to be discarded.
  */
 export const consentState = async (
   page: Page,

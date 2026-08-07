@@ -83,7 +83,7 @@ function newestDirectory(directories, family) {
   const [newest] = candidates;
   if (!newest) {
     throw new Error(
-      `no published spec directory for ${family.name} major ${family.major} — ` +
+      `no published spec directory for ${family.name} major ${family.major}; ` +
         `Salesforce may have renamed or retired it`,
     );
   }

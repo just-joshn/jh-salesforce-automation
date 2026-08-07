@@ -8,7 +8,7 @@ import type {
 } from '../../../api/support/oms';
 import { configuredShopper, omsPreflight, readOwnedOrder } from '../../../api/support/oms';
 
-// CUJ 22 — Cancel eligible OMS order.
+// CUJ 22: Cancel eligible OMS order.
 //
 // Cancellation is offered on identity and eligibility, both read from the order
 // itself. The shopper has to be registered and own it, and every line has to be
@@ -85,8 +85,8 @@ const blockingReason = (
 
 const seedReason =
   'E2E_OMS_CANCEL_ORDER_NO is empty. This journey needs an OMS-backed order still cancellable in ' +
-  'full, and OMS ingestion is neither retroactive nor instant, so the order is seeded rather than ' +
-  'placed here — a freshly placed order races Order Management allocating it';
+  'full, and OMS ingestion is neither retroactive nor instant, so the order is seeded, not placed ' +
+  'here; a freshly placed order races Order Management allocating it';
 
 /**
  * Whether this storefront can run the journey, proven against the commerce

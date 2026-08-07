@@ -56,7 +56,7 @@ export const removeItem = (
  *
  * Stands in for the browser journey opening the promo accordion and finding the
  * code box: what both assert is that reviewing a promotion from the cart is
- * offered. The status and fault envelope are returned rather than asserted here,
+ * offered. The status and fault envelope are returned unasserted here,
  * so the spec keeps that judgement.
  */
 export const openPromoCode = async (

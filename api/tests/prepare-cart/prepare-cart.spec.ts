@@ -70,7 +70,7 @@ test('review a two item basket, fix it up, and take it to checkout', async ({ re
   expect(coupon.faultType).toBeTruthy();
 
   // Handover stays as delivery. Collecting in store needs a store first, so the
-  // shipment carrying none is what keeps pickup closed off — the API counterpart
+  // shipment carrying none is what keeps pickup closed off, the API counterpart
   // of the cart's pickup choice being disabled.
   expect(keptLine.shipmentId).toBe(deliveryShipmentId);
   expect(collectionStoreId(shipmentById(cart, deliveryShipmentId))).toBeUndefined();

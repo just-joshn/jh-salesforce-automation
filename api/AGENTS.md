@@ -14,22 +14,28 @@ journey, same step order, asserted against SCAPI instead of a browser. See THE A
 | `generated/` | `openapi-typescript` output from `specs/`                            | **never hand-edit** — `pnpm gen:api`       |
 | `support/`   | hand-written                                                         | edit freely                                |
 
-Both machine directories are committed and ESLint-ignored, so nothing warns you when you edit them —
-your change will be silently destroyed on the next regeneration, and nightly `spec-drift` will go
-red. Regenerate instead.
+Both machine directories are committed and ignored by ESLint and Prettier — but **not** by
+`tsc`, which still typechecks `generated/`. So nothing lints your hand-edit, your change is
+silently destroyed on the next regeneration, and nightly `spec-drift` goes red. Regenerate instead.
 
 `specs/MANIFEST.json` records the resolved version, source path, sha256 and byte count per family,
 so an upstream bump reviews as `shopper-baskets 1.11.0 → 1.12.0` rather than tens of thousands of
 YAML lines. Eight families:
 auth, shopper-baskets, shopper-configurations, shopper-customers, shopper-orders, shopper-products,
-shopper-search, shopper-stores.
+shopper-search, shopper-stores. Read the resolved versions out of `MANIFEST.json` — do not copy them
+anywhere, including into this file.
+
+The upstream `ref` is `main`, not a tag, and each family's path embeds its own version
+(`apis/shopper-baskets-oas-1.11.0/…`). So `pnpm gen:api:fetch` resolves whatever is newest per
+family at fetch time — which is exactly what makes nightly `spec-drift` meaningful rather than a
+tautology.
 
 ## support/ — WHERE TO LOOK
 
 | Need                                         | File                                           | Notes                                                   |
 | -------------------------------------------- | ---------------------------------------------- | ------------------------------------------------------- |
 | Build a SCAPI URL                            | `scapi.ts` → `shopperApiUrl(family, resource)` |                                                         |
-| Add `siteId` / auth header                   | `scapi.ts` → `withSite()`, `bearer(token)`     | 42 callers each                                         |
+| Add `siteId` / auth header                   | `scapi.ts` → `withSite()`, `bearer(token)`     | 103 callers; `shopperApiUrl` itself has 195             |
 | Narrow an optional response field            | `scapi.ts` → `required(value, 'field')`        | see below                                               |
 | Read a `c_`-prefixed custom attribute        | `scapi.ts` → `customString(value)`             | runtime-checked                                         |
 | A response shape                             | `scapi-types.ts`                               | **the only place `components['schemas'][...]` appears** |
@@ -73,7 +79,7 @@ layer's replacement for the browser layer's `<f>.locators.ts`:
 - Actions take `(request: APIRequestContext, accessToken: string, ...)` and return `Promise<APIResponse>`.
 - Specs import `{ expect, test }` from `@playwright/test` — never the browser layer's shared fixtures.
 - Provisioning and condition probes may call SCAPI from `*.data.ts`; the browser layer does the same
-  in 10 of its own data files. The journey's own operations still belong in `*.actions.ts`.
+  in 14 of its own data files. The journey's own operations still belong in `*.actions.ts`.
 - **A browser-only assertion becomes the nearest API-observable claim, in the same position, with a
   comment naming the assertion it replaces.** Where nothing can substitute (a rendered iframe, a
   `window` global, a browser beacon), comment and assert nothing — never invent an endpoint.

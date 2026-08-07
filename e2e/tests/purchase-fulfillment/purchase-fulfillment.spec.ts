@@ -30,7 +30,7 @@ import {
 } from './purchase-fulfillment.data';
 import * as Locators from './purchase-fulfillment.locators';
 
-// CUJ 10 — Complete guest shipped purchase. A shopper with no account carries a
+// CUJ 10: Complete guest shipped purchase. A shopper with no account carries a
 // delivery basket through contact, address, shipping method and payment. The
 // confirmation then names the order and what was bought.
 test('a guest buys a shipped item and reaches order confirmation', async ({ page, request }) => {
@@ -74,7 +74,7 @@ test('a guest buys a shipped item and reaches order confirmation', async ({ page
   await expect(Locators.confirmationHeading(page, variant.productName)).toBeVisible();
 });
 
-// CUJ 11 — Complete registered shipped purchase. A signed-in shopper spends the
+// CUJ 11: Complete registered shipped purchase. A signed-in shopper spends the
 // contact details and saved address the account already holds. The finished order
 // then shows up in their history.
 test('a registered shopper buys with a saved address and finds the order in their history', async ({
@@ -124,7 +124,7 @@ test('a registered shopper buys with a saved address and finds the order in thei
   });
 });
 
-// CUJ 12 — Complete pickup purchase. The shopper collects in store, so the shelf
+// CUJ 12: Complete pickup purchase. The shopper collects in store, so the shelf
 // at that store decides what can be bought. The confirmation names the store.
 test('a guest buys an item for store pickup and the confirmation names the store', async ({
   page,
@@ -169,7 +169,7 @@ test('a guest buys an item for store pickup and the confirmation names the store
   await expect(Locators.confirmationText(page, store.name)).toBeVisible();
 });
 
-// CUJ 13 — Complete mixed pickup-and-delivery purchase. One basket, two ways of
+// CUJ 13: Complete mixed pickup-and-delivery purchase. One basket, two ways of
 // handing over, one payment, and a confirmation carrying both groups.
 test('a guest buys one item for pickup and another for delivery in a single order', async ({
   page,
@@ -224,7 +224,7 @@ test('a guest buys one item for pickup and another for delivery in a single orde
   await expect(Locators.confirmationText(page, homeAddress.address1)).toBeVisible();
 });
 
-// CUJ 14 — Complete multi-address purchase. Two lines, two destinations, one
+// CUJ 14: Complete multi-address purchase. Two lines, two destinations, one
 // order, and every line accounted for on a shipment of its own.
 test('a guest sends two items to two different addresses in one order', async ({
   page,

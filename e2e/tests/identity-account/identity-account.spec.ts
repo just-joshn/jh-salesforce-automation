@@ -14,7 +14,7 @@ import {
 } from './identity-account.data';
 import * as Locators from './identity-account.locators';
 
-// CUJ 5 — Create shopper account: register, authenticate the new credentials,
+// CUJ 5: Create shopper account: register, authenticate the new credentials,
 // and land in a registered session with the account area reachable.
 test('create a shopper account and reach the account area', async ({ page }) => {
   test.setTimeout(60000);
@@ -23,13 +23,13 @@ test('create a shopper account and reach the account area', async ({ page }) => 
   await Actions.register(page, registrant(uniqueEmail()));
 
   // Log Out proves the registered session. It may sit in a menu, so it is
-  // checked as attached rather than visible.
+  // checked as attached, not visible.
   await expect(page).toHaveURL(accountUrlPattern, { timeout: 20000 });
   await expect(Locators.logout(page).first()).toBeAttached();
   await expect(Locators.profileCard(page)).toBeVisible({ timeout: 20000 });
 });
 
-// CUJ 6 — Sign in and recover the existing shopping session: authenticate with
+// CUJ 6: Sign in and recover the existing shopping session: authenticate with
 // username/password and keep the guest cart contents after the basket merge.
 // Passwordless OTP and social IDP variants are not offered by this demo shop.
 test('sign in recovers the existing shopping session', async ({ page, request }) => {
@@ -53,7 +53,7 @@ test('sign in recovers the existing shopping session', async ({ page, request })
   await expect(Locators.cartItem(page, variant.variantId)).toBeVisible({ timeout: 15000 });
 });
 
-// CUJ 7 — Change password without losing the session.
+// CUJ 7: Change password without losing the session.
 //
 // Shopper Customers updates the credential. The old login stops working, and SLAS
 // reauthenticates with the new password. The current session stays signed in.
@@ -68,7 +68,7 @@ test('change password without losing the session', async ({ page, request }) => 
   // Sign-in already landed on the account area. A second goto races the app's
   // hydration and leaves the password form without working handlers.
   //
-  // Wait for real customer data rather than the loading skeleton. Otherwise the
+  // Wait for real customer data, not the loading skeleton. Otherwise the
   // Edit form detaches mid-flow and Save never submits.
   await expect(Locators.profileCard(page)).toContainText(provisionedName, { timeout: 20000 });
   await expect(Locators.passwordCard(page)).toContainText(maskedPassword, { timeout: 20000 });

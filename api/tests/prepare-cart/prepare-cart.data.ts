@@ -55,7 +55,7 @@ export const itemCount = (basket: Basket): number =>
 
 // What the order summary adds up. Only the subtotal is available at the cart
 // stage: a basket carries no orderTotal until it has a shipping method, so the
-// summary shows shipping and tax as pending rather than as amounts.
+// summary shows shipping and tax as pending, not as amounts.
 export const lineItemsTotal = (basket: Basket): number =>
   lineItems(basket).reduce(
     (sum, item) => sum + (item.priceAfterItemDiscount ?? item.price ?? 0),
@@ -89,7 +89,7 @@ export interface CouponAttempt {
 }
 
 // A code no promotion can match, so the answer is the basket's own coupon
-// handling rather than a discount.
+// handling instead of a discount.
 export const unmatchedCouponCode = 'PREPARE-CART-NO-SUCH-CODE';
 
 export const checkoutEmail = 'test.shopper@gmail.com';

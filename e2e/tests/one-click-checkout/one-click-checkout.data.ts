@@ -103,7 +103,7 @@ const conditionReason = (reasons: string[]): string =>
  * The journey only exists while the storefront is configured for it, so the
  * condition is read from the app's own configuration before the browser starts.
  *
- * A storefront that will not serve its configuration throws rather than skips.
+ * A storefront that will not serve its configuration throws. It never skips.
  * A broken shop must never read as "this journey does not apply here".
  */
 export const oneClickCondition = async (request: APIRequestContext): Promise<OneClickCondition> => {

@@ -4,7 +4,7 @@
 // in front of it. It also makes an upstream shape change arrive as a reviewable
 // diff, and gives the nightly drift check something to compare against.
 //
-// Plain .ts rather than .d.ts, so the files import like any other module and
+// Plain .ts, not .d.ts, so the files import like any other module and
 // tsc checks them with everything else.
 
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
@@ -21,7 +21,7 @@ async function readManifest() {
   try {
     return JSON.parse(await readFile(join(SPEC_DIR, 'MANIFEST.json'), 'utf8'));
   } catch {
-    throw new Error('api/specs/MANIFEST.json is missing — run `pnpm gen:api:fetch` first');
+    throw new Error('api/specs/MANIFEST.json is missing. Run `pnpm gen:api:fetch` first');
   }
 }
 

@@ -73,7 +73,7 @@ const expectConsentOffered = async (page: Page): Promise<void> => {
   await expect(Locators.dismissConsentForm(page)).toBeVisible();
 };
 
-// CUJ 24 — Set tracking consent across Commerce and analytics systems, accept
+// CUJ 24: Set tracking consent across Commerce and analytics systems, accept
 // branch.
 //
 // The shopper allows behavioural tracking. The preference is written, the SLAS
@@ -109,8 +109,8 @@ test('a shopper who accepts tracking is tracked by Einstein and Data Cloud', asy
     .poll(() => Actions.consentState(page, traffic), { timeout: 60000 })
     .toEqual(accepted);
 
-  // The session was traded for one declaring the new DNT rather than logged in
-  // again from scratch, which is what makes it the same shopper's session.
+  // The session was traded for one declaring the new DNT instead of being logged
+  // in again from scratch, which is what makes it the same shopper's session.
   expect(reauthorization(traffic, accepted)).toMatchObject({
     grantType: reauthorizationGrant,
     dnt: accepted.sessionDnt,
@@ -132,8 +132,8 @@ test('a shopper who accepts tracking is tracked by Einstein and Data Cloud', asy
   const activity = await recordedActivity(traffic, productViewActivity);
   expect(activity.cookieId).toBe(await Actions.shopperSessionId(page));
 
-  // Success: Data Cloud records the same view carrying the shopper's identifiers
-  // rather than the DNT marker, and still sends the events whose only purpose is
+  // Success: Data Cloud records the same view carrying the shopper's identifiers,
+  // not the DNT marker, and still sends the events whose only purpose is
   // to identify them.
   const view = await recordedProductView(traffic, productMasterId);
   expect(view.guestId).toBe(await Actions.shopperSessionId(page));

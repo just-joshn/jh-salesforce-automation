@@ -160,7 +160,7 @@ const fromOrder = (
 
 const seedReason =
   'E2E_OMS_TRACKING_ORDER_NO is empty. This journey needs an order whose OMS shipment already ' +
-  'carries a carrier tracking URL, which only exists once the order is fulfilled — OMS ingestion ' +
+  'carries a carrier tracking URL, which only exists once the order is fulfilled. OMS ingestion ' +
   'is not retroactive and cannot advance an order on demand, so the order is seeded, not placed here';
 
 export const trackShipmentCondition = async (

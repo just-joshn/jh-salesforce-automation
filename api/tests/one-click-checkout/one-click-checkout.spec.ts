@@ -14,7 +14,7 @@ import {
   shippingMethodId,
 } from './one-click-checkout.data';
 
-// CUJ 18 — Complete one-click checkout using saved identity data.
+// CUJ 18: Complete one-click checkout using saved identity data.
 test('a returning shopper places an order through one-click checkout', async ({ request }) => {
   test.setTimeout(300000);
 

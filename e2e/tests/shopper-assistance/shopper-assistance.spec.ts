@@ -42,7 +42,7 @@ const expectProviderLoaded = async (
     .toMatchObject(loaded);
 };
 
-// CUJ 25 — Obtain shopping assistance from an automated or human agent.
+// CUJ 25: Obtain shopping assistance from an automated or human agent.
 //
 // The configured provider is loaded. The Commerce session and configuration it
 // needs are retrieved. Opening the agent then hands the shopper's Commerce

@@ -89,7 +89,7 @@ const mountReasons = (agent: CommerceAgentConfig): string[] =>
   isOn(agent.enabled)
     ? []
     : [
-        `app.commerceAgent.enabled is "${agent.enabled ?? 'unset'}" rather than "true", so the ` +
+        `app.commerceAgent.enabled is "${agent.enabled ?? 'unset'}", not "true", so the ` +
           'agent is never mounted',
       ];
 
@@ -147,7 +147,7 @@ const conditionReason = (reasons: string[], provider: AgentProvider): string =>
  * The journey only exists while the storefront is configured for it, so the
  * condition is read from the app's own configuration before the browser starts.
  *
- * A storefront that will not serve its configuration throws rather than skips.
+ * A storefront that will not serve its configuration throws instead of skipping.
  * A broken shop must never read as "this journey does not apply here".
  */
 export const shopperAssistanceCondition = async (

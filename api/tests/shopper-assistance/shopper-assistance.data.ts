@@ -68,7 +68,7 @@ const mountReasons = (agent: CommerceAgentConfig): string[] =>
   isOn(agent.enabled)
     ? []
     : [
-        `app.commerceAgent.enabled is "${agent.enabled ?? 'unset'}" rather than "true", so the ` +
+        `app.commerceAgent.enabled is "${agent.enabled ?? 'unset'}" instead of "true", so the ` +
           'agent is never mounted',
       ];
 

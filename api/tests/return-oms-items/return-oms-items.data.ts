@@ -67,7 +67,7 @@ const blockingReason = (
 
 const seedReason =
   'E2E_OMS_RETURN_ORDER_NO is empty. This journey needs an OMS-backed order holding a returnable ' +
-  'quantity, which only exists once the order has been fulfilled — OMS ingestion is not ' +
+  'quantity, which only exists once the order has been fulfilled. OMS ingestion is not ' +
   'retroactive and cannot advance an order on demand, so the order is seeded, not placed here';
 
 const noReasonsReason =

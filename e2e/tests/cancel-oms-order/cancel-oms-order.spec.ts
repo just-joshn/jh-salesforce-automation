@@ -24,7 +24,7 @@ import {
 } from './cancel-oms-order.data';
 import * as Locators from './cancel-oms-order.locators';
 
-// CUJ 22 — Cancel eligible OMS order.
+// CUJ 22: Cancel eligible OMS order.
 //
 // A registered shopper who owns an OMS-backed order stops fulfilment before it
 // reaches a terminal state. Identity, ownership and per-line eligibility are all

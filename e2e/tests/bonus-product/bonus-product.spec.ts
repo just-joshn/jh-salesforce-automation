@@ -15,7 +15,7 @@ import {
 } from './bonus-product.data';
 import * as Locators from './bonus-product.locators';
 
-// CUJ 17 — Claim earned bonus product.
+// CUJ 17: Claim earned bonus product.
 //
 // A basket promotion creates a bonus discount line item. The chooser resolves
 // the products that entitlement allows. The chosen one is hydrated, configured,

@@ -9,7 +9,7 @@ export const headerAgentButton = (page: Page): Locator =>
   page.getByRole('button', { name: 'Ask Shopping Agent', exact: true });
 
 // The search entry carries its own strapline in its assistive label, so it is
-// matched by the label it starts with rather than the whole sentence.
+// matched by the label it starts with, not the whole sentence.
 export const askAgentFromSearch = (page: Page): Locator =>
   page.getByRole('button', { name: /^Ask Shopping Agent - / });
 

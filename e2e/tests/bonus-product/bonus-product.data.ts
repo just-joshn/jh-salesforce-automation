@@ -66,7 +66,7 @@ const MAX_QUALIFIERS = 3;
 // Callout wording a bonus-product promotion uses, as opposed to a price cut.
 const bonusCalloutPattern = /bonus|free|get \d/i;
 
-// `refine` repeats for each refinement, so it is appended rather than set.
+// `refine` repeats for each refinement, so it is appended, not set.
 const productSearchUrl = (params: Record<string, string>, refinements: string[]): string => {
   const url = new URL(shopperApiUrl(SEARCH, 'product-search'));
   for (const [key, value] of Object.entries(withSite(params))) url.searchParams.set(key, value);

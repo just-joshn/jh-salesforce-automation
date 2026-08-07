@@ -16,7 +16,7 @@ import {
 } from './track-shipment.data';
 import * as Locators from './track-shipment.locators';
 
-// CUJ 21 — Track shipment through carrier.
+// CUJ 21: Track shipment through carrier.
 //
 // A shopper opens an eligible order, picks a shipment, and is handed off to the
 // right carrier page for it. The order is retrieved from Shopper Orders with its

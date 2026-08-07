@@ -34,7 +34,7 @@ export const chooseVariant = async (
 };
 
 // Leaving the page before the shop has stored the line loses it, so this waits
-// for the basket count rather than for the confirmation dialog alone.
+// for the basket count, since the dialog can close before the line is stored.
 export const addToCart = async (page: Page, itemsInBasket: number): Promise<void> => {
   await Locators.addToCartButton(page).click();
   await Locators.addConfirmation(page).waitFor({ timeout: 40000 });

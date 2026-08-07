@@ -16,7 +16,7 @@ import {
   shopperEmail,
 } from './salesforce-payments.data';
 
-// CUJ 19 — Complete purchase through Salesforce Payments.
+// CUJ 19: Complete purchase through Salesforce Payments.
 test('a shopper pays through Salesforce Payments and one order is created', async ({ request }) => {
   test.setTimeout(300000);
 

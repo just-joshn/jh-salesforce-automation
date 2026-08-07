@@ -21,7 +21,7 @@ import {
 } from './guest-account-creation.data';
 import * as Locators from './guest-account-creation.locators';
 
-// CUJ 20 — Create account after guest purchase, preserving order addresses.
+// CUJ 20: Create account after guest purchase, preserving order addresses.
 //
 // A guest finishes checking out. The confirmation offers to turn that purchase
 // into an account. Registering derives the customer and their address book from
@@ -119,7 +119,7 @@ test('a guest turns a finished purchase into an account carrying the order addre
   await Actions.createAccount(page, who);
   await registered;
 
-  // Success: a registered session, named from the order rather than from a form
+  // Success: a registered session, named from the order instead of from a form
   // the shopper filled in.
   await expect(page).toHaveURL(accountUrlPattern, { timeout: 120000 });
   await expect(Locators.logout(page).first()).toBeAttached();

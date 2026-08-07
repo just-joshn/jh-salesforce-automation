@@ -71,8 +71,8 @@ const blockingReason = (
 
 const seedReason =
   'E2E_OMS_CANCEL_ORDER_NO is empty. This journey needs an OMS-backed order still cancellable in ' +
-  'full, and OMS ingestion is neither retroactive nor instant, so the order is seeded rather than ' +
-  'placed here — a freshly placed order races Order Management allocating it';
+  'full, and OMS ingestion is neither retroactive nor instant, so the order is seeded, not placed ' +
+  'here; a freshly placed order races Order Management allocating it';
 
 export const cancelOrderCondition = async (
   request: APIRequestContext,

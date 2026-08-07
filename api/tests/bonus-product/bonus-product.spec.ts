@@ -18,7 +18,7 @@ import {
   skipReason,
 } from './bonus-product.data';
 
-// CUJ 17 — Claim earned bonus product, through Shopper Baskets, Search, and Products.
+// CUJ 17: Claim earned bonus product, through Shopper Baskets, Search, and Products.
 test('claim a bonus product earned by a basket promotion', async ({ request }) => {
   test.setTimeout(150000);
 

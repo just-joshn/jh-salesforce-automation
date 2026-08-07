@@ -34,7 +34,7 @@ import {
 } from './order-review.data';
 import * as Locators from './order-review.locators';
 
-// CUJ 15 — Review order history and order details.
+// CUJ 15: Review order history and order details.
 //
 // A registered shopper looks back at what they bought. The history comes from
 // the shopper's own order list, asked for with the OMS expansion, and each

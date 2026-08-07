@@ -63,8 +63,8 @@ Same journey on both layers unless noted:
 | Obtain shopping assistance from a Commerce Agent        |   ✓†    |     |
 | A storefront with no Commerce Agent offers no way in    |    ✓    |     |
 
-† Written and gated, but the public demo is not configured for it, so the run skips it with the
-reason rather than executing it. See the conditional journeys below.
+† Written and gated. The public demo isn't configured for it, so the run prints the reason and skips.
+See the conditional journeys below.
 
 A few things that aren't obvious from the list:
 
@@ -81,10 +81,10 @@ A few things that aren't obvious from the list:
   is configured for it, so each one proves its own condition before the browser starts and skips with
   a reason when it isn't met. The recommendation journey asks Einstein whether it has anything to
   recommend; the bonus journey puts a qualifying product in a throwaway basket and looks for the bonus
-  discount line item. A store fault is raised rather than skipped, so a broken shop never reads as
-  "this journey doesn't apply here".
+  discount line item. A store fault raises. It never skips, so a broken shop can't read as "this
+  journey doesn't apply here".
 - The three checkout journeys read their condition out of the storefront's own shipped configuration,
-  which PWA Kit serializes into every page as `#mobify-data` (see `e2e/support/app-config.ts`). That
+  which PWA Kit serializes into every page as `#mobify-data` (see `api/support/app-config.ts`). That
   asks the app under test what it is configured to do instead of inferring it from what renders. Each
   skip names the exact setting that isn't met, so a skip is a statement about the deployment rather
   than a shrug:
@@ -105,7 +105,7 @@ A few things that aren't obvious from the list:
   sends two lines to one destination, so the order carries the same delivery address on two
   shipments, and then asserts exactly one address write and exactly one saved address. The order's
   own Shopper Orders payload is what the expected values are read from, so "the form is filled in
-  from the order" is a claim about the order rather than about what the test typed earlier.
+  from the order" is a claim about the order, not about what the test typed earlier.
 - The recommendation journey also asserts the tracking, not just the tiles: the impression and the
   click are matched in both Einstein (`viewReco` / `clickReco`) and Data Cloud
   (`catalog-object-impression` keyed by the recommender). It covers both endings the journey allows,
@@ -122,14 +122,13 @@ declining, and each run follows the choice all the way out to both analytics lay
 - The SLAS session is reauthorized to carry the same DNT, as a `refresh_token` grant rather than a
   fresh login, so it stays the same shopper's session. A session that already declares the chosen DNT
   is not reauthorized again, which is why the assertion is that the session in effect matches the
-  choice rather than that an exchange always happens.
+  choice, not that an exchange always happens.
 - Einstein either records the product view against the shopper's own session id or records nothing at
-  all — the layer is suppressed outright rather than anonymised.
+  all. Declining suppresses the layer outright; it does not anonymise it.
 - Data Cloud keeps sending the catalog view either way, but replaces every shopper identifier with
   `__DNT__` and drops its `identity` and `partyIdentification` events when tracking is declined.
 
-Two things about it are worth knowing, because both were found the hard way and both are what make it
-stable:
+Two things about it were found the hard way, and both are what make it stable:
 
 - The storefront deletes a stored preference that disagrees with the DNT its current access token
   carries, and reopens the form when it does. A test that pressed the button and navigated could
@@ -143,7 +142,7 @@ The condition has two halves. The analytics layers are read from the app's own s
 before the browser starts (`app.einsteinAPI.einsteinId`, `app.dataCloudAPI.appSourceId` and
 `tenantId`); whether the consent UX is still there at all can only be answered by the rendered page,
 so a storefront that renders and never asks skips with that reason. The public demo has all of it, so
-both runs execute. Its consent copy is the template's `Lorem ipsum` placeholder rather than a privacy
+both runs execute. Its consent copy is the template's `Lorem ipsum` placeholder, not a privacy
 notice, so the test asserts that the choice is offered and explained without pinning the words a
 merchant has to replace before launch.
 
@@ -151,8 +150,8 @@ merchant has to replace before launch.
 
 Obtaining shopping assistance is conditional on the storefront being configured for an agent at all.
 The condition is read from `app.commerceAgent` in the storefront's own shipped configuration, and the
-skip names every setting that isn't met. `enabled` must be exactly `"true"` — the settings are strings
-parsed out of one environment variable, so `"false"` is a value the agent reads rather than an absent
+skip names every setting that isn't met. `enabled` must be exactly `"true"`. The settings are all
+strings parsed out of one environment variable, so `"false"` is a value the agent reads, not a missing
 one. Beyond that, which settings are required depends on the provider the storefront selects:
 
 - `miaw`, the default, needs all of `embeddedServiceName`, `embeddedServiceEndpoint`,
@@ -179,7 +178,7 @@ The complement is the part the public demo can prove, and it is what keeps the s
 storefront with no agent configured must offer no header entry, no widget container and no ask-agent
 entry beside search suggestions, must load neither provider bundle, and must hand nothing to an agent
 platform. Search still returns real suggestions in that test, which is what makes the missing entry a
-decision rather than a page that failed to render one. It skips in the other direction, on a
+decision instead of a page that failed to render one. It skips in the other direction, on a
 storefront that does configure an agent.
 
 ### The Order Management journeys
@@ -192,14 +191,14 @@ on is a connected Order Management org enriching it. In the storefront's own wor
 feature flag. Each action is gated entirely on data and shopper identity... B2C Commerce-only orders
 (no `omsData`) never expose the return or cancel flows."
 
-So the condition is read from the commerce service instead. `e2e/support/oms.ts` asks Shopper Orders
+So the condition is read from the commerce service instead. `api/support/oms.ts` asks Shopper Orders
 for the OMS metadata resource the order detail page reads its return reasons from, and a site
 Order Management is not connected to answers `409 oms-not-active`. That is what each skip quotes,
 naming the settings that aren't met: a SOM org linked to the B2C Commerce instance,
 **Administration > Global Preferences > Salesforce Order Management Integration Administration** set
 to Active, and **Merchant Tools > Site Preferences > Order > Order Management Settings > Include in
 Order Management** set to Yes. Anything other than "here are the reason codes" or "OMS is not active"
-raises a store fault rather than skipping.
+raises a store fault instead of skipping.
 
 The orders these journeys use are named by `E2E_OMS_*` rather than placed by the test, because
 placing one cannot reach the states they need. A shipment only carries a carrier URL once the order
@@ -208,11 +207,11 @@ there is no on-demand way to advance an order. Cancellation is the opposite prob
 order nothing has been allocated against yet, which a freshly placed order races. Seed the three
 order numbers against an OMS-active storefront and all three execute with no code change.
 
-A few details worth knowing:
+Three details that matter:
 
-- The tracking journey reimplements the storefront's carrier-URL hardening rather than calling it, so
-  the set of tracking actions it expects is derived from the order payload on its own terms —
-  otherwise the test could only assert that the page agrees with itself. It also asserts the
+- The tracking journey reimplements the storefront's carrier-URL hardening instead of calling it, so
+  the set of tracking actions it expects is derived from the order payload on its own terms.
+  Otherwise the test could only assert that the page agrees with itself. It also asserts the
   filtering half: every raw URL that fails to externalize must have no matching link on the page.
 - Cancellation eligibility is checked more strictly than the page checks it. The page compares
   `quantityAvailableToCancel` against `quantityOrdered` directly, so a line carrying neither field
@@ -296,19 +295,20 @@ import { test } from '@playwright/test';
 test.use({ storageState: 'playwright/.auth/user.json' });
 ```
 
-I name those `*.auth.spec.ts`. A dedicated project for them is stubbed out (commented) in
-`playwright.config.ts` for when that suite grows.
+I'd name those `*.auth.spec.ts`. There aren't any yet, so nothing in the suite calls `test.use`
+today. A dedicated project for them is stubbed out (commented) in `playwright.config.ts` for when
+that suite grows.
 
 ## API sign-in
 
 The demo's login service (SLAS) uses a public client with no secret, so `api/support/slas.ts` can
-sign in the same way the storefront does — the SLAS + PKCE flow — straight from Playwright's
+sign in the same way the storefront does, over the SLAS + PKCE flow, straight from Playwright's
 request context. One token per spec keeps it well under the rate limit.
 
 ## Typed API responses
 
-Response shapes are generated from Salesforce's own OpenAPI specs rather than hand-written, so a
-field this suite reads that SCAPI does not return is a compile error instead of an `undefined` that
+Response shapes are generated from Salesforce's own OpenAPI specs instead of hand-written, so a
+field this suite reads that SCAPI does not return is a compile error, not an `undefined` that
 surfaces halfway through an assertion.
 
 Salesforce publishes SCAPI as OpenAPI 3, but the download button on the docs portal needs a browser
@@ -322,7 +322,7 @@ makes an upstream change arrive as a reviewable diff. `api/specs/MANIFEST.json` 
 version of each family, so the diff says "shopper-baskets 1.11.0 → 1.12.0" instead of showing tens
 of thousands of lines of YAML.
 
-A few things worth knowing:
+Notes on the generated side:
 
 - `api/support/scapi-types.ts` is the only place the `components['schemas'][...]` indirection lives.
   It exports the response shapes under readable names and is where to look first.
@@ -330,8 +330,8 @@ A few things worth knowing:
   and an order line item (`OrderProductItem`) are different shapes. Order history is served by
   Shopper Customers, which declares its own `Order`, exported here as `CustomerOrder`.
 - The spec marks nearly every response field optional, including ones a 200 always carries. Where a
-  value feeds a later request, `required()` from `api/support/scapi.ts` narrows it and names the
-  field if it really is missing, rather than passing `undefined` down the call.
+  value feeds a later request, `required()` from `api/support/scapi.ts` narrows it. If the field
+  really is missing it throws and names it, so no `undefined` travels down the call.
 - Request bodies and expected values stay in each feature's `*.data.ts`. Only response shapes are
   generated.
 - Nothing fetches at test time. The committed spec is the pin; `pnpm gen:api:fetch` runs when you
@@ -348,26 +348,27 @@ published spec, so those stay hand-written.
 
 ```
 config/
-  env.ts                     # everything read from the environment
+  env.ts                     # everything read from the environment, plus buildPath()
 e2e/
   setup/auth.setup.ts        # logs in once, saves the session (skips with no account)
   support/
-    site.ts                  # buildPath('/product/x') -> /global/en-US/product/x
+    site.ts                  # re-exports buildPath: '/product/x' -> /global/en-US/product/x
     fixtures.ts              # sets the consent cookie so the pop-up never interrupts a test
-    app-config.ts            # the storefront's own shipped config, read from #mobify-data
-    oms.ts                   # whether Order Management is connected, and reading a seeded order
   tests/
     login/                   # sign-in steps reused by auth.setup (spec skips without an account)
     <feature>/               # <feature>.{locators,actions,data,spec}.ts
-    journeys/<feature>/      # same four files, one folder per cross-service journey
 api/
   specs/                     # vendored SCAPI OpenAPI specs + MANIFEST.json (generated)
   generated/                 # types generated from those specs (generated)
-  support/
-    slas.ts                  # guest token (SLAS + PKCE)
+  support/                   # shared by both layers, which is why it isn't under e2e/
+    slas.ts                  # guest and registered tokens (SLAS + PKCE)
     scapi.ts                 # URL and header helpers, and required()
     scapi-types.ts           # named response shapes from api/generated
+    products.ts              # product, variant and inventory lookups
+    stores.ts                # pickup store and its inventory id
     einstein.ts              # recommendation host, paths, and a recs call
+    app-config.ts            # the storefront's own shipped config, read from #mobify-data
+    oms.ts                   # whether Order Management is connected, and reading a seeded order
   tests/
     <feature>/               # <feature>.{endpoints,actions,data,spec}.ts
 scripts/
@@ -385,8 +386,8 @@ signed-in journeys; without them the run is guest only. Every run uploads its HT
 A second job, `spec-drift`, runs nightly and on demand only. It re-fetches the SCAPI specs from
 upstream, regenerates the types, and fails if either differs from what is committed — so the run goes
 red when Salesforce changes the contract, and the job summary names the family whose version moved.
-Generation is deterministic, so a green run means nothing upstream moved rather than that the check
-did nothing. It never runs on a pull request: it answers "did Salesforce change something", not "is
+Generation is deterministic, so a green run means nothing upstream moved, not that the check did
+nothing. It never runs on a pull request: it answers "did Salesforce change something", not "is
 this branch correct".
 
 ## Known limitations

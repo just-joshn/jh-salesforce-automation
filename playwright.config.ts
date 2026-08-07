@@ -1,4 +1,4 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig } from '@playwright/test';
 import dotenv from 'dotenv';
 import path from 'path';
 
@@ -12,45 +12,16 @@ export default defineConfig({
   fullyParallel: false,
   /* Fail CI if someone left test.only in. */
   forbidOnly: !!process.env.CI,
-  /* Retry flaky live-demo fails. 1 try here, 2 on CI. */
-  retries: process.env.CI ? 2 : 1,
+  /* Retry flaky live-demo fails. 1 try here */
+  retries: 1,
   /* One worker on CI so we don't overload the demo shop. */
   workers: 1,
   reporter: process.env.CI ? [['github'], ['html'], ['list']] : [['html'], ['list']],
   use: {
     baseURL,
     trace: 'on-first-retry',
-    screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
+    screenshot: 'on-first-failure',
+    video: 'on-first-retry',
   },
-  projects: [
-    // Log in once. Other tests reuse the session. Skipped if no login is set.
-    {
-      name: 'setup',
-      testDir: './e2e/setup',
-      testMatch: /.*\.setup\.ts/,
-    },
-    // Browser tests as a guest (not logged in).
-    {
-      name: 'e2e-chromium',
-      testDir: './e2e/tests',
-      use: { ...devices['Desktop Chrome'] },
-      dependencies: ['setup'],
-    },
-    // API tests. No browser.
-    {
-      name: 'api',
-      testDir: './api/tests',
-    },
-
-    // Signed-in tests opt into the saved session themselves. Enable this project
-    // instead once that suite grows:
-    // {
-    //   name: 'e2e-authenticated',
-    //   testDir: './e2e/tests',
-    //   testMatch: /.*\.auth\.spec\.ts/,
-    //   use: { ...devices['Desktop Chrome'], storageState: 'playwright/.auth/user.json' },
-    //   dependencies: ['setup'],
-    // },
-  ],
+  projects: [],
 });

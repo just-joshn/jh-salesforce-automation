@@ -28,12 +28,14 @@ jobs:
     timeout-minutes: 15
     # Playwright image has browsers + Node. Tag matches package.json.
     container:
-      image: mcr.microsoft.com/playwright:v1.61.1-noble
+      image: mcr.microsoft.com/playwright:v1.62.1-noble
       options: --user 1001
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6 # pnpm version from package.json
       - run: pnpm install --frozen-lockfile
+      # Playwright transforms TypeScript but does not typecheck it.
+      - run: pnpm typecheck
       - run: pnpm test
         env:
           # Without these the run is guest-only. The public demo needs no secrets.

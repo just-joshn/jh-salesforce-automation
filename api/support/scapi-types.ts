@@ -11,6 +11,7 @@ import type { components as StoreComponents } from '../generated/shopper-stores'
 export type Basket = BasketComponents['schemas']['Basket'];
 export type BasketProductItem = BasketComponents['schemas']['ProductItem'];
 export type BasketShipment = BasketComponents['schemas']['Shipment'];
+export type ShippingMethodResult = BasketComponents['schemas']['ShippingMethodResult'];
 export type Fault = BasketComponents['schemas']['ErrorResponse'];
 
 export type Order = OrderComponents['schemas']['Order'];

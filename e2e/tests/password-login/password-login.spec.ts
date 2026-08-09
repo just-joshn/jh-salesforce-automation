@@ -1,19 +1,23 @@
+import { findOrderableVariant } from '../../../api/support/products';
+import { getGuestToken } from '../../../api/support/slas';
 import { expect, test } from '../../support/fixtures';
 import * as Actions from './password-login.actions';
 import {
   accountCredentials,
   credentialSkipReason,
   invalidCredentials,
-  journeyProduct,
+  toJourneyProduct,
 } from './password-login.data';
 import * as Locators from './password-login.locators';
 
-test('preserves guest cart when shopper signs in with password', async ({ page }) => {
+test('preserves guest cart when shopper signs in with password', async ({ page, request }) => {
   if (!accountCredentials) {
     test.skip(true, credentialSkipReason);
     return;
   }
   const credentials = accountCredentials;
+  const token = await getGuestToken(request);
+  const journeyProduct = toJourneyProduct(await findOrderableVariant(request, token.access_token));
 
   await test.step('Build guest basket', async () => {
     await Actions.buildGuestBasket(page, journeyProduct);

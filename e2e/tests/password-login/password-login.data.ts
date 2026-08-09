@@ -1,3 +1,4 @@
+import type { OrderableVariant } from '../../../api/support/products';
 import { env } from '../../../config/env';
 
 export interface LoginCredentials {
@@ -22,7 +23,10 @@ export const invalidCredentials: LoginCredentials = Object.freeze({
   password: 'DefinitelyWrong-CUJ10!',
 });
 
-export const journeyProduct: JourneyProduct = Object.freeze({
-  name: 'Checked Silk Tie',
-  path: '/product/25752235M?color=COBATSI',
-});
+// Resolved at run time: the shared demo discontinues products and runs stock down, so a pinned
+// product id fails for reasons unrelated to the journey under test.
+export const toJourneyProduct = (variant: OrderableVariant): JourneyProduct =>
+  Object.freeze({
+    name: variant.productName,
+    path: `/product/${variant.productId}?pid=${variant.variantId}`,
+  });

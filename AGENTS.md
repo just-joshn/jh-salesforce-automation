@@ -51,10 +51,15 @@ omitted because it looks thin.
 `playwright.config.ts`, the setup project and shared fixtures are infrastructure, exempt from the
 quartet. Feature-specific logic must not hide there.
 
-Validate a module with:
+Validate the quartet across every module — each folder must hold exactly four files, and `test(`
+must appear only in specs:
 
 ```bash
-python3 ~/.config/opencode/skills/playwright-functional-page-model/scripts/validate_fpm.py e2e/tests/<feature>
+for d in e2e/tests/*/ api/tests/*/; do
+  n=$(basename "$d"); c=$(ls "$d" | wc -l | tr -d ' ')
+  [ "$c" = 4 ] || echo "$n: $c files, expected 4"
+done
+grep -rl 'test(' --include='*.ts' e2e/tests api/tests | grep -v '\.spec\.ts$'
 ```
 
 ## Conventions

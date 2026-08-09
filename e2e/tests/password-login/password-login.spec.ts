@@ -10,7 +10,10 @@ import {
 } from './password-login.data';
 import * as Locators from './password-login.locators';
 
-test('preserves guest cart when shopper signs in with password', async ({ page, request }) => {
+test('CUJ 10 — preserves guest cart when shopper signs in with password', async ({
+  page,
+  request,
+}) => {
   if (!accountCredentials) {
     test.skip(true, credentialSkipReason);
     return;
@@ -42,7 +45,7 @@ test('preserves guest cart when shopper signs in with password', async ({ page, 
   });
 });
 
-test('rejects invalid password without authenticating shopper', async ({ page }) => {
+test('CUJ 10 — rejects invalid password without authenticating shopper', async ({ page }) => {
   await test.step('Submit credentials', async () => {
     await Actions.visitStorefront(page);
     await Actions.submitCredentials(page, invalidCredentials);

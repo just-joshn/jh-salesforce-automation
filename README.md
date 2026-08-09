@@ -35,206 +35,86 @@ stays in another.
 
 ## What's covered
 
-Same journey on both layers unless noted:
+The suite is the seventeen Critical User Journeys defined in `docs/critical-user-journeys.md`. Every
+journey is a module under `e2e/tests/` and a mirror under `api/tests/`, same folder name on both
+layers: 34 modules, 136 files, 76 tests.
 
-| Journey                                                 | Browser | API |
-| ------------------------------------------------------- | :-----: | :-: |
-| Browse a category and open a product                    |    ✓    |  ✓  |
-| Search and open a product                               |    ✓    |  ✓  |
-| Configure a product and add it for delivery             |    ✓    |  ✓  |
-| Pick a store and add a product for pickup               |    ✓    |  ✓  |
-| Review and edit the cart                                |    ✓    |  ✓  |
-| Guest delivery order through to confirmation            |    ✓    |  ✓  |
-| Guest pickup order through to confirmation              |    ✓    |  ✓  |
-| One order split across delivery and pickup              |         |  ✓  |
-| Register an account                                     |    ✓    |  ✓  |
-| Sign in                                                 |    ✓    |  ✓  |
-| Order history and detail, with access control           |    ✓    |  ✓  |
-| Discover a product from an Einstein recommendation      |    ✓    |     |
-| Claim a bonus product earned by a promotion             |    ✓    |     |
-| One-click checkout from saved identity data             |   ✓†    |     |
-| Pay through Salesforce Payments                         |   ✓†    |     |
-| Create an account after a guest purchase                |    ✓    |     |
-| Track a shipment through its carrier                    |   ✓†    |     |
-| Cancel an eligible Order Management order               |   ✓†    |     |
-| Return eligible order items                             |   ✓†    |     |
-| An un-ingested order offers no Order Management actions |    ✓    |     |
-| Set tracking consent across Commerce and analytics      |    ✓    |     |
-| Obtain shopping assistance from a Commerce Agent        |   ✓†    |     |
-| A storefront with no Commerce Agent offers no way in    |    ✓    |     |
+| CUJ | Module folder          | Journey                                             |
+| --- | ---------------------- | --------------------------------------------------- |
+| 1   | `delivery-purchase`    | Standard Delivery Purchase                          |
+| 2   | `salesforce-payments`  | Standard Checkout with Salesforce Payments          |
+| 3   | `express-checkout`     | Express Checkout                                    |
+| 4   | `one-click-returning`  | Returning Shopper One Click Checkout                |
+| 5   | `one-click-first-time` | First-Time One Click Checkout + Account Creation    |
+| 6   | `store-pickup`         | Buy Online, Pick Up In Store                        |
+| 7   | `multi-shipment`       | Multi-Shipment Checkout                             |
+| 8   | `shopping-agent`       | Guided Shopping Agent                               |
+| 9   | `registration`         | Account Registration → Authenticated Session        |
+| 10  | `password-login`       | Password Login + Guest Cart Preservation            |
+| 11  | `passwordless-login`   | Passwordless Login + Guest Cart Preservation        |
+| 12  | `social-login`         | Social Login + Guest Cart Preservation              |
+| 13  | `password-reset`       | Password Recovery via External Callback Delivery    |
+| 14  | `hybrid-continuity`    | Hybrid PWA Kit ↔ SFRA Session and Basket Continuity |
+| 15  | `shipment-tracking`    | Track OMS-Managed Shipment                          |
+| 16  | `order-cancellation`   | Cancel Eligible OMS-Managed Order                   |
+| 17  | `order-returns`        | Return Eligible OMS-Managed Items                   |
 
-† Written and gated. The public demo isn't configured for it, so the run prints the reason and skips.
-See the conditional journeys below.
+How much of that executes against the public demo depends on how the storefront is configured:
 
-A few things that aren't obvious from the list:
+- CUJ 1, 6, 7 and 9 run end to end on both layers. Checkout actually places the order: both layers
+  run to a real confirmation and order number with the demo's throwaway test data, and registration
+  creates a real account.
+- CUJ 10 always executes its invalid-credentials half. Its cart-preservation half needs
+  `E2E_ACCOUNT_EMAIL` / `E2E_ACCOUNT_PASSWORD` on the browser layer; the API layer creates its own
+  customer, so the API side runs unconditionally.
+- CUJ 11 and CUJ 12 execute on the browser layer, because passwordless and social login are both
+  switched on in this storefront's configuration. Only their token-entry and IdP-callback halves
+  skip.
+- The rest are gated: the feature is switched off on this deployment, so each one proves its own
+  precondition and skips with a reason naming the exact setting that isn't met. A switched-off
+  feature SKIPS; a storefront that cannot be interrogated RAISES. A skip is a statement about the
+  deployment, not a shrug.
 
-- Checkout actually places the order. Both layers run all the way to a real confirmation and order
-  number, using the demo's throwaway test data (a test card, disposable emails). The API checkout
-  also proves the basket is used up afterwards and can't be sent again to make a duplicate order.
-- The order-history test is really an access-control test. A shopper sees their own order, a second
-  shopper gets an empty list, a missing order number returns 404, and reading the first shopper's
-  orders as the second one is refused.
-- The `login` files hold the sign-in steps the auth setup reuses, so those selectors live in one
-  place. Its own spec asserts the same journey and skips itself when no shopper account is
-  configured.
-- Every journey from the Einstein recommendation down is conditional: it only exists while the store
-  is configured for it, so each one proves its own condition before the browser starts and skips with
-  a reason when it isn't met. The recommendation journey asks Einstein whether it has anything to
-  recommend; the bonus journey puts a qualifying product in a throwaway basket and looks for the bonus
-  discount line item. A store fault raises. It never skips, so a broken shop can't read as "this
-  journey doesn't apply here".
-- The three checkout journeys read their condition out of the storefront's own shipped configuration,
-  which PWA Kit serializes into every page as `#mobify-data` (see `api/support/app-config.ts`). That
-  asks the app under test what it is configured to do instead of inferring it from what renders. Each
-  skip names the exact setting that isn't met, so a skip is a statement about the deployment rather
-  than a shrug:
-  - One-click checkout needs `app.oneClickCheckout.enabled` (which is what switches the `/checkout`
-    route to the one-click page) plus `app.login.passwordless.enabled`.
-  - Salesforce Payments needs both halves its own feature hook needs: locally
-    `app.sfPayments.enabled` with a non-empty `sdkUrl` and `metadataUrl`, and server-side
-    `SalesforcePaymentsAllowed` from the Shopper Configuration API. `expressOnCheckoutPagesEnabled`
-    then decides which of PDP, mini-cart, cart and checkout the test expects an express button on.
-  - Creating an account after a guest purchase needs `app.oneClickCheckout.enabled` to be **off**,
-    because that is the flag the confirmation page renders its account form behind.
-- On the public demo one-click checkout and Salesforce Payments are both configured off, so those two
-  skip and only the guest account journey executes. Their steps are written against the deployed
-  app's own contract but have never run, so treat them as unproven until a storefront configured for
-  them says otherwise. Point `E2E_BASE_URL` at such a storefront and they execute with no code
-  change.
-- The guest account journey also proves the address deduplication the confirmation page does: it
-  sends two lines to one destination, so the order carries the same delivery address on two
-  shipments, and then asserts exactly one address write and exactly one saved address. The order's
-  own Shopper Orders payload is what the expected values are read from, so "the form is filled in
-  from the order" is a claim about the order, not about what the test typed earlier.
-- The recommendation journey also asserts the tracking, not just the tiles: the impression and the
-  click are matched in both Einstein (`viewReco` / `clickReco`) and Data Cloud
-  (`catalog-object-impression` keyed by the recommender). It covers both endings the journey allows,
-  opening the recommended product and saving it to the wishlist.
+### Conditional journeys
 
-### The tracking-consent journey
+Each gated journey reads its condition out of the storefront's own shipped configuration, which PWA
+Kit serializes into every page as `#mobify-data` (see `api/support/app-config.ts`). That asks the
+app under test what it is configured to do instead of inferring it from what renders:
 
-This is the one journey that must not arrive with the consent pop-up already answered, so it is the
-only one that takes Playwright's own fixtures instead of the shared ones — those set `dw_dnt` up front
-precisely so the form never interrupts anything else. It runs twice, once accepting and once
-declining, and each run follows the choice all the way out to both analytics layers:
+- CUJ 2 and 3 need `app.sfPayments.enabled` with a non-empty `sdkUrl` and `metadataUrl`, plus
+  server-side `SalesforcePaymentsAllowed`.
+- CUJ 4 and 5 need `app.oneClickCheckout.enabled`.
+- CUJ 8 needs `app.commerceAgent.enabled` to be exactly the string `"true"` — it is `"false"` here,
+  and all seven MIAW identifiers are empty.
+- CUJ 13 needs callback-mode recovery; this storefront's `app.login.resetPassword.mode` is
+  `"email"`, and the journey document scopes itself to callback mode only.
+- CUJ 14 needs an SFRA route on the same deployment. Probed live, `Home-Show`, `Cart-Show` and
+  `Login-Show` all return 404.
+- CUJ 15, 16 and 17 need Order Management connected. The Shopper Orders OMS metadata resource
+  answers `409 oms-not-active`, and the `E2E_OMS_*_ORDER_NO` seeds are absent. The orders these
+  journeys use are named by `E2E_OMS_*` rather than placed by the test, because placing one cannot
+  reach the states they need: a shipment only carries a carrier URL once the order is fulfilled, a
+  line is only returnable once it has shipped, OMS ingestion is not retroactive, and cancellation
+  needs an order nothing has been allocated against yet, which a freshly placed order races. Seed
+  the order numbers against an OMS-active storefront and they execute with no code change.
 
-- The stored preference is `dw_dnt`, `0` for accepted and `1` for declined.
-- The SLAS session is reauthorized to carry the same DNT, as a `refresh_token` grant rather than a
-  fresh login, so it stays the same shopper's session. A session that already declares the chosen DNT
-  is not reauthorized again, which is why the assertion is that the session in effect matches the
-  choice, not that an exchange always happens.
-- Einstein either records the product view against the shopper's own session id or records nothing at
-  all. Declining suppresses the layer outright; it does not anonymise it.
-- Data Cloud keeps sending the catalog view either way, but replaces every shopper identifier with
-  `__DNT__` and drops its `identity` and `partyIdentification` events when tracking is declined.
+Every gated journey also ships a complement that PASSES on the demo, so an absent feature is provably
+a configuration decision rather than a broken page. CUJ 8 proves no agent entry point exists and no
+provider bundle loads while search suggestions still return real results, which is what makes the
+missing entry a decision instead of a page that failed to render one. CUJ 15 places a real order and
+proves it carries no `omsData` under both OMS expansions, which is what keeps the CUJ 16 and 17 skips
+honest. CUJ 16 asserts the documented `409 oms-not-active` fault as a real contract, not merely a
+skip.
 
-Two things about it were found the hard way, and both are what make it stable:
+Two API mirrors cannot run against this demo at all, and skip naming the exact missing credential.
+CUJ 11's API mirror calls SLAS `POST /oauth2/passwordless/login`, which answers `401` without
+Authorization and needs a private SLAS client secret; this demo's client is public. The browser
+layer still covers the journey, because the storefront makes that call server-side with its own
+credentials. CUJ 13's API mirror needs Account Manager OAuth client credentials with the
+`sfcc.shopper-customers.login` scope, which this suite does not hold.
 
-- The storefront deletes a stored preference that disagrees with the DNT its current access token
-  carries, and reopens the form when it does. A test that pressed the button and navigated could
-  therefore lose the choice silently and still look green, so the choice is only treated as made once
-  the preference and the session agree.
-- The form is served rendered and stays pressable for several seconds before hydration attaches its
-  handler, so an early press is dropped with no sign of it. The press repeats until the preference is
-  actually stored.
-
-The condition has two halves. The analytics layers are read from the app's own shipped configuration
-before the browser starts (`app.einsteinAPI.einsteinId`, `app.dataCloudAPI.appSourceId` and
-`tenantId`); whether the consent UX is still there at all can only be answered by the rendered page,
-so a storefront that renders and never asks skips with that reason. The public demo has all of it, so
-both runs execute. Its consent copy is the template's `Lorem ipsum` placeholder, not a privacy
-notice, so the test asserts that the choice is offered and explained without pinning the words a
-merchant has to replace before launch.
-
-### The Commerce Agent journeys
-
-Obtaining shopping assistance is conditional on the storefront being configured for an agent at all.
-The condition is read from `app.commerceAgent` in the storefront's own shipped configuration, and the
-skip names every setting that isn't met. `enabled` must be exactly `"true"`. The settings are all
-strings parsed out of one environment variable, so `"false"` is a value the agent reads, not a missing
-one. Beyond that, which settings are required depends on the provider the storefront selects:
-
-- `miaw`, the default, needs all of `embeddedServiceName`, `embeddedServiceEndpoint`,
-  `scriptSourceUrl`, `scrt2Url`, `salesforceOrgId`, `commerceOrgId`, `siteId` and `askAgentOnSearch`.
-- `commerce-client` needs `scrt2Url`, `salesforceOrgId`, one of `cc_esDeveloperName` or
-  `embeddedServiceName`, and one of `cc_cdnVersion` or `commerceClientScriptSourceUrl`.
-
-On the public demo `enabled` is `"false"` and all seven MIAW identifiers and URLs are empty, so
-neither provider could initialize and the journey skips naming all of it. Its steps are written
-against the deployed app's own contract but have never run — treat them as unproven until a storefront
-configured for an agent says otherwise.
-
-What that journey asserts is deliberately the storefront's own half of the contract: the provider
-bundle its configuration names is requested, that provider publishes its global, Shopper
-Configurations is read for the Salesforce domain the agent platform is reached on, the shopper already
-holds a Commerce session, and opening the agent posts that identity to the storefront's own token
-bridge (`/api/agent/identity/bridge`) for this site. The conversation window itself is the provider's
-surface — an Embedded Messaging iframe, or the Commerce Client widget injected into the storefront's
-container — and site, locale, currency, USID and auth type reach it through that provider's pre-chat
-API. Typing into that conversation, and escalation to a human agent, are the provider's behaviour
-rather than this storefront's, so they are not asserted as if they were.
-
-The complement is the part the public demo can prove, and it is what keeps the skip honest: a
-storefront with no agent configured must offer no header entry, no widget container and no ask-agent
-entry beside search suggestions, must load neither provider bundle, and must hand nothing to an agent
-platform. Search still returns real suggestions in that test, which is what makes the missing entry a
-decision instead of a page that failed to render one. It skips in the other direction, on a
-storefront that does configure an agent.
-
-### The Order Management journeys
-
-Tracking a shipment, cancelling an order and returning items are the three shopper actions the
-storefront offers on an order that Salesforce Order Management (SOM) has ingested. They are
-conditional in a different way from the checkout journeys: there is no flag to read. The storefront
-gates all three purely on OMS state being attached to the order, so the only thing that turns them
-on is a connected Order Management org enriching it. In the storefront's own words: "There is no
-feature flag. Each action is gated entirely on data and shopper identity... B2C Commerce-only orders
-(no `omsData`) never expose the return or cancel flows."
-
-So the condition is read from the commerce service instead. `api/support/oms.ts` asks Shopper Orders
-for the OMS metadata resource the order detail page reads its return reasons from, and a site
-Order Management is not connected to answers `409 oms-not-active`. That is what each skip quotes,
-naming the settings that aren't met: a SOM org linked to the B2C Commerce instance,
-**Administration > Global Preferences > Salesforce Order Management Integration Administration** set
-to Active, and **Merchant Tools > Site Preferences > Order > Order Management Settings > Include in
-Order Management** set to Yes. Anything other than "here are the reason codes" or "OMS is not active"
-raises a store fault instead of skipping.
-
-The orders these journeys use are named by `E2E_OMS_*` rather than placed by the test, because
-placing one cannot reach the states they need. A shipment only carries a carrier URL once the order
-is fulfilled and a line is only returnable once it has shipped, OMS ingestion is not retroactive, and
-there is no on-demand way to advance an order. Cancellation is the opposite problem: it needs an
-order nothing has been allocated against yet, which a freshly placed order races. Seed the three
-order numbers against an OMS-active storefront and all three execute with no code change.
-
-Three details that matter:
-
-- The tracking journey reimplements the storefront's carrier-URL hardening instead of calling it, so
-  the set of tracking actions it expects is derived from the order payload on its own terms.
-  Otherwise the test could only assert that the page agrees with itself. It also asserts the
-  filtering half: every raw URL that fails to externalize must have no matching link on the page.
-- Cancellation eligibility is checked more strictly than the page checks it. The page compares
-  `quantityAvailableToCancel` against `quantityOrdered` directly, so a line carrying neither field
-  reads as equal and would enable a cancellation Order Management then refuses; the condition
-  requires real numbers.
-- The stale-quantity and unknown-item recoveries the return journey allows for are not asserted.
-  Reaching them means making Order Management answer 400 with a specific error code, which can only
-  be forced by faking the service the journey exists to exercise. What is asserted instead is the
-  validation standing between the shopper and those failures: a quantity above the limit OMS
-  currently reports cannot leave the modal.
-
-The public demo has Order Management switched off, so all three skip. Their steps are written against
-the deployed app's own contract but have never run — treat them as unproven until an OMS-active
-storefront says otherwise.
-
-The fourth journey is the complement, and the only part of this the public demo can prove: an order
-Order Management has not ingested must offer none of the three actions, must ask Order Management for
-nothing, and must fall back to its own ECOM status everywhere. It places a real order, reads it back
-under both OMS expansions to show it carries no OMS state, then checks the page renders no actions
-block, no carrier link, and the ECOM shipment state instead. It is what keeps the other three honest:
-their skip says "the action is not here", and this says "and that is correct" — without it an absent
-button could equally mean a broken page. It skips in the other direction, on a storefront that does
-ingest into OMS and therefore has no un-ingested order to assert against.
+The full run (`pnpm test`, all four projects, about thirteen and a half minutes) reports
+`69 passed, 44 skipped, 0 failed`. A few tests flake on the shared live store and pass on retry.
 
 ## Requirements
 
@@ -245,7 +125,7 @@ ingest into OMS and therefore has no un-ingested order to assert against.
 
 ```bash
 pnpm install
-pnpm exec playwright install chromium
+pnpm exec playwright install chromium webkit
 cp .env.example .env   # optional, only for the signed-in journeys
 ```
 
@@ -266,7 +146,7 @@ anything git tracks.
 
 ```bash
 pnpm test            # setup + browser + API
-pnpm test:e2e        # browser only (Chromium)
+pnpm test:e2e        # browser only (Chromium and WebKit)
 pnpm test:api        # API only
 pnpm test:headed     # browser, visible window
 pnpm test:ui         # Playwright UI runner
@@ -283,21 +163,18 @@ pnpm gen:api        # regenerate types from the vendored specs
 ## Signing in once
 
 The `setup` project (`e2e/setup/auth.setup.ts`) logs the shopper in a single time and saves the
-session to `playwright/.auth/user.json` (also gitignored). It reuses the `login` steps rather than
-owning its own selectors, and skips itself when no account is configured so the guest journeys still
-run.
+session to `playwright/.auth/user.json` (also gitignored). It reuses the `password-login` steps
+rather than owning its own selectors, and skips itself when no account is configured so the guest
+journeys still run.
 
-Guest journeys run in the `e2e-chromium` project with no saved session. A signed-in test opts into
-the session itself:
+Browser projects carry no saved session. A signed-in test opts into the session itself:
 
 ```ts
 import { test } from '@playwright/test';
 test.use({ storageState: 'playwright/.auth/user.json' });
 ```
 
-I'd name those `*.auth.spec.ts`. There aren't any yet, so nothing in the suite calls `test.use`
-today. A dedicated project for them is stubbed out (commented) in `playwright.config.ts` for when
-that suite grows.
+The auth file only exists when the setup project ran, so guest-only runs never reference it.
 
 ## API sign-in
 
@@ -341,8 +218,8 @@ Order Management needs no separate spec: OMS state reaches the tests through Sho
 and `oms_shipments` expansions, so `OmsShipment`, `OmsReasonCode` and `OmsMetaData` are generated
 alongside `Order`, and the per-line and per-order state hangs off `omsData` on each.
 
-Einstein, Data Cloud and the storefront's own `#mobify-data` config are not SCAPI and have no
-published spec, so those stay hand-written.
+The storefront's own `#mobify-data` config is not SCAPI and has no published spec, so it stays
+hand-written.
 
 ## Layout
 
@@ -355,7 +232,7 @@ e2e/
     site.ts                  # re-exports buildPath: '/product/x' -> /global/en-US/product/x
     fixtures.ts              # sets the consent cookie so the pop-up never interrupts a test
   tests/
-    login/                   # sign-in steps reused by auth.setup (spec skips without an account)
+    password-login/          # sign-in steps reused by auth.setup
     <feature>/               # <feature>.{locators,actions,data,spec}.ts
 api/
   specs/                     # vendored SCAPI OpenAPI specs + MANIFEST.json (generated)
@@ -366,15 +243,15 @@ api/
     scapi-types.ts           # named response shapes from api/generated
     products.ts              # product, variant and inventory lookups
     stores.ts                # pickup store and its inventory id
-    einstein.ts              # recommendation host, paths, and a recs call
     app-config.ts            # the storefront's own shipped config, read from #mobify-data
+    gates.ts                 # skip-reason strings shared by both layers
     oms.ts                   # whether Order Management is connected, and reading a seeded order
   tests/
     <feature>/               # <feature>.{endpoints,actions,data,spec}.ts
 scripts/
   fetch-api-specs.mjs        # pnpm gen:api:fetch
   generate-api-types.mjs     # pnpm gen:api
-playwright.config.ts         # projects: setup, e2e-chromium, api
+playwright.config.ts         # projects: setup, e2e-chromium, e2e-webkit, api
 ```
 
 ## CI

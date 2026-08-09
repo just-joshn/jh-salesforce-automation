@@ -1,0 +1,51 @@
+import { expect, test } from '../../support/fixtures';
+import * as Actions from './password-login.actions';
+import {
+  accountCredentials,
+  credentialSkipReason,
+  invalidCredentials,
+  journeyProduct,
+} from './password-login.data';
+import * as Locators from './password-login.locators';
+
+test('preserves guest cart when shopper signs in with password', async ({ page }) => {
+  if (!accountCredentials) {
+    test.skip(true, credentialSkipReason);
+    return;
+  }
+  const credentials = accountCredentials;
+
+  await test.step('Build guest basket', async () => {
+    await Actions.buildGuestBasket(page, journeyProduct);
+    await expect(Locators.cartProduct(page, journeyProduct.name)).toBeVisible();
+  });
+
+  await test.step('Submit credentials', async () => {
+    await Actions.signIn(page, credentials);
+    await expect(Locators.authenticatedAccountMenu(page)).toBeVisible();
+  });
+
+  await test.step('Load registered basket context', async () => {
+    await expect(Locators.accountHeading(page)).toBeVisible();
+  });
+
+  await test.step('Merge guest/registered baskets', async () => {
+    await Actions.returnToBasket(page);
+  });
+
+  await test.step('Return to shopping/account', async () => {
+    await expect(Locators.cartProduct(page, journeyProduct.name)).toBeVisible();
+  });
+});
+
+test('rejects invalid password without authenticating shopper', async ({ page }) => {
+  await test.step('Submit credentials', async () => {
+    await Actions.visitStorefront(page);
+    await Actions.submitCredentials(page, invalidCredentials);
+  });
+
+  await test.step('Return to shopping/account', async () => {
+    await expect(Locators.authenticationError(page)).toBeVisible();
+    await expect(Locators.authenticatedAccountMenu(page)).not.toBeVisible();
+  });
+});

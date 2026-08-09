@@ -1,4 +1,4 @@
-import { defineConfig } from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test';
 import dotenv from 'dotenv';
 import path from 'path';
 
@@ -23,5 +23,22 @@ export default defineConfig({
     screenshot: 'on-first-failure',
     video: 'on-first-retry',
   },
-  projects: [],
+  // Firefox deliberately omitted: suite targets Chromium and WebKit only. CI installs exactly
+  // those two browsers so configured projects and CI browser installs agree.
+  projects: [
+    { name: 'setup', testDir: './e2e/setup', testMatch: /.*\.setup\.ts/ },
+    {
+      name: 'e2e-chromium',
+      testDir: './e2e/tests',
+      use: { ...devices['Desktop Chrome'] },
+      dependencies: ['setup'],
+    },
+    {
+      name: 'e2e-webkit',
+      testDir: './e2e/tests',
+      use: { ...devices['Desktop Safari'] },
+      dependencies: ['setup'],
+    },
+    { name: 'api', testDir: './api/tests' },
+  ],
 });

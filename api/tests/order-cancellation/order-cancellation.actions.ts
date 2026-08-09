@@ -1,8 +1,7 @@
 import type { APIRequestContext, APIResponse } from '@playwright/test';
 
-import { readOmsExpandedOrder } from '../../support/oms';
 import { bearer, withSite } from '../../support/scapi';
-import type { Order } from '../../support/scapi-types';
+import { omsOrderExpansion } from './order-cancellation.data';
 import type { CancellationRequest } from './order-cancellation.data';
 import * as Endpoints from './order-cancellation.endpoints';
 
@@ -16,7 +15,11 @@ export const readCancellableOrder = async (
   request: APIRequestContext,
   orderNo: string,
   accessToken: string,
-): Promise<Order> => readOmsExpandedOrder(request, orderNo, accessToken);
+): Promise<APIResponse> =>
+  request.get(Endpoints.order(orderNo), {
+    headers: bearer(accessToken),
+    params: withSite({ expand: omsOrderExpansion }),
+  });
 
 export const cancelOmsOrder = async (
   request: APIRequestContext,

@@ -25,6 +25,13 @@ export const codeInputs = (page: Page): Locator => page.getByRole('dialog').getB
 
 export const codeInput = (page: Page, index: number): Locator => codeInputs(page).nth(index);
 
+// Authored but unproven: landing-form locators target configured passwordless landingPath, which
+// this deployment cannot complete without a token source outside the suite.
+export const landingCodeInputs = (page: Page): Locator => page.getByRole('textbox');
+
+export const landingCodeInput = (page: Page, index: number): Locator =>
+  landingCodeInputs(page).nth(index);
+
 export const addToCartButton = (page: Page): Locator =>
   page.getByRole('button', { name: /^Add(?: Bundle)? to Cart$/ });
 

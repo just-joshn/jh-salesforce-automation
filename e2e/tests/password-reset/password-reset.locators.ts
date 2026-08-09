@@ -1,3 +1,5 @@
+// Authored but unproven: these reset-landing locators match the callback-mode form.
+// The live deployment uses email mode, so they are not exercised here.
 import type { Locator, Page } from '@playwright/test';
 
 export const accountButton = (page: Page): Locator =>
@@ -14,6 +16,12 @@ export const forgotPasswordButton = (page: Page): Locator =>
 
 export const resetPasswordButton = (page: Page): Locator =>
   page.getByRole('button', { name: 'Reset Password', exact: true });
+
+export const newPasswordInput = (page: Page): Locator =>
+  page.getByLabel('New Password', { exact: true });
+
+export const confirmNewPasswordInput = (page: Page): Locator =>
+  page.getByLabel('Confirm New Password', { exact: true });
 
 export const returnToSignInButton = (page: Page): Locator =>
   page.getByRole('button', { name: 'Sign in', exact: true });

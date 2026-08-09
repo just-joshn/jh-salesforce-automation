@@ -6,7 +6,7 @@ import {
 import { expect, test } from '../../support/fixtures';
 import { buildPath } from '../../support/site';
 import * as Actions from './password-reset.actions';
-import { passwordResetRequest, resetLandingPath } from './password-reset.data';
+import { passwordReset, passwordResetRequest, resetLandingPath } from './password-reset.data';
 import * as Locators from './password-reset.locators';
 
 // Authored but unproven: this callback-only path runs only when resetPassword.mode is "callback".
@@ -34,11 +34,15 @@ test('CUJ 13 — resets the account password through callback delivery', async (
   });
 
   await test.step('Enter new password', async () => {
-    await expect(page).toHaveURL(buildPath(resetLandingPath));
+    await Actions.enterNewPassword(page, passwordReset);
+    await expect(Locators.newPasswordInput(page)).toHaveValue(passwordReset.newPassword);
+    await expect(Locators.confirmNewPasswordInput(page)).toHaveValue(passwordReset.newPassword);
+    await expect(Locators.resetPasswordButton(page)).toBeEnabled();
   });
 
   await test.step('Apply password reset', async () => {
-    await expect(page).toHaveURL(buildPath(resetLandingPath));
+    await Actions.applyPasswordReset(page);
+    await expect(page).toHaveURL(buildPath('/login'));
   });
 
   await test.step('Return to login', async () => {

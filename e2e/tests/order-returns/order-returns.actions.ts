@@ -35,6 +35,10 @@ export const submitReturn = async (page: Page): Promise<void> => {
   await Locators.submitReturnButton(page).click();
 };
 
+export const refreshOmsOrder = async (page: Page): Promise<void> => {
+  await page.reload();
+};
+
 export const visitStorefront = async (page: Page): Promise<void> => {
   await page.goto(buildPath('/'));
 };

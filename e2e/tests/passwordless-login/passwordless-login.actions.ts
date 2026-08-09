@@ -1,7 +1,11 @@
 import type { Page } from '@playwright/test';
 
 import { buildPath } from '../../support/site';
-import type { GuestBasketProduct, PasswordlessLoginRequest } from './passwordless-login.data';
+import type {
+  GuestBasketProduct,
+  PasswordlessLoginRequest,
+  PasswordlessToken,
+} from './passwordless-login.data';
 import * as Locators from './passwordless-login.locators';
 
 export const visitStorefront = async (page: Page): Promise<void> => {
@@ -36,8 +40,12 @@ export const openPasswordlessLanding = async (page: Page, landingPath: string): 
   await page.goto(buildPath(landingPath));
 };
 
-export const enterPasswordlessToken = async (page: Page, token: string): Promise<void> => {
-  for (const [index, digit] of [...token].entries()) {
-    await Locators.codeInput(page, index).fill(digit);
+export const submitPasswordlessToken = async (
+  page: Page,
+  token: PasswordlessToken,
+): Promise<void> => {
+  for (const [index, digit] of [...token.value].entries()) {
+    await Locators.landingCodeInput(page, index).fill(digit);
   }
+  await Locators.landingCodeInput(page, token.value.length - 1).press('Enter');
 };

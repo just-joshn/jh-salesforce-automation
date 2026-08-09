@@ -15,6 +15,9 @@ import * as Locators from './order-returns.locators';
  * retroactive, and this public demo has no OMS connection. Seed E2E_OMS_RETURN_ORDER_NO on an
  * OMS-active storefront rather than placing an order during this journey.
  *
+ * Return-flow locators are authored against documented OMS return UI and remain unproven on this
+ * deployment.
+ *
  * Non-goals: ReturnQuantityExceeded, InvalidReasonCode, UnknownProductItemIds, 409 state conflicts,
  * and network/server failures need a specific SOM rejection. Forcing one would fake SCAPI/SOM, which
  * is banned because it is this journey's system under test. The exceeded-quantity test below instead
@@ -55,7 +58,9 @@ test('CUJ 17 — submits a return for an eligible Order-Management-managed item 
 
   await test.step('Start return/select items', async () => {
     await Actions.startReturn(page);
+    await expect(Locators.returnModal(page)).toBeVisible();
     await Actions.selectReturnItem(page, selection.itemName);
+    await expect(Locators.returnItemCheckbox(page, selection.itemName)).toBeChecked();
   });
 
   await test.step('Choose valid quantity/reason', async () => {
@@ -65,10 +70,16 @@ test('CUJ 17 — submits a return for an eligible Order-Management-managed item 
       Data.quantityText(selection.returnableQuantity),
     );
     await Actions.selectReturnReason(page, selection.reason);
+    await expect(Locators.returnQuantityInput(page, selection.itemName)).toHaveValue(
+      Data.quantityText(selection.returnableQuantity),
+    );
+    await expect(Locators.returnReasonSelect(page)).toHaveValue(selection.reason);
   });
 
   await test.step('Review/submit return', async () => {
     await Actions.reviewReturn(page);
+    await expect(Locators.reviewReturnHeading(page)).toBeVisible();
+    await expect(Locators.submitReturnButton(page)).toBeVisible();
     await Actions.submitReturn(page);
   });
 
@@ -77,14 +88,20 @@ test('CUJ 17 — submits a return for an eligible Order-Management-managed item 
   });
 
   await test.step('View refreshed return state', async () => {
-    await expect(Locators.returnSubmittedStatus(page)).toBeVisible();
+    await Actions.refreshOmsOrder(page);
+    await expect(page).toHaveURL(buildPath(`/account/orders/${gate.orderNo}`));
+    await expect(Locators.returnRecordedStatus(page)).toBeVisible();
   });
 });
 
-test('CUJ 17 — refuses a requested quantity above the returnable quantity', async ({
+test('CUJ 17 — refuses an over-returnable quantity in the return form before submission', async ({
   page,
   request,
 }) => {
+  test.info().annotations.push({
+    type: 'coverage-gap',
+    description: Data.returnCoverageGapDescription,
+  });
   const { access_token: accessToken } = await getGuestToken(request);
   const availability = await probeOmsAvailability(request, accessToken);
   const gate = Data.returnJourneyGate(availability, seededOmsOrderNumber('return'));

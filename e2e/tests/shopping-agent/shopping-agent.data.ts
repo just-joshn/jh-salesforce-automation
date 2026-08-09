@@ -7,6 +7,9 @@ export interface ProviderBundleExpectation {
 }
 
 export const searchTerm = 'shirt';
+export const commerceQuestion = 'What shirts are available?';
+export const agentResultCoverageGapDescription =
+  'Agent result quality and actionability require user research; repository cannot establish them.';
 export const commerceSessionStorageKey = `access_token_${env.SFCC_SITE_ID}`;
 export const tokenBridgePath = '/api/agent/identity/bridge';
 

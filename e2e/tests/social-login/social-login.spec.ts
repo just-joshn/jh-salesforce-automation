@@ -51,15 +51,18 @@ test('CUJ 12 — hands a guest shopper with a basket to the chosen identity prov
 
   await Actions.buildGuestBasket(page, product);
   await expect(Locators.cartProduct(page, product.name)).toBeVisible();
-  await Actions.openSocialLogin(page);
 
-  // Assert storefront-controlled SLAS authorization departure, not third-party IdP content.
-  await Promise.all([
-    page.waitForURL((url) => matchesAuthorizationUrl(url, provider)),
-    Actions.chooseSocialProvider(page, provider),
-  ]);
-  await expect.poll(() => new URL(page.url()).hostname).toBe(provider.authorizationHost);
-  await expect.poll(() => new URL(page.url()).searchParams.get('hint')).toBe(provider.idp);
+  await test.step('Choose social provider', async () => {
+    await Actions.openSocialLogin(page);
+    await expect(Locators.socialProviderButton(page, provider.label)).toBeVisible();
+    await Actions.chooseSocialProvider(page, provider);
+  });
+
+  await test.step('Authenticate/authorize', async () => {
+    await page.waitForURL((url) => matchesAuthorizationUrl(url, provider));
+    await expect.poll(() => new URL(page.url()).hostname).toBe(provider.authorizationHost);
+    await expect.poll(() => new URL(page.url()).searchParams.get('hint')).toBe(provider.idp);
+  });
 });
 
 test('CUJ 12 — returns through the callback with an established session and the basket intact', async ({

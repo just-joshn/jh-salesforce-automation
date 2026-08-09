@@ -9,6 +9,7 @@ import {
   createPasswordlessLoginRequest,
   externalTokenSkipReason,
   toGuestBasketProduct,
+  toPasswordlessToken,
 } from './passwordless-login.data';
 import * as Locators from './passwordless-login.locators';
 
@@ -78,7 +79,15 @@ test('CUJ 11 — verifies the emailed token and resumes with the basket intact',
   const gate = evaluatePasswordlessLoginGate(app);
   const landingPath = gate.landingPath;
   const tokenLength = app.login?.tokenLength;
-  test.skip(true, externalTokenSkipReason(gate.mode, tokenLength, landingPath));
+  const deliveredToken = process.env.E2E_PASSWORDLESS_TOKEN;
+  test.skip(!gate.met, formatGateSkipReason(gate));
+  test.skip(
+    deliveredToken === undefined,
+    externalTokenSkipReason(gate.mode, tokenLength, landingPath),
+  );
+  if (deliveredToken === undefined) {
+    throw new Error('Passwordless token verification requires an externally delivered token');
+  }
   if (landingPath === undefined || tokenLength === undefined) {
     throw new Error(
       'Passwordless token verification requires observed landingPath and tokenLength',
@@ -89,21 +98,21 @@ test('CUJ 11 — verifies the emailed token and resumes with the basket intact',
     await findOrderableVariant(request, guestToken.access_token),
   );
   const passwordlessRequest = createPasswordlessLoginRequest();
-  const deliveredToken = process.env.E2E_PASSWORDLESS_TOKEN;
-  if (deliveredToken === undefined) {
-    throw new Error(
-      'Passwordless token verification requires a token delivered to an external mailbox',
-    );
-  }
 
-  await Actions.buildGuestBasket(page, product);
-  await Actions.requestPasswordlessLogin(page, passwordlessRequest);
+  await test.step('Request passwordless login', async () => {
+    await Actions.buildGuestBasket(page, product);
+    await Actions.requestPasswordlessLogin(page, passwordlessRequest);
+  });
+
+  await test.step('Receive OTP/token', async () => {
+    await expect(Locators.codeSentHeading(page)).toBeVisible();
+  });
 
   await test.step('Verify token', async () => {
-    await expect(Locators.codeInputs(page)).toHaveCount(tokenLength);
     await Actions.openPasswordlessLanding(page, landingPath);
     await expect(page).toHaveURL(buildPath(landingPath));
-    await Actions.enterPasswordlessToken(page, deliveredToken);
+    await expect(Locators.landingCodeInputs(page)).toHaveCount(tokenLength);
+    await Actions.submitPasswordlessToken(page, toPasswordlessToken(deliveredToken));
     await expect(Locators.authenticatedAccountMenu(page)).toBeVisible();
   });
 

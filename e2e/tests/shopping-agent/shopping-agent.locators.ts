@@ -15,6 +15,21 @@ export const agentEntry = (page: Page): Locator =>
 
 export const agentWidgetContainer = (page: Page): Locator => page.getByTestId('shopper-agent');
 
+export const conversationInput = (page: Page): Locator =>
+  page.getByRole('textbox', { name: 'Message', exact: true });
+
+export const sendConversationMessageButton = (page: Page): Locator =>
+  page.getByRole('button', { name: 'Send', exact: true });
+
+export const conversationTranscript = (page: Page): Locator =>
+  page.getByRole('log', { name: 'Conversation', exact: true });
+
+export const submittedConversationQuestion = (page: Page, question: string): Locator =>
+  conversationTranscript(page).getByText(question, { exact: true });
+
+export const agentResponse = (page: Page): Locator =>
+  conversationTranscript(page).getByRole('article', { name: /agent/i });
+
 export const searchBox = (page: Page): Locator =>
   page.getByRole('searchbox', { name: 'Search for products...', exact: true });
 
@@ -25,8 +40,6 @@ export const productSuggestionLinks = (page: Page, searchTerm: string): Locator 
 
 export const askAgentSearchEntry = (page: Page): Locator =>
   searchSuggestionDialog(page).getByRole('button', { name: /^Ask Shopping Agent/ });
-
-export const storefrontHeader = (page: Page): Locator => page.getByRole('banner');
 
 export const cartButton = (page: Page): Locator =>
   page.getByRole('button', { name: /^My cart, number of items: \d+$/ });

@@ -84,6 +84,15 @@ export const openAgent = async (page: Page): Promise<void> => {
   await Locators.agentEntry(page).click();
 };
 
+export const askCommerceQuestion = async (page: Page, question: string): Promise<void> => {
+  await Locators.conversationInput(page).fill(question);
+  await Locators.sendConversationMessageButton(page).click();
+};
+
+export const continueShoppingInCart = async (page: Page): Promise<void> => {
+  await Locators.cartButton(page).click();
+};
+
 export const searchForSuggestions = async (page: Page, searchTerm: string): Promise<void> => {
   await Locators.searchBox(page).fill(searchTerm);
 };

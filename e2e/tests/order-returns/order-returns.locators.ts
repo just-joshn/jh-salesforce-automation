@@ -30,6 +30,10 @@ export const returnReasonSelect = (page: Page): Locator =>
 export const reviewReturnButton = (page: Page): Locator =>
   returnModal(page).getByRole('button', { name: returnUiText.reviewReturn });
 
+// Unobserved on public demo: review state displays its heading before an OMS return is submitted.
+export const reviewReturnHeading = (page: Page): Locator =>
+  returnModal(page).getByRole('heading', { name: returnUiText.reviewReturn });
+
 // Unobserved on public demo: this submits an OMS-validated return from the review modal.
 export const submitReturnButton = (page: Page): Locator =>
   returnModal(page).getByRole('button', { name: returnUiText.submitReturn });
@@ -37,3 +41,7 @@ export const submitReturnButton = (page: Page): Locator =>
 // Unobserved on public demo: accepted OMS returns refresh this Order Detail status.
 export const returnSubmittedStatus = (page: Page): Locator =>
   page.getByRole('status', { name: returnUiText.returnSubmitted });
+
+// Unobserved on public demo: reloaded OMS order detail records an accepted return separately.
+export const returnRecordedStatus = (page: Page): Locator =>
+  page.getByRole('status', { name: returnUiText.returnRecorded });

@@ -13,6 +13,11 @@ import * as Data from './shipment-tracking.data';
 test('CUJ 15 — reaches valid carrier tracking information for an owned order', async ({
   request,
 }) => {
+  test.info().annotations.push({
+    type: 'layer-scope',
+    description: 'Account/order-history navigation is a UI affordance covered by the browser layer.',
+  });
+
   const { access_token: accessToken } = await getGuestToken(request);
   const availability = await probeOmsAvailability(request, accessToken);
   const gate = Data.trackingJourneyGate(availability, seededOmsOrderNumber('tracking'));
@@ -21,12 +26,12 @@ test('CUJ 15 — reaches valid carrier tracking information for an owned order',
     return;
   }
 
-  await test.step('Open account/order history', () => {
-    expect(accessToken).not.toBe('');
+  const order = await test.step('Load OMS-enriched order', async () => {
+    const trackingOrder = await Actions.readTrackingOrder(request, gate.orderNo, accessToken);
+    expect(trackingOrder.response.status()).toBe(200);
+    expect(trackingOrder.order.omsData).toBeDefined();
+    return trackingOrder.order;
   });
-
-  const order = await test.step('Load OMS-enriched order', async () =>
-    Actions.readTrackingOrder(request, gate.orderNo, accessToken));
 
   const actions = await test.step('Locate tracking action', () => {
     const trackingActions = Data.expectedTrackingActions(order);
@@ -36,17 +41,18 @@ test('CUJ 15 — reaches valid carrier tracking information for an owned order',
 
   await test.step('Validate/open tracking URL', () => {
     for (const action of actions) {
-      expect(Data.externalCarrierUrl(action.carrierUrl)).toBe(action.carrierUrl);
-    }
-    for (const rejectedUrl of Data.rejectedTrackingUrls(order)) {
-      expect(Data.externalCarrierUrl(rejectedUrl)).toBeUndefined();
+      const carrierUrl = new URL(action.rawCarrierUrl);
+      expect(carrierUrl.protocol).toBe(Data.carrierTrackingProtocol);
+      expect(carrierUrl.toString()).toBe(action.carrierUrl);
     }
   });
 
   await test.step('View carrier status', () => {
-    expect(actions.every((action) => new URL(action.carrierUrl).protocol !== 'javascript:')).toBe(
-      true,
-    );
+    test.info().annotations.push({
+      type: 'coverage-gap',
+      description:
+        'Carrier status page is an external dependency; this layer verifies only the OMS-provided HTTPS tracking URL and does not fetch it.',
+    });
   });
 });
 

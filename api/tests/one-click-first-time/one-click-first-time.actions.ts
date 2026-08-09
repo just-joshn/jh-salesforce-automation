@@ -3,9 +3,15 @@ import type { APIRequestContext, APIResponse } from '@playwright/test';
 import { bearer, withSite } from '../../support/scapi';
 import { emptyBasketRequest } from './one-click-first-time.data';
 import type {
+  BasketInput,
+  BasketPaymentInstrumentRequest,
   BasketCustomerInput,
   BasketItemInput,
+  CustomerPaymentInput,
   CustomerRegistrationRequest,
+  OrderRequest,
+  OtpRequest,
+  OtpVerificationRequest,
   ShipmentAddressInput,
   ShipmentMethodInput,
 } from './one-click-first-time.data';
@@ -15,6 +21,26 @@ const shopperOptions = (accessToken: string) => ({
   headers: bearer(accessToken),
   params: withSite(),
 });
+
+export const requestOtp = async (
+  request: APIRequestContext,
+  accessToken: string,
+  body: OtpRequest,
+): Promise<APIResponse> =>
+  request.post(Endpoints.otpRequest(), {
+    form: body,
+    headers: bearer(accessToken),
+  });
+
+export const verifyOtp = async (
+  request: APIRequestContext,
+  accessToken: string,
+  body: OtpVerificationRequest,
+): Promise<APIResponse> =>
+  request.post(Endpoints.otpVerification(), {
+    form: body,
+    headers: bearer(accessToken),
+  });
 
 export const registerCustomer = async (
   request: APIRequestContext,
@@ -79,3 +105,40 @@ export const selectShippingMethod = async (
     ...shopperOptions(accessToken),
     data: input.body,
   });
+
+export const providePayment = async (
+  request: APIRequestContext,
+  accessToken: string,
+  input: BasketInput<BasketPaymentInstrumentRequest>,
+): Promise<APIResponse> =>
+  request.post(Endpoints.basketPaymentInstruments(input.basketId), {
+    ...shopperOptions(accessToken),
+    data: input.body,
+  });
+
+export const persistCustomerPayment = async (
+  request: APIRequestContext,
+  accessToken: string,
+  input: CustomerPaymentInput,
+): Promise<APIResponse> =>
+  request.post(Endpoints.customerPaymentInstruments(input.customerId), {
+    ...shopperOptions(accessToken),
+    data: input.body,
+  });
+
+export const createOrder = async (
+  request: APIRequestContext,
+  accessToken: string,
+  body: OrderRequest,
+): Promise<APIResponse> =>
+  request.post(Endpoints.orders(), {
+    ...shopperOptions(accessToken),
+    data: body,
+  });
+
+export const readOrder = async (
+  request: APIRequestContext,
+  accessToken: string,
+  orderNo: string,
+): Promise<APIResponse> =>
+  request.get(Endpoints.order(orderNo), shopperOptions(accessToken));

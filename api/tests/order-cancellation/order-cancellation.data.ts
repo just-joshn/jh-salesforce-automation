@@ -1,9 +1,12 @@
 import type { OmsAvailability, SeededOmsOrderNumber } from '../../support/oms';
-import type { Fault, OmsReasonCode, OrderProductItem } from '../../support/scapi-types';
+import { required } from '../../support/scapi';
+import type { Fault, OmsReasonCode, Order, OrderProductItem } from '../../support/scapi-types';
 
 interface CancellationQuantities {
   readonly quantityAvailableToCancel: number;
+  readonly quantityCanceled: number;
   readonly quantityOrdered: number;
+  readonly status: string;
 }
 
 type DataRecord = Readonly<Record<string, unknown>>;
@@ -19,6 +22,7 @@ export type CancellationJourneyGate =
 export type InactiveOmsFault = Fault & { readonly type: string };
 
 export const omsNotActiveFaultSuffix = '/oms-not-active';
+export const omsOrderExpansion = 'oms,oms_shipments';
 
 const isRecord = (value: unknown): value is DataRecord =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -26,12 +30,15 @@ const isRecord = (value: unknown): value is DataRecord =>
 const hasCancellationQuantities = (value: unknown): value is CancellationQuantities =>
   isRecord(value) &&
   typeof value.quantityAvailableToCancel === 'number' &&
-  typeof value.quantityOrdered === 'number';
+  typeof value.quantityCanceled === 'number' &&
+  typeof value.quantityOrdered === 'number' &&
+  typeof value.status === 'string';
 
 export const isCancellationEligible = (item: OrderProductItem): boolean => {
   const omsData = item.omsData;
   return (
     hasCancellationQuantities(omsData) &&
+    omsData.quantityAvailableToCancel > 0 &&
     omsData.quantityAvailableToCancel === omsData.quantityOrdered
   );
 };
@@ -39,6 +46,32 @@ export const isCancellationEligible = (item: OrderProductItem): boolean => {
 export const hasOnlyCancellationEligibleItems = (
   items: readonly OrderProductItem[] | undefined,
 ): boolean => items !== undefined && items.length > 0 && items.every(isCancellationEligible);
+
+export const requireOrderPayload = (value: unknown): Order => {
+  if (!isRecord(value)) {
+    throw new Error('Shopper Orders response does not match Order');
+  }
+
+  return value;
+};
+
+export const orderNumber = (order: Order): string => required(order.orderNo, 'order.orderNo');
+
+const hasCanceledItemState = (item: OrderProductItem): boolean => {
+  const omsData = item.omsData;
+  return (
+    hasCancellationQuantities(omsData) &&
+    omsData.status === 'canceled' &&
+    omsData.quantityAvailableToCancel === 0 &&
+    omsData.quantityCanceled === omsData.quantityOrdered
+  );
+};
+
+export const hasCanceledOrderState = (order: Order): boolean =>
+  order.status === 'cancelled' &&
+  order.productItems !== undefined &&
+  order.productItems.length > 0 &&
+  order.productItems.every(hasCanceledItemState);
 
 const preferredReason = (codes: readonly OmsReasonCode[]): string | undefined =>
   codes.find((code) => code.default)?.reason ?? codes[0]?.reason;

@@ -6,6 +6,8 @@ import {
   accountCredentials,
   credentialSkipReason,
   invalidCredentials,
+  registeredBasketItemCount,
+  shoppingPath,
   toJourneyProduct,
 } from './password-login.data';
 import * as Locators from './password-login.locators';
@@ -33,15 +35,18 @@ test('CUJ 10 — preserves guest cart when shopper signs in with password', asyn
   });
 
   await test.step('Load registered basket context', async () => {
-    await expect(Locators.accountHeading(page)).toBeVisible();
+    await expect(Locators.cartButtonWithCount(page, registeredBasketItemCount)).toBeVisible();
   });
 
   await test.step('Merge guest/registered baskets', async () => {
     await Actions.returnToBasket(page);
+    await expect(Locators.cartProduct(page, journeyProduct.name)).toBeVisible();
   });
 
   await test.step('Return to shopping/account', async () => {
-    await expect(Locators.cartProduct(page, journeyProduct.name)).toBeVisible();
+    await Actions.visitStorefront(page);
+    await expect(page).toHaveURL(shoppingPath);
+    await expect(Locators.cartButton(page)).toBeVisible();
   });
 });
 

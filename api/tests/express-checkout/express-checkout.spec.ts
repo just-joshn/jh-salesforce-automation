@@ -1,91 +1,97 @@
-/**
- * CUJ 3 rows 2, 3, and 5 require PSP-side authorization, shipping invalidation, or payment
- * recovery failure injection. SCAPI mocking is prohibited, so those failures are not induced.
- */
-import type { APIRequestContext, APIResponse } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
 import { readAppConfiguration } from '../../support/app-config';
 import { evaluateExpressCheckoutGate, formatGateSkipReason } from '../../support/gates';
 import { findOrderableVariant } from '../../support/products';
+import type { Basket, Order } from '../../support/scapi-types';
 import { getGuestToken } from '../../support/slas';
-import type { Basket, ShippingMethodResult } from '../../support/scapi-types';
 import * as Actions from './express-checkout.actions';
-import {
-  basketIdFrom,
-  createCheckoutInput,
-  expected,
-  shipmentIdFrom,
-  shippingMethodInput,
-  type CheckoutInput,
-} from './express-checkout.data';
-
-const readBasket = async (response: APIResponse): Promise<Basket> => {
-  expect(response.status()).toBe(expected.successStatus);
-  return (await response.json()) as Basket;
-};
-
-const prepareOrderReadyBasket = async (
-  request: APIRequestContext,
-  accessToken: string,
-  checkout: CheckoutInput,
-): Promise<Basket> => {
-  const created = await readBasket(await Actions.createBasket(request, accessToken));
-  const basketId = basketIdFrom(created);
-  const withItem = await readBasket(
-    await Actions.addBasketItem(request, accessToken, { basketId, body: checkout.productItems }),
-  );
-  const shipmentId = shipmentIdFrom(withItem);
-  await readBasket(
-    await Actions.provideContact(request, accessToken, { basketId, body: checkout.customer }),
-  );
-  await readBasket(
-    await Actions.provideShippingAddress(request, accessToken, {
-      basketId,
-      body: checkout.shippingAddress,
-      shipmentId,
-    }),
-  );
-  const methodsResponse = await Actions.readShippingMethods(request, accessToken, {
-    basketId,
-    shipmentId,
-  });
-  expect(methodsResponse.status()).toBe(expected.successStatus);
-  const methods = (await methodsResponse.json()) as ShippingMethodResult;
-  return readBasket(
-    await Actions.selectShippingMethod(
-      request,
-      accessToken,
-      shippingMethodInput(basketId, shipmentId, methods),
-    ),
-  );
-};
-
-const expectBasketProduct = (basket: Basket, variantId: string): void => {
-  expect(basket.productItems).toEqual(
-    expect.arrayContaining([expect.objectContaining({ productId: variantId, quantity: 1 })]),
-  );
-};
-
-const expectShipmentAddress = (basket: Basket): void => {
-  expect(basket.shipments?.[0]?.shippingAddress).toBeDefined();
-};
-
-const expectShipmentMethod = (basket: Basket): void => {
-  expect(basket.shipments?.[0]?.shippingMethod?.id).toBeTruthy();
-};
+import * as Data from './express-checkout.data';
 
 test('CUJ 3 — completes a purchase through Express Checkout', async ({ request }) => {
+  test.info().annotations.push(
+    {
+      type: 'layer-scope',
+      description:
+        'CUJ 3 step 1 "Invoke express payment" occurs at the express-payment provider surface; the browser layer covers the storefront entry point.',
+    },
+    {
+      type: 'layer-scope',
+      description:
+        'CUJ 3 step 2 "Authorize with provider" occurs at the express-payment provider surface; the browser layer covers the storefront handoff entry point.',
+    },
+    {
+      type: 'layer-scope',
+      description:
+        'CUJ 3 step 5 "Process/confirm payment" has no Shopper SCAPI confirmation operation. Shopper Orders can attach payment details, but confirmation occurs through the Salesforce Payments SDK or PSP, and payment-status updates require the Admin Orders API.',
+    },
+    {
+      type: 'coverage-gap',
+      description:
+        'CUJ 3 pain rows 2, 3, and 5 require provider-authorization failure, shipping invalidation, or payment-recovery failure injection. They cannot be induced because SCAPI is the system under test and mocking it is prohibited.',
+    },
+  );
+
   const app = await readAppConfiguration(request);
   const gate = await evaluateExpressCheckoutGate(app, request);
   test.skip(!gate.met, formatGateSkipReason(gate));
 
-  await test.step('Invoke express payment', () => expect(gate.met).toBe(true));
-  await test.step('Authorize with provider', () => expect(gate.met).toBe(true));
-  await test.step('Prepare basket/address/shipping', () => expect(gate.met).toBe(true));
-  await test.step('Create order', () => expect(gate.met).toBe(true));
-  await test.step('Process/confirm payment', () => expect(gate.met).toBe(true));
-  await test.step('Reach confirmation', () => expect(gate.met).toBe(true));
+  const token = await getGuestToken(request);
+  const product = await findOrderableVariant(request, token.access_token);
+  const checkout = Data.createCheckoutInput(product);
+
+  const prepared = await test.step('Prepare basket/address/shipping', async () => {
+    const result = await Actions.prepareOrderReadyBasket(request, token.access_token, checkout);
+
+    expect(result.basket.productItems).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ productId: product.variantId, quantity: 1 }),
+      ]),
+    );
+    expect(Data.shippingAddressFrom(result.basket)).toEqual(
+      expect.objectContaining({
+        address1: checkout.shippingAddress.address1,
+        postalCode: checkout.shippingAddress.postalCode,
+      }),
+    );
+    expect(Data.selectedShippingMethodIdFrom(result.basket)).toBeTruthy();
+    return result;
+  });
+
+  const created = await test.step('Create order', async () => {
+    const paymentResponse = await Actions.providePayment(request, token.access_token, {
+      basketId: prepared.basketId,
+      body: Data.paymentInstrumentFor(prepared.basket),
+    });
+    expect(paymentResponse.status()).toBe(Data.expected.basketMutationStatus);
+    const basketWithPayment = (await paymentResponse.json()) as Basket;
+    expect(basketWithPayment.paymentInstruments).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ paymentMethodId: Data.expected.paymentMethodId }),
+      ]),
+    );
+
+    const orderResponse = await Actions.createOrder(
+      request,
+      token.access_token,
+      Data.orderRequestFor(prepared.basketId),
+    );
+    expect(orderResponse.status()).toBe(Data.expected.createOrderStatus);
+    const order = (await orderResponse.json()) as Order;
+    const orderNo = Data.orderNumberFrom(order);
+    expect(order.status).toBe(Data.expected.orderStatus);
+    expect(orderNo).toMatch(Data.expected.orderNumberPattern);
+    return { orderNo };
+  });
+
+  await test.step('Reach confirmation', async () => {
+    const response = await Actions.readOrder(request, token.access_token, created.orderNo);
+    expect(response.status()).toBe(Data.expected.orderReadStatus);
+    const confirmedOrder = (await response.json()) as Order;
+    expect(confirmedOrder.status).toBe(Data.expected.orderStatus);
+    expect(confirmedOrder.orderNo).toBe(created.orderNo);
+    expect(confirmedOrder.orderNo).toMatch(Data.expected.orderNumberPattern);
+  });
 });
 
 test('CUJ 3 — drives a basket to an order-ready state without an express provider', async ({
@@ -93,13 +99,19 @@ test('CUJ 3 — drives a basket to an order-ready state without an express provi
 }) => {
   const token = await getGuestToken(request);
   const product = await findOrderableVariant(request, token.access_token);
-  const basket = await prepareOrderReadyBasket(
-    request,
-    token.access_token,
-    createCheckoutInput(product),
-  );
+  const checkout = Data.createCheckoutInput(product);
+  const prepared = await Actions.prepareOrderReadyBasket(request, token.access_token, checkout);
 
-  expectBasketProduct(basket, product.variantId);
-  expectShipmentAddress(basket);
-  expectShipmentMethod(basket);
+  expect(prepared.basket.productItems).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({ productId: product.variantId, quantity: 1 }),
+    ]),
+  );
+  expect(Data.shippingAddressFrom(prepared.basket)).toEqual(
+    expect.objectContaining({
+      address1: checkout.shippingAddress.address1,
+      postalCode: checkout.shippingAddress.postalCode,
+    }),
+  );
+  expect(Data.selectedShippingMethodIdFrom(prepared.basket)).toBeTruthy();
 });

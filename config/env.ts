@@ -16,6 +16,9 @@ export interface Env {
 
   readonly E2E_ACCOUNT_EMAIL: string | undefined;
   readonly E2E_ACCOUNT_PASSWORD: string | undefined;
+  readonly E2E_ONE_CLICK_OTP: string | undefined;
+  readonly E2E_ACCOUNT_MANAGER_CLIENT_ID: string | undefined;
+  readonly E2E_ACCOUNT_MANAGER_CLIENT_SECRET: string | undefined;
 
   readonly E2E_OMS_TRACKING_ORDER_NO: string | undefined;
   readonly E2E_OMS_CANCEL_ORDER_NO: string | undefined;
@@ -51,6 +54,9 @@ export const env: Env = Object.freeze({
 
   E2E_ACCOUNT_EMAIL: optional(process.env.E2E_ACCOUNT_EMAIL),
   E2E_ACCOUNT_PASSWORD: optional(process.env.E2E_ACCOUNT_PASSWORD),
+  E2E_ONE_CLICK_OTP: optional(process.env.E2E_ONE_CLICK_OTP),
+  E2E_ACCOUNT_MANAGER_CLIENT_ID: optional(process.env.E2E_ACCOUNT_MANAGER_CLIENT_ID),
+  E2E_ACCOUNT_MANAGER_CLIENT_SECRET: optional(process.env.E2E_ACCOUNT_MANAGER_CLIENT_SECRET),
 
   E2E_OMS_TRACKING_ORDER_NO: optional(process.env.E2E_OMS_TRACKING_ORDER_NO),
   E2E_OMS_CANCEL_ORDER_NO: optional(process.env.E2E_OMS_CANCEL_ORDER_NO),

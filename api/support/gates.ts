@@ -1,5 +1,6 @@
 import type { APIRequestContext } from '@playwright/test';
 
+import { env } from '../../config/env';
 import type {
   AppConfiguration,
   CommerceAgentConfiguration,
@@ -22,6 +23,11 @@ export interface PasswordlessLoginGate extends GateVerdict {
 export interface SocialLoginGate extends GateVerdict {
   readonly idps: readonly string[];
   readonly redirectURI: string | undefined;
+}
+
+export interface SfraRouteProbe {
+  readonly status: number;
+  readonly url: string;
 }
 
 interface Requirement {
@@ -49,6 +55,8 @@ const requirementsFor = (
 
 const hasEither = (first: string | undefined, second: string | undefined): boolean =>
   isNonEmptyString(first) || isNonEmptyString(second);
+
+const isAvailableSfraRoute = (status: number): boolean => status >= 200 && status < 400;
 
 const isConfiguration = (value: unknown): value is Configuration =>
   typeof value === 'object' &&
@@ -98,6 +106,8 @@ export const formatGateSkipReason = (verdict: GateVerdict): string =>
     ? 'Journey gate met.'
     : `Journey skipped: unmet settings: ${verdict.missing.join(', ')}.`;
 
+// Payment configuration, provider metadata, and the server-side allowance are the full CUJ 2/3
+// prerequisites; basket, shipping, and payment behavior are exercised by their journeys.
 export const evaluateSalesforcePaymentsGate = async (
   app: AppConfiguration,
   request: APIRequestContext,
@@ -120,7 +130,16 @@ export const evaluateExpressCheckoutGate = async (
 export const evaluateOneClickCheckoutGate = (app: AppConfiguration): GateVerdict =>
   verdictFrom([
     { key: 'app.oneClickCheckout.enabled', isMet: app.oneClickCheckout?.enabled === true },
+    { key: 'E2E_ONE_CLICK_OTP', isMet: isNonEmptyString(env.E2E_ONE_CLICK_OTP) },
   ]);
+
+export const evaluateSfraRouteGate = (probes: readonly SfraRouteProbe[]): GateVerdict =>
+  verdictFrom(
+    probes.map(({ status, url }) => ({
+      key: `SFRA route ${url} (HTTP ${status})`,
+      isMet: isAvailableSfraRoute(status),
+    })),
+  );
 
 const miawRequirements = (agent: CommerceAgentConfiguration | undefined): Requirement[] =>
   requirementsFor(agent, [
@@ -191,6 +210,14 @@ export const evaluatePasswordResetExternalCallbackGate = (app: AppConfiguration)
     {
       key: `app.login.resetPassword.mode (observed ${JSON.stringify(mode)}; expected "callback")`,
       isMet: mode === 'callback',
+    },
+    {
+      key: 'E2E_ACCOUNT_MANAGER_CLIENT_ID',
+      isMet: isNonEmptyString(env.E2E_ACCOUNT_MANAGER_CLIENT_ID),
+    },
+    {
+      key: 'E2E_ACCOUNT_MANAGER_CLIENT_SECRET',
+      isMet: isNonEmptyString(env.E2E_ACCOUNT_MANAGER_CLIENT_SECRET),
     },
   ]);
 };

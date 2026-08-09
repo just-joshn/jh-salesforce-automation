@@ -28,7 +28,11 @@ export const returnUiText = {
   reviewReturn: 'Review return',
   submitReturn: 'Submit return',
   returnSubmitted: 'Return submitted',
+  returnRecorded: 'Return recorded',
 } as const;
+
+export const returnCoverageGapDescription =
+  'ReturnQuantityExceeded, InvalidReasonCode, UnknownProductItemIds, and an order-specific 409 state conflict remain uncovered: SCAPI mocking is prohibited because it is the system under test, and the observed oms-not-active 409 is not evidence of an order-specific conflict.';
 
 const isReturnableQuantity = (quantity: number | undefined): quantity is number =>
   typeof quantity === 'number' && quantity > 0;

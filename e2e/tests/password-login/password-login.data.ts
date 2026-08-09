@@ -1,5 +1,6 @@
 import type { OrderableVariant } from '../../../api/support/products';
 import { env } from '../../../config/env';
+import { buildPath } from '../../support/site';
 
 export interface LoginCredentials {
   readonly email: string;
@@ -12,6 +13,10 @@ export interface JourneyProduct {
 }
 
 export const credentialSkipReason = 'Requires E2E_ACCOUNT_EMAIL and E2E_ACCOUNT_PASSWORD';
+
+export const registeredBasketItemCount = 1;
+
+export const shoppingPath = buildPath('/');
 
 export const accountCredentials: LoginCredentials | undefined =
   env.E2E_ACCOUNT_EMAIL && env.E2E_ACCOUNT_PASSWORD

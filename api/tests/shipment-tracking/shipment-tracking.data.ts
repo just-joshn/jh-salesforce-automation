@@ -1,8 +1,12 @@
 import type { OmsAvailability, SeededOmsOrderNumber } from '../../support/oms';
 import type { OmsShipment, Order } from '../../support/scapi-types';
 
+export const carrierTrackingProtocol = 'https:' as const;
+export const omsOrderExpansions = 'oms,oms_shipments';
+
 export interface TrackingAction {
   readonly carrierUrl: string;
+  readonly rawCarrierUrl: string;
   readonly shipmentId: string | undefined;
 }
 
@@ -13,7 +17,7 @@ export type TrackingJourneyGate =
 export const externalCarrierUrl = (rawUrl: string): string | undefined => {
   try {
     const url = new URL(rawUrl);
-    return url.protocol === 'http:' || url.protocol === 'https:' ? url.toString() : undefined;
+    return url.protocol === carrierTrackingProtocol ? url.toString() : undefined;
   } catch (error) {
     if (error instanceof TypeError) {
       return undefined;
@@ -28,7 +32,9 @@ const trackingAction = (shipment: OmsShipment): TrackingAction | undefined => {
   }
 
   const carrierUrl = externalCarrierUrl(shipment.trackingUrl);
-  return carrierUrl === undefined ? undefined : { carrierUrl, shipmentId: shipment.id };
+  return carrierUrl === undefined
+    ? undefined
+    : { carrierUrl, rawCarrierUrl: shipment.trackingUrl, shipmentId: shipment.id };
 };
 
 const omsShipments = (order: Order): readonly OmsShipment[] => order.omsData?.shipments ?? [];

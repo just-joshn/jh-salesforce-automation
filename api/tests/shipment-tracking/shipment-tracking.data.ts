@@ -34,12 +34,16 @@ const trackingAction = (shipment: OmsShipment): TrackingAction | undefined => {
 const omsShipments = (order: Order): readonly OmsShipment[] => order.omsData?.shipments ?? [];
 
 export const expectedTrackingActions = (order: Order): readonly TrackingAction[] =>
-  omsShipments(order).map(trackingAction).filter((action): action is TrackingAction => action !== undefined);
+  omsShipments(order)
+    .map(trackingAction)
+    .filter((action): action is TrackingAction => action !== undefined);
 
 export const rejectedTrackingUrls = (order: Order): readonly string[] =>
   omsShipments(order)
     .map((shipment) => shipment.trackingUrl)
-    .filter((url): url is string => typeof url === 'string' && externalCarrierUrl(url) === undefined);
+    .filter(
+      (url): url is string => typeof url === 'string' && externalCarrierUrl(url) === undefined,
+    );
 
 const availabilityReason = (availability: OmsAvailability): string | undefined => {
   switch (availability.kind) {

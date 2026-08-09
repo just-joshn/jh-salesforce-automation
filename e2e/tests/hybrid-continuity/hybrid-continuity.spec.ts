@@ -23,9 +23,7 @@ test('CUJ 14 — preserves shopper session and basket across the hybrid runtime 
 
   const pwaState = await test.step('Establish shopping/session state', async () => {
     const token = await getGuestToken(request);
-    const product = toPwaJourneyProduct(
-      await findOrderableVariant(request, token.access_token),
-    );
+    const product = toPwaJourneyProduct(await findOrderableVariant(request, token.access_token));
     await Actions.buildPwaBasket(page, product);
     await expect(Locators.basketProduct(page, product.name)).toBeVisible();
     return { product, session: await Actions.captureShopperSession(page) };

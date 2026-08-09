@@ -14,11 +14,23 @@ export const visitProduct = async (page: Page, product: JourneyProduct): Promise
 };
 
 export const addProductToBasket = async (page: Page): Promise<void> => {
+  await Locators.cartButtonWithCount(page, 0).waitFor();
+  const basketResponse = page.waitForResponse(
+    (response) =>
+      response.request().method() === 'POST' &&
+      /\/baskets\/[^/]+\/items(?:\?|$)/.test(response.url()),
+  );
   await Locators.addToCartButton(page).click();
+  const response = await basketResponse;
+  if (!response.ok()) {
+    throw new Error(`Add-to-cart request failed with HTTP ${response.status()}`);
+  }
+  await page.reload();
 };
 
 export const openBasket = async (page: Page): Promise<void> => {
-  await Locators.viewCartLink(page).click();
+  await Locators.cartButtonWithCount(page, 1).waitFor();
+  await page.goto(buildPath('/cart'));
 };
 
 export const startCheckout = async (page: Page): Promise<void> => {
@@ -52,6 +64,7 @@ export const provideShipping = async (page: Page, address: ShippingAddress): Pro
   await Locators.stateSelect(page).selectOption(address.state);
   await Locators.zipCodeInput(page).fill(address.zipCode);
   await Locators.continueToShippingButton(page).click();
+  await Locators.continueToPaymentButton(page).press('Enter');
 };
 
 export const providePayment = async (page: Page, payment: PaymentCard): Promise<void> => {

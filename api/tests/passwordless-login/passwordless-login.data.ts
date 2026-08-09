@@ -46,7 +46,8 @@ export const expected = Object.freeze({
   passwordlessStartStatus: 200,
 });
 
-export const basketIdFrom = (basket: Basket): string => required(basket.basketId, 'basket.basketId');
+export const basketIdFrom = (basket: Basket): string =>
+  required(basket.basketId, 'basket.basketId');
 
 const isBasket = (value: unknown): value is Basket =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -92,3 +93,6 @@ export const externalTokenSkipReason = (
   landingPath: string | undefined,
 ): string =>
   `Skipped: passwordless token verification requires an external mailbox (mode: ${String(mode)}, landingPath: ${String(landingPath)}).`;
+
+export const passwordlessStartCredentialSkipReason = (): string =>
+  'Skipped: live SLAS passwordless start returned HTTP 401 without Authorization; it requires the unavailable private SLAS client secret (SFCC_CLIENT_SECRET) for Basic client credentials.';

@@ -9,14 +9,15 @@ export const addToCartButton = (page: Page): Locator =>
 export const addedToCartHeading = (page: Page): Locator =>
   page.getByRole('heading', { name: '1 item added to cart', exact: true, level: 1 });
 
-export const closeAddedToCartButton = (page: Page): Locator =>
-  page.getByRole('button', { name: 'Close', exact: true });
-
-export const viewCartLink = (page: Page): Locator =>
-  page.getByRole('link', { name: 'View Cart', exact: true });
-
 export const cartCountButton = (page: Page, itemCount: number): Locator =>
-  page.getByRole('button', { name: `My cart, number of items: ${itemCount}`, exact: true });
+  page.getByRole('button', {
+    name: `My cart, number of items: ${itemCount}`,
+    exact: true,
+    includeHidden: true,
+  });
+
+export const declineTrackingButton = (page: Page): Locator =>
+  page.getByRole('button', { name: 'Decline tracking', exact: true });
 
 export const cartProduct = (page: Page, productName: string): Locator =>
   page.getByRole('link', { name: productName, exact: true });
@@ -89,6 +90,16 @@ export const selectedDeliveryAddress = (
   deliveryAddressSelect(page, productName).getByRole('option', {
     name: addressLabel,
     selected: true,
+  });
+
+export const deliveryAddressOption = (
+  page: Page,
+  productName: string,
+  addressLabel: string,
+): Locator =>
+  deliveryAddressSelect(page, productName).getByRole('option', {
+    name: addressLabel,
+    exact: true,
   });
 
 export const continueToShippingButton = (page: Page): Locator =>

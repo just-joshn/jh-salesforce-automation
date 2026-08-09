@@ -60,6 +60,7 @@ export const selectProduct = (product: OrderableVariant): ProductSelection =>
     variantId: product.variantId,
   });
 
-export const isBundleOrSet = (productName: string): boolean => /\b(bundle|set)\b/i.test(productName);
+export const isBundleOrSet = (productName: string): boolean =>
+  /\b(bundle|set)\b/i.test(productName);
 
 export const acceptedSalesforcePaymentsInput = salesforcePaymentsInput;

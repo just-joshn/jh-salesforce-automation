@@ -117,7 +117,8 @@ export const createCheckoutInput = (variant: OrderableVariant): CheckoutInput =>
     shippingAddress,
   });
 
-export const basketIdFrom = (basket: Basket): string => required(basket.basketId, 'basket.basketId');
+export const basketIdFrom = (basket: Basket): string =>
+  required(basket.basketId, 'basket.basketId');
 
 export const defaultShipmentIdFrom = (basket: Basket): string =>
   required(basket.shipments?.[0]?.shipmentId, 'basket.shipments[0].shipmentId');

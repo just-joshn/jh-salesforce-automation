@@ -29,8 +29,10 @@ export const openUnavailableProduct = async (page: Page, productId: string): Pro
 
 export const addForPickupAndViewCart = async (page: Page): Promise<void> => {
   await Locators.pickupOptionLabel(page).click();
+  await Locators.selectedPickupOption(page).waitFor();
   await Locators.addToCartButton(page).click();
-  await Locators.viewCartLink(page).click();
+  await Locators.cartButtonWithCount(page, 1).waitFor();
+  await page.goto(buildPath('/cart'));
 };
 
 export const startGuestCheckout = async (page: Page, email: string): Promise<void> => {

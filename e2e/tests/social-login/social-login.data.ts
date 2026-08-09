@@ -20,7 +20,8 @@ const knownProviderLabels: Readonly<Record<string, string>> = Object.freeze({
 const titleCase = (value: string): string =>
   value.length === 0 ? value : `${value.charAt(0).toUpperCase()}${value.slice(1)}`;
 
-const providerLabel = (idp: string): string => knownProviderLabels[idp] ?? `${idp} ${titleCase(idp)}`;
+const providerLabel = (idp: string): string =>
+  knownProviderLabels[idp] ?? `${idp} ${titleCase(idp)}`;
 
 export const journeyProductFrom = ({ productName, variantId }: OrderableVariant): JourneyProduct =>
   Object.freeze({ name: productName, path: `/product/${variantId}` });

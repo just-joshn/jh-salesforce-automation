@@ -4,10 +4,7 @@
  * not artificially induced.
  */
 import { readAppConfiguration } from '../../../api/support/app-config';
-import {
-  evaluateExpressCheckoutGate,
-  formatGateSkipReason,
-} from '../../../api/support/gates';
+import { evaluateExpressCheckoutGate, formatGateSkipReason } from '../../../api/support/gates';
 import {
   findOrderableVariant,
   findOrderableVariantWithVariationValues,
@@ -57,35 +54,35 @@ test('CUJ 3 — completes a purchase through Express Checkout', async ({ page, r
   });
 });
 
-test(
-  'CUJ 3 — offers no express payment entry point on any surface when express payment is not configured',
-  async ({ page, request }) => {
-    const app = await readAppConfiguration(request);
-    const gate = await evaluateExpressCheckoutGate(app, request);
-    test.skip(gate.met, formatGateSkipReason(gate));
+test('CUJ 3 — offers no express payment entry point on any surface when express payment is not configured', async ({
+  page,
+  request,
+}) => {
+  const app = await readAppConfiguration(request);
+  const gate = await evaluateExpressCheckoutGate(app, request);
+  test.skip(gate.met, formatGateSkipReason(gate));
 
-    const token = await getGuestToken(request);
-    const initialCandidate = await findOrderableVariant(request, token.access_token);
-    const product = selectProduct(
-      isBundleOrSet(initialCandidate.productName)
-        ? await findOrderableVariantWithVariationValues(request, token.access_token)
-        : initialCandidate,
-    );
+  const token = await getGuestToken(request);
+  const initialCandidate = await findOrderableVariant(request, token.access_token);
+  const product = selectProduct(
+    isBundleOrSet(initialCandidate.productName)
+      ? await findOrderableVariantWithVariationValues(request, token.access_token)
+      : initialCandidate,
+  );
 
-    await Actions.visitProduct(page, product);
-    await expect(Locators.productHeading(page, product.productName)).toBeVisible();
-    await expect(Locators.addToCartButton(page)).toBeEnabled();
-    await expect(Locators.expressPaymentButton(page)).toHaveCount(0);
+  await Actions.visitProduct(page, product);
+  await expect(Locators.productHeading(page, product.productName)).toBeVisible();
+  await expect(Locators.addToCartButton(page)).toBeEnabled();
+  await expect(Locators.expressPaymentButton(page)).toHaveCount(0);
 
-    await Actions.addProductToBasket(page);
-    await expect(Locators.addedToCartHeading(page)).toBeVisible();
-    await Actions.openCart(page);
-    await expect(Locators.proceedToCheckoutLink(page)).toBeVisible();
-    await expect(Locators.expressPaymentButton(page)).toHaveCount(0);
+  await Actions.addProductToBasket(page);
+  await expect(Locators.addedToCartHeading(page)).toBeVisible();
+  await Actions.openCart(page);
+  await expect(Locators.proceedToCheckoutLink(page)).toBeVisible();
+  await expect(Locators.expressPaymentButton(page)).toHaveCount(0);
 
-    await Actions.startCheckout(page);
-    await expect(Locators.checkoutHeading(page)).toBeVisible();
-    await expect(Locators.emailInput(page)).toBeVisible();
-    await expect(Locators.expressPaymentButton(page)).toHaveCount(0);
-  },
-);
+  await Actions.startCheckout(page);
+  await expect(Locators.checkoutHeading(page)).toBeVisible();
+  await expect(Locators.emailInput(page)).toBeVisible();
+  await expect(Locators.expressPaymentButton(page)).toHaveCount(0);
+});

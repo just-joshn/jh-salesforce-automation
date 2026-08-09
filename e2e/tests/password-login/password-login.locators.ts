@@ -17,11 +17,15 @@ export const signInButton = (page: Page): Locator =>
 export const addToCartButton = (page: Page): Locator =>
   page.getByRole('button', { name: 'Add to Cart', exact: true });
 
-export const viewCartLink = (page: Page): Locator =>
-  page.getByRole('link', { name: 'View Cart', exact: true });
-
 export const cartButton = (page: Page): Locator =>
   page.getByRole('button', { name: /^My cart, number of items: \d+$/ });
+
+export const cartButtonWithCount = (page: Page, itemCount: number): Locator =>
+  page.getByRole('button', {
+    name: `My cart, number of items: ${itemCount}`,
+    exact: true,
+    includeHidden: true,
+  });
 
 export const cartProduct = (page: Page, productName: string): Locator =>
   page.getByRole('link', { name: productName, exact: true });

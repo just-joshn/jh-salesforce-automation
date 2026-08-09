@@ -11,7 +11,8 @@ export const visitStorefront = async (page: Page): Promise<void> => {
 export const buildGuestBasket = async (page: Page, product: GuestBasketProduct): Promise<void> => {
   await page.goto(buildPath(`/product/${product.productId}`));
   await Locators.addToCartButton(page).click();
-  await Locators.viewCartLink(page).click();
+  await Locators.cartButtonWithCount(page, 1).waitFor();
+  await page.goto(buildPath('/cart'));
 };
 
 export const requestPasswordlessLogin = async (

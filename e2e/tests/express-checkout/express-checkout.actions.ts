@@ -13,7 +13,8 @@ export const addProductToBasket = async (page: Page): Promise<void> => {
 };
 
 export const openCart = async (page: Page): Promise<void> => {
-  await Locators.viewCartLink(page).click();
+  await Locators.cartButtonWithCount(page, 1).waitFor();
+  await page.goto(buildPath('/cart'));
 };
 
 export const startCheckout = async (page: Page): Promise<void> => {

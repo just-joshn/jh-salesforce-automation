@@ -13,7 +13,10 @@ import * as Locators from './store-pickup.locators';
  * SCAPI mocking is banned, and either condition would disrupt this shared public demo.
  */
 
-test('CUJ 6 — places a confirmed pickup order for the selected store', async ({ page, request }) => {
+test('CUJ 6 — places a confirmed pickup order for the selected store', async ({
+  page,
+  request,
+}) => {
   const token = await getGuestToken(request);
   const pickupStore = await findPickupStore(request, token.access_token);
   const product = await findOrderableVariant(request, token.access_token);

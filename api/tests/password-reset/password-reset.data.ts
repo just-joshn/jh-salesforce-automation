@@ -1,7 +1,5 @@
 import { randomUUID } from 'node:crypto';
 
-import { env } from '../../../config/env';
-
 export interface CustomerRegistrationRequest {
   readonly customer: {
     readonly email: string;
@@ -12,12 +10,9 @@ export interface CustomerRegistrationRequest {
   readonly password: string;
 }
 
-export type ResetTokenRequest = Readonly<Record<string, string>> & {
-  readonly channel_id: string;
-  readonly locale: string;
-  readonly mode: string;
-  readonly user_id: string;
-};
+export interface ResetTokenRequest {
+  readonly login: string;
+}
 
 export interface ResetCustomer {
   readonly email: string;
@@ -43,11 +38,9 @@ export const createResetCustomer = (): ResetCustomer => {
       },
       password: 'Passw0rd!2026',
     },
-    resetTokenRequest: {
-      channel_id: env.SFCC_SITE_ID,
-      locale: 'en-us',
-      mode: 'email',
-      user_id: email,
-    },
+    resetTokenRequest: { login: email },
   };
 };
+
+export const accountManagerCredentialSkipReason = (): string =>
+  'Skipped: live Shopper Customers reset-token request returned HTTP 401 with SLAS bearer tokens; it requires unavailable Account Manager OAuth client credentials for sfcc.shopper-customers.login.';

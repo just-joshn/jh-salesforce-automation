@@ -6,10 +6,7 @@
  * injection. SCAPI mocking is prohibited, so neither recovery branch is artificially induced.
  */
 import { readAppConfiguration } from '../../../api/support/app-config';
-import {
-  evaluateSalesforcePaymentsGate,
-  formatGateSkipReason,
-} from '../../../api/support/gates';
+import { evaluateSalesforcePaymentsGate, formatGateSkipReason } from '../../../api/support/gates';
 import {
   findOrderableVariant,
   findOrderableVariantWithVariationValues,
@@ -70,33 +67,33 @@ test('CUJ 2 — completes a payment-backed checkout through Salesforce Payments'
   });
 });
 
-test(
-  'CUJ 2 — completes checkout through the standard payment surface when Salesforce Payments is not configured',
-  async ({ page, request }) => {
-    const app = await readAppConfiguration(request);
-    const gate = await evaluateSalesforcePaymentsGate(app, request);
-    test.skip(gate.met, formatGateSkipReason(gate));
+test('CUJ 2 — completes checkout through the standard payment surface when Salesforce Payments is not configured', async ({
+  page,
+  request,
+}) => {
+  const app = await readAppConfiguration(request);
+  const gate = await evaluateSalesforcePaymentsGate(app, request);
+  test.skip(gate.met, formatGateSkipReason(gate));
 
-    const token = await getGuestToken(request);
-    const initialCandidate = await findOrderableVariant(request, token.access_token);
-    const product = selectProduct(
-      isBundleOrSet(initialCandidate.productName)
-        ? await findOrderableVariantWithVariationValues(request, token.access_token)
-        : initialCandidate,
-    );
-    const checkout = createCheckoutInput();
+  const token = await getGuestToken(request);
+  const initialCandidate = await findOrderableVariant(request, token.access_token);
+  const product = selectProduct(
+    isBundleOrSet(initialCandidate.productName)
+      ? await findOrderableVariantWithVariationValues(request, token.access_token)
+      : initialCandidate,
+  );
+  const checkout = createCheckoutInput();
 
-    await Actions.visitProduct(page, product);
-    await expect(Locators.productHeading(page, product.productName)).toBeVisible();
-    await expect(Locators.addToCartButton(page)).toBeEnabled();
-    await Actions.addProductToBasket(page);
-    await expect(Locators.addedToCartHeading(page)).toBeVisible();
-    await Actions.startCheckout(page);
-    await expect(Locators.checkoutHeading(page)).toBeVisible();
-    await Actions.provideContact(page, checkout.email);
-    await Actions.provideShipping(page, checkout.shippingAddress);
+  await Actions.visitProduct(page, product);
+  await expect(Locators.productHeading(page, product.productName)).toBeVisible();
+  await expect(Locators.addToCartButton(page)).toBeEnabled();
+  await Actions.addProductToBasket(page);
+  await expect(Locators.addedToCartHeading(page)).toBeVisible();
+  await Actions.startCheckout(page);
+  await expect(Locators.checkoutHeading(page)).toBeVisible();
+  await Actions.provideContact(page, checkout.email);
+  await Actions.provideShipping(page, checkout.shippingAddress);
 
-    await expect(Locators.paymentHeading(page)).toBeVisible();
-    await expect(Locators.standardCardNumberInput(page)).toBeVisible();
-  },
-);
+  await expect(Locators.paymentHeading(page)).toBeVisible();
+  await expect(Locators.standardCardNumberInput(page)).toBeVisible();
+});

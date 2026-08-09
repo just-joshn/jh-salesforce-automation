@@ -3,10 +3,7 @@ import type { APIRequestContext, APIResponse, Page, Response } from '@playwright
 import { bearer, shopperApiUrl, withSite } from '../../../api/support/scapi';
 import { getGuestToken } from '../../../api/support/slas';
 import { buildPath } from '../../support/site';
-import {
-  toCustomerRegistrationRequest,
-  type RegistrationDetails,
-} from './registration.data';
+import { toCustomerRegistrationRequest, type RegistrationDetails } from './registration.data';
 import * as Locators from './registration.locators';
 
 export const visitStorefront = async (page: Page): Promise<void> => {
@@ -30,8 +27,7 @@ export const enterAccountDetails = async (
 
 export const submitRegistration = async (page: Page): Promise<Response> => {
   const customerResponse = page.waitForResponse(
-    (response) =>
-      response.request().method() === 'POST' && response.url().includes('/customers?'),
+    (response) => response.request().method() === 'POST' && response.url().includes('/customers?'),
   );
   await Locators.createAccountButton(page).click();
   return customerResponse;

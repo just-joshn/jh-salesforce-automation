@@ -7,8 +7,16 @@
  * state, which would mean faking the service this journey exercises. Shipment tracking owns the
  * un-ingested-order complement proving OMS actions remain absent from ordinary orders.
  */
-import { readOmsExpandedOrder, probeOmsAvailability, seededOmsOrderNumber } from '../../../api/support/oms';
-import { requireAuthenticatedShopper, getGuestToken, loginRegisteredShopper } from '../../../api/support/slas';
+import {
+  readOmsExpandedOrder,
+  probeOmsAvailability,
+  seededOmsOrderNumber,
+} from '../../../api/support/oms';
+import {
+  requireAuthenticatedShopper,
+  getGuestToken,
+  loginRegisteredShopper,
+} from '../../../api/support/slas';
 import { expect, test } from '../../support/fixtures';
 import { buildPath } from '../../support/site';
 import * as Actions from './order-cancellation.actions';

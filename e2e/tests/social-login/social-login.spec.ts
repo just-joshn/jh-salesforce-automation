@@ -20,7 +20,10 @@ import * as Locators from './social-login.locators';
  * "Callback state invalid", both live behind an external identity provider that this suite does not control.
  */
 
-test('CUJ 12 — offers every configured identity provider on the login surface', async ({ page, request }) => {
+test('CUJ 12 — offers every configured identity provider on the login surface', async ({
+  page,
+  request,
+}) => {
   const app = await readAppConfiguration(request);
   const gate = evaluateSocialLoginGate(app);
   test.skip(!gate.met, formatGateSkipReason(gate));

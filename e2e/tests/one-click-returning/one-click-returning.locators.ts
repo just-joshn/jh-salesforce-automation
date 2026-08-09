@@ -7,11 +7,15 @@ export const productHeading = (page: Page, productName: string): Locator =>
 export const addToCartButton = (page: Page): Locator =>
   page.getByRole('button', { name: 'Add to Cart', exact: true });
 
-export const viewCartLink = (page: Page): Locator =>
-  page.getByRole('link', { name: 'View Cart', exact: true });
-
 export const cartButton = (page: Page): Locator =>
   page.getByRole('button', { name: /^My cart, number of items: \d+$/ });
+
+export const cartButtonWithCount = (page: Page, itemCount: number): Locator =>
+  page.getByRole('button', {
+    name: `My cart, number of items: ${itemCount}`,
+    exact: true,
+    includeHidden: true,
+  });
 
 export const cartProduct = (page: Page, productName: string): Locator =>
   page.getByRole('link', { name: productName, exact: true });
@@ -31,8 +35,7 @@ export const checkoutEmailInput = (page: Page): Locator =>
 export const secureLinkButton = (page: Page): Locator =>
   page.getByRole('button', { name: 'Secure Link', exact: true });
 
-export const otpInputs = (page: Page): Locator =>
-  page.getByRole('dialog').getByRole('textbox');
+export const otpInputs = (page: Page): Locator => page.getByRole('dialog').getByRole('textbox');
 
 export const accountButton = (page: Page): Locator =>
   page.getByRole('button', { name: 'My Account', exact: true });

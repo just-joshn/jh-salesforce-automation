@@ -38,8 +38,7 @@ test('CUJ 16 — cancels an eligible Order-Management-managed order', async ({ r
   });
 
   const response = await test.step('Submit to SOM', async () =>
-    Actions.cancelOmsOrder(request, gate.orderNo, accessToken, body),
-  );
+    Actions.cancelOmsOrder(request, gate.orderNo, accessToken, body));
 
   await test.step('View updated canceled state', async () => {
     expect(response.status()).toBe(200);

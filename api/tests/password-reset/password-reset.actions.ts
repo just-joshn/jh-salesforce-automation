@@ -21,5 +21,10 @@ export const registerCustomer = async (
 
 export const requestResetToken = async (
   request: APIRequestContext,
+  accountManagerAccessToken: string,
   body: ResetTokenRequest,
-): Promise<APIResponse> => request.post(Endpoints.resetToken(), { form: body });
+): Promise<APIResponse> =>
+  request.post(Endpoints.resetToken(), {
+    ...shopperOptions(accountManagerAccessToken),
+    data: body,
+  });

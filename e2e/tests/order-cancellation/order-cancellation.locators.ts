@@ -52,4 +52,5 @@ export const cancellationSuccessAlert = (page: Page): Locator =>
 
 // Not live-observable without a configured shopper session; verified against the deployed template's
 // account order-detail contract.
-export const canceledOrderStatus = (page: Page): Locator => page.getByText('Canceled', { exact: true });
+export const canceledOrderStatus = (page: Page): Locator =>
+  page.getByText('Canceled', { exact: true });

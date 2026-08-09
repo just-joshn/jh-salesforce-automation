@@ -23,8 +23,7 @@ test('CUJ 17 — submits a return for an eligible Order-Management-managed item 
   }
 
   const order = await test.step('Open eligible OMS order', async () =>
-    Actions.readReturnOrder(request, gate.orderNo, accessToken),
-  );
+    Actions.readReturnOrder(request, gate.orderNo, accessToken));
 
   const selection = await test.step('Start return/select items', () => {
     const nextSelection = Data.returnSelection(order, gate.metadata);
@@ -40,8 +39,7 @@ test('CUJ 17 — submits a return for an eligible Order-Management-managed item 
   const body = await test.step('Review/submit return', () => Data.returnRequest(selection));
 
   const response = await test.step('SOM validates/creates return', async () =>
-    Actions.submitOmsReturn(request, gate.orderNo, accessToken, body),
-  );
+    Actions.submitOmsReturn(request, gate.orderNo, accessToken, body));
 
   await test.step('View refreshed return state', async () => {
     expect(response.status()).toBe(200);
@@ -50,7 +48,9 @@ test('CUJ 17 — submits a return for an eligible Order-Management-managed item 
   });
 });
 
-test('CUJ 17 — exposes no return surface while Order Management is inactive', async ({ request }) => {
+test('CUJ 17 — exposes no return surface while Order Management is inactive', async ({
+  request,
+}) => {
   const { access_token: accessToken } = await getGuestToken(request);
   const availability = await probeOmsAvailability(request, accessToken);
 

@@ -19,7 +19,8 @@ export interface RouteProbe {
 
 export const expected = Object.freeze({ basketStatus: 200 });
 
-export const basketIdFrom = (basket: Basket): string => required(basket.basketId, 'basket.basketId');
+export const basketIdFrom = (basket: Basket): string =>
+  required(basket.basketId, 'basket.basketId');
 
 const isBasket = (value: unknown): value is Basket =>
   typeof value === 'object' && value !== null && !Array.isArray(value);

@@ -18,7 +18,8 @@ export const addProductToBasket = async (page: Page): Promise<void> => {
 };
 
 export const startCheckout = async (page: Page): Promise<void> => {
-  await Locators.viewCartLink(page).click();
+  await Locators.cartButtonWithCount(page, 1).waitFor();
+  await page.goto(buildPath('/cart'));
   await Locators.proceedToCheckoutLink(page).click();
 };
 
@@ -27,10 +28,7 @@ export const provideContact = async (page: Page, email: string): Promise<void> =
   await Locators.checkoutAsGuestButton(page).click();
 };
 
-export const provideShipping = async (
-  page: Page,
-  address: ShippingAddress,
-): Promise<void> => {
+export const provideShipping = async (page: Page, address: ShippingAddress): Promise<void> => {
   await Locators.firstNameInput(page).fill(address.firstName);
   await Locators.lastNameInput(page).fill(address.lastName);
   await Locators.phoneInput(page).fill(address.phone);

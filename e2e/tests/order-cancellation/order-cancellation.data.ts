@@ -1,6 +1,10 @@
 import { env } from '../../../config/env';
 import type { OmsAvailability, SeededOmsOrderNumber } from '../../../api/support/oms';
-import type { OmsMetaData, OmsReasonCode, OrderProductItem } from '../../../api/support/scapi-types';
+import type {
+  OmsMetaData,
+  OmsReasonCode,
+  OrderProductItem,
+} from '../../../api/support/scapi-types';
 
 export interface CancellationCredentials {
   readonly email: string;
@@ -98,4 +102,5 @@ export const requireCancellationCredentials = (): CancellationCredentials => {
 
 export const preferredCancellationReason = (
   reasonCodes: readonly OmsReasonCode[],
-): string | undefined => reasonCodes.find((reason) => reason.default)?.reason ?? reasonCodes[0]?.reason;
+): string | undefined =>
+  reasonCodes.find((reason) => reason.default)?.reason ?? reasonCodes[0]?.reason;

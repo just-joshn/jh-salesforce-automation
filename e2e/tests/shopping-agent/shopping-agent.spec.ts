@@ -3,10 +3,7 @@ import { evaluateCommerceAgentGate, formatGateSkipReason } from '../../../api/su
 import { expect, test } from '../../support/fixtures';
 import { buildPath } from '../../support/site';
 import * as Actions from './shopping-agent.actions';
-import {
-  providerBundleExpectation,
-  searchTerm,
-} from './shopping-agent.data';
+import { providerBundleExpectation, searchTerm } from './shopping-agent.data';
 import * as Locators from './shopping-agent.locators';
 
 /*
@@ -33,7 +30,9 @@ test('CUJ 8 — obtains actionable commerce assistance without losing storefront
 
   await test.step('Open agent', async () => {
     await Actions.visitStorefront(page, buildPath('/'));
-    await expect.poll(() => Actions.providerBundleWasRequested(bundleObservation, provider)).toBe(true);
+    await expect
+      .poll(() => Actions.providerBundleWasRequested(bundleObservation, provider))
+      .toBe(true);
     await Actions.openAgent(page);
   });
 

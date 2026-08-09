@@ -94,6 +94,8 @@ export const tokenExchangeForm = (
   usid,
 });
 
-export const basicAuthorization = (credentials: LoginCredentials): Readonly<Record<string, string>> => ({
+export const basicAuthorization = (
+  credentials: LoginCredentials,
+): Readonly<Record<string, string>> => ({
   Authorization: `Basic ${Buffer.from(`${credentials.email}:${credentials.password}`).toString('base64')}`,
 });

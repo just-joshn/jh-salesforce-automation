@@ -36,14 +36,21 @@ export const selectedStoreButton = (page: Page, storeName: string): Locator =>
 export const pickupOption = (page: Page): Locator =>
   page.getByRole('radio', { name: 'Pick Up in Store', exact: true });
 
+export const selectedPickupOption = (page: Page): Locator =>
+  page.getByRole('radio', { name: 'Pick Up in Store', exact: true, checked: true });
+
 // Chakra renders fulfillment inputs visually hidden beneath their labels, so click the parent label.
 export const pickupOptionLabel = (page: Page): Locator => pickupOption(page).locator('..');
 
 export const addToCartButton = (page: Page): Locator =>
   page.getByRole('button', { name: /^Add(?: Bundle)? to Cart$/ });
 
-export const viewCartLink = (page: Page): Locator =>
-  page.getByRole('link', { name: 'View Cart', exact: true });
+export const cartButtonWithCount = (page: Page, itemCount: number): Locator =>
+  page.getByRole('button', {
+    name: `My cart, number of items: ${itemCount}`,
+    exact: true,
+    includeHidden: true,
+  });
 
 export const cartPickupSummary = (page: Page): Locator =>
   page.getByText(/^Pick Up in Store - \d+ out of \d+ items$/);
@@ -81,14 +88,12 @@ export const billingFirstNameInput = (page: Page): Locator =>
 export const billingLastNameInput = (page: Page): Locator =>
   page.getByLabel('Last Name', { exact: true });
 
-export const billingPhoneInput = (page: Page): Locator =>
-  page.getByLabel('Phone', { exact: true });
+export const billingPhoneInput = (page: Page): Locator => page.getByLabel('Phone', { exact: true });
 
 export const billingAddressInput = (page: Page): Locator =>
   page.getByLabel('Address', { exact: true });
 
-export const billingCityInput = (page: Page): Locator =>
-  page.getByLabel('City', { exact: true });
+export const billingCityInput = (page: Page): Locator => page.getByLabel('City', { exact: true });
 
 export const billingStateSelect = (page: Page): Locator =>
   page.getByLabel('State', { exact: true });

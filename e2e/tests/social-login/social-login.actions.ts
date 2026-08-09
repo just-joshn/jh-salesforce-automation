@@ -11,17 +11,15 @@ export const visitStorefront = async (page: Page): Promise<void> => {
 export const buildGuestBasket = async (page: Page, product: JourneyProduct): Promise<void> => {
   await page.goto(buildPath(product.path));
   await Locators.addToCartButton(page).click();
-  await Locators.viewCartLink(page).click();
+  await Locators.cartButtonWithCount(page, 1).waitFor();
+  await page.goto(buildPath('/cart'));
 };
 
 export const openSocialLogin = async (page: Page): Promise<void> => {
   await Locators.accountButton(page).click();
 };
 
-export const chooseSocialProvider = async (
-  page: Page,
-  provider: SocialProvider,
-): Promise<void> => {
+export const chooseSocialProvider = async (page: Page, provider: SocialProvider): Promise<void> => {
   await Locators.socialProviderButton(page, provider.label).click();
 };
 

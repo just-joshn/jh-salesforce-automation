@@ -12,7 +12,10 @@ import * as Locators from './password-reset.locators';
 // Authored but unproven: this callback-only path runs only when resetPassword.mode is "callback".
 // Out of scope: Step 2 "Reset message not delivered" and Step 3 "Token expired/invalid" require
 // control of an external delivery channel and a real token, neither of which this suite has.
-test('CUJ 13 — resets the account password through callback delivery', async ({ page, request }) => {
+test('CUJ 13 — resets the account password through callback delivery', async ({
+  page,
+  request,
+}) => {
   const app = await readAppConfiguration(request);
   const gate = evaluatePasswordResetExternalCallbackGate(app);
   test.skip(!gate.met, formatGateSkipReason(gate));

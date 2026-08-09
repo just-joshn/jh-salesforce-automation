@@ -9,6 +9,10 @@ const baseURL = process.env.E2E_BASE_URL ?? 'https://pwa-kit.mobify-storefront.c
 
 export default defineConfig({
   testDir: '.',
+  /* A journey that checks out against the shared live demo needs more than the 30s default,
+     especially on WebKit where hydration lands later. */
+  timeout: 120_000,
+  expect: { timeout: 15_000 },
   fullyParallel: false,
   /* Fail CI if someone left test.only in. */
   forbidOnly: !!process.env.CI,

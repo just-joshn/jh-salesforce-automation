@@ -14,11 +14,17 @@ export const visitProduct = async (page: Page, productId: string): Promise<void>
 };
 
 export const addProductToBasket = async (page: Page): Promise<void> => {
+  await Locators.cartButtonWithCount(page, 0).waitFor();
+  if (await Locators.declineTrackingButton(page).isVisible()) {
+    await Locators.declineTrackingButton(page).click();
+    await Locators.declineTrackingButton(page).waitFor({ state: 'hidden' });
+  }
   await Locators.addToCartButton(page).click();
 };
 
 export const reviewBasketAndStartCheckout = async (page: Page): Promise<void> => {
-  await Locators.viewCartLink(page).click();
+  await Locators.cartButtonWithCount(page, 1).waitFor();
+  await page.goto(buildPath('/cart'));
   await Locators.proceedToCheckoutLink(page).click();
 };
 

@@ -1,7 +1,4 @@
-import type {
-  OmsAvailability,
-  SeededOmsOrderNumber,
-} from '../../../api/support/oms';
+import type { OmsAvailability, SeededOmsOrderNumber } from '../../../api/support/oms';
 import type { OmsMetaData, OmsReasonCode, Order } from '../../../api/support/scapi-types';
 
 type OmsOrderProductItem = NonNullable<Order['productItems']>[number];
@@ -37,7 +34,8 @@ const isReturnableQuantity = (quantity: number | undefined): quantity is number 
   typeof quantity === 'number' && quantity > 0;
 
 export const isReturnableOrderItem = (item: OmsOrderProductItem): item is ReturnableOrderItem =>
-  typeof item.productName === 'string' && isReturnableQuantity(item.omsData?.quantityAvailableToReturn);
+  typeof item.productName === 'string' &&
+  isReturnableQuantity(item.omsData?.quantityAvailableToReturn);
 
 const returnableOrderItem = (order: Order): ReturnableOrderItem => {
   for (const item of order.productItems ?? []) {

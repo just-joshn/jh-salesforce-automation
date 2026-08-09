@@ -1,29 +1,51 @@
 import type { Page } from '@playwright/test';
 
 import { buildPath } from '../../support/site';
-import type {
-  JourneyProduct,
-  PaymentCard,
-  ShippingAddress,
-} from './multi-shipment.data';
+import type { JourneyProduct, PaymentCard, ShippingAddress } from './multi-shipment.data';
 import * as Locators from './multi-shipment.locators';
 
 export const visitProduct = async (page: Page, product: JourneyProduct): Promise<void> => {
   await page.goto(buildPath(`/product/${product.productId}?pid=${product.variantId}`));
 };
 
-export const addFirstProduct = async (page: Page, product: JourneyProduct): Promise<void> => {
-  await visitProduct(page, product);
-  await Locators.addToCartButton(page).click();
-  await Locators.closeAddedToCartButton(page).click();
+const waitForBasketState = async (page: Page, itemCount: number): Promise<void> => {
+  await Locators.cartCountButton(page, itemCount).waitFor();
+  if (await Locators.declineTrackingButton(page).isVisible()) {
+    await Locators.declineTrackingButton(page).click();
+    await Locators.declineTrackingButton(page).waitFor({ state: 'hidden' });
+  }
 };
 
-export const addSecondProductAndOpenCart = async (
+const addProductAtCount = async (
   page: Page,
   product: JourneyProduct,
+  itemCount: number,
 ): Promise<void> => {
   await visitProduct(page, product);
+  await waitForBasketState(page, itemCount);
+  const basketResponse = page.waitForResponse(
+    (response) =>
+      response.request().method() === 'POST' &&
+      /\/baskets\/[^/]+\/items(?:\?|$)/.test(response.url()),
+  );
   await Locators.addToCartButton(page).click();
+  const response = await basketResponse;
+  if (!response.ok()) {
+    throw new Error(`Add-to-cart request failed with HTTP ${response.status()}`);
+  }
+  await page.reload();
+  await waitForBasketState(page, itemCount + 1);
+};
+
+export const addFirstProduct = async (page: Page, product: JourneyProduct): Promise<void> => {
+  await addProductAtCount(page, product, 0);
+};
+
+export const addSecondProduct = async (page: Page, product: JourneyProduct): Promise<void> => {
+  await addProductAtCount(page, product, 1);
+};
+
+export const openCart = async (page: Page): Promise<void> => {
   await page.goto(buildPath('/cart'));
 };
 
@@ -62,21 +84,19 @@ export const selectShippingMethods = async (
   page: Page,
   methodNames: readonly [string, string],
 ): Promise<void> => {
-  await Locators.editShippingOptionsButton(page).click();
-  await Locators.shippingMethodRadio(page, methodNames[0], 0).press('Space');
-  await Locators.shippingMethodRadio(page, methodNames[1], 1).press('Space');
-  await Locators.continueToPaymentButton(page).press('Enter');
+  const secondMethodIndex = methodNames[0] === methodNames[1] ? 1 : 0;
+  await Locators.shippingSummaryMethod(page, methodNames[0]).first().waitFor();
+  await Locators.shippingSummaryMethod(page, methodNames[1]).nth(secondMethodIndex).waitFor();
+  await Locators.cardNumberInput(page).waitFor();
 };
 
 export const openShippingOptions = async (page: Page): Promise<void> => {
+  await Locators.cardNumberInput(page).waitFor();
   await Locators.editShippingOptionsButton(page).click();
   await Locators.continueToPaymentButton(page).waitFor();
 };
 
-export const selectFirstShipmentMethod = async (
-  page: Page,
-  methodName: string,
-): Promise<void> => {
+export const selectFirstShipmentMethod = async (page: Page, methodName: string): Promise<void> => {
   await Locators.shippingMethodRadio(page, methodName, 0).press('Space');
   await Locators.continueToPaymentButton(page).press('Enter');
 };
@@ -87,8 +107,15 @@ export const changeDestination = async (
   addressOption: string,
 ): Promise<void> => {
   await Locators.editShippingAddressesButton(page).click();
+  await Locators.returnToSingleShipmentButton(page).waitFor();
+  await Locators.deliveryAddressOption(page, productName, addressOption).waitFor({
+    state: 'attached',
+  });
   await Locators.deliveryAddressSelect(page, productName).selectOption({ label: addressOption });
-  await Locators.continueToShippingButton(page).click();
+  await Locators.selectedDeliveryAddress(page, productName, addressOption).waitFor({
+    state: 'attached',
+  });
+  await Locators.continueToShippingButton(page).press('Enter');
   await Locators.editShippingAddressButton(page).waitFor();
 };
 

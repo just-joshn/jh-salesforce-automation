@@ -27,14 +27,11 @@ test('CUJ 10 — preserves the guest basket through registered login', async ({ 
     expect(createResponse.status()).toBe(200);
     const created = (await createResponse.json()) as Basket;
     const basketId = required(created.basketId, 'basket.basketId');
-    const itemResponse = await Actions.addBasketItem(
-      request,
-      {
-        accessToken: guest.access_token,
-        basketId,
-        items: toBasketItemRequest(product),
-      },
-    );
+    const itemResponse = await Actions.addBasketItem(request, {
+      accessToken: guest.access_token,
+      basketId,
+      items: toBasketItemRequest(product),
+    });
     expect(itemResponse.status()).toBe(200);
     const basketWithItem = (await itemResponse.json()) as Basket;
     expect(Actions.hasProduct(basketWithItem, product.variantId)).toBe(true);
@@ -50,11 +47,7 @@ test('CUJ 10 — preserves the guest basket through registered login', async ({ 
     );
     expect(registrationResponse.status()).toBe(200);
     const customer = (await registrationResponse.json()) as Customer;
-    const result = await Actions.loginWithGuestUsid(
-      request,
-      credentials,
-      guestBasket.guest.usid,
-    );
+    const result = await Actions.loginWithGuestUsid(request, credentials, guestBasket.guest.usid);
     expect(result.status).toBe(303);
     expect(result.tokenStatus).toBe(200);
     expect(result.customerId).toBe(required(customer.customerId, 'customer.customerId'));
@@ -84,11 +77,7 @@ test('CUJ 10 — preserves the guest basket through registered login', async ({ 
 
 test('CUJ 10 — refuses invalid credentials without issuing a token', async ({ request }) => {
   const credentials = createInvalidCredentials();
-  const result = await loginRegisteredShopper(
-    request,
-    credentials.email,
-    credentials.password,
-  );
+  const result = await loginRegisteredShopper(request, credentials.email, credentials.password);
   expect(result.status).toBe(401);
   expect(result.accessToken).toBeUndefined();
   expect(result.customerId).toBeUndefined();

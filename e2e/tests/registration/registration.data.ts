@@ -25,9 +25,7 @@ export const createRegistrationDetails = (): RegistrationDetails =>
     password: 'Passw0rd!2026',
   });
 
-export const toInvalidRegistrationDetails = (
-  details: RegistrationDetails,
-): RegistrationDetails =>
+export const toInvalidRegistrationDetails = (details: RegistrationDetails): RegistrationDetails =>
   Object.freeze({
     ...details,
     firstName: '',

@@ -10,7 +10,9 @@ import { expect, test } from '@playwright/test';
 import * as Actions from './shipment-tracking.actions';
 import * as Data from './shipment-tracking.data';
 
-test('CUJ 15 — reaches valid carrier tracking information for an owned order', async ({ request }) => {
+test('CUJ 15 — reaches valid carrier tracking information for an owned order', async ({
+  request,
+}) => {
   const { access_token: accessToken } = await getGuestToken(request);
   const availability = await probeOmsAvailability(request, accessToken);
   const gate = Data.trackingJourneyGate(availability, seededOmsOrderNumber('tracking'));
@@ -24,8 +26,7 @@ test('CUJ 15 — reaches valid carrier tracking information for an owned order',
   });
 
   const order = await test.step('Load OMS-enriched order', async () =>
-    Actions.readTrackingOrder(request, gate.orderNo, accessToken),
-  );
+    Actions.readTrackingOrder(request, gate.orderNo, accessToken));
 
   const actions = await test.step('Locate tracking action', () => {
     const trackingActions = Data.expectedTrackingActions(order);
@@ -43,11 +44,15 @@ test('CUJ 15 — reaches valid carrier tracking information for an owned order',
   });
 
   await test.step('View carrier status', () => {
-    expect(actions.every((action) => new URL(action.carrierUrl).protocol !== 'javascript:')).toBe(true);
+    expect(actions.every((action) => new URL(action.carrierUrl).protocol !== 'javascript:')).toBe(
+      true,
+    );
   });
 });
 
-test('CUJ 15 — carries no Order Management state on an order it has not ingested', async ({ request }) => {
+test('CUJ 15 — carries no Order Management state on an order it has not ingested', async ({
+  request,
+}) => {
   const { access_token: accessToken } = await getGuestToken(request);
   const response = await Actions.readOmsMetadata(request, accessToken);
 

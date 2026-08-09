@@ -1,4 +1,8 @@
-import { readOmsExpandedOrder, probeOmsAvailability, seededOmsOrderNumber } from '../../../api/support/oms';
+import {
+  readOmsExpandedOrder,
+  probeOmsAvailability,
+  seededOmsOrderNumber,
+} from '../../../api/support/oms';
 import { getGuestToken } from '../../../api/support/slas';
 import { expect, test } from '../../support/fixtures';
 import { buildPath } from '../../support/site';
@@ -95,11 +99,7 @@ test('CUJ 17 — refuses a requested quantity above the returnable quantity', as
   await Actions.openOmsOrder(page, gate.orderNo);
   await Actions.startReturn(page);
   await Actions.selectReturnItem(page, selection.itemName);
-  await Actions.setReturnQuantity(
-    page,
-    selection.itemName,
-    Data.quantityText(requestedQuantity),
-  );
+  await Actions.setReturnQuantity(page, selection.itemName, Data.quantityText(requestedQuantity));
   await Actions.selectReturnReason(page, selection.reason);
   await Actions.reviewReturn(page);
 

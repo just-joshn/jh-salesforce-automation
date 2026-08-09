@@ -1,4 +1,4 @@
-import type { Page, Response } from '@playwright/test';
+import type { APIResponse, Page } from '@playwright/test';
 
 import { buildPath } from '../../support/site';
 import {
@@ -26,12 +26,15 @@ const raiseForServerFailure = (url: string, status: number): void => {
   }
 };
 
-const isSfraPage = async (response: Response, candidate: SfraRouteCandidate, page: Page): Promise<boolean> => {
+const isSfraPage = async (
+  response: APIResponse,
+  candidate: SfraRouteCandidate,
+): Promise<boolean> => {
   if (!isSuccessfulStatus(response.status())) {
     return false;
   }
 
-  return (await page.content()).includes(candidate.expectedHtmlMarker);
+  return (await response.text()).includes(candidate.expectedHtmlMarker);
 };
 
 const probeRoute = async (
@@ -39,14 +42,10 @@ const probeRoute = async (
   candidate: SfraRouteCandidate,
 ): Promise<SfraProbeObservation> => {
   const url = sfraRouteUrl(candidate);
-  const response = await page.goto(url);
-  if (!response) {
-    throw new Error(`SFRA route probe returned no response for ${url}`);
-  }
-
+  const response = await page.request.get(url);
   const status = response.status();
   raiseForServerFailure(url, status);
-  return { servesSfraPage: await isSfraPage(response, candidate, page), status, url };
+  return { servesSfraPage: await isSfraPage(response, candidate), status, url };
 };
 
 const absenceReason = (observations: readonly SfraProbeObservation[]): string =>
@@ -68,8 +67,18 @@ export const probeSfraAvailability = async (page: Page): Promise<SfraAvailabilit
 
 export const buildPwaBasket = async (page: Page, product: PwaJourneyProduct): Promise<void> => {
   await page.goto(buildPath(product.path));
+  await Locators.cartButtonWithCount(page, 0).waitFor();
+  const basketResponse = page.waitForResponse(
+    (response) =>
+      response.request().method() === 'POST' &&
+      /\/baskets\/[^/]+\/items(?:\?|$)/.test(response.url()),
+  );
   await Locators.addToCartButton(page).click();
-  await Locators.viewCartLink(page).click();
+  const response = await basketResponse;
+  if (!response.ok()) {
+    throw new Error(`Add-to-cart request failed with HTTP ${response.status()}`);
+  }
+  await page.goto(buildPath('/cart'));
 };
 
 export const captureShopperSession = async (page: Page): Promise<ShopperSession> => {

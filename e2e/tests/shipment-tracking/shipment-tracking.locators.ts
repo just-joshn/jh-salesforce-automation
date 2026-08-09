@@ -9,8 +9,15 @@ export const addToCartButton = (page: Page): Locator =>
 export const addedToCartHeading = (page: Page): Locator =>
   page.getByRole('heading', { name: /^\d+ items? added to cart$/, level: 1 });
 
-export const viewCartLink = (page: Page): Locator =>
-  page.getByRole('link', { name: 'View Cart', exact: true });
+export const cartButtonWithCount = (page: Page, itemCount: number): Locator =>
+  page.getByRole('button', {
+    name: `My cart, number of items: ${itemCount}`,
+    exact: true,
+    includeHidden: true,
+  });
+
+export const declineTrackingButton = (page: Page): Locator =>
+  page.getByRole('button', { name: 'Decline tracking', exact: true });
 
 export const proceedToCheckoutLink = (page: Page): Locator =>
   page.getByRole('link', { name: /^Proceed to Checkout(?: Secure)?$/ });

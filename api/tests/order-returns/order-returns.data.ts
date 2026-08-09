@@ -1,6 +1,11 @@
 import type { OmsAvailability, SeededOmsOrderNumber } from '../../support/oms';
 import { required } from '../../support/scapi';
-import type { OmsMetaData, OmsReasonCode, Order, OrderProductItem } from '../../support/scapi-types';
+import type {
+  OmsMetaData,
+  OmsReasonCode,
+  Order,
+  OrderProductItem,
+} from '../../support/scapi-types';
 
 interface ReturnQuantities {
   readonly quantityAvailableToReturn: number;
@@ -13,7 +18,9 @@ interface ReturnEligibleItem extends OrderProductItem {
 type DataRecord = Readonly<Record<string, unknown>>;
 
 export interface ReturnRequest {
-  readonly productItems: readonly [{ readonly itemId: string; readonly quantity: number; readonly reason: string }];
+  readonly productItems: readonly [
+    { readonly itemId: string; readonly quantity: number; readonly reason: string },
+  ];
 }
 
 export interface ReturnSelection {

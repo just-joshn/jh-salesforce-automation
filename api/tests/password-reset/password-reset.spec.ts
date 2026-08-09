@@ -7,7 +7,11 @@ import {
 } from '../../support/gates';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './password-reset.actions';
-import { createResetCustomer, expected } from './password-reset.data';
+import {
+  accountManagerCredentialSkipReason,
+  createResetCustomer,
+  expected,
+} from './password-reset.data';
 
 // OUT OF SCOPE: Pain rows 2 (delivery failure) and 3 (expired token) require a callback-delivery
 // integration. Scope constraint: Cross-service only in callback/external-delivery mode. Default
@@ -39,14 +43,24 @@ test('CUJ 13 — resets the account password through callback delivery', async (
 });
 
 test('CUJ 13 — accepts a password reset request for a registered customer', async ({ request }) => {
+  await readAppConfiguration(request);
+  test.skip(true, accountManagerCredentialSkipReason());
   const token = await getGuestToken(request);
   const customer = createResetCustomer();
 
   await test.step('1 Request reset', async () => {
-    const registration = await Actions.registerCustomer(request, token.access_token, customer.registration);
+    const registration = await Actions.registerCustomer(
+      request,
+      token.access_token,
+      customer.registration,
+    );
     expect(registration.status()).toBe(expected.customerRegistrationStatus);
 
-    const reset = await Actions.requestResetToken(request, customer.resetTokenRequest);
+    const reset = await Actions.requestResetToken(
+      request,
+      '<Account Manager OAuth access token>',
+      customer.resetTokenRequest,
+    );
     expect(reset.status()).toBe(expected.resetTokenStatus);
   });
 });

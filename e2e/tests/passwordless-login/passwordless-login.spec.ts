@@ -80,7 +80,9 @@ test('CUJ 11 — verifies the emailed token and resumes with the basket intact',
   const tokenLength = app.login?.tokenLength;
   test.skip(true, externalTokenSkipReason(gate.mode, tokenLength, landingPath));
   if (landingPath === undefined || tokenLength === undefined) {
-    throw new Error('Passwordless token verification requires observed landingPath and tokenLength');
+    throw new Error(
+      'Passwordless token verification requires observed landingPath and tokenLength',
+    );
   }
   const guestToken = await getGuestToken(request);
   const product = toGuestBasketProduct(
@@ -89,7 +91,9 @@ test('CUJ 11 — verifies the emailed token and resumes with the basket intact',
   const passwordlessRequest = createPasswordlessLoginRequest();
   const deliveredToken = process.env.E2E_PASSWORDLESS_TOKEN;
   if (deliveredToken === undefined) {
-    throw new Error('Passwordless token verification requires a token delivered to an external mailbox');
+    throw new Error(
+      'Passwordless token verification requires a token delivered to an external mailbox',
+    );
   }
 
   await Actions.buildGuestBasket(page, product);

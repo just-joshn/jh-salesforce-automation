@@ -11,5 +11,9 @@ export const emptyBasketMessage = (page: Page): Locator =>
 
 export const storefrontMain = (page: Page): Locator => page.getByRole('main');
 
-export const viewCartLink = (page: Page): Locator =>
-  page.getByRole('link', { name: 'View Cart', exact: true });
+export const cartButtonWithCount = (page: Page, itemCount: number): Locator =>
+  page.getByRole('button', {
+    name: `My cart, number of items: ${itemCount}`,
+    exact: true,
+    includeHidden: true,
+  });

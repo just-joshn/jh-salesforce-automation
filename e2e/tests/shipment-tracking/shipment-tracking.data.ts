@@ -82,7 +82,9 @@ export const externalCarrierUrl = (rawUrl: string): string | undefined => {
     throw error;
   }
 
-  return parsed.protocol === 'http:' || parsed.protocol === 'https:' ? parsed.toString() : undefined;
+  return parsed.protocol === 'http:' || parsed.protocol === 'https:'
+    ? parsed.toString()
+    : undefined;
 };
 
 const shipmentTrackingAction = (
@@ -119,7 +121,9 @@ export const expectedTrackingActions = (order: Order): readonly TrackingAction[]
 export const rejectedTrackingUrls = (order: Order): readonly string[] =>
   omsShipments(order)
     .map((shipment) => shipment.trackingUrl)
-    .filter((url): url is string => typeof url === 'string' && externalCarrierUrl(url) === undefined);
+    .filter(
+      (url): url is string => typeof url === 'string' && externalCarrierUrl(url) === undefined,
+    );
 
 export const trackingNavigation = (
   actions: readonly TrackingAction[],
@@ -156,7 +160,8 @@ export const trackingJourneyGate = (
 };
 
 export const carriesNoOmsData = (order: Order): boolean =>
-  order.omsData === undefined && (order.productItems ?? []).every((item) => item.omsData === undefined);
+  order.omsData === undefined &&
+  (order.productItems ?? []).every((item) => item.omsData === undefined);
 
 const shipmentStatusLabel = (status: string): string => {
   switch (status) {

@@ -9,11 +9,21 @@ export const visitProduct = async (page: Page, productId: string): Promise<void>
 };
 
 export const addProductToBasket = async (page: Page): Promise<void> => {
+  await Locators.cartButtonWithCount(page, 0).waitFor();
+  const basketResponse = page.waitForResponse(
+    (response) =>
+      response.request().method() === 'POST' &&
+      /\/baskets\/[^/]+\/items(?:\?|$)/.test(response.url()),
+  );
   await Locators.addToCartButton(page).click();
+  const response = await basketResponse;
+  if (!response.ok()) {
+    throw new Error(`Add-to-cart request failed with HTTP ${response.status()}`);
+  }
 };
 
 export const reviewBasketAndStartCheckout = async (page: Page): Promise<void> => {
-  await Locators.viewCartLink(page).click();
+  await page.goto(buildPath('/cart'));
   await Locators.proceedToCheckoutLink(page).click();
 };
 
@@ -22,10 +32,7 @@ export const provideContact = async (page: Page, email: string): Promise<void> =
   await Locators.checkoutAsGuestButton(page).click();
 };
 
-export const fillShippingAddress = async (
-  page: Page,
-  address: ShippingAddress,
-): Promise<void> => {
+export const fillShippingAddress = async (page: Page, address: ShippingAddress): Promise<void> => {
   await Locators.firstNameInput(page).fill(address.firstName);
   await Locators.lastNameInput(page).fill(address.lastName);
   await Locators.phoneInput(page).fill(address.phone);
@@ -35,10 +42,7 @@ export const fillShippingAddress = async (
   await Locators.zipCodeInput(page).fill(address.zipCode);
 };
 
-export const provideShipping = async (
-  page: Page,
-  address: ShippingAddress,
-): Promise<void> => {
+export const provideShipping = async (page: Page, address: ShippingAddress): Promise<void> => {
   await fillShippingAddress(page, address);
   await Locators.continueToShippingButton(page).click();
 };

@@ -78,7 +78,9 @@ test('CUJ 14 — keeps one SLAS session and basket usable across sequential requ
   await test.step('6 Continue intended task', () => {
     expect(basket.basketId).toBe(basketId);
     expect(basket.productItems).toEqual(
-      expect.arrayContaining([expect.objectContaining({ productId: variant.variantId, quantity: 1 })]),
+      expect.arrayContaining([
+        expect.objectContaining({ productId: variant.variantId, quantity: 1 }),
+      ]),
     );
   });
 });

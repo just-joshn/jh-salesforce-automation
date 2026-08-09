@@ -50,10 +50,10 @@ export const registerCustomer = async (
 
 export const requestPasswordlessLogin = async (
   request: APIRequestContext,
-  accessToken: string,
+  authorization: string,
   input: PasswordlessStartRequest,
 ): Promise<APIResponse> =>
   request.post(Endpoints.passwordlessLogin(), {
     form: input,
-    headers: bearer(accessToken),
+    headers: { Authorization: authorization },
   });

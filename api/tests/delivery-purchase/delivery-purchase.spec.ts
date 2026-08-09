@@ -29,11 +29,9 @@ const expectBasket = async (response: APIResponse): Promise<Basket> => {
   return (await response.json()) as Basket;
 };
 
-const readOrder = async (response: APIResponse): Promise<Order> =>
-  (await response.json()) as Order;
+const readOrder = async (response: APIResponse): Promise<Order> => (await response.json()) as Order;
 
-const readFault = async (response: APIResponse): Promise<Fault> =>
-  (await response.json()) as Fault;
+const readFault = async (response: APIResponse): Promise<Fault> => (await response.json()) as Fault;
 
 const readShippingMethods = async (response: APIResponse): Promise<ShippingMethodResult> =>
   (await response.json()) as ShippingMethodResult;
@@ -90,7 +88,9 @@ const prepareReadyBasket = async (
   return { basketId };
 };
 
-test('CUJ 1 — completes a delivery purchase and receives a confirmed order', async ({ request }) => {
+test('CUJ 1 — completes a delivery purchase and receives a confirmed order', async ({
+  request,
+}) => {
   const token = await getGuestToken(request);
   const product = await findOrderableVariant(request, token.access_token);
   const checkout = createCheckoutInput(product);
@@ -115,7 +115,9 @@ test('CUJ 1 — completes a delivery purchase and receives a confirmed order', a
     expect(itemResponse.status()).toBe(expected.basketMutationStatus);
     basket = (await itemResponse.json()) as Basket;
     expect(basket.productItems).toEqual(
-      expect.arrayContaining([expect.objectContaining({ productId: product.variantId, quantity: 1 })]),
+      expect.arrayContaining([
+        expect.objectContaining({ productId: product.variantId, quantity: 1 }),
+      ]),
     );
   });
 
@@ -220,7 +222,9 @@ test('CUJ 1 — refuses to create a second order from a basket already consumed 
   expect(fault.type).toContain('basket-not-found');
 });
 
-test('CUJ 1 — rejects an invalid shipping address with an actionable fault', async ({ request }) => {
+test('CUJ 1 — rejects an invalid shipping address with an actionable fault', async ({
+  request,
+}) => {
   const token = await getGuestToken(request);
   const product = await findOrderableVariant(request, token.access_token);
   const checkout = createCheckoutInput(product);

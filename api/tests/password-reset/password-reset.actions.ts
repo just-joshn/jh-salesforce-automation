@@ -21,10 +21,21 @@ export const registerCustomer = async (
 
 export const requestResetToken = async (
   request: APIRequestContext,
-  accountManagerAccessToken: string,
+  accountManagerCredentials: string,
   body: ResetTokenRequest,
 ): Promise<APIResponse> =>
   request.post(Endpoints.resetToken(), {
-    ...shopperOptions(accountManagerAccessToken),
     data: body,
+    headers: { Authorization: `Basic ${accountManagerCredentials}` },
+    params: withSite(),
   });
+
+export const requestCallbackReset = async (
+  request: APIRequestContext,
+  form: Readonly<Record<string, string>>,
+): Promise<APIResponse> => request.post(Endpoints.passwordReset(), { form });
+
+export const applyPasswordAction = async (
+  request: APIRequestContext,
+  form: Readonly<Record<string, string>>,
+): Promise<APIResponse> => request.post(Endpoints.passwordAction(), { form });

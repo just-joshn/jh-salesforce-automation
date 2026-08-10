@@ -2,6 +2,7 @@ import type { APIRequestContext, APIResponse } from '@playwright/test';
 
 import { bearer, withSite } from '../../support/scapi';
 import type { BasketItemInput, RouteProbe } from './hybrid-continuity.data';
+import { sessionCookieFrom } from './hybrid-continuity.data';
 import * as Endpoints from './hybrid-continuity.endpoints';
 
 const shopperOptions = (accessToken: string) => ({
@@ -39,6 +40,15 @@ export const probeSfraRoute = async (
 
   return { status: response.status(), url };
 };
+
+export const crossRuntimeBoundary = async (
+  request: APIRequestContext,
+  url: string,
+): Promise<APIResponse> => request.get(url);
+
+export const readSessionCookie = async (
+  request: APIRequestContext,
+): Promise<string | undefined> => sessionCookieFrom(await request.storageState());
 
 export const readBasket = async (
   request: APIRequestContext,

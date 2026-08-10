@@ -1,3 +1,4 @@
+import type { SfraRouteProbe } from '../../support/gates';
 import type { OrderableVariant } from '../../support/products';
 import { required } from '../../support/scapi';
 import type { Basket } from '../../support/scapi-types';
@@ -12,12 +13,20 @@ interface ProductItemRequest {
   readonly quantity: number;
 }
 
-export interface RouteProbe {
-  readonly status: number;
-  readonly url: string;
+export type RouteProbe = SfraRouteProbe;
+
+interface StoredCookie {
+  readonly name: string;
+  readonly value: string;
 }
 
-export const expected = Object.freeze({ basketStatus: 200 });
+interface StoredState {
+  readonly cookies: readonly StoredCookie[];
+}
+
+export const expected = Object.freeze({ basketStatus: 200, sfraStatus: 200 });
+
+export const sessionCookieName = 'dwsid';
 
 export const basketIdFrom = (basket: Basket): string =>
   required(basket.basketId, 'basket.basketId');
@@ -41,10 +50,5 @@ export const createBasketItemInput = (
   body: [{ productId: variant.variantId, quantity: 1 }],
 });
 
-export const formatHybridGateSkipReason = (probes: readonly RouteProbe[]): string =>
-  `Journey skipped: unavailable SFRA routes: ${probes
-    .map((probe) => `${probe.url} (HTTP ${probe.status})`)
-    .join(', ')}.`;
-
-export const hybridRuntimeAvailable = (probes: readonly RouteProbe[]): boolean =>
-  probes.every((probe) => probe.status >= 200 && probe.status < 400);
+export const sessionCookieFrom = (state: StoredState): string | undefined =>
+  state.cookies.find((cookie) => cookie.name === sessionCookieName)?.value;

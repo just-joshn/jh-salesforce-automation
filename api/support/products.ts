@@ -160,6 +160,11 @@ interface ProductCandidate {
   readonly master: Product;
 }
 
+// Bundles and sets render "Add Bundle to Cart" / "Add Set to Cart", so a journey resolving one fails
+// on the standard affordance for reasons unrelated to itself. Live-verified: womens-jewelry-bundleM.
+const isStandaloneProduct = (product: Product): boolean =>
+  product.type?.bundle !== true && product.type?.set !== true;
+
 const findOrderableVariantInProduct = async (
   request: APIRequestContext,
   accessToken: string,
@@ -167,6 +172,10 @@ const findOrderableVariantInProduct = async (
   inventoryId: string | undefined,
 ): Promise<ProductCandidate | undefined> => {
   const master = await fetchProduct(request, accessToken, productId, inventoryId);
+  if (!isStandaloneProduct(master)) {
+    return undefined;
+  }
+
   const variantCandidate = await findOrderableVariantFromVariants(
     request,
     accessToken,

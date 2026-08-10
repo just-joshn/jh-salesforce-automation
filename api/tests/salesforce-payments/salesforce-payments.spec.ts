@@ -61,9 +61,8 @@ test('CUJ 2 — completes payment-backed checkout through Salesforce Payments', 
   test.skip(!gate.met, formatGateSkipReason(gate));
 
   const token = await getGuestToken(request);
-  const paymentReady = await test.step(
-    'Reach payment-ready checkout',
-    async (): Promise<PaymentReadyCheckout> => {
+  const paymentReady =
+    await test.step('Reach payment-ready checkout', async (): Promise<PaymentReadyCheckout> => {
       const product = await findOrderableVariant(request, token.access_token);
       const checkout = createCheckoutInput(product);
       const createdBasket = await expectBasket(
@@ -133,8 +132,7 @@ test('CUJ 2 — completes payment-backed checkout through Salesforce Payments', 
       );
       expect(basket.orderTotal).toBeGreaterThan(0);
       return { basket, basketId };
-    },
-  );
+    });
 
   const paymentMethodId = await test.step('Load/select payment method', async () => {
     const methodsResponse = await Actions.getPaymentMethods(
@@ -154,9 +152,7 @@ test('CUJ 2 — completes payment-backed checkout through Salesforce Payments', 
       }),
     );
     expect(basket.paymentInstruments).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ paymentMethodId: selectedMethodId }),
-      ]),
+      expect.arrayContaining([expect.objectContaining({ paymentMethodId: selectedMethodId })]),
     );
     return selectedMethodId;
   });

@@ -156,10 +156,7 @@ export const paymentInstrumentFrom = (
     `order payment instrument ${paymentMethodId}`,
   );
 
-export const paymentInstrumentIdFrom = (
-  order: Order,
-  paymentMethodId: string,
-): string =>
+export const paymentInstrumentIdFrom = (order: Order, paymentMethodId: string): string =>
   required(
     paymentInstrumentFrom(order, paymentMethodId).paymentInstrumentId,
     'order.paymentInstruments[].paymentInstrumentId',

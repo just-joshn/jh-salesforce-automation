@@ -46,9 +46,8 @@ export const crossRuntimeBoundary = async (
   url: string,
 ): Promise<APIResponse> => request.get(url);
 
-export const readSessionCookie = async (
-  request: APIRequestContext,
-): Promise<string | undefined> => sessionCookieFrom(await request.storageState());
+export const readSessionCookie = async (request: APIRequestContext): Promise<string | undefined> =>
+  sessionCookieFrom(await request.storageState());
 
 export const readBasket = async (
   request: APIRequestContext,

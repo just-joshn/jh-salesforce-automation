@@ -140,5 +140,4 @@ export const readOrder = async (
   request: APIRequestContext,
   accessToken: string,
   orderNo: string,
-): Promise<APIResponse> =>
-  request.get(Endpoints.order(orderNo), shopperOptions(accessToken));
+): Promise<APIResponse> => request.get(Endpoints.order(orderNo), shopperOptions(accessToken));

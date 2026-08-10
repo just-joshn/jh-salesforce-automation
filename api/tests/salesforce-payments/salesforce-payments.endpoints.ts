@@ -43,10 +43,7 @@ export const orders = (): string => shopperApiUrl('checkout/shopper-orders', 'or
 export const order = (orderNo: string): string =>
   shopperApiUrl('checkout/shopper-orders', `orders/${encodeURIComponent(orderNo)}`);
 
-export const orderPaymentInstrument = (
-  orderNo: string,
-  paymentInstrumentId: string,
-): string =>
+export const orderPaymentInstrument = (orderNo: string, paymentInstrumentId: string): string =>
   shopperApiUrl(
     'checkout/shopper-orders',
     `orders/${encodeURIComponent(orderNo)}/payment-instruments/${encodeURIComponent(paymentInstrumentId)}`,

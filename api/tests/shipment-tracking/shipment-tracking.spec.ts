@@ -15,7 +15,8 @@ test('CUJ 15 — reaches valid carrier tracking information for an owned order',
 }) => {
   test.info().annotations.push({
     type: 'layer-scope',
-    description: 'Account/order-history navigation is a UI affordance covered by the browser layer.',
+    description:
+      'Account/order-history navigation is a UI affordance covered by the browser layer.',
   });
 
   const { access_token: accessToken } = await getGuestToken(request);

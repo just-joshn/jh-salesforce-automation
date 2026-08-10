@@ -192,9 +192,7 @@ export const oneTimeCodeRequestFor = (email: string, usid: string): OneTimeCodeR
   usid,
 });
 
-export const oneTimeCodeVerificationFor = (
-  email: string,
-): OneTimeCodeVerificationRequest => ({
+export const oneTimeCodeVerificationFor = (email: string): OneTimeCodeVerificationRequest => ({
   client_id: env.SFCC_CLIENT_ID,
   grant_type: 'authorization_code',
   hint: 'pwdless_login',

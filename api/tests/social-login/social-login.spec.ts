@@ -21,7 +21,7 @@ test('CUJ 12 — offers a SLAS authorization entry for every configured identity
   test.skip(!gate.met, formatGateSkipReason(gate));
 
   for (const provider of gate.idps) {
-    await test.step('1 Choose social provider', async () => {
+    await test.step('Choose social provider', async () => {
       const token = await getGuestToken(request);
       const response = await Actions.requestSocialAuthorization(
         request,
@@ -38,19 +38,17 @@ test('CUJ 12 — returns through the callback with an established session and th
 }) => {
   const app = await readAppConfiguration(request);
   const gate = evaluateSocialLoginGate(app);
+  test.info().annotations.push({
+    type: 'layer-scope',
+    description:
+      'CUJ 12 steps "Authenticate/authorize" and "Return through callback" execute at the external identity provider and on the storefront callback route. Neither is a SCAPI surface, so neither is mirrored here.',
+  });
+  test.info().annotations.push({
+    type: 'coverage-gap',
+    description:
+      'CUJ 12 steps "Establish SLAS session" and "Merge basket and return" do have SLAS and Shopper Baskets analogues, but both require the authorization code the identity provider issues after a real login. This suite holds no Google or Apple credentials, so the code cannot be obtained and these steps remain unproven at every layer.',
+  });
+
   test.skip(!gate.met, formatGateSkipReason(gate));
   test.skip(true, externalIdpSkipReason(gate.idps, gate.redirectURI));
-
-  await test.step('2 Authenticate/authorize', () => {
-    expect(gate.idps).not.toHaveLength(0);
-  });
-  await test.step('3 Return through callback', () => {
-    expect(gate.redirectURI).toBeTruthy();
-  });
-  await test.step('4 Establish SLAS session', () => {
-    expect(gate.met).toBe(true);
-  });
-  await test.step('5 Merge basket and return', () => {
-    expect(gate.idps).not.toHaveLength(0);
-  });
 });

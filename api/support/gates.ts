@@ -6,6 +6,7 @@ import type {
   CommerceAgentConfiguration,
   SocialLoginConfiguration,
 } from './app-config';
+import type { OmsAvailability, SeededOmsOrderNumber } from './oms';
 import { bearer, shopperApiUrl, withSite } from './scapi';
 import type { Configuration, SiteConfiguration } from './scapi-types';
 import { getGuestToken } from './slas';
@@ -221,3 +222,33 @@ export const evaluatePasswordResetExternalCallbackGate = (app: AppConfiguration)
     },
   ]);
 };
+
+const availabilityReason = (availability: OmsAvailability): string | undefined =>
+  availability.kind === 'gated' ? availability.reason : undefined;
+
+const seededOrderReason = (order: SeededOmsOrderNumber): string | undefined =>
+  order.kind === 'not-configured' ? order.reason : undefined;
+
+export const composeOmsSkipReason = (
+  availability: OmsAvailability,
+  order: SeededOmsOrderNumber,
+): string =>
+  [availabilityReason(availability), seededOrderReason(order)]
+    .filter((reason): reason is string => reason !== undefined)
+    .join(' ');
+
+export const socialLoginExternalIdpSkipReason = (
+  idps: readonly string[],
+  redirectURI: string | undefined,
+): string =>
+  `Skipped: completing social login requires authenticating at an external identity provider this suite holds no credentials for (idps: ${idps.join(', ')}, redirectURI: ${String(redirectURI)}).`;
+
+export const externalTokenSkipReason = (
+  mode: string | undefined,
+  tokenLength: number | undefined,
+  landingPath: string | undefined,
+): string =>
+  `Skipped: one-time token is delivered to an external mailbox this suite cannot read (mode: ${String(mode)}, tokenLength: ${String(tokenLength)}, landingPath: ${String(landingPath)}).`;
+
+export const passwordlessStartCredentialSkipReason = (): string =>
+  'Skipped: live SLAS passwordless start requires a private client secret (SFCC_CLIENT_SECRET) for Basic client credentials; the public PKCE client answers 401.';

@@ -12,13 +12,6 @@ export interface TrackingOrderRead {
   readonly order: Order;
 }
 
-class InvalidTrackingOrderResponseError extends Error {
-  public constructor() {
-    super('Tracking order response is not an object');
-    this.name = 'InvalidTrackingOrderResponseError';
-  }
-}
-
 const isRecord = (value: unknown): value is ApiRecord =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 
@@ -39,7 +32,7 @@ export const readTrackingOrder = async (
   });
   const payload: unknown = await response.json();
   if (!isRecord(payload)) {
-    throw new InvalidTrackingOrderResponseError();
+    throw new Error('Tracking order response is not an object');
   }
 
   return { response, order: payload };

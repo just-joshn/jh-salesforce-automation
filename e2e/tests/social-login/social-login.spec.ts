@@ -1,5 +1,9 @@
 import { readAppConfiguration } from '../../../api/support/app-config';
-import { evaluateSocialLoginGate, formatGateSkipReason } from '../../../api/support/gates';
+import {
+  evaluateSocialLoginGate,
+  formatGateSkipReason,
+  socialLoginExternalIdpSkipReason,
+} from '../../../api/support/gates';
 import { findOrderableVariant } from '../../../api/support/products';
 import { getGuestToken } from '../../../api/support/slas';
 import { expect, test } from '../../support/fixtures';
@@ -7,7 +11,6 @@ import { buildPath } from '../../support/site';
 import * as Actions from './social-login.actions';
 import {
   callbackPath,
-  externalIdentityProviderSkipReason,
   firstSocialProvider,
   journeyProductFrom,
   matchesAuthorizationUrl,
@@ -71,7 +74,7 @@ test('CUJ 12 — returns through the callback with an established session and th
 }) => {
   const app = await readAppConfiguration(request);
   const gate = evaluateSocialLoginGate(app);
-  test.skip(true, externalIdentityProviderSkipReason(gate.idps, gate.redirectURI));
+  test.skip(true, socialLoginExternalIdpSkipReason(gate.idps, gate.redirectURI));
 
   const guest = await getGuestToken(request);
   const variant = await findOrderableVariant(request, guest.access_token);

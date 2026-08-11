@@ -29,9 +29,3 @@ export const createSocialAuthorizationRequest = (
     usid,
   };
 };
-
-export const externalIdpSkipReason = (
-  idps: readonly string[],
-  redirectURI: string | undefined,
-): string =>
-  `Skipped: completing social login requires external IdP credentials and callback state (idps: ${idps.join(', ')}, redirectURI: ${String(redirectURI)}).`;

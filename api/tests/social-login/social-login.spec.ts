@@ -1,14 +1,14 @@
 import { expect, test } from '@playwright/test';
 
 import { readAppConfiguration } from '../../support/app-config';
-import { evaluateSocialLoginGate, formatGateSkipReason } from '../../support/gates';
+import {
+  evaluateSocialLoginGate,
+  formatGateSkipReason,
+  socialLoginExternalIdpSkipReason,
+} from '../../support/gates';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './social-login.actions';
-import {
-  createSocialAuthorizationRequest,
-  expected,
-  externalIdpSkipReason,
-} from './social-login.data';
+import { createSocialAuthorizationRequest, expected } from './social-login.data';
 
 // OUT OF SCOPE: Pain rows 2 (external IdP failure) and 3 (callback-state failure) belong to the
 // provider and callback channel, which this SCAPI-only suite does not control.
@@ -50,5 +50,5 @@ test('CUJ 12 — returns through the callback with an established session and th
   });
 
   test.skip(!gate.met, formatGateSkipReason(gate));
-  test.skip(true, externalIdpSkipReason(gate.idps, gate.redirectURI));
+  test.skip(true, socialLoginExternalIdpSkipReason(gate.idps, gate.redirectURI));
 });

@@ -54,9 +54,3 @@ export const callbackPath = (redirectURI: string | undefined): string => {
 
   return redirectURI;
 };
-
-export const externalIdentityProviderSkipReason = (
-  idps: readonly string[],
-  redirectURI: string | undefined,
-): string =>
-  `Completing social login requires authenticating at an external identity provider this suite holds no credentials for (idps: ${JSON.stringify(idps)}, redirectURI: ${JSON.stringify(redirectURI)}).`;

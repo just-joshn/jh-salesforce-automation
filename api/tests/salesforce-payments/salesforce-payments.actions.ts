@@ -1,7 +1,7 @@
 import type { APIRequestContext, APIResponse } from '@playwright/test';
 
 import { findOrderableVariant } from '../../support/products';
-import { bearer, withSite } from '../../support/scapi';
+import { bearer, requireStatus, withSite } from '../../support/scapi';
 import type { Basket, ShippingMethodResult } from '../../support/scapi-types';
 import {
   basketIdFrom,
@@ -26,16 +26,6 @@ const requestOptions = (accessToken: string) => ({
   headers: bearer(accessToken),
   params: withSite(),
 });
-
-const requireStatus = async (
-  response: APIResponse,
-  status: number,
-  operation: string,
-): Promise<void> => {
-  if (response.status() !== status) {
-    throw new Error(`${operation} failed with HTTP ${response.status()}: ${await response.text()}`);
-  }
-};
 
 const readBasket = async (response: APIResponse, operation: string): Promise<Basket> => {
   await requireStatus(response, expected.basketMutationStatus, operation);

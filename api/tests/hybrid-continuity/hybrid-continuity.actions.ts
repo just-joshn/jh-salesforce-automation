@@ -41,9 +41,7 @@ export const probeSfraRoute = async (
   return { status: response.status(), url };
 };
 
-export const probeSfraRoutes = async (
-  request: APIRequestContext,
-): Promise<readonly RouteProbe[]> =>
+export const probeSfraRoutes = async (request: APIRequestContext): Promise<readonly RouteProbe[]> =>
   Promise.all([
     probeSfraRoute(request, Endpoints.sfraHome()),
     probeSfraRoute(request, Endpoints.sfraCart()),

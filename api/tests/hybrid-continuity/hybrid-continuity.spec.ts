@@ -13,7 +13,6 @@ import {
   sessionCookieName,
   type RouteProbe,
 } from './hybrid-continuity.data';
-import * as Endpoints from './hybrid-continuity.endpoints';
 
 // The cross-runtime body is authored against a deployment that actually serves SFRA routes and is
 // unproven here, where every SFRA probe answers 404. It uses the built-in `request` fixture
@@ -24,11 +23,7 @@ import * as Endpoints from './hybrid-continuity.endpoints';
 test('CUJ 14 — preserves shopper session and basket across the hybrid runtime boundary', async ({
   request,
 }) => {
-  const probes: readonly RouteProbe[] = await Promise.all([
-    Actions.probeSfraRoute(request, Endpoints.sfraHome()),
-    Actions.probeSfraRoute(request, Endpoints.sfraCart()),
-    Actions.probeSfraRoute(request, Endpoints.sfraLogin()),
-  ]);
+  const probes: readonly RouteProbe[] = await Actions.probeSfraRoutes(request);
   const gate = evaluateSfraRouteGate(probes);
   test.skip(!gate.met, formatGateSkipReason(gate));
 
@@ -57,7 +52,7 @@ test('CUJ 14 — preserves shopper session and basket across the hybrid runtime 
   });
 
   await test.step('Navigate across runtime boundary', async () => {
-    const response = await Actions.crossRuntimeBoundary(request, Endpoints.sfraCart());
+    const response = await Actions.crossToSfraCart(request);
     expect(response.status()).toBe(expected.sfraStatus);
   });
 
@@ -68,7 +63,7 @@ test('CUJ 14 — preserves shopper session and basket across the hybrid runtime 
   });
 
   await test.step('Restore identity', async () => {
-    const response = await Actions.crossRuntimeBoundary(request, Endpoints.sfraHome());
+    const response = await Actions.crossToSfraHome(request);
     expect(response.status()).toBe(expected.sfraStatus);
     expect(
       await Actions.readSessionCookie(request),

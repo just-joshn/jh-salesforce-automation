@@ -26,6 +26,8 @@ interface StoredState {
 
 export const expected = Object.freeze({ basketStatus: 200, sfraStatus: 200 });
 
+export const emptyBasketRequest = Object.freeze({});
+
 export const sessionCookieName = 'dwsid';
 
 export const basketIdFrom = (basket: Basket): string =>

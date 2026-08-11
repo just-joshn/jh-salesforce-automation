@@ -2,7 +2,7 @@ import type { APIRequestContext, APIResponse } from '@playwright/test';
 
 import { bearer, withSite } from '../../support/scapi';
 import type { BasketItemInput, RouteProbe } from './hybrid-continuity.data';
-import { sessionCookieFrom } from './hybrid-continuity.data';
+import { emptyBasketRequest, sessionCookieFrom } from './hybrid-continuity.data';
 import * as Endpoints from './hybrid-continuity.endpoints';
 
 const shopperOptions = (accessToken: string) => ({
@@ -26,7 +26,7 @@ export const createBasket = async (
 ): Promise<APIResponse> =>
   request.post(Endpoints.baskets(), {
     ...shopperOptions(accessToken),
-    data: {},
+    data: emptyBasketRequest,
   });
 
 export const probeSfraRoute = async (
@@ -41,10 +41,20 @@ export const probeSfraRoute = async (
   return { status: response.status(), url };
 };
 
-export const crossRuntimeBoundary = async (
+export const probeSfraRoutes = async (
   request: APIRequestContext,
-  url: string,
-): Promise<APIResponse> => request.get(url);
+): Promise<readonly RouteProbe[]> =>
+  Promise.all([
+    probeSfraRoute(request, Endpoints.sfraHome()),
+    probeSfraRoute(request, Endpoints.sfraCart()),
+    probeSfraRoute(request, Endpoints.sfraLogin()),
+  ]);
+
+export const crossToSfraCart = async (request: APIRequestContext): Promise<APIResponse> =>
+  request.get(Endpoints.sfraCart());
+
+export const crossToSfraHome = async (request: APIRequestContext): Promise<APIResponse> =>
+  request.get(Endpoints.sfraHome());
 
 export const readSessionCookie = async (request: APIRequestContext): Promise<string | undefined> =>
   sessionCookieFrom(await request.storageState());

@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 
+import { composeOmsSkipReason } from '../../../api/support/gates';
 import type { OmsAvailability, SeededOmsOrderNumber } from '../../../api/support/oms';
 import type { Order, OmsShipment } from '../../../api/support/scapi-types';
 
@@ -139,17 +140,10 @@ export const trackingNavigation = (
     : { kind: 'multiple', accessibleName: first.accessibleName, href: first.href };
 };
 
-const availabilityReason = (availability: OmsAvailability): string | undefined =>
-  availability.kind === 'gated' ? availability.reason : undefined;
-
-const seededOrderReason = (seededOrder: SeededOmsOrderNumber): string | undefined =>
-  seededOrder.kind === 'not-configured' ? seededOrder.reason : undefined;
-
 export const composeTrackingSkipReason = (
   availability: OmsAvailability,
   seededOrder: SeededOmsOrderNumber,
-): string =>
-  [availabilityReason(availability), seededOrderReason(seededOrder)].filter(Boolean).join(' ');
+): string => composeOmsSkipReason(availability, seededOrder);
 
 export const trackingJourneyGate = (
   availability: OmsAvailability,

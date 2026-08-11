@@ -1,3 +1,4 @@
+import { composeOmsSkipReason } from '../../support/gates';
 import type { OmsAvailability, SeededOmsOrderNumber } from '../../support/oms';
 import type { OmsShipment, Order } from '../../support/scapi-types';
 
@@ -51,28 +52,10 @@ export const rejectedTrackingUrls = (order: Order): readonly string[] =>
       (url): url is string => typeof url === 'string' && externalCarrierUrl(url) === undefined,
     );
 
-const availabilityReason = (availability: OmsAvailability): string | undefined => {
-  switch (availability.kind) {
-    case 'active':
-      return undefined;
-    case 'gated':
-      return availability.reason;
-  }
-};
-
-const seededOrderReason = (order: SeededOmsOrderNumber): string | undefined => {
-  switch (order.kind) {
-    case 'configured':
-      return undefined;
-    case 'not-configured':
-      return order.reason;
-  }
-};
-
 export const composeTrackingSkipReason = (
   availability: OmsAvailability,
   order: SeededOmsOrderNumber,
-): string => [availabilityReason(availability), seededOrderReason(order)].filter(Boolean).join(' ');
+): string => composeOmsSkipReason(availability, order);
 
 export const trackingJourneyGate = (
   availability: OmsAvailability,

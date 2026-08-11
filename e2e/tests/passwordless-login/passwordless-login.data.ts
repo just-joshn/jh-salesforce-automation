@@ -25,10 +25,3 @@ export const createPasswordlessLoginRequest = (): PasswordlessLoginRequest => ({
 });
 
 export const toPasswordlessToken = (value: string): PasswordlessToken => ({ value });
-
-export const externalTokenSkipReason = (
-  mode: string | undefined,
-  tokenLength: number | undefined,
-  landingPath: string | undefined,
-): string =>
-  `Skipped: one-time token is delivered to an external mailbox this suite cannot read (mode: ${String(mode)}, tokenLength: ${String(tokenLength)}, landingPath: ${String(landingPath)}).`;

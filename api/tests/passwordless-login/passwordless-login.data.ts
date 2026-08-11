@@ -68,7 +68,7 @@ export const createBasketItemInput = (
   body: [{ productId: variant.variantId, quantity: 1 }],
 });
 
-export const createPasswordlessShopper = (usid: string): PasswordlessShopper => {
+export const createPasswordlessShopper = (usid: string, mode: string): PasswordlessShopper => {
   const email = `cuj11-${randomUUID().replaceAll('-', '')}@mailinator.com`;
   const password = 'Passw0rd!2026';
   return {
@@ -77,7 +77,7 @@ export const createPasswordlessShopper = (usid: string): PasswordlessShopper => 
     passwordless: {
       channel_id: env.SFCC_SITE_ID,
       locale: 'en-us',
-      mode: 'email',
+      mode,
       user_id: email,
       usid,
     },
@@ -88,11 +88,5 @@ export const createPasswordlessShopper = (usid: string): PasswordlessShopper => 
   };
 };
 
-export const externalTokenSkipReason = (
-  mode: string | undefined,
-  landingPath: string | undefined,
-): string =>
-  `Skipped: passwordless token verification requires an external mailbox (mode: ${String(mode)}, landingPath: ${String(landingPath)}).`;
-
-export const passwordlessStartCredentialSkipReason = (): string =>
-  'Skipped: live SLAS passwordless start returned HTTP 401 without Authorization; it requires the unavailable private SLAS client secret (SFCC_CLIENT_SECRET) for Basic client credentials.';
+export const basicClientCredentials = (): string =>
+  `Basic ${Buffer.from(`${env.SFCC_CLIENT_ID}:${required(env.SFCC_CLIENT_SECRET, 'SFCC_CLIENT_SECRET')}`).toString('base64')}`;

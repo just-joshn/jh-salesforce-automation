@@ -1,5 +1,10 @@
+import { env } from '../../../config/env';
 import { readAppConfiguration } from '../../../api/support/app-config';
-import { evaluatePasswordlessLoginGate, formatGateSkipReason } from '../../../api/support/gates';
+import {
+  evaluatePasswordlessLoginGate,
+  externalTokenSkipReason,
+  formatGateSkipReason,
+} from '../../../api/support/gates';
 import { getGuestToken } from '../../../api/support/slas';
 import { findOrderableVariant } from '../../../api/support/products';
 import { expect, test } from '../../support/fixtures';
@@ -7,7 +12,6 @@ import { buildPath } from '../../support/site';
 import * as Actions from './passwordless-login.actions';
 import {
   createPasswordlessLoginRequest,
-  externalTokenSkipReason,
   toGuestBasketProduct,
   toPasswordlessToken,
 } from './passwordless-login.data';
@@ -79,7 +83,7 @@ test('CUJ 11 — verifies the emailed token and resumes with the basket intact',
   const gate = evaluatePasswordlessLoginGate(app);
   const landingPath = gate.landingPath;
   const tokenLength = app.login?.tokenLength;
-  const deliveredToken = process.env.E2E_PASSWORDLESS_TOKEN;
+  const deliveredToken = env.E2E_PASSWORDLESS_TOKEN;
   test.skip(!gate.met, formatGateSkipReason(gate));
   test.skip(
     deliveredToken === undefined,

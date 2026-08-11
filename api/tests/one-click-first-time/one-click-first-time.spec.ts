@@ -2,7 +2,7 @@
  * Latent One Click path: authored for a One-Click-enabled deployment with a seeded OTP. The public
  * demo does not meet those prerequisites, so the gated body remains unproven here.
  */
-import type { APIRequestContext, APIResponse } from '@playwright/test';
+import type { APIResponse } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
 import { env } from '../../../config/env';
@@ -10,7 +10,7 @@ import { readAppConfiguration } from '../../support/app-config';
 import { evaluateOneClickCheckoutGate, formatGateSkipReason } from '../../support/gates';
 import { findOrderableVariant } from '../../support/products';
 import { required } from '../../support/scapi';
-import type { Basket, Customer, Order, ShippingMethodResult } from '../../support/scapi-types';
+import type { Basket, Customer, Order } from '../../support/scapi-types';
 import {
   getGuestToken,
   loginRegisteredShopper,
@@ -30,50 +30,11 @@ import {
   otpRequestFor,
   otpVerificationFor,
   registeredCheckoutInputFor,
-  shipmentIdFrom,
-  shippingMethodInput,
-  type CheckoutInput,
 } from './one-click-first-time.data';
 
 const basketFrom = async (response: APIResponse): Promise<Basket> => {
   expect(response.status()).toBe(expected.successStatus);
   return (await response.json()) as Basket;
-};
-
-const prepareOrderReadyBasket = async (
-  request: APIRequestContext,
-  accessToken: string,
-  checkout: CheckoutInput,
-): Promise<Basket> => {
-  const created = await basketFrom(await Actions.createBasket(request, accessToken));
-  const basketId = basketIdFrom(created);
-  const withItem = await basketFrom(
-    await Actions.addBasketItem(request, accessToken, { basketId, body: checkout.items }),
-  );
-  const shipmentId = shipmentIdFrom(withItem);
-  await basketFrom(
-    await Actions.provideContact(request, accessToken, { basketId, body: checkout.customer }),
-  );
-  await basketFrom(
-    await Actions.provideShippingAddress(request, accessToken, {
-      basketId,
-      body: checkout.shippingAddress,
-      shipmentId,
-    }),
-  );
-  const methodsResponse = await Actions.readShippingMethods(request, accessToken, {
-    basketId,
-    shipmentId,
-  });
-  expect(methodsResponse.status()).toBe(expected.successStatus);
-  const methods = (await methodsResponse.json()) as ShippingMethodResult;
-  return basketFrom(
-    await Actions.selectShippingMethod(
-      request,
-      accessToken,
-      shippingMethodInput(basketId, shipmentId, methods),
-    ),
-  );
 };
 
 test('CUJ 5 — creates registered customer state and completes a One Click purchase', async ({
@@ -143,7 +104,7 @@ test('CUJ 5 — creates registered customer state and completes a One Click purc
 
   const basket = await test.step('Supply shipping details', async () => {
     const product = await findOrderableVariant(request, authenticated.accessToken);
-    const prepared = await prepareOrderReadyBasket(
+    const prepared = await Actions.prepareOrderReadyBasket(
       request,
       authenticated.accessToken,
       registeredCheckoutInputFor(product, shopper),
@@ -221,7 +182,7 @@ test('CUJ 5 — separates customer creation from order readiness', async ({ requ
 
   const checkoutToken = await getGuestToken(request);
   const product = await findOrderableVariant(request, checkoutToken.access_token);
-  const basket = await prepareOrderReadyBasket(
+  const basket = await Actions.prepareOrderReadyBasket(
     request,
     checkoutToken.access_token,
     checkoutInputFor(product),

@@ -1,15 +1,8 @@
 import { randomUUID } from 'node:crypto';
 
 import type { OrderableVariant } from '../../support/products';
-import { MINIMUM_AVAILABLE_TO_SELL } from '../../support/products';
 import { required } from '../../support/scapi';
-import type {
-  Basket,
-  BasketShipment,
-  Product,
-  ProductInventory,
-  ShippingMethodResult,
-} from '../../support/scapi-types';
+import type { Basket, BasketShipment, ShippingMethodResult } from '../../support/scapi-types';
 
 export interface AddressRequest {
   readonly address1: string;
@@ -133,35 +126,6 @@ export const paymentInstrumentFor = (basket: Basket): PaymentInstrumentRequest =
 });
 
 export const orderRequestFor = (basketId: string): OrderRequest => ({ basketId });
-
-const availableToSell = (inventory: ProductInventory | undefined): number | undefined => {
-  if (!inventory?.orderable) {
-    return undefined;
-  }
-  const ats = inventory.ats;
-  if (ats === undefined) {
-    return undefined;
-  }
-  return ats >= MINIMUM_AVAILABLE_TO_SELL ? ats : undefined;
-};
-
-export const orderableVariantFrom = (
-  master: Product,
-  stockedProduct: Product,
-  variantId: string,
-): OrderableVariant | undefined => {
-  const ats = availableToSell(stockedProduct.inventory);
-  if (ats === undefined) {
-    return undefined;
-  }
-
-  return {
-    availableToSell: ats,
-    productId: required(master.id, 'product.id'),
-    productName: required(master.name, 'product.name'),
-    variantId,
-  };
-};
 
 export const shipmentFrom = (basket: Basket, shipmentId: string): BasketShipment =>
   required(

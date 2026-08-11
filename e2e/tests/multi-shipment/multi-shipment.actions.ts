@@ -8,12 +8,15 @@ export const visitProduct = async (page: Page, product: JourneyProduct): Promise
   await page.goto(buildPath(`/product/${product.productId}?pid=${product.variantId}`));
 };
 
+const dismissOptionalTracking = async (page: Page): Promise<void> => {
+  await Locators.declineTrackingButton(page)
+    .click({ timeout: 2_000 })
+    .catch(() => undefined);
+};
+
 const waitForBasketState = async (page: Page, itemCount: number): Promise<void> => {
   await Locators.cartCountButton(page, itemCount).waitFor();
-  if (await Locators.declineTrackingButton(page).isVisible()) {
-    await Locators.declineTrackingButton(page).click();
-    await Locators.declineTrackingButton(page).waitFor({ state: 'hidden' });
-  }
+  await dismissOptionalTracking(page);
 };
 
 const addProductAtCount = async (

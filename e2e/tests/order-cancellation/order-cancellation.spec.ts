@@ -38,7 +38,6 @@ test('CUJ 16 — cancels an eligible Order-Management-managed order', async ({ p
   const skipReason = orderCancellationSkipReason(availability, seededOrder);
 
   if (skipReason) {
-    console.log(`CUJ 16 skipped: ${skipReason}`);
     test.skip(true, skipReason);
     return;
   }

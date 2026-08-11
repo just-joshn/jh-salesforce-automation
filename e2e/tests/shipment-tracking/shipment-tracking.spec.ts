@@ -26,7 +26,6 @@ test('CUJ 15 — reaches valid carrier tracking information for an owned order',
   const availability = await probeOmsAvailability(request, accessToken);
   const gate = Data.trackingJourneyGate(availability, seededOmsOrderNumber('tracking'));
   if (gate.kind === 'skip') {
-    console.info(`CUJ 15 skipped: ${gate.reason}`);
     test.skip(true, gate.reason);
     return;
   }
@@ -95,8 +94,10 @@ test('CUJ 15 — offers no Order Management tracking action on an order it has n
 
   const order = await readOmsExpandedOrder(request, orderNo, accessToken);
   expect(Data.carriesNoOmsData(order)).toBe(true);
-  console.info(`REAL ORDER NUMBER: ${orderNo}`);
-  console.info(`OMS EXPANSIONS PROOF: order ${orderNo} has no omsData under oms,oms_shipments`);
+  test.info().annotations.push(
+    { type: 'orderNo', description: orderNo },
+    { type: 'oms-expansions', description: 'order has no omsData under oms,oms_shipments' },
+  );
 
   await expect(Locators.createAccountHeading(page)).toBeVisible();
   await Actions.createPostCheckoutAccount(page, checkout.email, checkout.password);

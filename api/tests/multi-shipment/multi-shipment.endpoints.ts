@@ -35,9 +35,4 @@ export const basketPaymentInstruments = (basketId: string): string =>
     `baskets/${encodeURIComponent(basketId)}/payment-instruments`,
   );
 
-export const product = (productId: string): string =>
-  shopperApiUrl('product/shopper-products', `products/${encodeURIComponent(productId)}`);
-
-export const productSearch = (): string => shopperApiUrl('search/shopper-search', 'product-search');
-
 export const orders = (): string => shopperApiUrl('checkout/shopper-orders', 'orders');

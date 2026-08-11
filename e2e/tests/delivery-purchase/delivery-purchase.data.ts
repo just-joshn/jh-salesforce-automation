@@ -52,6 +52,8 @@ export const invalidPaymentCard: PaymentCard = Object.freeze({
   securityCode: '12',
 });
 
+export const defaultShippingMethod = 'Ground';
+
 export const confirmationExpectation: ConfirmationExpectation = Object.freeze({
   orderNumberPattern: /^Order Number: \d{8}$/,
   pathPattern: /\/checkout\/confirmation\/\d{8}$/,

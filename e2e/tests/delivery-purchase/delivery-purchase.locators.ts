@@ -54,7 +54,8 @@ export const zipCodeInput = (page: Page): Locator =>
 export const continueToShippingButton = (page: Page): Locator =>
   page.getByRole('button', { name: 'Continue to Shipping Method', exact: true });
 
-export const shippingMethod = (page: Page): Locator => page.getByText('Ground', { exact: true });
+export const shippingMethod = (page: Page, methodName: string): Locator =>
+  page.getByText(methodName, { exact: true });
 
 export const editShippingAddressButton = (page: Page): Locator =>
   page.getByRole('button', { name: 'Edit Shipping Address', exact: true });

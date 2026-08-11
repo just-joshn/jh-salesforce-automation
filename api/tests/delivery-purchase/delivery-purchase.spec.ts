@@ -1,9 +1,9 @@
-import type { APIRequestContext, APIResponse } from '@playwright/test';
+import type { APIResponse } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
 import { findOrderableVariant } from '../../support/products';
-import { getGuestToken } from '../../support/slas';
 import type { Basket, Fault, Order, ShippingMethodResult } from '../../support/scapi-types';
+import { getGuestToken } from '../../support/slas';
 import * as Actions from './delivery-purchase.actions';
 import {
   basketIdFrom,
@@ -14,20 +14,10 @@ import {
   paymentInstrumentFor,
   shippingMethodIdFrom,
   shippingMethodRequestFor,
-  type CheckoutInput,
 } from './delivery-purchase.data';
 
 // OUT OF SCOPE: Pain rows 1 (availability flips) and 2 (basket-mutation failure) cannot be
 // forced against a live store without faking SCAPI, which this suite explicitly bans.
-
-interface PreparedBasket {
-  readonly basketId: string;
-}
-
-const expectBasket = async (response: APIResponse): Promise<Basket> => {
-  expect(response.status()).toBe(expected.basketMutationStatus);
-  return (await response.json()) as Basket;
-};
 
 const readOrder = async (response: APIResponse): Promise<Order> => (await response.json()) as Order;
 
@@ -35,58 +25,6 @@ const readFault = async (response: APIResponse): Promise<Fault> => (await respon
 
 const readShippingMethods = async (response: APIResponse): Promise<ShippingMethodResult> =>
   (await response.json()) as ShippingMethodResult;
-
-const prepareReadyBasket = async (
-  request: APIRequestContext,
-  accessToken: string,
-  checkout: CheckoutInput,
-): Promise<PreparedBasket> => {
-  const createResponse = await Actions.createBasket(request, accessToken);
-  const createdBasket = await expectBasket(createResponse);
-  const basketId = basketIdFrom(createdBasket);
-
-  const itemResponse = await Actions.addProductToBasket(request, accessToken, {
-    basketId,
-    body: checkout.productItems,
-  });
-  const basketWithItem = await expectBasket(itemResponse);
-  const shipmentId = defaultShipmentIdFrom(basketWithItem);
-
-  const contactResponse = await Actions.provideContact(request, accessToken, {
-    basketId,
-    body: checkout.customer,
-  });
-  await expectBasket(contactResponse);
-
-  const addressResponse = await Actions.provideShippingAddress(request, accessToken, {
-    basketId,
-    body: checkout.shippingAddress,
-    shipmentId,
-  });
-  await expectBasket(addressResponse);
-
-  const methodsResponse = await Actions.getShippingMethods(request, accessToken, {
-    basketId,
-    shipmentId,
-  });
-  const shippingMethods = await readShippingMethods(methodsResponse);
-  expect(methodsResponse.status()).toBe(expected.basketMutationStatus);
-  const shippingMethodId = shippingMethodIdFrom(shippingMethods);
-
-  const shippingResponse = await Actions.selectShippingMethod(request, accessToken, {
-    basketId,
-    body: shippingMethodRequestFor(shippingMethodId),
-    shipmentId,
-  });
-  const basketWithShipping = await expectBasket(shippingResponse);
-
-  const paymentResponse = await Actions.providePayment(request, accessToken, {
-    basketId,
-    body: paymentInstrumentFor(basketWithShipping),
-  });
-  await expectBasket(paymentResponse);
-  return { basketId };
-};
 
 test('CUJ 1 — completes a delivery purchase and receives a confirmed order', async ({
   request,
@@ -198,7 +136,7 @@ test('CUJ 1 — completes a delivery purchase and receives a confirmed order', a
 
   await test.step('Receive order confirmation', () => {
     expect(order.orderNo).toMatch(expected.orderNumberPattern);
-    console.log(`REAL ORDER NUMBER: ${order.orderNo}`);
+    test.info().annotations.push({ type: 'orderNo', description: String(order.orderNo) });
   });
 });
 
@@ -208,7 +146,7 @@ test('CUJ 1 — refuses to create a second order from a basket already consumed 
   const token = await getGuestToken(request);
   const product = await findOrderableVariant(request, token.access_token);
   const checkout = createCheckoutInput(product);
-  const prepared = await prepareReadyBasket(request, token.access_token, checkout);
+  const prepared = await Actions.prepareReadyBasket(request, token.access_token, checkout);
   const orderRequest = orderRequestFor(prepared.basketId);
 
   const firstResponse = await Actions.createOrder(request, token.access_token, orderRequest);

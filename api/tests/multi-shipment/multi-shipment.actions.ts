@@ -1,16 +1,14 @@
 import type { APIRequestContext, APIResponse } from '@playwright/test';
 
-import type { OrderableVariant } from '../../support/products';
+import {
+  findTwoDistinctOrderableVariants,
+  type OrderableVariant,
+} from '../../support/products';
 import { bearer, withSite } from '../../support/scapi';
-import type {
-  Product,
-  ProductSearchHit,
-  ProductSearchResult,
-  ProductVariant,
-} from '../../support/scapi-types';
+import type { Basket, ShippingMethodResult } from '../../support/scapi-types';
 import {
   emptyBasketRequest,
-  orderableVariantFrom,
+  expected,
   type AddressRequest,
   type BasketInput,
   type OrderRequest,
@@ -19,6 +17,12 @@ import {
   type ShipmentInput,
   type ShipmentRequest,
   type ShippingMethodRequest,
+  basketIdFrom,
+  defaultShipmentIdFrom,
+  defaultShippingMethodIdFrom,
+  productItemRequest,
+  secondShipmentRequest,
+  shippingMethodRequestFor,
 } from './multi-shipment.data';
 import * as Endpoints from './multi-shipment.endpoints';
 
@@ -27,81 +31,27 @@ const requestOptions = (accessToken: string) => ({
   params: withSite(),
 });
 
-const requireOk = async (response: APIResponse, operation: string): Promise<void> => {
-  if (!response.ok()) {
+const requireStatus = async (
+  response: APIResponse,
+  status: number,
+  operation: string,
+): Promise<void> => {
+  if (response.status() !== status) {
     throw new Error(`${operation} failed with HTTP ${response.status()}: ${await response.text()}`);
   }
 };
 
-const fetchProduct = async (
-  request: APIRequestContext,
-  accessToken: string,
-  productId: string,
-): Promise<Product> => {
-  const response = await request.get(Endpoints.product(productId), {
-    headers: bearer(accessToken),
-    params: withSite({ expand: 'availability,variations' }),
-  });
-  await requireOk(response, `SCAPI product ${productId}`);
-  return (await response.json()) as Product;
+const readBasket = async (response: APIResponse, operation: string): Promise<Basket> => {
+  await requireStatus(response, expected.mutationStatus, operation);
+  return (await response.json()) as Basket;
 };
 
-const standaloneCandidate = (master: Product): OrderableVariant | undefined => {
-  const masterId = master.id;
-  return masterId ? orderableVariantFrom(master, master, masterId) : undefined;
-};
-
-const orderableVariants = (master: Product): readonly ProductVariant[] =>
-  (master.variants ?? []).filter((variant) => variant.orderable);
-
-const variantCandidateFromMaster = async (
-  request: APIRequestContext,
-  accessToken: string,
-  master: Product,
-): Promise<OrderableVariant | undefined> => {
-  for (const variant of orderableVariants(master)) {
-    const stockedProduct = await fetchProduct(request, accessToken, variant.productId);
-    const candidate = orderableVariantFrom(master, stockedProduct, variant.productId);
-    if (candidate) {
-      return candidate;
-    }
-  }
-  return undefined;
-};
-
-const candidateFromMaster = async (
-  request: APIRequestContext,
-  accessToken: string,
-  master: Product,
-): Promise<OrderableVariant | undefined> =>
-  standaloneCandidate(master) ?? variantCandidateFromMaster(request, accessToken, master);
-
-const distinctHits = (
-  result: ProductSearchResult,
-  excludedProductId: string,
-): readonly ProductSearchHit[] =>
-  (result.hits ?? []).filter((hit) => hit.productId !== excludedProductId);
-
-export const findDistinctOrderableVariant = async (
-  request: APIRequestContext,
-  accessToken: string,
-  excludedProductId: string,
-): Promise<OrderableVariant> => {
-  const response = await request.get(Endpoints.productSearch(), {
-    headers: bearer(accessToken),
-    params: withSite({ limit: '24', refine: 'cgid=root' }),
-  });
-  await requireOk(response, 'SCAPI product search');
-  const result = (await response.json()) as ProductSearchResult;
-  for (const hit of distinctHits(result, excludedProductId)) {
-    const master = await fetchProduct(request, accessToken, hit.productId);
-    const candidate = await candidateFromMaster(request, accessToken, master);
-    if (candidate) {
-      return candidate;
-    }
-  }
-  throw new Error('No second distinct orderable product was found in the current catalog sample');
-};
+export interface PreparedShipments {
+  readonly basket: Basket;
+  readonly basketId: string;
+  readonly products: readonly [OrderableVariant, OrderableVariant];
+  readonly shipmentIds: readonly [string, string];
+}
 
 export const createBasket = async (
   request: APIRequestContext,
@@ -191,3 +141,74 @@ export const createOrder = async (
     ...requestOptions(accessToken),
     data: body,
   });
+
+const addItemsToShipments = async (
+  request: APIRequestContext,
+  accessToken: string,
+  basketId: string,
+  products: readonly [OrderableVariant, OrderableVariant],
+  shipmentIds: readonly [string, string],
+): Promise<Basket> => {
+  await readBasket(
+    await addProductToShipment(request, accessToken, {
+      basketId,
+      body: productItemRequest(products[0], shipmentIds[0]),
+    }),
+    'add first product to shipment',
+  );
+  return readBasket(
+    await addProductToShipment(request, accessToken, {
+      basketId,
+      body: productItemRequest(products[1], shipmentIds[1]),
+    }),
+    'add second product to shipment',
+  );
+};
+
+export const prepareTwoShipments = async (
+  request: APIRequestContext,
+  accessToken: string,
+): Promise<PreparedShipments> => {
+  const products = await findTwoDistinctOrderableVariants(request, accessToken);
+  const createdBasket = await readBasket(await createBasket(request, accessToken), 'create basket');
+  const basketId = basketIdFrom(createdBasket);
+  const firstShipmentId = defaultShipmentIdFrom(createdBasket);
+  const secondShipment = secondShipmentRequest();
+  await readBasket(
+    await createShipment(request, accessToken, { basketId, body: secondShipment }),
+    'create second shipment',
+  );
+  const shipmentIds: readonly [string, string] = [firstShipmentId, secondShipment.shipmentId];
+  const basket = await addItemsToShipments(request, accessToken, basketId, products, shipmentIds);
+  return { basket, basketId, products, shipmentIds };
+};
+
+export const fetchShippingMethods = async (
+  request: APIRequestContext,
+  accessToken: string,
+  basketId: string,
+  shipmentId: string,
+): Promise<ShippingMethodResult> => {
+  const response = await getShippingMethods(request, accessToken, { basketId, shipmentId });
+  await requireStatus(response, expected.mutationStatus, 'get shipping methods');
+  return (await response.json()) as ShippingMethodResult;
+};
+
+export const selectDefaultShippingMethod = async (
+  request: APIRequestContext,
+  accessToken: string,
+  basketId: string,
+  shipmentId: string,
+): Promise<Basket> => {
+  const methods = await fetchShippingMethods(request, accessToken, basketId, shipmentId);
+  const methodId = defaultShippingMethodIdFrom(methods);
+  return readBasket(
+    await selectShippingMethod(request, accessToken, {
+      basketId,
+      body: shippingMethodRequestFor(methodId),
+      shipmentId,
+    }),
+    'select shipping method',
+  );
+};
+

@@ -13,12 +13,15 @@ export const visitProduct = async (page: Page, productId: string): Promise<void>
   await page.goto(buildPath(`/product/${productId}`));
 };
 
+const dismissOptionalTracking = async (page: Page): Promise<void> => {
+  await Locators.declineTrackingButton(page)
+    .click({ timeout: 2_000 })
+    .catch(() => undefined);
+};
+
 export const addProductToBasket = async (page: Page): Promise<void> => {
   await Locators.cartButtonWithCount(page, 0).waitFor();
-  if (await Locators.declineTrackingButton(page).isVisible()) {
-    await Locators.declineTrackingButton(page).click();
-    await Locators.declineTrackingButton(page).waitFor({ state: 'hidden' });
-  }
+  await dismissOptionalTracking(page);
   await Locators.addToCartButton(page).click();
 };
 

@@ -56,7 +56,7 @@ test('CUJ 6 — places a confirmed pickup order for the selected store', async (
     const orderNumber = Data.orderNumberFromConfirmation(
       await Locators.confirmationOrderNumber(page).textContent(),
     );
-    console.log(`Real pickup order number: ${orderNumber}`);
+    test.info().annotations.push({ type: 'orderNo', description: orderNumber });
   });
 
   await test.step('Receive pickup confirmation', async () => {

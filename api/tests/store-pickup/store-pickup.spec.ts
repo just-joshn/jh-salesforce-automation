@@ -163,7 +163,7 @@ test('CUJ 6 — places a confirmed pickup order for the selected store', async (
         stateCode: pickupAddress.stateCode,
       }),
     );
-    console.log(`REAL PICKUP ORDER NUMBER: ${order.orderNo}`);
+    test.info().annotations.push({ type: 'orderNo', description: String(order.orderNo) });
   });
 });
 

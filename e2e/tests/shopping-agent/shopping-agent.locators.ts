@@ -7,12 +7,14 @@ export const headerAgentEntry = (page: Page): Locator =>
 export const miawAgentEntry = (page: Page): Locator =>
   page.locator('button.embeddedMessagingConversationButton');
 
+// Commerce client FAB is icon-only with no stable accessible name when that entry point ships.
 export const commerceClientAgentEntry = (page: Page): Locator =>
   page.getByTestId('commerce-client-fab');
 
 export const agentEntry = (page: Page): Locator =>
   headerAgentEntry(page).or(miawAgentEntry(page)).or(commerceClientAgentEntry(page));
 
+// Widget shell is a non-semantic root; children carry roles but the container itself does not.
 export const agentWidgetContainer = (page: Page): Locator => page.getByTestId('shopper-agent');
 
 export const conversationInput = (page: Page): Locator =>

@@ -50,10 +50,14 @@ export const pickupProductPath = (product: JourneyProduct): string =>
 export const unavailableProductPath = (productId: string): string =>
   `/product/${encodeURIComponent(productId)}`;
 
+const acceptedCardNumber = '4111111111111111';
+
+export const maskedCardSuffix = `•••• ${acceptedCardNumber.slice(-4)}`;
+
 export const createCheckoutData = (): CheckoutData =>
   Object.freeze({
     address: '1 Market Street',
-    cardNumber: '4111111111111111',
+    cardNumber: acceptedCardNumber,
     cardholder: 'BOPIS Shopper',
     city: 'San Francisco',
     email: `cuj6-${Date.now()}-${crypto.randomUUID()}@mailinator.com`,

@@ -102,6 +102,8 @@ export const deliveryAddressOption = (
     exact: true,
   });
 
+// Multi-address step reuses the same accessible name as single-ship checkout; test id is the
+// stable contract that targets only the multi-shipment continue control.
 export const continueToShippingButton = (page: Page): Locator =>
   page.getByTestId('continue-to-shipping-button');
 

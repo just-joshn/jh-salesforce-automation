@@ -3,15 +3,12 @@ import { expect, test } from '@playwright/test';
 
 import { readAppConfiguration } from '../../support/app-config';
 import { evaluateSalesforcePaymentsGate, formatGateSkipReason } from '../../support/gates';
-import { findOrderableVariant } from '../../support/products';
-import type { Basket, Order, ShippingMethodResult } from '../../support/scapi-types';
+import type { Basket, Order } from '../../support/scapi-types';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './salesforce-payments.actions';
+import type { PaymentReadyCheckout } from './salesforce-payments.actions';
 import {
-  basketIdFrom,
   basketPaymentInstrumentFor,
-  createCheckoutInput,
-  defaultShipmentIdFrom,
   expected,
   isEnabled,
   orderNoFrom,
@@ -20,16 +17,9 @@ import {
   paymentInstrumentFrom,
   paymentInstrumentIdFrom,
   salesforcePaymentsMethodIdFrom,
-  shippingMethodIdFrom,
-  shippingMethodRequestFor,
   type PaymentMethodResult,
   type ShopperConfigurationsResponse,
 } from './salesforce-payments.data';
-
-interface PaymentReadyCheckout {
-  readonly basket: Basket;
-  readonly basketId: string;
-}
 
 const expectBasket = async (response: APIResponse): Promise<Basket> => {
   expect(response.status()).toBe(expected.basketMutationStatus);
@@ -63,75 +53,32 @@ test('CUJ 2 — completes payment-backed checkout through Salesforce Payments', 
   const token = await getGuestToken(request);
   const paymentReady =
     await test.step('Reach payment-ready checkout', async (): Promise<PaymentReadyCheckout> => {
-      const product = await findOrderableVariant(request, token.access_token);
-      const checkout = createCheckoutInput(product);
-      const createdBasket = await expectBasket(
-        await Actions.createBasket(request, token.access_token),
-      );
-      const basketId = basketIdFrom(createdBasket);
-      const basketWithItem = await expectBasket(
-        await Actions.addProductToBasket(request, token.access_token, {
-          basketId,
-          body: checkout.productItems,
-        }),
-      );
-      const shipmentId = defaultShipmentIdFrom(basketWithItem);
-
-      await expectBasket(
-        await Actions.provideContact(request, token.access_token, {
-          basketId,
-          body: checkout.customer,
-        }),
-      );
-      await expectBasket(
-        await Actions.provideShippingAddress(request, token.access_token, {
-          basketId,
-          body: checkout.shippingAddress,
-          shipmentId,
-        }),
-      );
-
-      const methodsResponse = await Actions.getShippingMethods(request, token.access_token, {
-        basketId,
-        shipmentId,
-      });
-      expect(methodsResponse.status()).toBe(expected.successStatus);
-      const methods = (await methodsResponse.json()) as ShippingMethodResult;
-      const shippingMethodId = shippingMethodIdFrom(methods);
-      const basket = await expectBasket(
-        await Actions.selectShippingMethod(request, token.access_token, {
-          basketId,
-          body: shippingMethodRequestFor(shippingMethodId),
-          shipmentId,
-        }),
-      );
-
-      expect(basket.productItems).toEqual(
+      const ready = await Actions.preparePaymentReadyCheckout(request, token.access_token);
+      expect(ready.basket.productItems).toEqual(
         expect.arrayContaining([
-          expect.objectContaining({ productId: product.variantId, quantity: 1 }),
+          expect.objectContaining({ productId: ready.productVariantId, quantity: 1 }),
         ]),
       );
-      expect(basket.customerInfo?.email).toBe(checkout.customer.email);
-      expect(basket.billingAddress).toEqual(
+      expect(ready.basket.customerInfo?.email).toBe(ready.customerEmail);
+      expect(ready.basket.billingAddress).toEqual(
         expect.objectContaining({
-          address1: checkout.shippingAddress.address1,
-          postalCode: checkout.shippingAddress.postalCode,
+          address1: ready.shippingAddress1,
+          postalCode: ready.shippingPostalCode,
         }),
       );
-      expect(basket.shipments).toEqual(
+      expect(ready.basket.shipments).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
-            shipmentId,
             shippingAddress: expect.objectContaining({
-              address1: checkout.shippingAddress.address1,
-              postalCode: checkout.shippingAddress.postalCode,
+              address1: ready.shippingAddress1,
+              postalCode: ready.shippingPostalCode,
             }),
-            shippingMethod: expect.objectContaining({ id: shippingMethodId }),
+            shippingMethod: expect.objectContaining({ id: ready.shippingMethodId }),
           }),
         ]),
       );
-      expect(basket.orderTotal).toBeGreaterThan(0);
-      return { basket, basketId };
+      expect(ready.basket.orderTotal).toBeGreaterThan(0);
+      return ready;
     });
 
   const paymentMethodId = await test.step('Load/select payment method', async () => {

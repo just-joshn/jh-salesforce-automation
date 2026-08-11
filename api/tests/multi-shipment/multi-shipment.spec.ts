@@ -1,11 +1,11 @@
-import type { APIRequestContext, APIResponse } from '@playwright/test';
+import type { APIResponse } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
-import { findOrderableVariant, type OrderableVariant } from '../../support/products';
 import { required } from '../../support/scapi';
-import type { Basket, Order, ShippingMethodResult } from '../../support/scapi-types';
+import type { Basket, Order } from '../../support/scapi-types';
 import { getGuestToken } from '../../support/slas';
 import * as Actions from './multi-shipment.actions';
+import type { PreparedShipments } from './multi-shipment.actions';
 import * as Data from './multi-shipment.data';
 
 /**
@@ -13,81 +13,9 @@ import * as Data from './multi-shipment.data';
  * functional observable, and forcing a contrary SCAPI state would require banned service mocking.
  */
 
-interface PreparedShipments {
-  readonly basket: Basket;
-  readonly basketId: string;
-  readonly products: readonly [OrderableVariant, OrderableVariant];
-  readonly shipmentIds: readonly [string, string];
-}
-
 const expectBasket = async (response: APIResponse): Promise<Basket> => {
   expect(response.status()).toBe(Data.expected.mutationStatus);
   return (await response.json()) as Basket;
-};
-
-const prepareTwoShipments = async (
-  request: APIRequestContext,
-  accessToken: string,
-): Promise<PreparedShipments> => {
-  const firstProduct = await findOrderableVariant(request, accessToken);
-  const secondProduct = await Actions.findDistinctOrderableVariant(
-    request,
-    accessToken,
-    firstProduct.productId,
-  );
-  const createdBasket = await expectBasket(await Actions.createBasket(request, accessToken));
-  const basketId = Data.basketIdFrom(createdBasket);
-  const firstShipmentId = Data.defaultShipmentIdFrom(createdBasket);
-  const secondShipment = Data.secondShipmentRequest();
-  await expectBasket(
-    await Actions.createShipment(request, accessToken, { basketId, body: secondShipment }),
-  );
-  await expectBasket(
-    await Actions.addProductToShipment(request, accessToken, {
-      basketId,
-      body: Data.productItemRequest(firstProduct, firstShipmentId),
-    }),
-  );
-  const basket = await expectBasket(
-    await Actions.addProductToShipment(request, accessToken, {
-      basketId,
-      body: Data.productItemRequest(secondProduct, secondShipment.shipmentId),
-    }),
-  );
-  return {
-    basket,
-    basketId,
-    products: [firstProduct, secondProduct],
-    shipmentIds: [firstShipmentId, secondShipment.shipmentId],
-  };
-};
-
-const shippingMethods = async (
-  request: APIRequestContext,
-  accessToken: string,
-  basketId: string,
-  shipmentId: string,
-): Promise<ShippingMethodResult> => {
-  const response = await Actions.getShippingMethods(request, accessToken, { basketId, shipmentId });
-  expect(response.status()).toBe(Data.expected.mutationStatus);
-  return (await response.json()) as ShippingMethodResult;
-};
-
-const selectDefaultShippingMethod = async (
-  request: APIRequestContext,
-  accessToken: string,
-  basketId: string,
-  shipmentId: string,
-): Promise<Basket> => {
-  const methods = await shippingMethods(request, accessToken, basketId, shipmentId);
-  const methodId = Data.defaultShippingMethodIdFrom(methods);
-  return expectBasket(
-    await Actions.selectShippingMethod(request, accessToken, {
-      basketId,
-      body: Data.shippingMethodRequestFor(methodId),
-      shipmentId,
-    }),
-  );
 };
 
 test('CUJ 7 — creates one order with items assigned to two shipments', async ({ request }) => {
@@ -98,7 +26,7 @@ test('CUJ 7 — creates one order with items assigned to two shipments', async (
   let order: Order = {};
 
   await test.step('Start multi-shipment checkout', async () => {
-    prepared = await prepareTwoShipments(request, token.access_token);
+    prepared = await Actions.prepareTwoShipments(request, token.access_token);
     basket = prepared.basket;
     expect(prepared.shipmentIds[0]).not.toBe(prepared.shipmentIds[1]);
     expect(basket.shipments).toHaveLength(Data.expected.shipmentCount);
@@ -165,13 +93,13 @@ test('CUJ 7 — creates one order with items assigned to two shipments', async (
 
   await test.step('Select valid shipping methods', async () => {
     const state = required(prepared, 'prepared shipments');
-    await selectDefaultShippingMethod(
+    await Actions.selectDefaultShippingMethod(
       request,
       token.access_token,
       state.basketId,
       state.shipmentIds[0],
     );
-    basket = await selectDefaultShippingMethod(
+    basket = await Actions.selectDefaultShippingMethod(
       request,
       token.access_token,
       state.basketId,
@@ -214,9 +142,10 @@ test('CUJ 7 — creates one order with items assigned to two shipments', async (
         }),
       ]),
     );
-    console.log(
-      `REAL MULTI-SHIPMENT ORDER NUMBER: ${order.orderNo}; ${state.products[0].variantId}->${state.shipmentIds[0]}, ${state.products[1].variantId}->${state.shipmentIds[1]}`,
-    );
+    test.info().annotations.push({
+      type: 'orderNo',
+      description: String(order.orderNo),
+    });
   });
 });
 
@@ -225,7 +154,7 @@ test('CUJ 7 — refetches shipping methods when a shipment destination changes',
 }) => {
   test.setTimeout(120_000);
   const token = await getGuestToken(request);
-  const prepared = await prepareTwoShipments(request, token.access_token);
+  const prepared = await Actions.prepareTwoShipments(request, token.access_token);
   const changedShipmentId = prepared.shipmentIds[0];
 
   await expectBasket(
@@ -235,13 +164,13 @@ test('CUJ 7 — refetches shipping methods when a shipment destination changes',
       shipmentId: changedShipmentId,
     }),
   );
-  const before = await shippingMethods(
+  const before = await Actions.fetchShippingMethods(
     request,
     token.access_token,
     prepared.basketId,
     changedShipmentId,
   );
-  await selectDefaultShippingMethod(
+  await Actions.selectDefaultShippingMethod(
     request,
     token.access_token,
     prepared.basketId,
@@ -255,7 +184,7 @@ test('CUJ 7 — refetches shipping methods when a shipment destination changes',
       shipmentId: changedShipmentId,
     }),
   );
-  const after = await shippingMethods(
+  const after = await Actions.fetchShippingMethods(
     request,
     token.access_token,
     prepared.basketId,

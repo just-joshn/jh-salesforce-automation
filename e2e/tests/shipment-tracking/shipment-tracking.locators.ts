@@ -54,7 +54,8 @@ export const zipCodeInput = (page: Page): Locator =>
 export const continueToShippingButton = (page: Page): Locator =>
   page.getByRole('button', { name: 'Continue to Shipping Method', exact: true });
 
-export const shippingMethod = (page: Page): Locator => page.getByText('Ground', { exact: true });
+export const shippingMethod = (page: Page, methodName: string): Locator =>
+  page.getByText(methodName, { exact: true });
 
 export const editShippingAddressButton = (page: Page): Locator =>
   page.getByRole('button', { name: 'Edit Shipping Address', exact: true });
@@ -115,6 +116,7 @@ export const trackingOption = (page: Page, accessibleName: string): Locator =>
 
 export const allOrderLinks = (page: Page): Locator => page.getByRole('link');
 
+// Order detail has no landmark around carrier links; test id is the only stable section root.
 export const trackingSection = (page: Page): Locator =>
   page.getByTestId('account-order-detail-tracking');
 

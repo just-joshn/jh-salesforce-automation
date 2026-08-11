@@ -1,16 +1,17 @@
-import type { APIRequestContext, APIResponse, Page } from '@playwright/test';
+import type { Page } from '@playwright/test';
 
-import { findOrderableVariant, MINIMUM_AVAILABLE_TO_SELL } from '../../../api/support/products';
-import { bearer, required, shopperApiUrl, withSite } from '../../../api/support/scapi';
-import type { Product, ProductSearchResult } from '../../../api/support/scapi-types';
+import { findTwoDistinctOrderableVariants } from '../../../api/support/products';
 import { getGuestToken } from '../../../api/support/slas';
 import { expect, test } from '../../support/fixtures';
 import * as Actions from './multi-shipment.actions';
 import {
   addressLabel,
   createCheckoutInput,
+  defaultShippingMethod,
+  defaultShippingMethods,
   type JourneyProduct,
   recipientName,
+  revalidationMethod,
 } from './multi-shipment.data';
 import * as Locators from './multi-shipment.locators';
 
@@ -20,128 +21,8 @@ import * as Locators from './multi-shipment.locators';
  * observable. These tests assert assignment accuracy instead of claiming visual comprehension.
  */
 
-const SHIPPING_METHODS = ['Ground', 'Ground'] as const;
-const REVALIDATION_METHOD = '2-Day Express';
-
-const requireSuccess = async (response: APIResponse, operation: string): Promise<void> => {
-  if (!response.ok()) {
-    throw new Error(`${operation} failed with HTTP ${response.status()}: ${await response.text()}`);
-  }
-};
-
-const fetchProduct = async (
-  request: APIRequestContext,
-  accessToken: string,
-  productId: string,
-): Promise<Product> => {
-  const response = await request.get(
-    shopperApiUrl('product/shopper-products', `products/${encodeURIComponent(productId)}`),
-    { headers: bearer(accessToken), params: withSite({ expand: 'availability,variations' }) },
-  );
-  await requireSuccess(response, `SCAPI product ${productId}`);
-  return (await response.json()) as Product;
-};
-
-const toJourneyProduct = (
-  master: Product,
-  stockedProduct: Product,
-  variantId: string,
-): JourneyProduct | undefined => {
-  const inventory = stockedProduct.inventory;
-  if (!inventory?.orderable || inventory.ats === undefined) {
-    return undefined;
-  }
-  if (inventory.ats < MINIMUM_AVAILABLE_TO_SELL) {
-    return undefined;
-  }
-
-  return {
-    availableToSell: inventory.ats,
-    productId: required(master.id, 'product.id'),
-    productName: required(master.name, 'product.name'),
-    variantId,
-  };
-};
-
-const findVariantCandidate = async (
-  request: APIRequestContext,
-  accessToken: string,
-  master: Product,
-): Promise<JourneyProduct | undefined> => {
-  for (const variant of master.variants ?? []) {
-    if (!variant.orderable) {
-      continue;
-    }
-    const product = await fetchProduct(request, accessToken, variant.productId);
-    const candidate = toJourneyProduct(master, product, variant.productId);
-    if (candidate) {
-      return candidate;
-    }
-  }
-  return undefined;
-};
-
-const findCandidateInProduct = async (
-  request: APIRequestContext,
-  accessToken: string,
-  master: Product,
-): Promise<JourneyProduct | undefined> => {
-  const productType = master.type;
-  if (productType && (productType.bundle || productType.set)) {
-    return undefined;
-  }
-  const standalone = toJourneyProduct(master, master, required(master.id, 'product.id'));
-  if (standalone) {
-    return standalone;
-  }
-  return findVariantCandidate(request, accessToken, master);
-};
-
-const searchCatalog = async (
-  request: APIRequestContext,
-  accessToken: string,
-): Promise<ProductSearchResult> => {
-  const response = await request.get(shopperApiUrl('search/shopper-search', 'product-search'), {
-    headers: bearer(accessToken),
-    params: withSite({ limit: '24', refine: 'cgid=root' }),
-  });
-  await requireSuccess(response, 'SCAPI product search');
-  return (await response.json()) as ProductSearchResult;
-};
-
-const findDistinctProduct = async (
-  request: APIRequestContext,
-  accessToken: string,
-  excludedProductId: string,
-): Promise<JourneyProduct> => {
-  const catalog = await searchCatalog(request, accessToken);
-  for (const hit of catalog.hits ?? []) {
-    if (hit.productId !== excludedProductId) {
-      const master = await fetchProduct(request, accessToken, hit.productId);
-      const candidate = await findCandidateInProduct(request, accessToken, master);
-      if (candidate) {
-        return candidate;
-      }
-    }
-  }
-  throw new Error('No second distinct orderable product was found in the current catalog sample');
-};
-
-const resolveProducts = async (
-  request: APIRequestContext,
-): Promise<readonly [JourneyProduct, JourneyProduct]> => {
-  const token = await getGuestToken(request);
-  const resolved = await findOrderableVariant(request, token.access_token);
-  const resolvedMaster = await fetchProduct(request, token.access_token, resolved.productId);
-  const first =
-    (await findCandidateInProduct(request, token.access_token, resolvedMaster)) ??
-    (await findDistinctProduct(request, token.access_token, resolved.productId));
-  const second = await findDistinctProduct(request, token.access_token, first.productId);
-  return [first, second];
-};
-
 const addProducts = async (
-  page: Parameters<typeof Actions.addFirstProduct>[0],
+  page: Page,
   products: readonly [JourneyProduct, JourneyProduct],
 ): Promise<void> => {
   await Actions.addFirstProduct(page, products[0]);
@@ -152,7 +33,7 @@ const addProducts = async (
 };
 
 const addDestinations = async (
-  page: Parameters<typeof Actions.addDestination>[0],
+  page: Page,
   products: readonly [JourneyProduct, JourneyProduct],
   checkout: ReturnType<typeof createCheckoutInput>,
 ): Promise<void> => {
@@ -181,7 +62,8 @@ test('CUJ 7 — places one order with items assigned to two destinations', async
   request,
 }) => {
   test.setTimeout(120_000);
-  const products = await resolveProducts(request);
+  const token = await getGuestToken(request);
+  const products = await findTwoDistinctOrderableVariants(request, token.access_token);
   const checkout = createCheckoutInput();
 
   await test.step('Start multi-shipment checkout', async () => {
@@ -216,9 +98,9 @@ test('CUJ 7 — places one order with items assigned to two destinations', async
 
   await test.step('Select valid shipping methods', async () => {
     await Actions.continueToShipping(page);
-    await Actions.selectShippingMethods(page, SHIPPING_METHODS);
+    await Actions.selectShippingMethods(page, defaultShippingMethods);
     await expect(Locators.multipleAddressesSummary(page)).toBeVisible();
-    await expect(Locators.shippingSummaryMethod(page, 'Ground')).toHaveCount(2);
+    await expect(Locators.shippingSummaryMethod(page, defaultShippingMethod)).toHaveCount(2);
   });
 
   await test.step('Pay/place order', async () => {
@@ -231,7 +113,10 @@ test('CUJ 7 — places one order with items assigned to two destinations', async
       recipientName(checkout.addresses[0]),
       recipientName(checkout.addresses[1]),
     ]);
-    console.log(`CUJ 7 multi-shipment order ${await Locators.orderNumber(page).textContent()}`);
+    test.info().annotations.push({
+      type: 'orderNo',
+      description: (await Locators.orderNumber(page).textContent()) ?? '',
+    });
   });
 });
 
@@ -240,7 +125,8 @@ test('CUJ 7 — revalidates the shipping method when a destination changes', asy
   request,
 }) => {
   test.setTimeout(120_000);
-  const products = await resolveProducts(request);
+  const token = await getGuestToken(request);
+  const products = await findTwoDistinctOrderableVariants(request, token.access_token);
   const checkout = createCheckoutInput();
 
   await test.step('Start multi-shipment checkout', async () => {
@@ -278,7 +164,7 @@ test('CUJ 7 — revalidates the shipping method when a destination changes', asy
     await Actions.openShippingOptions(page);
     await expect(Locators.continueToPaymentButton(page)).toBeVisible();
     await expect(Locators.shippingMethodGroups(page)).toHaveCount(2);
-    await Actions.selectFirstShipmentMethod(page, REVALIDATION_METHOD);
+    await Actions.selectFirstShipmentMethod(page, revalidationMethod);
     await Actions.changeDestination(
       page,
       products[0].productName,
@@ -286,8 +172,8 @@ test('CUJ 7 — revalidates the shipping method when a destination changes', asy
     );
     await expect(Locators.multipleAddressesSummary(page)).not.toBeVisible();
     await expect(Locators.editShippingAddressButton(page)).toBeVisible();
-    await expect(Locators.shippingSummaryMethod(page, REVALIDATION_METHOD)).toHaveCount(1);
-    await expect(Locators.shippingSummaryMethod(page, 'Ground')).not.toBeVisible();
+    await expect(Locators.shippingSummaryMethod(page, revalidationMethod)).toHaveCount(1);
+    await expect(Locators.shippingSummaryMethod(page, defaultShippingMethod)).not.toBeVisible();
   });
 
   await test.step('Pay/place order', async () => {
@@ -298,6 +184,9 @@ test('CUJ 7 — revalidates the shipping method when a destination changes', asy
   await test.step('Verify fulfillment in confirmation', async () => {
     const changedRecipient = recipientName(checkout.addresses[1]);
     await assertConfirmation(page, products, [changedRecipient, changedRecipient]);
-    console.log(`CUJ 7 revalidation order ${await Locators.orderNumber(page).textContent()}`);
+    test.info().annotations.push({
+      type: 'orderNo',
+      description: (await Locators.orderNumber(page).textContent()) ?? '',
+    });
   });
 });

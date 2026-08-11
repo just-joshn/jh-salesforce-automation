@@ -32,7 +32,6 @@ const skipWhenReturnJourneyIsGated = (
     return false;
   }
 
-  console.info(`CUJ 17 skipped: ${gate.reason}`);
   test.skip(true, gate.reason);
   return true;
 };

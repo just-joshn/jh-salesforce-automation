@@ -104,7 +104,8 @@ export const billingPostalCodeInput = (page: Page): Locator =>
 export const reviewOrderButton = (page: Page): Locator =>
   page.getByRole('button', { name: 'Review Order', exact: true });
 
-export const reviewedCard = (page: Page): Locator => page.getByText('•••• 1111', { exact: true });
+export const reviewedCard = (page: Page, maskedSuffix: string): Locator =>
+  page.getByText(maskedSuffix, { exact: true });
 
 export const placeOrderButton = (page: Page): Locator =>
   page.getByRole('button', { name: 'Place Order', exact: true }).first();

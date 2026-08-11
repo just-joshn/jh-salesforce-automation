@@ -2,7 +2,11 @@ import type { Page } from '@playwright/test';
 
 import { buildPath } from '../../support/site';
 import type { CheckoutData, JourneyProduct, StoreSelection } from './store-pickup.data';
-import { pickupProductPath, unavailableProductPath } from './store-pickup.data';
+import {
+  maskedCardSuffix,
+  pickupProductPath,
+  unavailableProductPath,
+} from './store-pickup.data';
 import * as Locators from './store-pickup.locators';
 
 export const visitStorefront = async (page: Page): Promise<void> => {
@@ -62,7 +66,7 @@ export const payAndPlaceOrder = async (page: Page, checkout: CheckoutData): Prom
   await fillCard(page, checkout);
   await fillBillingAddress(page, checkout);
   await Locators.reviewOrderButton(page).click();
-  await Locators.reviewedCard(page).waitFor();
+  await Locators.reviewedCard(page, maskedCardSuffix).waitFor();
   await Promise.all([
     page.waitForURL(buildPath('/checkout/confirmation/*')),
     Locators.placeOrderButton(page).click(),

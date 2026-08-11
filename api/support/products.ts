@@ -260,6 +260,28 @@ export const findOrderableVariant = async (
   accessToken: string,
 ): Promise<OrderableVariant> => (await findCandidate(request, accessToken, undefined)).candidate;
 
+export const findDistinctOrderableVariant = async (
+  request: APIRequestContext,
+  accessToken: string,
+  excludedProductId: string,
+): Promise<OrderableVariant> => {
+  const found = await collectCandidates(request, accessToken, undefined);
+  const match = found.find((item) => item.candidate.productId !== excludedProductId);
+  if (!match) {
+    throw new Error('No second distinct orderable product was found in the current catalog sample');
+  }
+  return match.candidate;
+};
+
+export const findTwoDistinctOrderableVariants = async (
+  request: APIRequestContext,
+  accessToken: string,
+): Promise<readonly [OrderableVariant, OrderableVariant]> => {
+  const first = await findOrderableVariant(request, accessToken);
+  const second = await findDistinctOrderableVariant(request, accessToken, first.productId);
+  return [first, second];
+};
+
 export const findOrderableVariantWithVariationValues = async (
   request: APIRequestContext,
   accessToken: string,

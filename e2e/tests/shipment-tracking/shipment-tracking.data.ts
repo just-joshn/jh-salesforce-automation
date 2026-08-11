@@ -43,6 +43,8 @@ export type TrackingJourneyGate =
 
 export const shopperAccessTokenKeyPrefix = 'access_token_' as const;
 
+export const defaultShippingMethod = 'Ground';
+
 const shippingAddress: ShippingAddress = Object.freeze({
   address: '1 Market Street',
   city: 'San Francisco',

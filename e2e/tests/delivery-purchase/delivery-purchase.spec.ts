@@ -5,6 +5,7 @@ import * as Actions from './delivery-purchase.actions';
 import {
   confirmationExpectation,
   createCheckoutInput,
+  defaultShippingMethod,
   extractOrderNumber,
   invalidPaymentCard,
 } from './delivery-purchase.data';
@@ -38,7 +39,7 @@ test('CUJ 1 — completes a delivery purchase and receives a confirmed order', a
     await Actions.provideContact(page, checkout.email);
     await Actions.provideShipping(page, checkout.shippingAddress);
     await expect(Locators.editShippingAddressButton(page)).toBeVisible();
-    await expect(Locators.shippingMethod(page)).toBeVisible();
+    await expect(Locators.shippingMethod(page, defaultShippingMethod)).toBeVisible();
   });
 
   await test.step('Provide valid payment and place order', async () => {
@@ -51,7 +52,7 @@ test('CUJ 1 — completes a delivery purchase and receives a confirmed order', a
     const orderNumberLocator = Locators.orderNumber(page);
     await expect(orderNumberLocator).toHaveText(confirmationExpectation.orderNumberPattern);
     const orderNumber = extractOrderNumber(await orderNumberLocator.innerText());
-    console.log(`REAL ORDER NUMBER: ${orderNumber}`);
+    test.info().annotations.push({ type: 'orderNo', description: orderNumber });
   });
 });
 

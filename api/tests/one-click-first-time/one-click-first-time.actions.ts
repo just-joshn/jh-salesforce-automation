@@ -1,19 +1,25 @@
 import type { APIRequestContext, APIResponse } from '@playwright/test';
 
 import { bearer, withSite } from '../../support/scapi';
-import { emptyBasketRequest } from './one-click-first-time.data';
-import type {
-  BasketInput,
-  BasketPaymentInstrumentRequest,
-  BasketCustomerInput,
-  BasketItemInput,
-  CustomerPaymentInput,
-  CustomerRegistrationRequest,
-  OrderRequest,
-  OtpRequest,
-  OtpVerificationRequest,
-  ShipmentAddressInput,
-  ShipmentMethodInput,
+import type { Basket, ShippingMethodResult } from '../../support/scapi-types';
+import {
+  basketIdFrom,
+  emptyBasketRequest,
+  expected,
+  shipmentIdFrom,
+  shippingMethodInput,
+  type BasketInput,
+  type BasketPaymentInstrumentRequest,
+  type BasketCustomerInput,
+  type BasketItemInput,
+  type CheckoutInput,
+  type CustomerPaymentInput,
+  type CustomerRegistrationRequest,
+  type OrderRequest,
+  type OtpRequest,
+  type OtpVerificationRequest,
+  type ShipmentAddressInput,
+  type ShipmentMethodInput,
 } from './one-click-first-time.data';
 import * as Endpoints from './one-click-first-time.endpoints';
 
@@ -21,6 +27,21 @@ const shopperOptions = (accessToken: string) => ({
   headers: bearer(accessToken),
   params: withSite(),
 });
+
+const requireStatus = async (
+  response: APIResponse,
+  status: number,
+  operation: string,
+): Promise<void> => {
+  if (response.status() !== status) {
+    throw new Error(`${operation} failed with HTTP ${response.status()}: ${await response.text()}`);
+  }
+};
+
+const readBasket = async (response: APIResponse, operation: string): Promise<Basket> => {
+  await requireStatus(response, expected.successStatus, operation);
+  return (await response.json()) as Basket;
+};
 
 export const requestOtp = async (
   request: APIRequestContext,
@@ -141,3 +162,43 @@ export const readOrder = async (
   accessToken: string,
   orderNo: string,
 ): Promise<APIResponse> => request.get(Endpoints.order(orderNo), shopperOptions(accessToken));
+
+export const prepareOrderReadyBasket = async (
+  request: APIRequestContext,
+  accessToken: string,
+  checkout: CheckoutInput,
+): Promise<Basket> => {
+  const created = await readBasket(await createBasket(request, accessToken), 'create basket');
+  const basketId = basketIdFrom(created);
+  const withItem = await readBasket(
+    await addBasketItem(request, accessToken, { basketId, body: checkout.items }),
+    'add basket item',
+  );
+  const shipmentId = shipmentIdFrom(withItem);
+  await readBasket(
+    await provideContact(request, accessToken, { basketId, body: checkout.customer }),
+    'provide contact',
+  );
+  await readBasket(
+    await provideShippingAddress(request, accessToken, {
+      basketId,
+      body: checkout.shippingAddress,
+      shipmentId,
+    }),
+    'provide shipping address',
+  );
+  const methodsResponse = await readShippingMethods(request, accessToken, {
+    basketId,
+    shipmentId,
+  });
+  await requireStatus(methodsResponse, expected.successStatus, 'read shipping methods');
+  const methods = (await methodsResponse.json()) as ShippingMethodResult;
+  return readBasket(
+    await selectShippingMethod(
+      request,
+      accessToken,
+      shippingMethodInput(basketId, shipmentId, methods),
+    ),
+    'select shipping method',
+  );
+};

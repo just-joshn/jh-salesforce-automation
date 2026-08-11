@@ -1,11 +1,8 @@
 import { randomUUID } from 'node:crypto';
 
-export interface JourneyProduct {
-  readonly availableToSell: number;
-  readonly productId: string;
-  readonly productName: string;
-  readonly variantId: string;
-}
+import type { OrderableVariant } from '../../../api/support/products';
+
+export type JourneyProduct = OrderableVariant;
 
 export interface ShippingAddress {
   readonly address: string;
@@ -29,6 +26,12 @@ export interface MultiShipmentCheckoutInput {
   readonly email: string;
   readonly payment: PaymentCard;
 }
+
+export const defaultShippingMethod = 'Ground';
+
+export const defaultShippingMethods = [defaultShippingMethod, defaultShippingMethod] as const;
+
+export const revalidationMethod = '2-Day Express';
 
 export const destinationAddresses: readonly [ShippingAddress, ShippingAddress] = Object.freeze([
   Object.freeze({

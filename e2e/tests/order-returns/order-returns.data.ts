@@ -1,3 +1,4 @@
+import { composeOmsSkipReason } from '../../../api/support/gates';
 import type { OmsAvailability, SeededOmsOrderNumber } from '../../../api/support/oms';
 import type { OmsMetaData, OmsReasonCode, Order } from '../../../api/support/scapi-types';
 
@@ -80,17 +81,10 @@ export const quantityText = (quantity: number): string => quantity.toString();
 
 export const quantityAboveReturnable = (quantity: number): number => quantity + 1;
 
-const omsReason = (availability: OmsAvailability): string | undefined =>
-  availability.kind === 'gated' ? availability.reason : undefined;
-
-const seededOrderReason = (order: SeededOmsOrderNumber): string | undefined =>
-  order.kind === 'not-configured' ? order.reason : undefined;
-
-// Both strings originate in OMS helpers; this only joins unmet-condition explanations.
 export const composeReturnSkipReason = (
   availability: OmsAvailability,
   order: SeededOmsOrderNumber,
-): string => [omsReason(availability), seededOrderReason(order)].filter(Boolean).join(' ');
+): string => composeOmsSkipReason(availability, order);
 
 export const returnJourneyGate = (
   availability: OmsAvailability,

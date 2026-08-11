@@ -1,10 +1,11 @@
-import { env } from '../../../config/env';
+import { composeOmsSkipReason } from '../../../api/support/gates';
 import type { OmsAvailability, SeededOmsOrderNumber } from '../../../api/support/oms';
 import type {
   OmsMetaData,
   OmsReasonCode,
   OrderProductItem,
 } from '../../../api/support/scapi-types';
+import { env } from '../../../config/env';
 
 export interface CancellationCredentials {
   readonly email: string;
@@ -47,32 +48,12 @@ export const hasOnlyCancellationEligibleItems = (
   items: readonly OrderProductItem[] | undefined,
 ): boolean => items !== undefined && items.length > 0 && items.every(isCancellationEligible);
 
-const availabilityReason = (availability: OmsAvailability): string | undefined => {
-  switch (availability.kind) {
-    case 'active':
-      return undefined;
-    case 'gated':
-      return availability.reason;
-  }
-};
-
-const seededOrderReason = (seededOrder: SeededOmsOrderNumber): string | undefined => {
-  switch (seededOrder.kind) {
-    case 'configured':
-      return undefined;
-    case 'not-configured':
-      return seededOrder.reason;
-  }
-};
-
 export const orderCancellationSkipReason = (
   availability: OmsAvailability,
   seededOrder: SeededOmsOrderNumber,
 ): string | undefined => {
-  const reasons = [availabilityReason(availability), seededOrderReason(seededOrder)].filter(
-    (reason): reason is string => reason !== undefined,
-  );
-  return reasons.length === 0 ? undefined : reasons.join(' ');
+  const reason = composeOmsSkipReason(availability, seededOrder);
+  return reason.length === 0 ? undefined : reason;
 };
 
 export const requireActiveOmsMetadata = (availability: OmsAvailability): OmsMetaData => {

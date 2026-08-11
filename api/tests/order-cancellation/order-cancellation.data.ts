@@ -1,3 +1,4 @@
+import { composeOmsSkipReason } from '../../support/gates';
 import type { OmsAvailability, SeededOmsOrderNumber } from '../../support/oms';
 import { required } from '../../support/scapi';
 import type { Fault, OmsReasonCode, Order, OrderProductItem } from '../../support/scapi-types';
@@ -76,28 +77,10 @@ export const hasCanceledOrderState = (order: Order): boolean =>
 const preferredReason = (codes: readonly OmsReasonCode[]): string | undefined =>
   codes.find((code) => code.default)?.reason ?? codes[0]?.reason;
 
-const availabilityReason = (availability: OmsAvailability): string | undefined => {
-  switch (availability.kind) {
-    case 'active':
-      return undefined;
-    case 'gated':
-      return availability.reason;
-  }
-};
-
-const seededOrderReason = (order: SeededOmsOrderNumber): string | undefined => {
-  switch (order.kind) {
-    case 'configured':
-      return undefined;
-    case 'not-configured':
-      return order.reason;
-  }
-};
-
 export const composeCancellationSkipReason = (
   availability: OmsAvailability,
   order: SeededOmsOrderNumber,
-): string => [availabilityReason(availability), seededOrderReason(order)].filter(Boolean).join(' ');
+): string => composeOmsSkipReason(availability, order);
 
 export const cancellationJourneyGate = (
   availability: OmsAvailability,

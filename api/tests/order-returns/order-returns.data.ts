@@ -1,3 +1,4 @@
+import { composeOmsSkipReason } from '../../support/gates';
 import type { OmsAvailability, SeededOmsOrderNumber } from '../../support/oms';
 import { required } from '../../support/scapi';
 import type {
@@ -74,28 +75,10 @@ export const returnSelection = (order: Order, metadata: OmsMetaData): ReturnSele
   };
 };
 
-const availabilityReason = (availability: OmsAvailability): string | undefined => {
-  switch (availability.kind) {
-    case 'active':
-      return undefined;
-    case 'gated':
-      return availability.reason;
-  }
-};
-
-const seededOrderReason = (order: SeededOmsOrderNumber): string | undefined => {
-  switch (order.kind) {
-    case 'configured':
-      return undefined;
-    case 'not-configured':
-      return order.reason;
-  }
-};
-
 export const composeReturnSkipReason = (
   availability: OmsAvailability,
   order: SeededOmsOrderNumber,
-): string => [availabilityReason(availability), seededOrderReason(order)].filter(Boolean).join(' ');
+): string => composeOmsSkipReason(availability, order);
 
 export const returnJourneyGate = (
   availability: OmsAvailability,

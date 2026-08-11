@@ -1,6 +1,6 @@
 import type { APIRequestContext, APIResponse } from '@playwright/test';
 
-import { bearer, withSite } from '../../support/scapi';
+import { bearer, requireStatus, withSite } from '../../support/scapi';
 import type { Basket, ShippingMethodResult } from '../../support/scapi-types';
 import {
   basketIdFrom,
@@ -26,29 +26,8 @@ const shopperOptions = (accessToken: string) => ({
   params: withSite(),
 });
 
-class ExpressCheckoutApiError extends Error {
-  public readonly operation: string;
-  public readonly status: number;
-
-  public constructor(operation: string, status: number, detail: string) {
-    super(`${operation} failed with HTTP ${status}: ${detail}`);
-    this.name = 'ExpressCheckoutApiError';
-    this.operation = operation;
-    this.status = status;
-  }
-}
-
-const requireSuccessfulResponse = async (
-  response: APIResponse,
-  operation: string,
-): Promise<void> => {
-  if (response.status() !== expected.basketMutationStatus) {
-    throw new ExpressCheckoutApiError(operation, response.status(), await response.text());
-  }
-};
-
 const readBasket = async (response: APIResponse, operation: string): Promise<Basket> => {
-  await requireSuccessfulResponse(response, operation);
+  await requireStatus(response, expected.basketMutationStatus, operation);
   return (await response.json()) as Basket;
 };
 
@@ -137,7 +116,7 @@ export const prepareOrderReadyBasket = async (
     basketId,
     shipmentId,
   });
-  await requireSuccessfulResponse(methodsResponse, 'Read shipping methods');
+  await requireStatus(methodsResponse, expected.basketMutationStatus, 'Read shipping methods');
   const methods = (await methodsResponse.json()) as ShippingMethodResult;
   const basket = await readBasket(
     await selectShippingMethod(

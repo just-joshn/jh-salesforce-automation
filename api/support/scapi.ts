@@ -1,3 +1,5 @@
+import type { APIResponse } from '@playwright/test';
+
 import { env } from '../../config/env';
 
 export const scapiHost = (): string =>
@@ -27,4 +29,20 @@ export const required = <T>(value: T | undefined, field: string): T => {
   }
 
   return value;
+};
+
+export const requireStatus = async (
+  response: APIResponse,
+  status: number,
+  operation: string,
+): Promise<void> => {
+  if (response.status() !== status) {
+    throw new Error(`${operation} failed with HTTP ${response.status()}: ${await response.text()}`);
+  }
+};
+
+export const requireOk = async (response: APIResponse, operation: string): Promise<void> => {
+  if (!response.ok()) {
+    throw new Error(`${operation} failed with HTTP ${response.status()}: ${await response.text()}`);
+  }
 };

@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { readAppConfig } from '../support/app-config';
 import { resolveTarget, storefrontPath } from '../../support/targets';
-import { openPath } from '../support/site';
+import { openPath, openPrimaryNavIfCollapsed } from '../support/site';
 
 const target = resolveTarget();
 
@@ -58,11 +58,7 @@ test.describe('G. Localization', { tag: '@localization' }, () => {
     { tag: ['@config-off', '@smoke'] },
     async ({ page }) => {
       await openPath(page, '');
-
-      const menu = page.getByRole('button', { name: 'Menu' });
-      if (await menu.count()) {
-        await menu.click();
-      }
+      await openPrimaryNavIfCollapsed(page);
 
       const categoryResponse = page.waitForResponse((res) =>
         res.url().includes('/categories/gift-certificates'),

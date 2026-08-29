@@ -1,4 +1,4 @@
-import type { Locator, Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 
 /**
  * The "N item(s) added to cart" confirmation dialog — shared by every place an item can
@@ -12,7 +12,9 @@ export class AddedToCartDialog {
   }
 
   async waitForVisible(timeout = 25_000): Promise<void> {
-    await this.root.getByRole('heading', { name: /added to cart/i }).waitFor({ timeout });
+    await expect(this.root.getByRole('heading', { name: /added to cart/i })).toBeVisible({
+      timeout,
+    });
   }
 
   async close(): Promise<void> {

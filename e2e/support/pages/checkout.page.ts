@@ -1,4 +1,4 @@
-import { expect, type Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 import { AddressForm } from '../components/address-form.component';
 import type { AddressInput, CreditCardInput } from '../test-data';
 
@@ -55,10 +55,10 @@ export class CheckoutPage {
     await expect(editShippingAddress.or(addNewAddress).or(firstNameField).first()).toBeVisible({
       timeout: 15_000,
     });
-    if (await editShippingAddress.count()) {
+    if (await editShippingAddress.isVisible()) {
       await editShippingAddress.click();
     }
-    if (await addNewAddress.count()) {
+    if (await addNewAddress.isVisible()) {
       await addNewAddress.click();
     }
     await new AddressForm(this.page).fill(address);
@@ -102,7 +102,7 @@ export class CheckoutPage {
     await expect(continueToPayment.or(cardNumberField).first()).toBeVisible({
       timeout: 15_000,
     });
-    if (await continueToPayment.count()) {
+    if (await continueToPayment.isVisible()) {
       await continueToPayment.click({ timeout: 5000 }).catch(() => undefined);
     }
   }
@@ -151,10 +151,23 @@ export class CheckoutPage {
 
   // --- Review / place order ------------------------------------------------------------
 
+  private get placeOrderButton(): Locator {
+    return this.page.getByRole('button', { name: /place order/i });
+  }
+
+  /** Clicks Place Order without waiting for confirmation — used to assert a refused attempt. */
+  async attemptPlaceOrder(): Promise<void> {
+    await this.placeOrderButton.click();
+  }
+
+  async expectPlaceOrderAvailable(): Promise<void> {
+    await expect(this.placeOrderButton).toBeVisible();
+  }
+
   /** Places the reviewed order and returns the API status plus the minted order number. */
   async placeOrder(): Promise<PlacedOrder> {
-    const placeOrderButton = this.page.getByTestId('sf-checkout-place-order-btn');
-    await placeOrderButton.waitFor({ state: 'visible' });
+    const placeOrderButton = this.placeOrderButton;
+    await expect(placeOrderButton).toBeEnabled();
     const orderResponse = this.page.waitForResponse(
       (res) => /\/orders(\?|$)/.test(res.url()) && res.request().method() === 'POST',
     );

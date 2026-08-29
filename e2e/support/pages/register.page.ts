@@ -17,11 +17,10 @@ export class RegisterPage {
 
   /** B1: fills and submits the create-account form. Assumes /registration is already open. */
   async submit(details: RegistrationDetails): Promise<void> {
-    const form = this.page.getByTestId('sf-auth-modal-form-register');
-    await form.getByRole('textbox', { name: 'First Name' }).fill(details.firstName);
-    await form.getByRole('textbox', { name: 'Last Name' }).fill(details.lastName);
-    await form.getByRole('textbox', { name: 'Email' }).fill(details.email);
-    await form.getByRole('textbox', { name: 'Password' }).fill(details.password);
+    await this.page.getByRole('textbox', { name: 'First Name' }).fill(details.firstName);
+    await this.page.getByRole('textbox', { name: 'Last Name' }).fill(details.lastName);
+    await this.page.getByRole('textbox', { name: 'Email', exact: true }).fill(details.email);
+    await this.page.getByRole('textbox', { name: 'Password' }).fill(details.password);
     await this.page.getByRole('button', { name: 'Create Account' }).click();
   }
 

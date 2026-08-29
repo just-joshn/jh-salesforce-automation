@@ -12,8 +12,7 @@ export class LoginPage {
   /** B2: signs in via the password tab (email -> "Password" tab -> password -> Sign In). */
   async loginWithPassword(email: string, password: string): Promise<void> {
     await this.goto();
-    const form = this.page.getByTestId('sf-auth-modal-form');
-    await form.getByRole('textbox', { name: 'Email' }).fill(email);
+    await this.page.getByRole('textbox', { name: 'Email', exact: true }).fill(email);
     await this.page.getByRole('button', { name: 'Password', exact: true }).click();
     await this.page.getByRole('textbox', { name: 'Password', exact: true }).fill(password);
     await this.page.getByRole('button', { name: 'Sign In', exact: true }).click();
@@ -26,8 +25,7 @@ export class LoginPage {
   /** B3: fills email and requests a one-time passwordless code via "Continue". */
   async requestPasswordlessCode(email: string): Promise<void> {
     await this.goto();
-    const form = this.page.getByTestId('sf-auth-modal-form');
-    await form.getByRole('textbox', { name: 'Email' }).fill(email);
+    await this.page.getByRole('textbox', { name: 'Email', exact: true }).fill(email);
     await this.page.getByRole('button', { name: 'Continue', exact: true }).click();
   }
 
@@ -47,8 +45,7 @@ export class LoginPage {
    */
   async goToForgotPassword(emailAttempt: string): Promise<ResetPasswordPage> {
     await this.goto();
-    const form = this.page.getByTestId('sf-auth-modal-form');
-    await form.getByRole('textbox', { name: 'Email' }).fill(emailAttempt);
+    await this.page.getByRole('textbox', { name: 'Email', exact: true }).fill(emailAttempt);
     await this.page.getByRole('button', { name: 'Password', exact: true }).click();
     await this.page.getByRole('button', { name: 'Forgot password?' }).click();
     return new ResetPasswordPage(this.page);

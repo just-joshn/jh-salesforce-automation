@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '../support/fixtures';
 import { StoreLocatorDialog } from '../support/components/store-locator-dialog.component';
 import { openPath } from '../support/site';
 import { STORE_LOCATOR_ZIP, STORES } from '../support/test-data';
@@ -26,17 +26,16 @@ test.describe('F. Store Locator', { tag: '@store-locator' }, () => {
     });
   });
 
-  test('F2 - "Use My Location" geolocation branch', { tag: '@smoke' }, async ({ browser }) => {
-    const context = await browser.newContext({ permissions: [] });
-    const page = await context.newPage();
+  test(
+    'F2 - "Use My Location" geolocation branch',
+    { tag: '@smoke' },
+    async ({ locationDeniedPage: page }) => {
+      await openPath(page, '/store-locator');
+      await page.getByRole('button', { name: 'Use My Location' }).click();
+      await expect(page.getByText('To use your location, enable location sharing.')).toBeVisible();
 
-    await openPath(page, '/store-locator');
-    await page.getByRole('button', { name: 'Use My Location' }).click();
-    await expect(page.getByText('To use your location, enable location sharing.')).toBeVisible();
-
-    // The ZIP-based list stays fully usable underneath the fallback copy.
-    await expect(page.getByRole('textbox', { name: 'Enter postal code' })).toBeEditable();
-
-    await context.close();
-  });
+      // The ZIP-based list stays fully usable underneath the fallback copy.
+      await expect(page.getByRole('textbox', { name: 'Enter postal code' })).toBeEditable();
+    },
+  );
 });

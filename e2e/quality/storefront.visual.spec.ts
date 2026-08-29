@@ -15,7 +15,7 @@ const cartBreakpoints = [
   { name: 'desktop', width: 1440, height: 900 },
 ] as const;
 
-test.describe('Storefront visual regression', { tag: ['@nightly'] }, () => {
+test.describe('Storefront visual regression', { tag: ['@nightly', '@visual'] }, () => {
   test('home layout', async ({ page }) => {
     await openPath(page);
     await expect(page.getByRole('main')).toBeVisible();

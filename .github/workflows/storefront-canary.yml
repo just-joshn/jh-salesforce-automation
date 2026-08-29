@@ -8,6 +8,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: storefront-canary
+  cancel-in-progress: false
+
 jobs:
   canary:
     name: Public read-only canary

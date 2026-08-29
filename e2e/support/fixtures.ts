@@ -1,4 +1,4 @@
-import { test as base, type BrowserContext, type Page } from '@playwright/test';
+import { expect, test as base, type BrowserContext, type Page } from '@playwright/test';
 import { AccountPage } from './pages/account.page';
 import { AddressBookPage } from './pages/address-book.page';
 import { CartPage } from './pages/cart.page';
@@ -19,6 +19,7 @@ export interface WorkerAccount {
 
 interface TestFixtures {
   signedInPage: Page;
+  locationDeniedPage: Page;
   loginPage: LoginPage;
   registerPage: RegisterPage;
   productPage: ProductPage;
@@ -58,10 +59,15 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
         password: VALID_PASSWORD,
       };
       const context = await browser.newContext();
-      const page = await context.newPage();
-      await new RegisterPage(page).register(account);
-      await page.getByRole('button', { name: 'Open account menu' }).waitFor({ timeout: 20_000 });
-      await context.close();
+      try {
+        const page = await context.newPage();
+        await new RegisterPage(page).register(account);
+        await expect(page.getByRole('button', { name: 'Open account menu' })).toBeVisible({
+          timeout: 20_000,
+        });
+      } finally {
+        await context.close();
+      }
       await use(account);
     },
     { scope: 'worker' },
@@ -70,14 +76,17 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
   authenticatedContext: [
     async ({ browser, workerAccount }, use) => {
       const context = await browser.newContext();
-      const page = await context.newPage();
-      await new LoginPage(page).loginWithPassword(workerAccount.email, workerAccount.password);
-      await page.getByRole('button', { name: 'Open account menu' }).waitFor({ timeout: 20_000 });
-      await page.close();
-
-      await use(context);
-
-      await context.close();
+      try {
+        const page = await context.newPage();
+        await new LoginPage(page).loginWithPassword(workerAccount.email, workerAccount.password);
+        await expect(page.getByRole('button', { name: 'Open account menu' })).toBeVisible({
+          timeout: 20_000,
+        });
+        await page.close();
+        await use(context);
+      } finally {
+        await context.close();
+      }
     },
     { scope: 'worker' },
   ],
@@ -86,6 +95,16 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
     const page = await authenticatedContext.newPage();
     await use(page);
     await page.close();
+  },
+
+  locationDeniedPage: async ({ browser }, use) => {
+    const context = await browser.newContext({ permissions: [] });
+    try {
+      const page = await context.newPage();
+      await use(page);
+    } finally {
+      await context.close();
+    }
   },
 
   // Guest-bound page objects (pre-authentication / unauthenticated journeys), each

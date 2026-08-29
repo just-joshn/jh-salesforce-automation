@@ -19,7 +19,7 @@ async function expectReadOnlyNavigation(
   expect(response, `response for ${path || 'home'}`).not.toBeNull();
   expect(response?.status(), `status for ${path || 'home'}`).toBe(200);
   await expect(page).toHaveTitle(expectedTitle);
-  await expect(page.locator('body')).toContainText(expectedContent);
+  await expect(page.getByText(expectedContent).first()).toBeVisible();
   expect(nonReadOnlyMethods, 'canary navigation methods').toEqual([]);
 }
 

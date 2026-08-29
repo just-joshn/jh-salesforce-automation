@@ -17,8 +17,8 @@ export const PRODUCTS = {
 export const ACCEPTED_EMAIL_DOMAIN = 'outlook.com';
 export const REJECTED_EMAIL_DOMAIN = 'example.com';
 
-export const VALID_PASSWORD = 'CujAutomation!2026';
-export const ALTERNATE_PASSWORD = 'CujAutomation!2027';
+export const VALID_PASSWORD = process.env.E2E_TEST_PASSWORD ?? 'CujAutomation!2026';
+export const ALTERNATE_PASSWORD = process.env.E2E_TEST_PASSWORD_ALTERNATE ?? 'CujAutomation!2027';
 
 export interface AddressInput {
   firstName: string;

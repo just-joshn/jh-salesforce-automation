@@ -26,8 +26,9 @@ export const PRODUCTS = {
 export const ACCEPTED_EMAIL_DOMAIN = 'outlook.com';
 export const REJECTED_EMAIL_DOMAIN = 'example.com';
 
-export const VALID_PASSWORD = 'CujAutomationApi!2026';
-export const ALTERNATE_PASSWORD = 'CujAutomationApi!2027';
+export const VALID_PASSWORD = process.env.API_TEST_PASSWORD ?? 'CujAutomationApi!2026';
+export const ALTERNATE_PASSWORD =
+  process.env.API_TEST_PASSWORD_ALTERNATE ?? 'CujAutomationApi!2027';
 
 export interface AddressInput {
   firstName: string;

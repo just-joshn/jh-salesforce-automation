@@ -15,7 +15,7 @@
     "test:cross-browser": "playwright test --project=e2e-firefox --project=e2e-webkit --project=mobile-chrome --project=mobile-safari",
     "test:a11y": "playwright test --project=a11y",
     "test:visual": "playwright test --project=visual",
-    "test:visual:update": "playwright test --project=visual --update-snapshots",
+    "test:visual:update": "docker run --rm -v $(pwd):/work -w /work mcr.microsoft.com/playwright:v1.62.1-noble npx playwright test --project=visual --update-snapshots",
     "test:performance": "playwright test --project=performance",
     "test:security": "playwright test --project=security",
     "test:quality": "playwright test --project=a11y --project=visual --project=performance --project=security",

@@ -1,9 +1,37 @@
-import { expect, test } from '@playwright/test';
-import { openPath } from '../support/site';
+import { expect, test, type Page } from '@playwright/test';
+import { headerSearchBox, openPath } from '../support/site';
 
-const xssPayload = '"><img src=x onerror=alert(1)>';
+type WindowWithXssFlag = Window & { __xssTriggered?: boolean };
 
-test.describe('Storefront security boundaries', { tag: ['@nightly'] }, () => {
+const xssPayloads = [
+  '<script>alert("xss")</script>',
+  '<img src="x" onerror="alert(1)">',
+  '"><script>alert(1)</script>',
+  'javascript:alert(1)',
+  '<svg onload="alert(1)">',
+] as const;
+
+async function assertSearchDoesNotExecuteXss(page: Page, payload: string): Promise<void> {
+  await page.evaluate(() => {
+    (window as WindowWithXssFlag).__xssTriggered = false;
+  });
+
+  const searchBox = headerSearchBox(page);
+  await searchBox.fill(payload);
+  await searchBox.press('Enter');
+  await expect(page).toHaveURL(/\/search\?q=/);
+
+  const executed = await page.evaluate(() => (window as WindowWithXssFlag).__xssTriggered === true);
+  expect(executed).toBe(false);
+
+  // Only assert raw-tag injection for HTML payloads. A javascript: query will legitimately
+  // appear in the URL and search box; the execution flag above is the signal that matters.
+  if (payload.includes('<')) {
+    expect(await page.content()).not.toContain(payload);
+  }
+}
+
+test.describe('Storefront security boundaries', { tag: ['@nightly', '@security'] }, () => {
   test('root response carries the required security headers', async ({ page }) => {
     const response = await page.goto('/');
     expect(response, 'root response').not.toBeNull();
@@ -32,22 +60,15 @@ test.describe('Storefront security boundaries', { tag: ['@nightly'] }, () => {
 
   test('search input does not execute reflected XSS', async ({ page }) => {
     await page.addInitScript(() => {
-      (window as Window & { __xssTriggered?: boolean }).__xssTriggered = false;
+      (window as WindowWithXssFlag).__xssTriggered = false;
       window.alert = () => {
-        (window as Window & { __xssTriggered?: boolean }).__xssTriggered = true;
+        (window as WindowWithXssFlag).__xssTriggered = true;
       };
     });
 
     await openPath(page);
-    const searchBox = page.getByRole('searchbox', { name: 'Search for products...' });
-    await searchBox.fill(xssPayload);
-    await searchBox.press('Enter');
-    await expect(page).toHaveURL(/\/search\?q=/);
-
-    const executed = await page.evaluate(
-      () => (window as Window & { __xssTriggered?: boolean }).__xssTriggered === true,
-    );
-    expect(executed).toBe(false);
-    expect(await page.content()).not.toContain('<img src=x onerror=alert(1)>');
+    for (const payload of xssPayloads) {
+      await assertSearchDoesNotExecuteXss(page, payload);
+    }
   });
 });

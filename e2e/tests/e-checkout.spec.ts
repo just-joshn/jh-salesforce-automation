@@ -30,9 +30,9 @@ test.describe('E. Checkout', { tag: '@checkout' }, () => {
       await test.step('A platform-rejected email fails at order placement with a graceful, in-place error', async () => {
         // placeOrder() waits for a success heading, which never comes here — the failed
         // attempt itself is what this step verifies, so it's driven directly.
-        await page.getByTestId('sf-checkout-place-order-btn').click();
+        await checkoutPage.attemptPlaceOrder();
         await checkoutPage.expectOrderPlacementError();
-        await expect(page.getByTestId('sf-checkout-place-order-btn')).toBeVisible();
+        await checkoutPage.expectPlaceOrderAvailable();
       });
 
       const email = uniqueEmail('checkout');

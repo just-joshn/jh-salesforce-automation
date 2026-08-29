@@ -25,7 +25,7 @@ function assertBudget(
   );
 }
 
-test.describe('Storefront performance', { tag: ['@nightly'] }, () => {
+test.describe('Storefront performance', { tag: ['@nightly', '@performance'] }, () => {
   for (const pageCase of cases) {
     test(`${pageCase.name} meets its performance budget`, async ({ page }, testInfo) => {
       await observePage(page);

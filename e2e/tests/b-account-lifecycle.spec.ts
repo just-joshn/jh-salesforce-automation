@@ -101,6 +101,7 @@ test.describe('B. Account Lifecycle', { tag: '@account' }, () => {
       await expect(dialog.getByText(/confirm it.s you/i)).toBeVisible();
 
       const codeBoxes = dialog.getByRole('textbox');
+      await expect(codeBoxes.first()).toBeVisible();
       const codeLength = await codeBoxes.count();
       expect(codeLength, 'passwordless code input count').toBeGreaterThan(0);
 

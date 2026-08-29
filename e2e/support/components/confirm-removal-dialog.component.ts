@@ -1,4 +1,4 @@
-import type { Page } from '@playwright/test';
+import { expect, type Page } from '@playwright/test';
 
 /**
  * The "Yes, remove ..." confirmation that sometimes appears after clicking a Remove
@@ -13,7 +13,7 @@ export class ConfirmRemovalDialog {
   async confirmIfPrompted(): Promise<void> {
     const confirmButton = this.page.getByRole('button', { name: /^Yes, remove/i });
     try {
-      await confirmButton.waitFor({ state: 'visible', timeout: 3000 });
+      await expect(confirmButton).toBeVisible({ timeout: 3000 });
       await confirmButton.click();
     } catch {
       // This remove action did not prompt for confirmation.

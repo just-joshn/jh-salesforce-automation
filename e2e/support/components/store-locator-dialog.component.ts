@@ -1,4 +1,4 @@
-import type { Locator, Page, Response } from '@playwright/test';
+import { expect, type Locator, type Page, type Response } from '@playwright/test';
 
 /**
  * The "Find a Store" UI — a genuine Component Object (page-object-model.md's dialog/modal
@@ -47,7 +47,7 @@ export class StoreLocatorDialog {
    */
   async selectStore(index: number): Promise<void> {
     const storeRadio = this.storeRadioAt(index);
-    await storeRadio.waitFor({ state: 'visible' });
+    await expect(storeRadio).toBeVisible();
     await storeRadio.locator('..').click({ force: true });
   }
 
@@ -63,6 +63,6 @@ export async function openStorePickerFromPdp(page: Page): Promise<StoreLocatorDi
   const dialog = page
     .getByRole('dialog')
     .filter({ has: page.getByRole('heading', { name: 'Find a Store' }) });
-  await dialog.waitFor({ state: 'visible' });
+  await expect(dialog).toBeVisible();
   return new StoreLocatorDialog(dialog);
 }

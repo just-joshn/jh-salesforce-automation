@@ -1,5 +1,5 @@
 import { assertNoA11yViolations, expect, test } from './fixtures';
-import { dismissConsent, openPath } from '../support/site';
+import { dismissConsent, headerSearchBox, openPath } from '../support/site';
 import { PRODUCTS } from '../support/test-data';
 
 const pages = [
@@ -9,19 +9,19 @@ const pages = [
   { name: 'empty cart', path: '/cart' },
 ] as const;
 
-test.describe('Storefront accessibility', { tag: ['@nightly'] }, () => {
+test.describe('Storefront accessibility', { tag: ['@nightly', '@a11y'] }, () => {
   for (const pageCase of pages) {
-    test(`${pageCase.name} has no WCAG violations`, async ({ page }, testInfo) => {
+    test(`${pageCase.name} has no WCAG violations`, async ({ page, makeAxeBuilder }, testInfo) => {
       await openPath(page, pageCase.path);
       await expect(page.getByRole('main')).toBeVisible();
       await dismissConsent(page, 10_000);
-      await assertNoA11yViolations(page, testInfo);
+      await assertNoA11yViolations(makeAxeBuilder, testInfo);
     });
   }
 
   test('header search is keyboard operable', async ({ page }) => {
     await openPath(page);
-    const searchBox = page.getByRole('searchbox', { name: 'Search for products...' });
+    const searchBox = headerSearchBox(page);
 
     await searchBox.focus();
     await expect(searchBox).toBeFocused();

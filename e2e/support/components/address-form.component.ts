@@ -21,6 +21,6 @@ export class AddressForm {
 
   /** True when a blank form is on screen right now (vs. e.g. an address-book radio list). */
   async isBlank(): Promise<boolean> {
-    return (await this.page.getByRole('textbox', { name: 'First Name' }).count()) > 0;
+    return this.page.getByRole('textbox', { name: 'First Name' }).isVisible();
   }
 }

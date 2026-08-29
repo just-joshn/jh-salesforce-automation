@@ -1,6 +1,6 @@
 import { expect, test, type Locator } from '@playwright/test';
 import { readAppConfig } from '../support/app-config';
-import { openPath } from '../support/site';
+import { headerSearchBox, openPath } from '../support/site';
 import { PRODUCTS } from '../support/test-data';
 
 async function readCount(heading: Locator): Promise<number> {
@@ -15,7 +15,7 @@ test.describe('A. Discovery & Browse', { tag: '@discovery' }, () => {
     { tag: ['@critical', '@smoke'] },
     async ({ page }) => {
       await openPath(page, '');
-      const searchBox = page.getByRole('searchbox', { name: 'Search for products...' });
+      const searchBox = headerSearchBox(page);
 
       await test.step('A matching query returns Einstein-backed suggestions the shopper can see and pick', async () => {
         const suggestions = page.waitForResponse(
@@ -107,7 +107,7 @@ test.describe('A. Discovery & Browse', { tag: '@discovery' }, () => {
       await test.step('No agent affordance renders anywhere, and search still works fully', async () => {
         await expect(page.getByRole('button', { name: /agent/i })).toHaveCount(0);
 
-        const searchBox = page.getByRole('searchbox', { name: 'Search for products...' });
+        const searchBox = headerSearchBox(page);
         const suggestions = page.waitForResponse((res) => res.url().includes('search-suggestions'));
         await searchBox.fill('tie');
         expect((await suggestions).status()).toBe(200);

@@ -8,6 +8,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: playwright-nightly
+  cancel-in-progress: false
+
 jobs:
   paired:
     name: Full ${{ matrix.project }} shard ${{ matrix.shard }}
@@ -66,6 +70,10 @@ jobs:
     name: Quality project ${{ matrix.project }}
     runs-on: ubuntu-latest
     timeout-minutes: 35
+    # Pinned so the visual project's screenshots render identically on every run — font
+    # rendering and anti-aliasing drift across unpinned Linux images, not just OS families.
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.1-noble
     strategy:
       fail-fast: false
       matrix:
@@ -82,6 +90,7 @@ jobs:
       CI: true
       E2E_TARGET: staging
       PLAYWRIGHT_REPORTER: blob
+      HOME: /root
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
@@ -92,18 +101,6 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Cache Playwright browsers
-        id: playwright-cache
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-browsers-all-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
-      - name: Install Playwright browsers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: pnpm exec playwright install --with-deps chromium firefox webkit
-      - name: Install Playwright OS dependencies
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: pnpm exec playwright install-deps chromium firefox webkit
       - run: pnpm check:target
       - run: pnpm exec playwright test --project=${{ matrix.project }}
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

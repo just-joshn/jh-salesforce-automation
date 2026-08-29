@@ -26,10 +26,11 @@ export class ProductPage {
    * radiogroup) rather than matching by color name.
    */
   async selectFirstColorOption(): Promise<void> {
-    const colorRadio = this.page.getByRole('radiogroup').first().getByRole('radio').first();
-    if (await colorRadio.count()) {
-      await colorRadio.check({ force: true });
-    }
+    const colorGroup = this.page.getByRole('radiogroup').first();
+    await expect(colorGroup).toBeVisible();
+    // Native radios sit behind decorative swatches (same pointer-interception as pickup),
+    // so visibility is not a useful gate — force-check the first radio in the group.
+    await colorGroup.getByRole('radio').first().check({ force: true });
   }
 
   /** Opens the "Select Store" picker and returns its dialog, scoped to just that dialog. */

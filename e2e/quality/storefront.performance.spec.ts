@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { openPath } from '../support/site';
+import { openMain } from '../support/site';
 import { budgets, measurePage, observePage, type PerformanceBudget } from './performance-budgets';
 
 const cases = [
@@ -29,8 +29,7 @@ test.describe('Storefront performance', { tag: ['@nightly', '@performance'] }, (
   for (const pageCase of cases) {
     test(`${pageCase.name} meets its performance budget`, async ({ page }, testInfo) => {
       await observePage(page);
-      await openPath(page, pageCase.path);
-      await expect(page.getByRole('main')).toBeVisible();
+      await openMain(page, pageCase.path);
 
       const metrics = await measurePage(page);
       await testInfo.attach('performance.json', {

@@ -1,4 +1,5 @@
 import { expect, test } from '../support/fixtures';
+import { accountMenuButton } from '../support/site';
 import { PRODUCTS, uniqueEmail, VALID_PASSWORD } from '../support/test-data';
 
 test.describe('D. Cart', { tag: '@cart' }, () => {
@@ -55,7 +56,7 @@ test.describe('D. Cart', { tag: '@cart' }, () => {
       });
       await expect(page.getByRole('button', { name: 'Log Out' })).toBeVisible();
       await page.getByRole('button', { name: 'Log Out' }).click();
-      await expect(page.getByRole('button', { name: 'Open account menu' })).toHaveCount(0);
+      await expect(accountMenuButton(page)).toHaveCount(0);
 
       await productPage.goto(PRODUCTS.hoopEarring);
       const addedToCartDialog = await productPage.addToCart();

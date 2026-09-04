@@ -9,7 +9,10 @@ export class ResetPasswordPage {
   }
 
   async requestReset(email: string): Promise<void> {
-    await this.page.getByRole('main').getByRole('textbox', { name: 'Email' }).fill(email);
+    await this.page
+      .getByRole('main')
+      .getByRole('textbox', { name: 'Email', exact: true })
+      .fill(email);
     await this.page.getByRole('button', { name: 'Reset Password' }).click();
   }
 

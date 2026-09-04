@@ -1,39 +1,9 @@
 import { expect, type APIRequestContext } from '@playwright/test';
+import type { StorefrontAppConfig } from '../../support/storefront-config';
 import { storefrontRequestUrl } from './env';
 import { appConfigSchema, mobifyDataSchema } from './schemas';
 
-interface SupportedLocale {
-  id: string;
-  preferredCurrency: string;
-}
-
-export interface StorefrontAppConfig {
-  multishipEnabled: boolean;
-  commerceAgent: {
-    enabled: string;
-    askAgentOnSearch: string;
-    enableAgentFromHeader: string;
-    enableAgentFromFloatingButton: string;
-    enableAgentFromSearchSuggestions: string;
-  };
-  sfPayments: {
-    enabled: boolean;
-    sdkUrl: string;
-    metadataUrl: string;
-  };
-  oneClickCheckout: {
-    enabled: boolean;
-  };
-  login: {
-    passwordless: { enabled: boolean; mode: string; landingPath: string };
-    social: { enabled: boolean; idps: string[]; redirectURI: string };
-    resetPassword: { mode: string; landingPath: string };
-  };
-  sites: {
-    id: string;
-    l10n: { supportedLocales: SupportedLocale[]; defaultLocale: string };
-  }[];
-}
+export type { StorefrontAppConfig };
 
 /**
  * Reads the storefront's own shipped config from the `#mobify-data` script tag — the

@@ -1,21 +1,39 @@
-import { expect, type Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 import { openPath } from '../site';
 import { ResetPasswordPage } from './reset-password.page';
 
 export class LoginPage {
-  constructor(private readonly page: Page) {}
+  readonly email: Locator;
+  readonly passwordTab: Locator;
+  readonly password: Locator;
+  readonly signIn: Locator;
+  readonly continueButton: Locator;
+  readonly forgotPassword: Locator;
+
+  constructor(private readonly page: Page) {
+    this.email = page.getByRole('textbox', { name: 'Email', exact: true });
+    this.passwordTab = page.getByRole('button', { name: 'Password', exact: true });
+    this.password = page.getByRole('textbox', { name: 'Password', exact: true });
+    this.signIn = page.getByRole('button', { name: 'Sign In', exact: true });
+    this.continueButton = page.getByRole('button', { name: 'Continue', exact: true });
+    this.forgotPassword = page.getByRole('button', { name: 'Forgot password?' });
+  }
 
   async goto(): Promise<void> {
     await openPath(this.page, '/login');
   }
 
+  private async openWithEmail(email: string): Promise<void> {
+    await this.goto();
+    await this.email.fill(email);
+  }
+
   /** B2: signs in via the password tab (email -> "Password" tab -> password -> Sign In). */
   async loginWithPassword(email: string, password: string): Promise<void> {
-    await this.goto();
-    await this.page.getByRole('textbox', { name: 'Email', exact: true }).fill(email);
-    await this.page.getByRole('button', { name: 'Password', exact: true }).click();
-    await this.page.getByRole('textbox', { name: 'Password', exact: true }).fill(password);
-    await this.page.getByRole('button', { name: 'Sign In', exact: true }).click();
+    await this.openWithEmail(email);
+    await this.passwordTab.click();
+    await this.password.fill(password);
+    await this.signIn.click();
   }
 
   async expectInvalidCredentialsError(): Promise<void> {
@@ -24,9 +42,8 @@ export class LoginPage {
 
   /** B3: fills email and requests a one-time passwordless code via "Continue". */
   async requestPasswordlessCode(email: string): Promise<void> {
-    await this.goto();
-    await this.page.getByRole('textbox', { name: 'Email', exact: true }).fill(email);
-    await this.page.getByRole('button', { name: 'Continue', exact: true }).click();
+    await this.openWithEmail(email);
+    await this.continueButton.click();
   }
 
   /**
@@ -44,10 +61,9 @@ export class LoginPage {
    * page — a real, meaningful transition worth modeling, not just "navigation happened".
    */
   async goToForgotPassword(emailAttempt: string): Promise<ResetPasswordPage> {
-    await this.goto();
-    await this.page.getByRole('textbox', { name: 'Email', exact: true }).fill(emailAttempt);
-    await this.page.getByRole('button', { name: 'Password', exact: true }).click();
-    await this.page.getByRole('button', { name: 'Forgot password?' }).click();
+    await this.openWithEmail(emailAttempt);
+    await this.passwordTab.click();
+    await this.forgotPassword.click();
     return new ResetPasswordPage(this.page);
   }
 }

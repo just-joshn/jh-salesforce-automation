@@ -19,15 +19,7 @@ export class AddressBookPage {
   /** Best-effort cleanup: removes every saved address so a test starts from a known-empty book. */
   async clear(): Promise<void> {
     await this.goto();
-    let removeButton = this.page.getByRole('button', { name: /^Remove /i }).first();
-    // Wait for the list to actually settle (populated or empty) once, so the loop's first
-    // isVisible() below can't race the page's own post-navigation render.
-    await expect(removeButton.or(this.page.getByText('No Saved Addresses')).first()).toBeVisible();
-    while (await removeButton.isVisible()) {
-      await removeButton.click();
-      await this.confirmRemoval.confirmIfPrompted();
-      removeButton = this.page.getByRole('button', { name: /^Remove /i }).first();
-    }
+    await this.confirmRemoval.drain(/^Remove /i, 'No Saved Addresses');
   }
 
   /** B8: adds a new saved address, optionally flagged as default. */

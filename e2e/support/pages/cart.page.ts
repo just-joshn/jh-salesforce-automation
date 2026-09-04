@@ -22,24 +22,13 @@ export class CartPage {
   /** Removes the first cart line item and confirms the "Yes, remove item" dialog. */
   async removeFirstItem(): Promise<void> {
     await this.page.getByRole('button', { name: 'Remove' }).first().click();
-    await this.page
-      .getByRole('alertdialog')
-      .getByRole('button', { name: 'Yes, remove item' })
-      .click();
+    await this.confirmRemoval.confirm();
   }
 
   /** Best-effort cleanup: empties the cart so a test starts from a known-empty basket. */
   async clear(): Promise<void> {
     await this.goto();
-    let removeButton = this.page.getByRole('button', { name: 'Remove' }).first();
-    // Wait for the cart to actually settle (populated or empty) once, so the loop's first
-    // isVisible() below can't race the page's own post-navigation render.
-    await expect(removeButton.or(this.page.getByText('Your cart is empty.')).first()).toBeVisible();
-    while (await removeButton.isVisible()) {
-      await removeButton.click();
-      await this.confirmRemoval.confirmIfPrompted();
-      removeButton = this.page.getByRole('button', { name: 'Remove' }).first();
-    }
+    await this.confirmRemoval.drain('Remove', 'Your cart is empty.');
   }
 
   async expectItemCount(count: number): Promise<void> {

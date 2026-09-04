@@ -1,5 +1,5 @@
-import { expect, type Page } from '@playwright/test';
-import { openPath } from '../site';
+import { expect, type Locator, type Page } from '@playwright/test';
+import { expectSignedIn, openPath } from '../site';
 
 export interface RegistrationDetails {
   firstName: string;
@@ -9,7 +9,19 @@ export interface RegistrationDetails {
 }
 
 export class RegisterPage {
-  constructor(private readonly page: Page) {}
+  readonly firstName: Locator;
+  readonly lastName: Locator;
+  readonly email: Locator;
+  readonly password: Locator;
+  readonly createAccount: Locator;
+
+  constructor(private readonly page: Page) {
+    this.firstName = page.getByRole('textbox', { name: 'First Name' });
+    this.lastName = page.getByRole('textbox', { name: 'Last Name' });
+    this.email = page.getByRole('textbox', { name: 'Email', exact: true });
+    this.password = page.getByRole('textbox', { name: 'Password' });
+    this.createAccount = page.getByRole('button', { name: 'Create Account' });
+  }
 
   async goto(): Promise<void> {
     await openPath(this.page, '/registration');
@@ -17,11 +29,11 @@ export class RegisterPage {
 
   /** B1: fills and submits the create-account form. Assumes /registration is already open. */
   async submit(details: RegistrationDetails): Promise<void> {
-    await this.page.getByRole('textbox', { name: 'First Name' }).fill(details.firstName);
-    await this.page.getByRole('textbox', { name: 'Last Name' }).fill(details.lastName);
-    await this.page.getByRole('textbox', { name: 'Email', exact: true }).fill(details.email);
-    await this.page.getByRole('textbox', { name: 'Password' }).fill(details.password);
-    await this.page.getByRole('button', { name: 'Create Account' }).click();
+    await this.firstName.fill(details.firstName);
+    await this.lastName.fill(details.lastName);
+    await this.email.fill(details.email);
+    await this.password.fill(details.password);
+    await this.createAccount.click();
   }
 
   /** B1: navigates to /registration and submits the form in one step. */
@@ -33,13 +45,13 @@ export class RegisterPage {
   /** An email the platform rejects keeps the shopper on this same form with an inline error. */
   async expectRejected(): Promise<void> {
     await expect(this.page.getByRole('alert')).toBeVisible();
-    await expect(this.page.getByRole('textbox', { name: 'First Name' })).toBeVisible();
+    await expect(this.firstName).toBeVisible();
   }
 
   async expectAccountCreated(): Promise<void> {
     await expect(this.page).toHaveURL(/\/account$/);
     await expect(this.page.getByRole('heading', { name: 'My Account', level: 1 })).toBeVisible();
-    await expect(this.page.getByRole('button', { name: 'Open account menu' })).toBeVisible();
+    await expectSignedIn(this.page);
     await expect(this.page.getByRole('button', { name: 'Log Out' })).toBeVisible();
   }
 }

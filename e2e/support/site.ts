@@ -8,15 +8,18 @@ export function buildPath(path = ''): string {
   return storefrontPath(target, path);
 }
 
-// Tracks pages that have already had at least one consent-dismissal attempt. The dialog
-// can still reappear later (e.g. after a PDP color-variant navigation), so this never
-// skips the check entirely — it only shortens the timeout for repeat checks, since by
-// then the app has had a full page lifecycle to decide whether to show it again.
 const consentChecked = new WeakSet<Page>();
 
-/** Header product search — the same control A1, A3, a11y, and XSS tests all drive. */
 export function headerSearchBox(page: Page): Locator {
   return page.getByRole('searchbox', { name: 'Search for products...' });
+}
+
+export function accountMenuButton(page: Page): Locator {
+  return page.getByRole('button', { name: 'Open account menu' });
+}
+
+export async function expectSignedIn(page: Page, timeout = 20_000): Promise<void> {
+  await expect(accountMenuButton(page)).toBeVisible({ timeout });
 }
 
 /**
@@ -30,8 +33,7 @@ export async function dismissConsent(page: Page, timeout?: number): Promise<void
     await expect(decline).toBeVisible({ timeout: effectiveTimeout });
     await decline.click();
   } catch {
-    // Consent dialog did not appear this check (already dismissed, or never shown) —
-    // nothing to do.
+    // Consent dialog did not appear this check (already dismissed, or never shown).
   }
   consentChecked.add(page);
 }
@@ -47,7 +49,13 @@ export async function openPrimaryNavIfCollapsed(page: Page): Promise<void> {
 }
 
 /** Navigates to a locale-prefixed storefront path and clears the consent dialog. */
-export async function openPath(page: Page, path = ''): Promise<void> {
+export async function openPath(page: Page, path = '', consentTimeout?: number): Promise<void> {
   await page.goto(buildPath(path));
-  await dismissConsent(page);
+  await dismissConsent(page, consentTimeout);
+}
+
+/** openPath plus a web-first wait for `<main>` — used by quality tests that screenshot or audit. */
+export async function openMain(page: Page, path = '', consentTimeout?: number): Promise<void> {
+  await openPath(page, path, consentTimeout);
+  await expect(page.getByRole('main')).toBeVisible();
 }

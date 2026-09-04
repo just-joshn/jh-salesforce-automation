@@ -3,6 +3,7 @@ import { expect, test } from '../support/fixtures';
 import { readAppConfig } from '../support/app-config';
 import { resolveTarget } from '../../support/targets';
 import { AccountPage } from '../support/pages/account.page';
+import { expectSignedIn } from '../support/site';
 import { placeSignedInOrder } from '../support/workflows';
 import {
   ALTERNATE_PASSWORD,
@@ -70,7 +71,7 @@ test.describe('B. Account Lifecycle', { tag: '@account' }, () => {
         email,
         password: VALID_PASSWORD,
       });
-      await expect(page.getByRole('button', { name: 'Open account menu' })).toBeVisible();
+      await expectSignedIn(page);
       await new AccountPage(page).logout();
 
       await test.step('Wrong credentials show an inline alert and do not redirect', async () => {
@@ -82,7 +83,7 @@ test.describe('B. Account Lifecycle', { tag: '@account' }, () => {
       await test.step('Correct credentials redirect to /account', async () => {
         await loginPage.loginWithPassword(email, VALID_PASSWORD);
         await expect(page).toHaveURL(/\/account$/);
-        await expect(page.getByRole('button', { name: 'Open account menu' })).toBeVisible();
+        await expectSignedIn(page);
       });
     },
   );

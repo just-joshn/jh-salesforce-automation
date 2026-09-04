@@ -1,4 +1,4 @@
-import { expect, test as base, type BrowserContext, type Page } from '@playwright/test';
+import { test as base, type BrowserContext, type Page } from '@playwright/test';
 import { AccountPage } from './pages/account.page';
 import { AddressBookPage } from './pages/address-book.page';
 import { CartPage } from './pages/cart.page';
@@ -8,6 +8,7 @@ import { OrderHistoryPage } from './pages/order-history.page';
 import { ProductPage } from './pages/product.page';
 import { RegisterPage } from './pages/register.page';
 import { WishlistPage } from './pages/wishlist.page';
+import { expectSignedIn } from './site';
 import { uniqueEmail, VALID_PASSWORD } from './test-data';
 
 export interface WorkerAccount {
@@ -62,9 +63,7 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
       try {
         const page = await context.newPage();
         await new RegisterPage(page).register(account);
-        await expect(page.getByRole('button', { name: 'Open account menu' })).toBeVisible({
-          timeout: 20_000,
-        });
+        await expectSignedIn(page);
       } finally {
         await context.close();
       }
@@ -79,9 +78,7 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
       try {
         const page = await context.newPage();
         await new LoginPage(page).loginWithPassword(workerAccount.email, workerAccount.password);
-        await expect(page.getByRole('button', { name: 'Open account menu' })).toBeVisible({
-          timeout: 20_000,
-        });
+        await expectSignedIn(page);
         await page.close();
         await use(context);
       } finally {

@@ -17,23 +17,14 @@ export class WishlistPage {
   /** Best-effort cleanup: removes every wishlist item so a test starts from a known-empty list. */
   async clear(): Promise<void> {
     await this.goto();
-    let removeButton = this.page.getByRole('button', { name: 'Remove' }).first();
-    // Wait for the list to actually settle (populated or empty) once, so the loop's first
-    // isVisible() below can't race the page's own post-navigation render.
-    await expect(removeButton.or(this.page.getByText('No Wishlist Items')).first()).toBeVisible();
-    while (await removeButton.isVisible()) {
-      await removeButton.click();
-      await this.confirmRemoval.confirmIfPrompted();
-      removeButton = this.page.getByRole('button', { name: 'Remove' }).first();
-    }
+    await this.confirmRemoval.drain('Remove', 'No Wishlist Items');
   }
 
   /** C2: removes the first wishlist row via its own "Confirm Remove Item" alert dialog. */
   async removeFirstItem(): Promise<void> {
     await this.page.getByRole('button', { name: 'Remove' }).first().click();
-    const confirmDialog = this.page.getByRole('alertdialog');
-    await expect(confirmDialog).toContainText('Confirm Remove Item');
-    await confirmDialog.getByRole('button', { name: 'Yes, remove item' }).click();
+    await expect(this.page.getByRole('alertdialog')).toContainText('Confirm Remove Item');
+    await this.confirmRemoval.confirm();
   }
 
   /**

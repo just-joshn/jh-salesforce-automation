@@ -9,7 +9,11 @@ export interface PlacedOrder {
 
 /** The multi-step /checkout wizard: Contact Info -> Shipping -> Payment -> Review -> Place Order. */
 export class CheckoutPage {
-  constructor(private readonly page: Page) {}
+  private readonly addressForm: AddressForm;
+
+  constructor(private readonly page: Page) {
+    this.addressForm = new AddressForm(page);
+  }
 
   async expectLoaded(): Promise<void> {
     await expect(this.page.getByRole('heading', { name: 'Checkout', level: 1 })).toBeVisible();
@@ -61,7 +65,7 @@ export class CheckoutPage {
     if (await addNewAddress.isVisible()) {
       await addNewAddress.click();
     }
-    await new AddressForm(this.page).fill(address);
+    await this.addressForm.fill(address);
     await this.page.getByRole('button', { name: 'Continue to Shipping Method' }).click();
   }
 
@@ -74,7 +78,7 @@ export class CheckoutPage {
     await this.page
       .getByRole('button', { name: `Add new delivery address for ${productName}` })
       .click();
-    await new AddressForm(this.page).fill(address);
+    await this.addressForm.fill(address);
     await this.page.getByRole('button', { name: 'Save' }).click();
   }
 
@@ -124,9 +128,8 @@ export class CheckoutPage {
     await this.page.getByRole('textbox', { name: 'Expiration Date' }).fill(card.expiration);
     await this.page.getByRole('textbox', { name: 'Security Code' }).fill(card.cvv);
 
-    const billingForm = new AddressForm(this.page);
-    if (billingAddress && (await billingForm.isBlank())) {
-      await billingForm.fill(billingAddress);
+    if (billingAddress && (await this.addressForm.isBlank())) {
+      await this.addressForm.fill(billingAddress);
     }
     await this.page.getByRole('button', { name: 'Review Order' }).click();
   }

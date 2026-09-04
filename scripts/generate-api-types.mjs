@@ -1,6 +1,6 @@
 // Generates TypeScript types from the vendored SCAPI specs in api/specs/.
 //
-// The output is committed. That keeps `pnpm test` a single step with no codegen
+// The output is committed. That keeps `bun test` a single step with no codegen
 // in front of it. It also makes an upstream shape change arrive as a reviewable
 // diff, and gives the nightly drift check something to compare against.
 //
@@ -21,7 +21,7 @@ async function readManifest() {
   try {
     return JSON.parse(await readFile(join(SPEC_DIR, 'MANIFEST.json'), 'utf8'));
   } catch {
-    throw new Error('api/specs/MANIFEST.json is missing. Run `pnpm gen:api:fetch` first');
+    throw new Error('api/specs/MANIFEST.json is missing. Run `bun run gen:api:fetch` first');
   }
 }
 
@@ -33,7 +33,7 @@ function header(entry) {
     `// Version: ${entry.version}`,
     `// Source:  ${entry.source}`,
     '//',
-    '// Regenerate with `pnpm gen:api:fetch && pnpm gen:api`.',
+    '// Regenerate with `bun run gen:api:fetch && bun run gen:api`.',
     '',
     '',
   ].join('\n');

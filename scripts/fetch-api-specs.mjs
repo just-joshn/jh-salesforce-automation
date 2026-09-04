@@ -133,7 +133,7 @@ async function main() {
     'utf8',
   );
 
-  console.log(`\nVendored ${manifest.length} specs into api/specs/. Run \`pnpm gen:api\` next.`);
+  console.log(`\nVendored ${manifest.length} specs into api/specs/. Run \`bun run gen:api\` next.`);
 }
 
 await main();

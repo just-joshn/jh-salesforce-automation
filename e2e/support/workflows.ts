@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test';
-import { type PlacedOrder } from './pages/checkout.page';
+import type { PlacedOrder } from './pages/checkout.page';
 import { CheckoutPage } from './pages/checkout.page';
 import { type ProductRef, ProductPage } from './pages/product.page';
 import { PRIMARY_ADDRESS, PRODUCTS, TEST_VISA } from './test-data';

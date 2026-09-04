@@ -26,16 +26,14 @@ test.describe('F. Store Locator', { tag: '@store-locator' }, () => {
     });
   });
 
-  test(
-    'F2 - "Use My Location" geolocation branch',
-    { tag: '@smoke' },
-    async ({ locationDeniedPage: page }) => {
-      await openPath(page, '/store-locator');
-      await page.getByRole('button', { name: 'Use My Location' }).click();
-      await expect(page.getByText('To use your location, enable location sharing.')).toBeVisible();
+  test('F2 - "Use My Location" geolocation branch', { tag: '@smoke' }, async ({
+    locationDeniedPage: page,
+  }) => {
+    await openPath(page, '/store-locator');
+    await page.getByRole('button', { name: 'Use My Location' }).click();
+    await expect(page.getByText('To use your location, enable location sharing.')).toBeVisible();
 
-      // The ZIP-based list stays fully usable underneath the fallback copy.
-      await expect(page.getByRole('textbox', { name: 'Enter postal code' })).toBeEditable();
-    },
-  );
+    // The ZIP-based list stays fully usable underneath the fallback copy.
+    await expect(page.getByRole('textbox', { name: 'Enter postal code' })).toBeEditable();
+  });
 });

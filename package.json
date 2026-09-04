@@ -4,9 +4,9 @@
   "description": "Playwright E2E + API tests for the Salesforce PWA Kit Retail React App storefront",
   "private": true,
   "engines": {
-    "node": ">=24"
+    "bun": "1.4.0"
   },
-  "packageManager": "pnpm@11.17.0",
+  "packageManager": "bun@1.4.0",
   "scripts": {
     "test": "playwright test",
     "test:e2e": "playwright test --project=e2e",
@@ -23,32 +23,29 @@
     "test:headed": "playwright test --project=e2e --headed",
     "test:ui": "playwright test --ui",
     "report": "playwright show-report",
-    "gen:api:fetch": "node scripts/fetch-api-specs.mjs",
-    "gen:api": "node scripts/generate-api-types.mjs",
+    "gen:api:fetch": "bun scripts/fetch-api-specs.mjs",
+    "gen:api": "bun scripts/generate-api-types.mjs",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "check:title-parity": "node scripts/check-title-parity.mjs",
-    "check:target": "node --experimental-strip-types --no-warnings scripts/check-target.mjs",
-    "test:targets": "node --experimental-strip-types --no-warnings support/targets.test.ts",
-    "test:contracts": "node --experimental-strip-types --no-warnings api/support/schemas.test.mjs"
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "check:title-parity": "bun scripts/check-title-parity.mjs",
+    "check:target": "bun scripts/check-target.mjs",
+    "test:targets": "bun test support/targets.test.ts",
+    "test:contracts": "bun api/support/schemas.test.mjs"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
-    "@eslint/js": "^10.0.1",
+    "@biomejs/biome": "^2.5.12",
     "@playwright/test": "^1.62.1",
     "@types/node": "^26.3.0",
     "dotenv": "^17.4.2",
-    "eslint": "^10.9.1",
     "openapi-typescript": "^7.13.0",
-    "prettier": "^3.9.6",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.68.0",
     "zod": "^4.4.3"
   }
 }

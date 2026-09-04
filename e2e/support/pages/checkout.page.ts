@@ -154,8 +154,10 @@ export class CheckoutPage {
 
   // --- Review / place order ------------------------------------------------------------
 
+  // Two buttons share the accessible name "Place Order"; only the review-step submit
+  // control carries this test id (confirmed live: strict-mode violation without it).
   private get placeOrderButton(): Locator {
-    return this.page.getByRole('button', { name: /place order/i });
+    return this.page.getByTestId('sf-checkout-place-order-btn');
   }
 
   /** Clicks Place Order without waiting for confirmation — used to assert a refused attempt. */

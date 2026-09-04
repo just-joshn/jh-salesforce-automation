@@ -72,7 +72,8 @@ export async function measurePage(page: Page): Promise<PerformanceMetrics> {
   await page.waitForLoadState('load');
   return page.evaluate(() => {
     const navigation = performance.getEntriesByType('navigation')[0] as
-      PerformanceNavigationTiming | undefined;
+      | PerformanceNavigationTiming
+      | undefined;
     if (!navigation) {
       throw new Error('No navigation timing entry was recorded');
     }

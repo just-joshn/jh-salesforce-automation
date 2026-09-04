@@ -47,21 +47,19 @@ test.describe('G. Localization', { tag: '@localization' }, () => {
     });
   });
 
-  test(
-    'G2 - Config-off catalogue gap: Gift Certificates category',
-    { tag: ['@config-off', '@smoke'] },
-    async ({ request, guestSession }) => {
-      const stores = clients.stores(request);
+  test('G2 - Config-off catalogue gap: Gift Certificates category', {
+    tag: ['@config-off', '@smoke'],
+  }, async ({ request, guestSession }) => {
+    const stores = clients.stores(request);
 
-      const category = await stores.getCategory(guestSession.accessToken, 'gift-certificates');
-      expect(category.name).toBe('Gift Certificates');
+    const category = await stores.getCategory(guestSession.accessToken, 'gift-certificates');
+    expect(category.name).toBe('Gift Certificates');
 
-      await test.step('The category resolves, but the catalogue behind it is empty', async () => {
-        const results = await clients.search(request).productSearch(guestSession.accessToken, {
-          refinements: ['cgid=gift-certificates'],
-        });
-        expect(results.total).toBe(0);
+    await test.step('The category resolves, but the catalogue behind it is empty', async () => {
+      const results = await clients.search(request).productSearch(guestSession.accessToken, {
+        refinements: ['cgid=gift-certificates'],
       });
-    },
-  );
+      expect(results.total).toBe(0);
+    });
+  });
 });

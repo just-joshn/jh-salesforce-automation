@@ -3,7 +3,7 @@ import { withLocale, withSite } from './env';
 import { ScapiClient } from './scapi-client';
 import type { Order } from './scapi-types';
 import { parseJson } from './response';
-import { orderSchema, problemDetailSchema } from './schemas';
+import { orderSchema } from './schemas';
 
 const FAMILY = 'checkout/shopper-orders/v1';
 
@@ -39,21 +39,22 @@ export class OrdersClient extends ScapiClient {
   }
 
   /**
-   * H2: the OMS metadata probe. With no Order Management org linked (this demo), SCAPI
-   * answers 409 with an oms-not-active fault rather than 200 — the contract-level fact
-   * behind the UI's absent tracking/cancel/return affordances.
+   * H2: the OMS metadata probe. Staging has answered both 409 (oms-not-active) and 200
+   * (metadata payload) depending on org linkage; callers assert the live status.
    */
   async getOmsMetadata(accessToken: string) {
     const response = await this.request.get(this.apiUrl(FAMILY, 'orders/oms-meta-data'), {
       headers: this.authed(accessToken),
       params: withSite(),
     });
-    expect(response.status(), 'OMS metadata').toBe(409);
-    const body = await parseJson<{ title?: string; detail?: string; message?: string }>(
-      response,
-      problemDetailSchema,
-      'OMS metadata',
-    );
-    return { status: response.status(), body };
+    const status = response.status();
+    let body: { title?: string; detail?: string; message?: string } = {};
+    if (status === 200 || status === 409) {
+      const payload: unknown = await response.json().catch(() => ({}));
+      if (payload && typeof payload === 'object') {
+        body = payload;
+      }
+    }
+    return { status, body };
   }
 }

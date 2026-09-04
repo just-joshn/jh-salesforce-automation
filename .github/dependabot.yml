@@ -11,7 +11,7 @@ updates:
         patterns:
           - '*'
 
-  # npm/pnpm dependencies (devDependencies only — this repo has no runtime deps).
+  # npm dependencies (devDependencies only — this repo has no runtime deps).
   - package-ecosystem: 'npm'
     directory: '/'
     schedule:

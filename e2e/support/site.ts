@@ -31,10 +31,12 @@ export async function dismissConsent(page: Page, timeout?: number): Promise<void
   const decline = page.getByRole('button', { name: 'Decline tracking' });
   try {
     await expect(decline).toBeVisible({ timeout: effectiveTimeout });
-    await decline.click();
   } catch {
-    // Consent dialog did not appear this check (already dismissed, or never shown).
+    consentChecked.add(page);
+    return;
   }
+  await decline.click();
+  await expect(decline).toBeHidden();
   consentChecked.add(page);
 }
 
@@ -54,8 +56,10 @@ export async function openPath(page: Page, path = '', consentTimeout?: number): 
   await dismissConsent(page, consentTimeout);
 }
 
-/** openPath plus a web-first wait for `<main>` — used by quality tests that screenshot or audit. */
-export async function openMain(page: Page, path = '', consentTimeout?: number): Promise<void> {
-  await openPath(page, path, consentTimeout);
+/** Navigate, dismiss consent, wait for `<main>`, then dismiss again if it re-paints. */
+export async function openMain(page: Page, path = '', consentTimeout = 10_000): Promise<void> {
+  await page.goto(buildPath(path));
+  await dismissConsent(page, consentTimeout);
   await expect(page.getByRole('main')).toBeVisible();
+  await dismissConsent(page, 2_000);
 }

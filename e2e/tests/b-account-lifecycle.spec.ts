@@ -28,65 +28,62 @@ function customersEndpointResponse(page: Page, email: string) {
 }
 
 test.describe('B. Account Lifecycle', { tag: '@account' }, () => {
-  test(
-    'B1 - Register a new account',
-    { tag: ['@critical', '@destructive', '@nightly'] },
-    async ({ page, registerPage }) => {
-      const badEmail = rejectedEmail('reg-invalid');
-      await test.step('An email the platform rejects keeps the shopper on the form with an inline error', async () => {
-        const response = customersEndpointResponse(page, badEmail);
-        await registerPage.register({
-          firstName: 'Cuj',
-          lastName: 'Discovery',
-          email: badEmail,
-          password: VALID_PASSWORD,
-        });
-        expect((await response).status()).toBe(400);
-        await registerPage.expectRejected();
-      });
-
-      const goodEmail = uniqueEmail('reg-valid');
-      await test.step('A deliverable-looking email succeeds and lands on an authenticated /account', async () => {
-        const response = customersEndpointResponse(page, goodEmail);
-        await registerPage.submit({
-          firstName: 'Cuj',
-          lastName: 'Discovery',
-          email: goodEmail,
-          password: VALID_PASSWORD,
-        });
-        expect((await response).status()).toBe(200);
-        await registerPage.expectAccountCreated();
-      });
-    },
-  );
-
-  test(
-    'B2 - Sign in with password (valid and invalid)',
-    { tag: ['@critical', '@destructive', '@nightly'] },
-    async ({ page, registerPage, loginPage }) => {
-      const email = uniqueEmail('login');
+  test('B1 - Register a new account', { tag: ['@critical', '@destructive', '@nightly'] }, async ({
+    page,
+    registerPage,
+  }) => {
+    const badEmail = rejectedEmail('reg-invalid');
+    await test.step('An email the platform rejects keeps the shopper on the form with an inline error', async () => {
+      const response = customersEndpointResponse(page, badEmail);
       await registerPage.register({
         firstName: 'Cuj',
-        lastName: 'Login',
-        email,
+        lastName: 'Discovery',
+        email: badEmail,
         password: VALID_PASSWORD,
       });
+      expect((await response).status()).toBe(400);
+      await registerPage.expectRejected();
+    });
+
+    const goodEmail = uniqueEmail('reg-valid');
+    await test.step('A deliverable-looking email succeeds and lands on an authenticated /account', async () => {
+      const response = customersEndpointResponse(page, goodEmail);
+      await registerPage.submit({
+        firstName: 'Cuj',
+        lastName: 'Discovery',
+        email: goodEmail,
+        password: VALID_PASSWORD,
+      });
+      expect((await response).status()).toBe(200);
+      await registerPage.expectAccountCreated();
+    });
+  });
+
+  test('B2 - Sign in with password (valid and invalid)', {
+    tag: ['@critical', '@destructive', '@nightly'],
+  }, async ({ page, registerPage, loginPage }) => {
+    const email = uniqueEmail('login');
+    await registerPage.register({
+      firstName: 'Cuj',
+      lastName: 'Login',
+      email,
+      password: VALID_PASSWORD,
+    });
+    await expectSignedIn(page);
+    await new AccountPage(page).logout();
+
+    await test.step('Wrong credentials show an inline alert and do not redirect', async () => {
+      await loginPage.loginWithPassword(email, 'DefinitelyWrongPassword!1');
+      await loginPage.expectInvalidCredentialsError();
+      await expect(page).toHaveURL(/\/login/);
+    });
+
+    await test.step('Correct credentials redirect to /account', async () => {
+      await loginPage.loginWithPassword(email, VALID_PASSWORD);
+      await expect(page).toHaveURL(/\/account$/);
       await expectSignedIn(page);
-      await new AccountPage(page).logout();
-
-      await test.step('Wrong credentials show an inline alert and do not redirect', async () => {
-        await loginPage.loginWithPassword(email, 'DefinitelyWrongPassword!1');
-        await loginPage.expectInvalidCredentialsError();
-        await expect(page).toHaveURL(/\/login/);
-      });
-
-      await test.step('Correct credentials redirect to /account', async () => {
-        await loginPage.loginWithPassword(email, VALID_PASSWORD);
-        await expect(page).toHaveURL(/\/account$/);
-        await expectSignedIn(page);
-      });
-    },
-  );
+    });
+  });
 
   test(
     'B3 - Passwordless (email one-time code) login',
@@ -190,74 +187,68 @@ test.describe('B. Account Lifecycle', { tag: '@account' }, () => {
     },
   );
 
-  test(
-    'B6 - Self-service password change (signed-in)',
-    { tag: ['@destructive', '@nightly'] },
-    async ({ workerAccount, accountPage }) => {
-      await accountPage.goto();
+  test('B6 - Self-service password change (signed-in)', {
+    tag: ['@destructive', '@nightly'],
+  }, async ({ workerAccount, accountPage }) => {
+    await accountPage.goto();
 
-      await test.step('Change the password and confirm the toast', async () => {
-        await accountPage.changePassword(workerAccount.password, ALTERNATE_PASSWORD);
-        await accountPage.expectPasswordUpdated();
-      });
+    await test.step('Change the password and confirm the toast', async () => {
+      await accountPage.changePassword(workerAccount.password, ALTERNATE_PASSWORD);
+      await accountPage.expectPasswordUpdated();
+    });
 
-      // Revert immediately so the shared worker account stays valid for later tests —
-      // mirrors the doc's own repeatable-flow verification for B6.
-      await test.step('Revert the password, proving the flow is repeatable', async () => {
-        await accountPage.changePassword(ALTERNATE_PASSWORD, workerAccount.password);
-        await accountPage.expectPasswordUpdated();
-      });
-    },
-  );
+    // Revert immediately so the shared worker account stays valid for later tests —
+    // mirrors the doc's own repeatable-flow verification for B6.
+    await test.step('Revert the password, proving the flow is repeatable', async () => {
+      await accountPage.changePassword(ALTERNATE_PASSWORD, workerAccount.password);
+      await accountPage.expectPasswordUpdated();
+    });
+  });
 
-  test(
-    'B7 - Edit profile details (phone number)',
-    { tag: ['@destructive', '@nightly'] },
-    async ({ signedInPage: page, accountPage }) => {
-      await accountPage.goto();
+  test('B7 - Edit profile details (phone number)', { tag: ['@destructive', '@nightly'] }, async ({
+    signedInPage: page,
+    accountPage,
+  }) => {
+    await accountPage.goto();
 
-      const response = await accountPage.updatePhoneNumber('4155550142');
-      expect(response.status()).toBe(200);
+    const response = await accountPage.updatePhoneNumber('4155550142');
+    expect(response.status()).toBe(200);
 
-      await expect(page.getByText('(415) 555-0142')).toBeVisible();
-      await page.reload();
-      await expect(page.getByText('(415) 555-0142')).toBeVisible();
-    },
-  );
+    await expect(page.getByText('(415) 555-0142')).toBeVisible();
+    await page.reload();
+    await expect(page.getByText('(415) 555-0142')).toBeVisible();
+  });
 
-  test(
-    'B8 - Manage saved addresses (add, default, remove)',
-    { tag: ['@destructive', '@nightly'] },
-    async ({ signedInPage: page, addressBookPage }) => {
-      await addressBookPage.clear();
-      await addressBookPage.expectEmpty();
+  test('B8 - Manage saved addresses (add, default, remove)', {
+    tag: ['@destructive', '@nightly'],
+  }, async ({ signedInPage: page, addressBookPage }) => {
+    await addressBookPage.clear();
+    await addressBookPage.expectEmpty();
 
-      await addressBookPage.add(PRIMARY_ADDRESS, true);
-      await expect(page.getByText('Default', { exact: true })).toBeVisible();
-      await expect(page.getByText(PRIMARY_ADDRESS.address)).toBeVisible();
-      await expect(
-        page.getByText(`${PRIMARY_ADDRESS.city}, CA ${PRIMARY_ADDRESS.zip}`),
-      ).toBeVisible();
+    await addressBookPage.add(PRIMARY_ADDRESS, true);
+    await expect(page.getByText('Default', { exact: true })).toBeVisible();
+    await expect(page.getByText(PRIMARY_ADDRESS.address)).toBeVisible();
+    await expect(
+      page.getByText(`${PRIMARY_ADDRESS.city}, CA ${PRIMARY_ADDRESS.zip}`),
+    ).toBeVisible();
 
-      await addressBookPage.remove(PRIMARY_ADDRESS.address);
-      await addressBookPage.expectEmpty();
-    },
-  );
+    await addressBookPage.remove(PRIMARY_ADDRESS.address);
+    await addressBookPage.expectEmpty();
+  });
 
-  test(
-    'B9 - View order history and order detail',
-    { tag: ['@destructive', '@nightly'] },
-    async ({ signedInPage: page, orderHistoryPage }) => {
-      const order = await placeSignedInOrder(page);
+  test('B9 - View order history and order detail', { tag: ['@destructive', '@nightly'] }, async ({
+    signedInPage: page,
+    orderHistoryPage,
+  }) => {
+    const order = await placeSignedInOrder(page);
 
-      const ordersResponse = await orderHistoryPage.goto();
-      expect(ordersResponse.status()).toBe(200);
+    const ordersResponse = await orderHistoryPage.goto();
+    expect(ordersResponse.status()).toBe(200);
 
-      await orderHistoryPage.expectOrderListed(order.orderNumber);
-      await orderHistoryPage.viewDetails();
-      await orderHistoryPage.expectDetailUrl(order.orderNumber);
-      await expect(page.getByText('Visa')).toBeVisible();
-      await orderHistoryPage.expectNotShipped();
-    },
-  );
+    await orderHistoryPage.expectOrderListed(order.orderNumber);
+    await orderHistoryPage.viewDetails();
+    await orderHistoryPage.expectDetailUrl(order.orderNumber);
+    await expect(page.getByText('Visa')).toBeVisible();
+    await orderHistoryPage.expectNotShipped();
+  });
 });

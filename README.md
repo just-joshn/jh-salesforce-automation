@@ -49,7 +49,7 @@ The API tests cover the same journeys as the browser tests. They use the same sp
 test counts, and test titles. Run this check after changing either layer:
 
 ```bash
-pnpm check:title-parity
+bun run check:title-parity
 ```
 
 Together, the two paired projects run 56 tests grouped into eight areas:
@@ -73,13 +73,13 @@ radio defect, missing SFRA routes, and an inactive OMS connection.
 ## Test tiers and commands
 
 ```bash
-pnpm check:target
-pnpm test:smoke
-pnpm test:e2e
-pnpm test:api
-pnpm test:cross-browser
-pnpm test:quality
-E2E_TARGET=canary pnpm test:canary
+bun run check:target
+bun run test:smoke
+bun run test:e2e
+bun run test:api
+bun run test:cross-browser
+bun run test:quality
+E2E_TARGET=canary bun run test:canary
 ```
 
 `@smoke` is read-only and is used for fast validation. `@destructive` marks account, basket,
@@ -90,11 +90,11 @@ configuration boundary and is not a scheduling tier.
 The dedicated quality commands are:
 
 ```bash
-pnpm test:a11y
-pnpm test:visual
-pnpm test:visual:update
-pnpm test:performance
-pnpm test:security
+bun run test:a11y
+bun run test:visual
+bun run test:visual:update
+bun run test:performance
+bun run test:security
 ```
 
 Accessibility checks are strict WCAG 2A/2AA axe checks and attach rule, impact, and node evidence.
@@ -182,29 +182,29 @@ need the storefront's private client use `/mobify/slas/private/...`, matching th
 the storefront. No private SLAS secret is stored in this repository.
 
 Generated OpenAPI types give compile-time checks. Focused Zod schemas validate important runtime
-response fields. The contract check is separate from the Playwright journey tests:
+The contract check is separate from the Playwright journey tests:
 
 ```bash
-pnpm test:contracts
+bun run test:contracts
 ```
 
 ## Requirements and setup
 
-- Node.js 24, also recorded in `.nvmrc`.
-- pnpm 11.17.0, recorded in `package.json`.
+- Bun 1.4.0, installed by mise from `mise.toml`.
 - Internet access to the selected storefront for live tests.
 
 Install dependencies and the browser used by the focused E2E project:
 
 ```bash
-pnpm install
-pnpm exec playwright install chromium
+mise install
+bun install --frozen-lockfile
+bunx playwright install chromium
 ```
 
 Install Firefox and WebKit when running the cross-browser or full nightly matrix:
 
 ```bash
-pnpm exec playwright install firefox webkit
+bunx playwright install firefox webkit
 ```
 
 Copy the example environment file only when you need to change the defaults:
@@ -234,11 +234,11 @@ Fetch the newest published major-version-1 specs from Salesforce's public Commer
 then regenerate the TypeScript types:
 
 ```bash
-pnpm gen:api:fetch
-pnpm gen:api
+bun run gen:api:fetch
+bun run gen:api
 ```
 
-`pnpm gen:api:fetch` needs network access. `pnpm gen:api` reads the vendored files locally. Do not
+`bun run gen:api:fetch` needs network access. `bun run gen:api` reads the vendored files locally. Do not
 edit files in `api/generated/` by hand.
 
 ## Test data and live-site limits
@@ -265,12 +265,12 @@ The executable tests and current source code are the source of truth for what ru
 Before opening a change, run the focused static and contract checks plus the relevant test tier:
 
 ```bash
-pnpm check:title-parity
-pnpm test:contracts
-pnpm typecheck
-pnpm lint
-pnpm format:check
-pnpm test:smoke
+bun run check:title-parity
+bun run test:contracts
+bun run typecheck
+bun run lint
+bun run format:check
+bun run test:smoke
 ```
 
 Keep API and E2E test titles aligned. Keep generated API files in sync with `api/specs/`, keep

@@ -42,7 +42,10 @@ export class OrderHistoryPage {
 
   /** The tracking copy can render a beat after its own data response settles. */
   async expectNotShipped(): Promise<void> {
-    await expect(this.page.getByText(/not shipped/i)).toBeVisible({ timeout: 15_000 });
+    // "Not shipped" also appears on the order summary; the tracking card is the unique region.
+    await expect(
+      this.page.getByTestId('order-tracking-card').getByText(/not shipped/i),
+    ).toBeVisible({ timeout: 15_000 });
   }
 
   async expectNoCancelOrReturnActions(): Promise<void> {

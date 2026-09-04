@@ -1,6 +1,6 @@
 import { expect, test, type Locator } from '@playwright/test';
 import { readAppConfig } from '../support/app-config';
-import { headerSearchBox, openPath } from '../support/site';
+import { dismissConsent, headerSearchBox, openPath } from '../support/site';
 import { PRODUCTS } from '../support/test-data';
 
 async function readCount(heading: Locator): Promise<number> {
@@ -10,57 +10,56 @@ async function readCount(heading: Locator): Promise<number> {
 }
 
 test.describe('A. Discovery & Browse', { tag: '@discovery' }, () => {
-  test(
-    'A1 - Search for a product by keyword',
-    { tag: ['@critical', '@smoke'] },
-    async ({ page }) => {
-      await openPath(page, '');
-      const searchBox = headerSearchBox(page);
+  test('A1 - Search for a product by keyword', { tag: ['@critical', '@smoke'] }, async ({
+    page,
+  }) => {
+    await openPath(page, '');
+    const searchBox = headerSearchBox(page);
 
-      await test.step('A matching query returns Einstein-backed suggestions the shopper can see and pick', async () => {
-        const suggestions = page.waitForResponse(
-          (res) =>
-            res.url().includes('search-suggestions') &&
-            res.url().includes('includeEinsteinSuggestedPhrases=true'),
-        );
-        await searchBox.fill('tie');
-        expect((await suggestions).status()).toBe(200);
+    await test.step('A matching query returns Einstein-backed suggestions the shopper can see and pick', async () => {
+      const suggestions = page.waitForResponse(
+        (res) =>
+          res.url().includes('search-suggestions') &&
+          res.url().includes('includeEinsteinSuggestedPhrases=true'),
+      );
+      await searchBox.fill('tie');
+      expect((await suggestions).status()).toBe(200);
 
-        // The API call alone doesn't prove a shopper sees anything: confirm the suggestions
-        // panel actually renders matching, clickable product results. Desktop renders links
-        // in a dialog; the responsive header renders product buttons instead.
-        const suggestionsPanel = page.getByRole('dialog');
-        const productSuggestion = suggestionsPanel
-          .getByRole('link', { name: new RegExp(PRODUCTS.silkTie.name) })
-          .or(page.getByRole('button', { name: new RegExp(PRODUCTS.silkTie.name) }))
-          .first();
-        await expect(productSuggestion).toBeVisible();
-        if ((page.viewportSize()?.width ?? 0) >= 768) {
-          await expect(suggestionsPanel.getByRole('link', { name: 'View All' })).toBeVisible();
-        }
-      });
+      // The API call alone doesn't prove a shopper sees anything: confirm the suggestions
+      // panel actually renders matching, clickable product results. Desktop renders links
+      // in a dialog; the responsive header renders product buttons instead.
+      const suggestionsPanel = page.getByRole('dialog');
+      const productSuggestion = suggestionsPanel
+        .getByRole('link', { name: new RegExp(PRODUCTS.silkTie.name) })
+        .or(page.getByRole('button', { name: new RegExp(PRODUCTS.silkTie.name) }))
+        .first();
+      await expect(productSuggestion).toBeVisible();
+      if ((page.viewportSize()?.width ?? 0) >= 768) {
+        await expect(suggestionsPanel.getByRole('link', { name: 'View All' })).toBeVisible();
+      }
+    });
 
-      await test.step('Submitting the query lands on a results page with a count heading', async () => {
-        const productSearch = page.waitForResponse(
-          (res) => res.url().includes('product-search') && res.request().method() === 'GET',
-        );
-        await searchBox.press('Enter');
-        expect((await productSearch).status()).toBe(200);
-        await expect(page).toHaveURL(/\/search\?q=tie/);
-        await expect(
-          page.getByRole('heading', { level: 1 }).filter({ hasText: /^\(\d+\)$/ }),
-        ).toBeVisible();
-      });
+    await test.step('Submitting the query lands on a results page with a count heading', async () => {
+      const productSearch = page.waitForResponse(
+        (res) => res.url().includes('product-search') && res.request().method() === 'GET',
+      );
+      await searchBox.press('Enter');
+      expect((await productSearch).status()).toBe(200);
+      await expect(page).toHaveURL(/\/search\?q=tie/);
+      await dismissConsent(page);
+      await expect(
+        page.getByRole('heading', { level: 1 }).filter({ hasText: /\(\d+\)/ }),
+      ).toBeVisible();
+    });
 
-      await test.step('A query with no matches degrades gracefully instead of breaking', async () => {
-        await searchBox.fill('zzzz-cuj-no-match-xyz');
-        await searchBox.press('Enter');
-        const zeroCount = page.getByRole('heading', { level: 1 }).filter({ hasText: '(0)' });
-        const noResultsCopy = page.getByText(/couldn.t find|no results/i);
-        await expect(zeroCount.or(noResultsCopy).first()).toBeVisible();
-      });
-    },
-  );
+    await test.step('A query with no matches degrades gracefully instead of breaking', async () => {
+      await searchBox.fill('zzzz-cuj-no-match-xyz');
+      await searchBox.press('Enter');
+      const zeroCount = page.getByRole('heading', { level: 1 }).filter({ hasText: '(0)' });
+      const noResultsCopy = page.getByText(/couldn.t find|no results/i);
+      await expect(zeroCount.or(noResultsCopy).first()).toBeVisible();
+    });
+  });
 
   test('A2 - Browse a category and refine by facet', { tag: '@smoke' }, async ({ page }) => {
     await openPath(page, '/category/womens');
@@ -91,27 +90,25 @@ test.describe('A. Discovery & Browse', { tag: '@discovery' }, () => {
     });
   });
 
-  test(
-    'A3 - Guided Shopping Agent is intentionally absent (config-off complement)',
-    { tag: ['@config-off', '@smoke'] },
-    async ({ page }) => {
-      await openPath(page, '');
-      const config = await readAppConfig(page);
+  test('A3 - Guided Shopping Agent is intentionally absent (config-off complement)', {
+    tag: ['@config-off', '@smoke'],
+  }, async ({ page }) => {
+    await openPath(page, '');
+    const config = await readAppConfig(page);
 
-      // Compared exactly, never by truthiness — the demo ships this as the *string* "false".
-      expect(config.commerceAgent.enabled).toBe('false');
-      expect(config.commerceAgent.enableAgentFromHeader).toBe('false');
-      expect(config.commerceAgent.enableAgentFromFloatingButton).toBe('false');
-      expect(config.commerceAgent.enableAgentFromSearchSuggestions).toBe('false');
+    // Compared exactly, never by truthiness — the demo ships this as the *string* "false".
+    expect(config.commerceAgent.enabled).toBe('false');
+    expect(config.commerceAgent.enableAgentFromHeader).toBe('false');
+    expect(config.commerceAgent.enableAgentFromFloatingButton).toBe('false');
+    expect(config.commerceAgent.enableAgentFromSearchSuggestions).toBe('false');
 
-      await test.step('No agent affordance renders anywhere, and search still works fully', async () => {
-        await expect(page.getByRole('button', { name: /agent/i })).toHaveCount(0);
+    await test.step('No agent affordance renders anywhere, and search still works fully', async () => {
+      await expect(page.getByRole('button', { name: /agent/i })).toHaveCount(0);
 
-        const searchBox = headerSearchBox(page);
-        const suggestions = page.waitForResponse((res) => res.url().includes('search-suggestions'));
-        await searchBox.fill('tie');
-        expect((await suggestions).status()).toBe(200);
-      });
-    },
-  );
+      const searchBox = headerSearchBox(page);
+      const suggestions = page.waitForResponse((res) => res.url().includes('search-suggestions'));
+      await searchBox.fill('tie');
+      expect((await suggestions).status()).toBe(200);
+    });
+  });
 });

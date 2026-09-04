@@ -7,7 +7,7 @@ import { expect, type Locator, type Page } from '@playwright/test';
 export class AddedToCartDialog {
   private readonly root: Locator;
 
-  constructor(private readonly page: Page) {
+  constructor(page: Page) {
     this.root = page.getByRole('dialog');
   }
 

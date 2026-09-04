@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { readAppConfig } from '../support/app-config';
 import { resolveTarget, storefrontPath } from '../../support/targets';
-import { openPath, openPrimaryNavIfCollapsed } from '../support/site';
+import { dismissConsent, openPath, openPrimaryNavIfCollapsed } from '../support/site';
 
 const target = resolveTarget();
 
@@ -38,8 +38,11 @@ test.describe('G. Localization', { tag: '@localization' }, () => {
           .getByRole('combobox', { name: /Select Language|Sprache auswählen/ })
           .selectOption('de-DE');
         await expect(page).toHaveURL(expectedLocaleUrl('de-DE'), { timeout: 2000 });
+        await dismissConsent(page, 3_000);
+        await expect(page.getByRole('combobox', { name: 'Sprache auswählen' })).toBeVisible({
+          timeout: 2_000,
+        });
       }).toPass({ timeout: 20_000 });
-      await expect(page.getByRole('combobox', { name: 'Sprache auswählen' })).toBeVisible();
     });
 
     await test.step('Switching back to English is a clean, reversible round trip', async () => {
@@ -53,26 +56,22 @@ test.describe('G. Localization', { tag: '@localization' }, () => {
     });
   });
 
-  test(
-    'G2 - Config-off catalogue gap: Gift Certificates category',
-    { tag: ['@config-off', '@smoke'] },
-    async ({ page }) => {
-      await openPath(page, '');
-      await openPrimaryNavIfCollapsed(page);
+  test('G2 - Config-off catalogue gap: Gift Certificates category', {
+    tag: ['@config-off', '@smoke'],
+  }, async ({ page }) => {
+    await openPath(page, '');
+    await openPrimaryNavIfCollapsed(page);
 
-      const categoryResponse = page.waitForResponse((res) =>
-        res.url().includes('/categories/gift-certificates'),
-      );
-      await page.getByRole('link', { name: 'Gift Certificates' }).click();
-      expect((await categoryResponse).status()).toBe(200);
+    const categoryResponse = page.waitForResponse((res) =>
+      res.url().includes('/categories/gift-certificates'),
+    );
+    await page.getByRole('link', { name: 'Gift Certificates' }).click();
+    expect((await categoryResponse).status()).toBe(200);
 
-      await expect(
-        page.getByRole('heading', { level: 1, name: 'Gift Certificates', exact: true }),
-      ).toBeVisible();
-      await expect(
-        page.getByRole('heading', { level: 1 }).filter({ hasText: '(0)' }),
-      ).toBeVisible();
-      await expect(page.getByText(/couldn.t find anything for gift certificates/i)).toBeVisible();
-    },
-  );
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Gift Certificates', exact: true }),
+    ).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1 }).filter({ hasText: '(0)' })).toBeVisible();
+    await expect(page.getByText(/couldn.t find anything for gift certificates/i)).toBeVisible();
+  });
 });

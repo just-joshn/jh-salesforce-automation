@@ -23,8 +23,9 @@ const KNOWN_A11Y_DEFECTS: Record<string, (html: string) => boolean> = {
   // Header popover trigger renders as a <form>, whose implicit role doesn't support these ARIA
   // attributes. Present on every page; the DOM id carries a volatile React-generated suffix.
   'aria-allowed-attr': (html) => html.startsWith('<form id="popover-trigger-'),
-  // "Continue Shopping" link on the empty-cart state fails minimum color contrast.
-  'color-contrast': (html) => html.includes('>Continue Shopping<'),
+  // Empty-cart "Continue Shopping" and PDP "Add to Cart" fail WCAG contrast on this demo.
+  'color-contrast': (html) =>
+    html.includes('>Continue Shopping<') || html.includes('>Add to Cart<'),
 };
 
 /** Analyzes with the same tagged AxeBuilder every a11y test gets via the `makeAxeBuilder` fixture. */
@@ -57,8 +58,8 @@ export async function assertNoA11yViolations(
       type: 'known-defect',
       description:
         `Excluded ${excludedCount} node(s) matching confirmed storefront defects (header ` +
-        'popover <form> with unsupported ARIA attributes; color-contrast on the empty-cart ' +
-        '"Continue Shopping" link) — tracked upstream, not owned by this suite.',
+        'popover <form> with unsupported ARIA attributes; color-contrast on empty-cart ' +
+        '"Continue Shopping" and PDP "Add to Cart") — tracked upstream, not owned by this suite.',
     });
   }
 

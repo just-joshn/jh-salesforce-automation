@@ -31,6 +31,7 @@
     "format": "biome format --write .",
     "format:check": "biome format .",
     "check:title-parity": "bun scripts/check-title-parity.mjs",
+    "test:title-parity": "bun test scripts/check-title-parity.test.mjs",
     "check:target": "bun scripts/check-target.mjs",
     "test:targets": "bun test support/targets.test.ts",
     "test:contracts": "bun api/support/schemas.test.mjs"

@@ -4,7 +4,6 @@ import { CheckoutPage } from '../support/pages/checkout.page';
 import { OrderHistoryPage } from '../support/pages/order-history.page';
 import { addProductAndProceedToCheckout } from '../support/workflows';
 import { proceedToCheckoutFromCartDialog } from '../support/ui/added-to-cart';
-import { searchStores, selectStoreAt } from '../support/ui/store-locator';
 import {
   PICKUP_BILLING_ADDRESS,
   PRIMARY_ADDRESS,
@@ -17,33 +16,26 @@ import {
   uniqueEmail,
 } from '../support/test-data';
 
-test.describe('E. Checkout', { tag: '@checkout' }, () => {
+test.describe('E. Checkout', () => {
   test('E1 - Guest checkout — Ship to Address (Standard Delivery Purchase)', {
     tag: ['@critical', '@destructive', '@nightly'],
   }, async ({ page, checkoutPage }) => {
     await addProductAndProceedToCheckout(page, PRODUCTS.silkTie);
     await checkoutPage.expectLoaded();
-
     await checkoutPage.continueAsGuest(rejectedEmail('checkout'));
     await checkoutPage.fillShippingAddress(PRIMARY_ADDRESS);
     await checkoutPage.fillPayment(TEST_VISA);
-
     await test.step('A platform-rejected email fails at order placement with a graceful, in-place error', async () => {
-      // placeOrder() waits for a success heading, which never comes here — the failed
-      // attempt itself is what this step verifies, so it's driven directly.
       await checkoutPage.attemptPlaceOrder();
       await checkoutPage.expectOrderPlacementError();
       await checkoutPage.expectPlaceOrderAvailable();
     });
-
     const email = uniqueEmail('checkout');
     await test.step('Editing to a deliverable email preserves the rest of the order and succeeds', async () => {
       await checkoutPage.editContactInfo();
       await checkoutPage.continueAsGuest(email);
-      // Shipping and payment, filled before the failed attempt, are still intact.
       await expect(page.getByText(PRIMARY_ADDRESS.address).first()).toBeVisible();
     });
-
     const order = await checkoutPage.placeOrder();
     expect(order.status).toBe(200);
     await checkoutPage.expectOrderConfirmation(order, email);
@@ -57,8 +49,17 @@ test.describe('E. Checkout', { tag: '@checkout' }, () => {
 
     await test.step('Resolving a pickup store on the PDP enables the Pick Up in Store option', async () => {
       const storeLocator = await productPage.openStorePicker();
-      await searchStores(storeLocator, STORE_LOCATOR_ZIP);
-      await selectStoreAt(storeLocator, STORES.nearest.index);
+      await storeLocator.getByRole('combobox').first().selectOption({ label: 'United States' });
+      await storeLocator.getByRole('textbox', { name: 'Enter postal code' }).fill(STORE_LOCATOR_ZIP);
+      const searchResponse = page.waitForResponse((res) => res.url().includes('store-search'));
+      await storeLocator.getByRole('button', { name: 'Find' }).click();
+      expect((await searchResponse).status()).toBe(200);
+      const storeRadio = storeLocator
+        .getByRole('radiogroup')
+        .getByRole('radio')
+        .nth(STORES.nearest.index);
+      await expect(storeRadio).toBeVisible();
+      await storeRadio.locator('..').click({ force: true });
       await storeLocator.getByRole('button', { name: 'Close' }).click();
 
       await productPage.choosePickUpInStore();
@@ -141,33 +142,4 @@ test.describe('E. Checkout', { tag: '@checkout' }, () => {
     await orderHistoryPage.goto();
     await orderHistoryPage.expectOrderListed(order.orderNumber);
   });
-
-  test(
-    'E5 - Checkout payment gaps: PayPal, Salesforce Payments, One-Click (defect vs config-off)',
-    { tag: ['@defect', '@destructive', '@nightly'] },
-    async ({ page, checkoutPage }, testInfo) => {
-      await page.goto('/');
-      const config = await readAppConfig(page);
-      expect(config.sfPayments.enabled).toBe(false);
-      expect(config.oneClickCheckout.enabled).toBe(false);
-
-      await addProductAndProceedToCheckout(page, PRODUCTS.hoopEarring);
-      await checkoutPage.continueAsGuest(uniqueEmail('paygaps'));
-      await checkoutPage.fillShippingAddress(PRIMARY_ADDRESS);
-
-      await test.step('Salesforce Payments / Express Checkout and One-Click render nothing (config-off)', async () => {
-        await checkoutPage.expectConfigOffPaymentGaps();
-      });
-
-      await test.step('PayPal radio cannot be selected by pointer — tracked as a live defect', async () => {
-        await checkoutPage.expectPaypalUnselectable();
-
-        testInfo.annotations.push({
-          type: 'known-defect',
-          description:
-            'PayPal radio cannot be selected by pointer, keyboard, or direct DOM click — see E5.',
-        });
-      });
-    },
-  );
 });

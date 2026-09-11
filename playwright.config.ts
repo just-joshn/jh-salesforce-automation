@@ -123,9 +123,8 @@ export default defineConfig({
       use: { ...devices['iPhone 13'] },
     },
     {
-      // API-only project: no browser, no device emulation — just Playwright's request
-      // context against the storefront's own origin. Mirrors e2e/tests test-for-test;
-      // scripts/check-title-parity.mjs enforces that mapping.
+      // API-only project: no browser or device emulation. It covers every E2E declaration
+      // and may add API-only contract/state assertions; parity is intentionally directional.
       name: 'api',
       testDir: './api/tests',
     },

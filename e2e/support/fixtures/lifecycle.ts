@@ -6,7 +6,7 @@ import { uniqueEmail, VALID_PASSWORD } from '../test-data';
 
 export interface WorkerAccount { firstName: string; lastName: string; email: string; password: string }
 
-type LifecycleFixtures = { signedInPage: Page; locationDeniedPage: Page };
+type LifecycleFixtures = { signedInPage: Page };
 type WorkerFixtures = { workerAccount: WorkerAccount; authenticatedContext: BrowserContext };
 
 export const lifecycleTest = base.extend<LifecycleFixtures, WorkerFixtures>({
@@ -34,9 +34,5 @@ export const lifecycleTest = base.extend<LifecycleFixtures, WorkerFixtures>({
     const page = await authenticatedContext.newPage();
     await use(page);
     await page.close();
-  },
-  locationDeniedPage: async ({ browser }, use) => {
-    const context = await browser.newContext({ permissions: [] });
-    try { await use(await context.newPage()); } finally { await context.close(); }
   },
 });

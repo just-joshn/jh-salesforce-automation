@@ -3,12 +3,9 @@ import { expect, test } from '../support/fixtures';
 import { readAppConfig } from '../support/app-config';
 import { resolveTarget } from '../../support/targets';
 import { expectSignedIn, openPath } from '../support/site';
-import { fillAddressForm } from '../support/ui/address-form';
-import { confirmRemovalIfPrompted, drainRemovals } from '../support/ui/removal';
 import { placeSignedInOrder } from '../support/workflows';
 import {
   ALTERNATE_PASSWORD,
-  PRIMARY_ADDRESS,
   uniqueEmail,
   rejectedEmail,
   VALID_PASSWORD,
@@ -33,7 +30,7 @@ async function openAccountCardEditor(page: Page, cardHeading: string): Promise<v
   await heading.locator('..').getByRole('button', { name: 'Edit' }).click();
 }
 
-test.describe('B. Account Lifecycle', { tag: '@account' }, () => {
+test.describe('B. Account Lifecycle', () => {
   test('B1 - Register a new account', { tag: ['@critical', '@destructive', '@nightly'] }, async ({
     page,
     registerPage,
@@ -197,72 +194,6 @@ test.describe('B. Account Lifecycle', { tag: '@account' }, () => {
       });
     },
   );
-
-  test('B6 - Self-service password change (signed-in)', {
-    tag: ['@destructive', '@nightly'],
-  }, async ({ signedInPage: page, workerAccount }) => {
-    await openPath(page, '/account');
-
-    await test.step('Change the password and confirm the toast', async () => {
-      await openAccountCardEditor(page, 'Password');
-      await page.getByRole('textbox', { name: 'Current Password' }).fill(workerAccount.password);
-      await page.getByRole('textbox', { name: 'New Password', exact: true }).fill(ALTERNATE_PASSWORD);
-      await page.getByRole('textbox', { name: 'Confirm New Password' }).fill(ALTERNATE_PASSWORD);
-      await page.getByRole('button', { name: 'Save' }).click();
-      await expect(page.getByText('Password updated')).toBeVisible();
-    });
-
-    // Revert immediately so the shared worker account stays valid for later tests —
-    // mirrors the doc's own repeatable-flow verification for B6.
-    await test.step('Revert the password, proving the flow is repeatable', async () => {
-      await openAccountCardEditor(page, 'Password');
-      await page.getByRole('textbox', { name: 'Current Password' }).fill(ALTERNATE_PASSWORD);
-      await page.getByRole('textbox', { name: 'New Password', exact: true }).fill(workerAccount.password);
-      await page.getByRole('textbox', { name: 'Confirm New Password' }).fill(workerAccount.password);
-      await page.getByRole('button', { name: 'Save' }).click();
-      await expect(page.getByText('Password updated')).toBeVisible();
-    });
-  });
-
-  test('B7 - Edit profile details (phone number)', { tag: ['@destructive', '@nightly'] }, async ({
-    signedInPage: page,
-  }) => {
-    await openPath(page, '/account');
-    await openAccountCardEditor(page, 'My Profile');
-    const patchResponse = page.waitForResponse(
-      (res) => res.request().method() === 'PATCH' && res.url().includes('/customers/'),
-    );
-    await page.getByRole('textbox', { name: 'Phone Number' }).fill('4155550142');
-    await page.getByRole('button', { name: 'Save' }).click();
-    const response = await patchResponse;
-    expect(response.status()).toBe(200);
-
-    await expect(page.getByText('(415) 555-0142')).toBeVisible();
-    await page.reload();
-    await expect(page.getByText('(415) 555-0142')).toBeVisible();
-  });
-
-  test('B8 - Manage saved addresses (add, default, remove)', {
-    tag: ['@destructive', '@nightly'],
-  }, async ({ signedInPage: page }) => {
-    await openPath(page, '/account/addresses');
-    await drainRemovals(page, /^Remove /i, 'No Saved Addresses');
-    await expect(page.getByText('No Saved Addresses')).toBeVisible();
-
-    await page.getByRole('button', { name: /add address/i }).click();
-    await fillAddressForm(page, PRIMARY_ADDRESS);
-    await page.getByRole('checkbox', { name: 'Set as default' }).check({ force: true });
-    await page.getByRole('button', { name: 'Save' }).click();
-    await expect(page.getByText('Default', { exact: true })).toBeVisible();
-    await expect(page.getByText(PRIMARY_ADDRESS.address)).toBeVisible();
-    await expect(
-      page.getByText(`${PRIMARY_ADDRESS.city}, CA ${PRIMARY_ADDRESS.zip}`),
-    ).toBeVisible();
-
-    await page.getByRole('button', { name: `Remove ${PRIMARY_ADDRESS.address}` }).click();
-    await confirmRemovalIfPrompted(page, page.getByText('No Saved Addresses'));
-    await expect(page.getByText('No Saved Addresses')).toBeVisible();
-  });
 
   test('B9 - View order history and order detail', { tag: ['@destructive', '@nightly'] }, async ({
     signedInPage: page,

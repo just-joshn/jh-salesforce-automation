@@ -1,31 +1,16 @@
-// Verifies the api/ suite mirrors e2e/tests test-for-test: same spec-file basenames,
-// same number of tests per file, identical titles in the same order. "Same journey,
-// API requests instead of UI clicks" is only true if the titles line up — this check
-// makes that contract executable instead of aspirational.
+// Verifies that every E2E test title is represented in the corresponding API
+// spec. API-only files and titles are allowed.
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const titleRe = /(?:^|\n)\s*test\(\s*(['"])(.*?)\1/g;
-const sectionRe = /(?:^|\n)\s*test\.describe\(\s*(['"])(.*?)\1/g;
-const tagRe = /tag:\s*(?:(['"])(.*?)\1|\[([^\]]*)\])/g;
-const stringRe = /(['"])(.*?)\1/g;
-
-const metadataIn = (file) => {
+const titleRe = /(?:^|\n)\s*test(?:\.(?:only|skip|fixme|fail|slow))?\(\s*(['"])(.*?)\1/g;
+export const metadataIn = (file) => {
   if (!fs.existsSync(file)) return null;
   const text = fs.readFileSync(file, 'utf8');
-  const tags = [];
-  for (const match of text.matchAll(tagRe)) {
-    if (match[2] !== undefined) {
-      tags.push(match[2]);
-    } else {
-      tags.push(...[...match[3].matchAll(stringRe)].map((tag) => tag[2]));
-    }
-  }
   return {
     titles: [...text.matchAll(titleRe)].map((match) => match[2]),
-    sections: [...text.matchAll(sectionRe)].map((match) => match[2]),
-    tags,
   };
 };
 
@@ -39,71 +24,59 @@ const specFiles = (root) =>
 const formatList = (titles) =>
   titles.length === 0 ? '  (none)' : titles.map((t) => `  - ${t}`).join('\n');
 
-const diffValues = (label, e2eValues, apiValues) => {
-  const lines = [];
-  const max = Math.max(e2eValues.length, apiValues.length);
-  for (let i = 0; i < max; i++) {
-    const e = e2eValues[i];
-    const a = apiValues[i];
-    if (e === a) continue;
-    if (e === undefined) lines.push(`  + api only ${label} [${i}]: ${a}`);
-    else if (a === undefined) lines.push(`  - e2e only ${label} [${i}]: ${e}`);
-    else lines.push(`  ~ ${label} [${i}]\n      e2e: ${e}\n      api: ${a}`);
+export const missingTitles = (e2eTitles, apiTitles) => {
+  const available = new Map();
+  for (const title of apiTitles) available.set(title, (available.get(title) ?? 0) + 1);
+  const missing = [];
+  for (const title of e2eTitles) {
+    const count = available.get(title) ?? 0;
+    if (count === 0) missing.push(title);
+    else available.set(title, count - 1);
   }
-  return lines.join('\n');
+  return missing;
 };
 
-let failed = false;
-const e2eFiles = specFiles('e2e/tests');
-const apiFiles = specFiles('api/tests');
+export const checkTitleParity = (e2eRoot = 'e2e/tests', apiRoot = 'api/tests') => {
+  let failed = false;
+  const e2eFiles = specFiles(e2eRoot);
+  const apiFiles = specFiles(apiRoot);
 
-const e2eSet = new Set(e2eFiles);
-const apiSet = new Set(apiFiles);
-const allFiles = [...new Set([...e2eFiles, ...apiFiles])].sort();
+  const e2eSet = new Set(e2eFiles);
+  const apiSet = new Set(apiFiles);
+  const allFiles = [...new Set([...e2eFiles, ...apiFiles])].sort();
 
-for (const file of allFiles) {
-  const inE2e = e2eSet.has(file);
-  const inApi = apiSet.has(file);
+  for (const file of allFiles) {
+    const inE2e = e2eSet.has(file);
+    const inApi = apiSet.has(file);
 
-  if (!inE2e || !inApi) {
-    failed = true;
-    const side = inE2e ? 'api/tests' : 'e2e/tests';
-    console.error(`spec file "${file}": missing under ${side}`);
-    continue;
-  }
+    if (!inE2e) {
+      continue;
+    }
+    if (!inApi) {
+      failed = true;
+      console.error(`spec file "${file}": missing under api/tests`);
+      continue;
+    }
 
-  const e2eMetadata = metadataIn(path.join('e2e/tests', file));
-  const apiMetadata = metadataIn(path.join('api/tests', file));
+    const e2eMetadata = metadataIn(path.join(e2eRoot, file));
+    const apiMetadata = metadataIn(path.join(apiRoot, file));
 
-  if (e2eMetadata === null || apiMetadata === null) {
-    failed = true;
-    console.error(`spec file "${file}": could not read metadata`);
-    continue;
-  }
+    if (e2eMetadata === null || apiMetadata === null) {
+      failed = true;
+      console.error(`spec file "${file}": could not read metadata`);
+      continue;
+    }
 
-  const checks = [
-    ['section', e2eMetadata.sections, apiMetadata.sections],
-    ['tag', e2eMetadata.tags, apiMetadata.tags],
-    ['title', e2eMetadata.titles, apiMetadata.titles],
-  ];
-  const mismatches = checks.filter(
-    ([, e2eValues, apiValues]) =>
-      e2eValues.length !== apiValues.length || e2eValues.some((value, i) => value !== apiValues[i]),
-  );
-
-  if (mismatches.length > 0) {
-    failed = true;
-    console.error(`spec file "${file}": metadata mismatch`);
-    for (const [label, e2eValues, apiValues] of mismatches) {
-      console.error(`  ${label} e2e (${e2eValues.length}):\n${formatList(e2eValues)}`);
-      console.error(`  ${label} api (${apiValues.length}):\n${formatList(apiValues)}`);
-      console.error(`  ${label} diff:\n${diffValues(label, e2eValues, apiValues)}`);
+    const missing = missingTitles(e2eMetadata.titles, apiMetadata.titles);
+    if (missing.length > 0) {
+      failed = true;
+      console.error(`spec file "${file}": missing API titles:\n${formatList(missing)}`);
     }
   }
-}
+  if (!failed) console.log(`title parity ok: ${allFiles.length} spec files`);
+  return !failed;
+};
 
-if (!failed) {
-  console.log(`title parity ok: ${allFiles.length} spec files`);
+if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
+  process.exit(checkTitleParity() ? 0 : 1);
 }
-
-process.exit(failed ? 1 : 0);

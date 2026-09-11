@@ -135,23 +135,6 @@ export class CheckoutPage {
     await this.page.getByRole('button', { name: 'Review Order' }).click();
   }
 
-  async expectConfigOffPaymentGaps(): Promise<void> {
-    await expect(this.page.getByText(/express checkout/i)).toHaveCount(0);
-    await expect(this.page.getByText(/one.?click checkout/i)).toHaveCount(0);
-  }
-
-  /**
-   * E5: the PayPal radio cannot be selected by pointer — tracked as a live defect. A
-   * sibling label intercepts pointer events on this radio, so a click never lands on the
-   * input itself. Asserted directly and quickly here rather than via test.fail() plus a
-   * full actionTimeout wait.
-   */
-  async expectPaypalUnselectable(): Promise<void> {
-    const paypalRadio = this.page.getByRole('radio', { name: 'paypal-icon' });
-    await paypalRadio.click({ timeout: 3000 }).catch(() => undefined);
-    await expect(paypalRadio).not.toBeChecked();
-    await expect(this.page.getByRole('radio', { name: /^Credit Card/ })).toBeChecked();
-  }
 
   // --- Review / place order ------------------------------------------------------------
 

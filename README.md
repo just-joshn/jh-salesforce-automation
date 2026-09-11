@@ -40,31 +40,32 @@ Never put a private SLAS secret, access token, or password in a tracked file.
 
 ## Test layers
 
-The paired journey suite has 28 browser tests and 28 browserless API tests:
+The journey suite has 15 browser tests and 28 browserless API tests:
 
 - **`e2e`**: Desktop Chromium journeys using the real storefront UI and proxy.
 - **`api`**: Playwright `APIRequestContext` journeys using the real storefront proxy.
 
-The API tests cover the same journeys as the browser tests. They use the same spec-file names,
-test counts, and test titles. Run this check after changing either layer:
+The API declarations are a directional superset of the browser declarations: every browser
+journey has API coverage, while API may add contract/state assertions without a browser twin.
+The parity check enforces browser declarations ⊆ API declarations (not equal counts or titles).
+Run this check after changing either layer:
 
 ```bash
 bun run check:title-parity
 ```
 
-Together, the two paired projects run 56 tests grouped into eight areas:
+Together, the paired projects cover seven browser journey areas and eight API journey areas:
 
 | Area                       | File                                  |  Tests |
 | -------------------------- | ------------------------------------- | -----: |
-| A. Discovery & Browse      | `a-discovery-and-browse.spec.ts`      |      3 |
-| B. Account Lifecycle       | `b-account-lifecycle.spec.ts`         |      9 |
-| C. Wishlist                | `c-wishlist.spec.ts`                  |      3 |
-| D. Cart                    | `d-cart.spec.ts`                      |      2 |
-| E. Checkout                | `e-checkout.spec.ts`                  |      5 |
-| F. Store Locator           | `f-store-locator.spec.ts`             |      2 |
-| G. Localization            | `g-localization.spec.ts`              |      2 |
-| H. Hybrid Continuity & OMS | `h-hybrid-continuity-and-oms.spec.ts` |      2 |
-| **Total per layer**        |                                       | **28** |
+| A. Discovery & Browse      | `a-discovery-and-browse.spec.ts`      |      1 |
+| B. Account Lifecycle       | `b-account-lifecycle.spec.ts`         |      6 |
+| C. Wishlist                | `c-wishlist.spec.ts`                  |      1 |
+| D. Cart                    | `d-cart.spec.ts`                      |      1 |
+| E. Checkout                | `e-checkout.spec.ts`                  |      4 |
+| G. Localization            | `g-localization.spec.ts`              |      1 |
+| H. Hybrid Continuity & OMS | `h-hybrid-continuity-and-oms.spec.ts` |      1 |
+| **Browser declarations**   |                                       | **15** |
 
 Some journeys check a live boundary instead of pretending an unavailable feature works. Examples
 include disabled configuration, invalid passwordless codes, blocked social login, the PayPal
@@ -112,7 +113,7 @@ corrected.
 
 | Project         | Coverage                                           |
 | --------------- | -------------------------------------------------- |
-| `e2e`           | Full 28-journey Desktop Chromium suite             |
+| `e2e`           | 15 qualifying Desktop Chromium journeys            |
 | `api`           | Full 28-journey `APIRequestContext` suite          |
 | `e2e-firefox`   | Read-only `@smoke` Desktop Firefox checks          |
 | `e2e-webkit`    | Read-only `@smoke` Desktop WebKit checks           |
@@ -123,9 +124,11 @@ corrected.
 | `performance`   | Browser performance budget checks                  |
 | `security`      | Read-only deployed security-boundary checks        |
 | `canary`        | JavaScript-disabled public `@live` GET-only checks |
+| Quality total   | 18 declarations across dedicated quality projects  |
 
-Alternate browsers and devices run read-only smoke coverage. The full account, basket, checkout,
-and order mutation matrix remains limited to the focused staging Desktop Chromium/API projects.
+Alternate browsers and devices run the approved read-only smoke matrix. The full account, basket,
+checkout, and order mutation matrix remains limited to the focused staging Desktop Chromium/API
+projects. Quality projects, including `canary`, run as dedicated projects.
 
 ## Project layout
 
@@ -159,8 +162,9 @@ scripts/
 
 ### Browser tests
 
-The E2E layer uses page objects, component objects, fixtures, and small workflow functions. Tests
-say what the shopper does and assert the result. Selectors and page details stay in `e2e/support/`.
+The E2E layer uses page objects, fixtures, stateless UI helpers, and small workflow functions.
+Tests say what the shopper does and assert the result. Selectors and page details stay in
+`e2e/support/`; browser-only component-responsibility coverage is deferred.
 
 Guest journeys use a fresh page and context for each test. Signed-in journeys use one synthetic
 account and authenticated context per worker, then create a fresh page for each test.

@@ -148,3 +148,5 @@ dist
 .omo
 .playwright-cli
 .worktrees/
+.gjc/
+.omc/

@@ -8,8 +8,6 @@ export function buildPath(path = ''): string {
   return storefrontPath(target, path);
 }
 
-const consentChecked = new WeakSet<Page>();
-
 export function headerSearchBox(page: Page): Locator {
   return page.getByRole('searchbox', { name: 'Search for products...' });
 }
@@ -27,17 +25,18 @@ export async function expectSignedIn(page: Page, timeout = 20_000): Promise<void
  * fresh browser context. Dismiss it (if present) so it never intercepts a later step.
  */
 export async function dismissConsent(page: Page, timeout?: number): Promise<void> {
-  const effectiveTimeout = timeout ?? (consentChecked.has(page) ? 1000 : 4000);
+  const effectiveTimeout = timeout ?? 4000;
   const decline = page.getByRole('button', { name: 'Decline tracking' });
   try {
     await expect(decline).toBeVisible({ timeout: effectiveTimeout });
   } catch {
-    consentChecked.add(page);
+    // A first paint can produce <main> before the consent dialog. Re-poll once without
+    // preserving process-wide state, which would leak across parallel tests.
+    await expect(decline).toBeVisible({ timeout: 1000 }).catch(() => undefined);
     return;
   }
   await decline.click();
   await expect(decline).toBeHidden();
-  consentChecked.add(page);
 }
 
 /** Opens the responsive header menu when the primary nav is collapsed behind it. */

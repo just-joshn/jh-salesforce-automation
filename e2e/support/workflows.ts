@@ -3,6 +3,7 @@ import type { PlacedOrder } from './pages/checkout.page';
 import { CheckoutPage } from './pages/checkout.page';
 import { type ProductRef, ProductPage } from './pages/product.page';
 import { PRIMARY_ADDRESS, PRODUCTS, TEST_VISA } from './test-data';
+import { proceedToCheckoutFromCartDialog } from './ui/added-to-cart';
 
 /**
  * Scenario helpers that compose several page/component objects into one multi-page flow.
@@ -19,8 +20,8 @@ export async function addProductAndProceedToCheckout(
   const productPage = new ProductPage(page);
   await productPage.goto(product);
   await productPage.selectFirstColorOption();
-  const addedToCartDialog = await productPage.addToCart();
-  await addedToCartDialog.proceedToCheckout();
+  await productPage.addToCart();
+  await proceedToCheckoutFromCartDialog(page);
 }
 
 /**

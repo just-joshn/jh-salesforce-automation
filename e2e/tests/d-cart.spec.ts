@@ -1,11 +1,14 @@
 import { expect, test } from '../support/fixtures';
 import { accountMenuButton } from '../support/site';
 import { PRODUCTS, uniqueEmail, VALID_PASSWORD } from '../support/test-data';
+import { expectCartItemCount, gotoCart } from '../support/ui/cart';
+import { confirmRemoval } from '../support/ui/removal';
+import { quantityStepper } from '../support/ui/quantity-stepper';
 
 test.describe('D. Cart', { tag: '@cart' }, () => {
   test('D1 - Add to cart, adjust quantity, remove', {
     tag: ['@critical', '@destructive', '@nightly'],
-  }, async ({ page, productPage, cartPage }) => {
+  }, async ({ page, productPage }) => {
     await productPage.goto(PRODUCTS.hoopEarring);
 
     await test.step('Add to Cart shows a confirmation flyout and increments the header badge', async () => {
@@ -13,15 +16,18 @@ test.describe('D. Cart', { tag: '@cart' }, () => {
         (res) => res.url().includes('/items') && res.request().method() === 'POST',
         { timeout: 25_000 },
       );
-      const addedToCartDialog = await productPage.addToCart();
+      await productPage.addToCart();
       expect((await itemsResponse).status()).toBe(200);
 
-      await addedToCartDialog.viewCart();
+      await page
+        .getByRole('dialog')
+        .getByRole('link', { name: 'View Cart' })
+        .click();
       await expect(page.getByRole('heading', { name: 'Cart (1 item)' })).toBeVisible();
     });
 
     await test.step('Incrementing quantity re-syncs the line item', async () => {
-      const stepper = cartPage.quantityStepper(PRODUCTS.hoopEarring.name);
+      const stepper = quantityStepper(page, PRODUCTS.hoopEarring.name);
       const patchResponse = page.waitForResponse(
         (res) => res.url().includes('/items/') && res.request().method() === 'PATCH',
       );
@@ -34,16 +40,17 @@ test.describe('D. Cart', { tag: '@cart' }, () => {
       const deleteResponse = page.waitForResponse(
         (res) => res.url().includes('/items/') && res.request().method() === 'DELETE',
       );
-      await cartPage.removeFirstItem();
+      await page.getByRole('button', { name: 'Remove' }).first().click();
+      await confirmRemoval(page);
       expect((await deleteResponse).status()).toBe(200);
-      await cartPage.expectItemCount(0);
-      await cartPage.expectEmpty();
+      await expectCartItemCount(page, 0);
+      await expect(page.getByText('Your cart is empty.')).toBeVisible();
     });
   });
 
   test('D2 - Guest cart merges into account cart on login', {
     tag: ['@destructive', '@nightly'],
-  }, async ({ page, registerPage, productPage, cartPage, loginPage }) => {
+  }, async ({ page, registerPage, productPage, loginPage }) => {
     const email = uniqueEmail('cart-merge');
     await registerPage.register({
       firstName: 'Cuj',
@@ -56,8 +63,11 @@ test.describe('D. Cart', { tag: '@cart' }, () => {
     await expect(accountMenuButton(page)).toHaveCount(0);
 
     await productPage.goto(PRODUCTS.hoopEarring);
-    const addedToCartDialog = await productPage.addToCart();
-    await addedToCartDialog.viewCart();
+    await productPage.addToCart();
+    await page
+      .getByRole('dialog')
+      .getByRole('link', { name: 'View Cart' })
+      .click();
     await expect(page.getByRole('heading', { name: 'Cart (1 item)' })).toBeVisible();
 
     const mergeResponse = page.waitForResponse((res) =>
@@ -66,7 +76,7 @@ test.describe('D. Cart', { tag: '@cart' }, () => {
     await loginPage.loginWithPassword(email, VALID_PASSWORD);
     expect((await mergeResponse).status()).toBe(200);
 
-    await cartPage.goto();
+    await gotoCart(page);
     await expect(page.getByRole('heading', { name: 'Cart (1 item)' })).toBeVisible();
     await expect(page.getByText(PRODUCTS.hoopEarring.name).first()).toBeVisible();
   });

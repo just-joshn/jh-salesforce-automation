@@ -1,5 +1,5 @@
 import { expect, type Locator, type Page } from '@playwright/test';
-import { AddressForm } from '../components/address-form.component';
+import { fillAddressForm, isAddressFormBlank } from '../ui/address-form';
 import type { AddressInput, CreditCardInput } from '../test-data';
 
 export interface PlacedOrder {
@@ -9,11 +9,7 @@ export interface PlacedOrder {
 
 /** The multi-step /checkout wizard: Contact Info -> Shipping -> Payment -> Review -> Place Order. */
 export class CheckoutPage {
-  private readonly addressForm: AddressForm;
-
-  constructor(private readonly page: Page) {
-    this.addressForm = new AddressForm(page);
-  }
+  constructor(private readonly page: Page) {}
 
   async expectLoaded(): Promise<void> {
     await expect(this.page.getByRole('heading', { name: 'Checkout', level: 1 })).toBeVisible();
@@ -65,7 +61,7 @@ export class CheckoutPage {
     if (await addNewAddress.isVisible()) {
       await addNewAddress.click();
     }
-    await this.addressForm.fill(address);
+    await fillAddressForm(this.page, address);
     await this.page.getByRole('button', { name: 'Continue to Shipping Method' }).click();
   }
 
@@ -78,7 +74,7 @@ export class CheckoutPage {
     await this.page
       .getByRole('button', { name: `Add new delivery address for ${productName}` })
       .click();
-    await this.addressForm.fill(address);
+    await fillAddressForm(this.page, address);
     await this.page.getByRole('button', { name: 'Save' }).click();
   }
 
@@ -95,10 +91,7 @@ export class CheckoutPage {
    * Single-address checkout auto-advances past its one Ground default; multi-ship — one
    * shipping-method choice per delivery — sometimes needs this click and sometimes
    * auto-advances first. An instant, zero-wait count() would race the step's own render,
-   * so this waits for either outcome to actually settle before deciding. Racing a click
-   * against a later auto-advance can also detach the button mid-click, so a failed click
-   * is treated as "already advanced", not a real error — fillPayment's own wait is what
-   * actually confirms we got there.
+   * so this waits for either outcome to settle before deciding.
    */
   async continueToPaymentIfPrompted(): Promise<void> {
     const continueToPayment = this.page.getByRole('button', { name: 'Continue to Payment' });
@@ -107,7 +100,15 @@ export class CheckoutPage {
       timeout: 15_000,
     });
     if (await continueToPayment.isVisible()) {
-      await continueToPayment.click({ timeout: 5000 }).catch(() => undefined);
+      try {
+        await continueToPayment.click({ timeout: 5000 });
+      } catch (error) {
+        // Multi-ship sometimes advances while the transient checkout overlay is still
+        // intercepting the button. Treat that as auto-advance only when Payment appears.
+        await expect(cardNumberField).toBeVisible({ timeout: 20_000 }).catch(() => {
+          throw error;
+        });
+      }
     }
   }
 
@@ -128,8 +129,8 @@ export class CheckoutPage {
     await this.page.getByRole('textbox', { name: 'Expiration Date' }).fill(card.expiration);
     await this.page.getByRole('textbox', { name: 'Security Code' }).fill(card.cvv);
 
-    if (billingAddress && (await this.addressForm.isBlank())) {
-      await this.addressForm.fill(billingAddress);
+    if (billingAddress && (await isAddressFormBlank(this.page))) {
+      await fillAddressForm(this.page, billingAddress);
     }
     await this.page.getByRole('button', { name: 'Review Order' }).click();
   }

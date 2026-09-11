@@ -3,6 +3,8 @@ import { readAppConfig } from '../support/app-config';
 import { CheckoutPage } from '../support/pages/checkout.page';
 import { OrderHistoryPage } from '../support/pages/order-history.page';
 import { addProductAndProceedToCheckout } from '../support/workflows';
+import { proceedToCheckoutFromCartDialog } from '../support/ui/added-to-cart';
+import { searchStores, selectStoreAt } from '../support/ui/store-locator';
 import {
   PICKUP_BILLING_ADDRESS,
   PRIMARY_ADDRESS,
@@ -55,16 +57,16 @@ test.describe('E. Checkout', { tag: '@checkout' }, () => {
 
     await test.step('Resolving a pickup store on the PDP enables the Pick Up in Store option', async () => {
       const storeLocator = await productPage.openStorePicker();
-      await storeLocator.search(STORE_LOCATOR_ZIP);
-      await storeLocator.selectStore(STORES.nearest.index);
-      await storeLocator.close();
+      await searchStores(storeLocator, STORE_LOCATOR_ZIP);
+      await selectStoreAt(storeLocator, STORES.nearest.index);
+      await storeLocator.getByRole('button', { name: 'Close' }).click();
 
       await productPage.choosePickUpInStore();
       await productPage.expectPickupStoreSelected(STORES.nearest.name);
     });
 
-    const addedToCartDialog = await productPage.addToCart();
-    await addedToCartDialog.proceedToCheckout();
+    await productPage.addToCart();
+    await proceedToCheckoutFromCartDialog(page);
 
     await checkoutPage.continueAsGuest(uniqueEmail('pickup'));
     await expect(page.getByRole('heading', { name: 'Pickup Address & Information' })).toBeVisible();
@@ -88,13 +90,13 @@ test.describe('E. Checkout', { tag: '@checkout' }, () => {
 
     await productPage.goto(PRODUCTS.hoopEarring);
     await productPage.selectFirstColorOption();
-    const firstItemDialog = await productPage.addToCart();
-    await firstItemDialog.close();
+    await productPage.addToCart();
+    await page.getByRole('dialog', { name: 'Added to Cart' }).getByRole('button', { name: 'Close' }).click();
 
     await productPage.goto(PRODUCTS.silkTie);
     await productPage.selectFirstColorOption();
-    const secondItemDialog = await productPage.addToCart();
-    await secondItemDialog.proceedToCheckout();
+    await productPage.addToCart();
+    await proceedToCheckoutFromCartDialog(page);
 
     await checkoutPage.continueAsGuest(uniqueEmail('multiship'));
     await checkoutPage.shipToMultipleAddresses();

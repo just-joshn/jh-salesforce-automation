@@ -2,8 +2,9 @@ import type { Page } from '@playwright/test';
 import { expect, test } from '../support/fixtures';
 import { readAppConfig } from '../support/app-config';
 import { resolveTarget } from '../../support/targets';
-import { AccountPage } from '../support/pages/account.page';
-import { expectSignedIn } from '../support/site';
+import { expectSignedIn, openPath } from '../support/site';
+import { fillAddressForm } from '../support/ui/address-form';
+import { confirmRemovalIfPrompted, drainRemovals } from '../support/ui/removal';
 import { placeSignedInOrder } from '../support/workflows';
 import {
   ALTERNATE_PASSWORD,
@@ -25,6 +26,11 @@ function customersEndpointResponse(page: Page, email: string) {
     }
     return (res.request().postData() ?? '').includes(email);
   });
+}
+
+async function openAccountCardEditor(page: Page, cardHeading: string): Promise<void> {
+  const heading = page.getByRole('heading', { name: cardHeading, exact: true });
+  await heading.locator('..').getByRole('button', { name: 'Edit' }).click();
 }
 
 test.describe('B. Account Lifecycle', { tag: '@account' }, () => {
@@ -70,7 +76,8 @@ test.describe('B. Account Lifecycle', { tag: '@account' }, () => {
       password: VALID_PASSWORD,
     });
     await expectSignedIn(page);
-    await new AccountPage(page).logout();
+    await openPath(page, '/account');
+    await page.getByRole('button', { name: 'Log Out' }).click();
 
     await test.step('Wrong credentials show an inline alert and do not redirect', async () => {
       await loginPage.loginWithPassword(email, 'DefinitelyWrongPassword!1');
@@ -160,21 +167,25 @@ test.describe('B. Account Lifecycle', { tag: '@account' }, () => {
       // A registered address is required here: unlike registration/checkout's domain-only
       // validation, an address with no matching customer surfaces a generic error instead
       // of the anti-enumeration confirmation copy — so this reuses the worker's own account.
-      const resetPasswordPage = await loginPage.goToForgotPassword(uniqueEmail('reset-entry'));
-      await resetPasswordPage.expectLoaded();
+      await loginPage.goToForgotPassword(uniqueEmail('reset-entry'));
+      await expect(page.getByRole('heading', { name: 'Reset Password' })).toBeVisible();
 
       const resetResponse = page.waitForResponse(
         (res) => res.request().method() === 'POST' && res.url().includes('oauth2/password/reset'),
       );
-      await resetPasswordPage.requestReset(workerAccount.email);
+      await page
+        .getByRole('main')
+        .getByRole('textbox', { name: 'Email', exact: true })
+        .fill(workerAccount.email);
+      await page.getByRole('button', { name: 'Reset Password' }).click();
       const response = await resetResponse;
       if (target.name === 'staging') {
         expect(response.status()).toBe(401);
         expect(await response.text()).toContain('no sender email defined');
-        await resetPasswordPage.expectServiceError();
+        await expect(page.getByRole('alert')).toContainText('Something went wrong');
       } else {
         expect(response.status()).toBe(200);
-        await resetPasswordPage.expectConfirmation();
+        await expect(page.getByText(/you will receive an email/i)).toBeVisible();
       }
 
       testInfo.annotations.push({
@@ -189,29 +200,41 @@ test.describe('B. Account Lifecycle', { tag: '@account' }, () => {
 
   test('B6 - Self-service password change (signed-in)', {
     tag: ['@destructive', '@nightly'],
-  }, async ({ workerAccount, accountPage }) => {
-    await accountPage.goto();
+  }, async ({ signedInPage: page, workerAccount }) => {
+    await openPath(page, '/account');
 
     await test.step('Change the password and confirm the toast', async () => {
-      await accountPage.changePassword(workerAccount.password, ALTERNATE_PASSWORD);
-      await accountPage.expectPasswordUpdated();
+      await openAccountCardEditor(page, 'Password');
+      await page.getByRole('textbox', { name: 'Current Password' }).fill(workerAccount.password);
+      await page.getByRole('textbox', { name: 'New Password', exact: true }).fill(ALTERNATE_PASSWORD);
+      await page.getByRole('textbox', { name: 'Confirm New Password' }).fill(ALTERNATE_PASSWORD);
+      await page.getByRole('button', { name: 'Save' }).click();
+      await expect(page.getByText('Password updated')).toBeVisible();
     });
 
     // Revert immediately so the shared worker account stays valid for later tests —
     // mirrors the doc's own repeatable-flow verification for B6.
     await test.step('Revert the password, proving the flow is repeatable', async () => {
-      await accountPage.changePassword(ALTERNATE_PASSWORD, workerAccount.password);
-      await accountPage.expectPasswordUpdated();
+      await openAccountCardEditor(page, 'Password');
+      await page.getByRole('textbox', { name: 'Current Password' }).fill(ALTERNATE_PASSWORD);
+      await page.getByRole('textbox', { name: 'New Password', exact: true }).fill(workerAccount.password);
+      await page.getByRole('textbox', { name: 'Confirm New Password' }).fill(workerAccount.password);
+      await page.getByRole('button', { name: 'Save' }).click();
+      await expect(page.getByText('Password updated')).toBeVisible();
     });
   });
 
   test('B7 - Edit profile details (phone number)', { tag: ['@destructive', '@nightly'] }, async ({
     signedInPage: page,
-    accountPage,
   }) => {
-    await accountPage.goto();
-
-    const response = await accountPage.updatePhoneNumber('4155550142');
+    await openPath(page, '/account');
+    await openAccountCardEditor(page, 'My Profile');
+    const patchResponse = page.waitForResponse(
+      (res) => res.request().method() === 'PATCH' && res.url().includes('/customers/'),
+    );
+    await page.getByRole('textbox', { name: 'Phone Number' }).fill('4155550142');
+    await page.getByRole('button', { name: 'Save' }).click();
+    const response = await patchResponse;
     expect(response.status()).toBe(200);
 
     await expect(page.getByText('(415) 555-0142')).toBeVisible();
@@ -221,19 +244,24 @@ test.describe('B. Account Lifecycle', { tag: '@account' }, () => {
 
   test('B8 - Manage saved addresses (add, default, remove)', {
     tag: ['@destructive', '@nightly'],
-  }, async ({ signedInPage: page, addressBookPage }) => {
-    await addressBookPage.clear();
-    await addressBookPage.expectEmpty();
+  }, async ({ signedInPage: page }) => {
+    await openPath(page, '/account/addresses');
+    await drainRemovals(page, /^Remove /i, 'No Saved Addresses');
+    await expect(page.getByText('No Saved Addresses')).toBeVisible();
 
-    await addressBookPage.add(PRIMARY_ADDRESS, true);
+    await page.getByRole('button', { name: /add address/i }).click();
+    await fillAddressForm(page, PRIMARY_ADDRESS);
+    await page.getByRole('checkbox', { name: 'Set as default' }).check({ force: true });
+    await page.getByRole('button', { name: 'Save' }).click();
     await expect(page.getByText('Default', { exact: true })).toBeVisible();
     await expect(page.getByText(PRIMARY_ADDRESS.address)).toBeVisible();
     await expect(
       page.getByText(`${PRIMARY_ADDRESS.city}, CA ${PRIMARY_ADDRESS.zip}`),
     ).toBeVisible();
 
-    await addressBookPage.remove(PRIMARY_ADDRESS.address);
-    await addressBookPage.expectEmpty();
+    await page.getByRole('button', { name: `Remove ${PRIMARY_ADDRESS.address}` }).click();
+    await confirmRemovalIfPrompted(page, page.getByText('No Saved Addresses'));
+    await expect(page.getByText('No Saved Addresses')).toBeVisible();
   });
 
   test('B9 - View order history and order detail', { tag: ['@destructive', '@nightly'] }, async ({

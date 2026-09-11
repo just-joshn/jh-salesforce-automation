@@ -1,6 +1,5 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 import { openPath } from '../site';
-import { ResetPasswordPage } from './reset-password.page';
 
 export class LoginPage {
   readonly email: Locator;
@@ -57,13 +56,11 @@ export class LoginPage {
   }
 
   /**
-   * B5: opens the "Forgot password?" flow from the password tab. Returns the resulting
-   * page — a real, meaningful transition worth modeling, not just "navigation happened".
+   * B5: opens the "Forgot password?" flow from the password tab.
    */
-  async goToForgotPassword(emailAttempt: string): Promise<ResetPasswordPage> {
+  async goToForgotPassword(emailAttempt: string): Promise<void> {
     await this.openWithEmail(emailAttempt);
     await this.passwordTab.click();
     await this.forgotPassword.click();
-    return new ResetPasswordPage(this.page);
   }
 }

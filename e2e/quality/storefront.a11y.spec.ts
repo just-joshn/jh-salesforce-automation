@@ -1,4 +1,5 @@
-import { assertNoA11yViolations, expect, test } from './fixtures';
+import { assertNoA11yViolations } from './a11y';
+import { expect, test } from './fixtures';
 import { headerSearchBox, openMain } from '../support/site';
 import { PRODUCTS } from '../support/test-data';
 

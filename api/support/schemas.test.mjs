@@ -160,10 +160,23 @@ assertInvalid(productSearchSchema, { hits: [] }, 'product search without total')
 
 assertValid(
   storeSearchResponseSchema,
-  { data: [{ id: 'store-1', name: 'Demo Store' }] },
+  {
+    data: [
+      {
+        id: 'store-1',
+        name: 'Demo Store',
+        phone: '4155550100',
+        address1: '1 Market Street',
+        city: 'San Francisco',
+        stateCode: 'CA',
+        postalCode: '94103',
+      },
+    ],
+  },
   'store search',
 );
 assertInvalid(storeSearchResponseSchema, { data: [{ id: 'store-1' }] }, 'store without name');
+
 
 const jsonResponse = (payload, contentType = 'application/json') => ({
   headers: () => ({ 'content-type': contentType }),

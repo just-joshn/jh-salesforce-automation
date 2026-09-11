@@ -261,7 +261,8 @@ suite intentionally records some live limitations:
 - Some payment and OMS features are disabled or unavailable on the staging deployment.
 - A live-site failure may be an environment problem, not a code problem.
 
-The evidence log in `docs/cross-service-critical-user-journeys.md` contains dated observations.
+The evidence index in `docs/cross-service-critical-user-journeys.md` links to focused, dated
+journey-family evidence and separate cross-cutting/defect records.
 The executable tests and current source code are the source of truth for what runs now.
 
 ## Development checks

@@ -4,6 +4,7 @@ import { CheckoutPage } from '../support/pages/checkout.page';
 import { OrderHistoryPage } from '../support/pages/order-history.page';
 import { addProductAndProceedToCheckout } from '../support/workflows';
 import { proceedToCheckoutFromCartDialog } from '../support/ui/added-to-cart';
+import { openPath } from '../support/site';
 import {
   PICKUP_BILLING_ADDRESS,
   PRIMARY_ADDRESS,
@@ -85,7 +86,7 @@ test.describe('E. Checkout', () => {
   test('E3 - Multi-Shipment Checkout (split delivery to two addresses)', {
     tag: ['@critical', '@destructive', '@nightly'],
   }, async ({ page, productPage, checkoutPage }) => {
-    await page.goto('/');
+    await openPath(page, '');
     const config = await readAppConfig(page);
     expect(config.multishipEnabled).toBe(true);
 

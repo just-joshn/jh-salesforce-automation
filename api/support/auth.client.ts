@@ -3,7 +3,7 @@ import { expect, type APIRequestContext, type APIResponse } from '@playwright/te
 import { basicAuth, callbackUri, env, slasPrivateUrl } from './env';
 import type { TokenResponse } from './scapi-types';
 import { parseJson } from './response';
-import { tokenResponseSchema } from './schemas';
+import { tokenResponseSchema } from './schemas/auth';
 
 const passwordLoginForm = (challenge: string, usid?: string): Record<string, string> => {
   const form: Record<string, string> = {

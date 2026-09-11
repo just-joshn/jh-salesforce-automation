@@ -50,9 +50,9 @@ test.describe('G. Localization', { tag: '@localization' }, () => {
   test('G2 - Config-off catalogue gap: Gift Certificates category', {
     tag: ['@config-off', '@smoke'],
   }, async ({ request, guestSession }) => {
-    const stores = clients.stores(request);
+    const products = clients.products(request);
 
-    const category = await stores.getCategory(guestSession.accessToken, 'gift-certificates');
+    const category = await products.getCategory(guestSession.accessToken, 'gift-certificates');
     expect(category.name).toBe('Gift Certificates');
 
     await test.step('The category resolves, but the catalogue behind it is empty', async () => {

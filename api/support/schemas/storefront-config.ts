@@ -1,0 +1,5 @@
+import { z } from 'zod';
+import { loose } from './primitives';
+const supportedLocaleSchema = loose({ id: z.string().min(1), preferredCurrency: z.string().min(1) });
+export const mobifyDataSchema = loose({ __CONFIG__: loose({ app: z.unknown() }) });
+export const appConfigSchema = loose({ multishipEnabled: z.boolean(), commerceAgent: loose({ enabled: z.string().default('false'), askAgentOnSearch: z.string().default('false'), enableAgentFromHeader: z.string().default('false'), enableAgentFromFloatingButton: z.string().default('false'), enableAgentFromSearchSuggestions: z.string().default('false') }), sfPayments: loose({ enabled: z.boolean(), sdkUrl: z.string(), metadataUrl: z.string() }), oneClickCheckout: loose({ enabled: z.boolean() }), login: loose({ passwordless: loose({ enabled: z.boolean(), mode: z.string(), landingPath: z.string() }), social: loose({ enabled: z.boolean(), idps: z.array(z.string()), redirectURI: z.string() }), resetPassword: loose({ mode: z.string(), landingPath: z.string() }) }), sites: z.array(loose({ id: z.string(), l10n: loose({ supportedLocales: z.array(supportedLocaleSchema), defaultLocale: z.string() }) })) });

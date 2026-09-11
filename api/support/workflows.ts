@@ -1,10 +1,12 @@
 import { expect, type APIRequestContext } from '@playwright/test';
 import { BasketsClient } from './baskets.client';
+import { CheckoutClient } from './checkout.client';
+import { CustomerBasketsClient } from './customer-baskets.client';
 import type { PickupStore } from './store-types';
 import { OrdersClient } from './orders.client';
 import type { Order } from './scapi-types';
 import { StoresClient } from './stores.client';
-import type { AddressInput, CreditCardInput } from './test-data';
+import { STORE_LOCATOR_ZIP, type AddressInput, type CreditCardInput } from './test-data';
 
 /**
  * Scenario helpers composing several clients into one multi-call flow — the API-suite
@@ -27,7 +29,7 @@ export async function getOrCreateBasket(
   session: Session,
 ): Promise<{ basketId: string }> {
   const baskets = new BasketsClient(request);
-  const existing = await baskets.listCustomerBaskets(session.accessToken, session.customerId);
+  const existing = await new CustomerBasketsClient(request).listCustomerBaskets(session.accessToken, session.customerId);
   const open = existing.find((basket) => basket.status !== 'completed');
   if (open?.basketId) {
     return { basketId: open.basketId };
@@ -45,7 +47,7 @@ export interface OrderPlacement {
 }
 
 function shippingMethodId(
-  methods: Awaited<ReturnType<BasketsClient['getShippingMethods']>>,
+  methods: Awaited<ReturnType<CheckoutClient['getShippingMethods']>>,
   shipmentId: string,
 ): string {
   const ground =
@@ -69,15 +71,15 @@ function requiredItemId(
 }
 
 async function setShippingMethods(
-  baskets: BasketsClient,
+  checkout: CheckoutClient,
   accessToken: string,
   basketId: string,
   shipmentIds: readonly string[],
 ): Promise<void> {
   for (const shipmentId of shipmentIds) {
-    const methods = await baskets.getShippingMethods(accessToken, basketId, shipmentId);
+    const methods = await checkout.getShippingMethods(accessToken, basketId, shipmentId);
     const methodId = shippingMethodId(methods, shipmentId);
-    await baskets.setShippingMethod(accessToken, basketId, shipmentId, methodId);
+    await checkout.setShippingMethod(accessToken, basketId, shipmentId, methodId);
   }
 }
 
@@ -89,20 +91,21 @@ async function completeAndPlace(
   options: { shippingAddress: AddressInput; billingAddress: AddressInput; card: CreditCardInput },
 ): Promise<OrderPlacement> {
   const baskets = new BasketsClient(request);
+  const checkout = new CheckoutClient(request);
 
-  await baskets.setShippingAddress(session.accessToken, basketId, options.shippingAddress);
-  const methods = await baskets.getShippingMethods(session.accessToken, basketId, 'me');
+  await checkout.setShippingAddress(session.accessToken, basketId, options.shippingAddress);
+  const methods = await checkout.getShippingMethods(session.accessToken, basketId, 'me');
   const methodId = shippingMethodId(methods, 'me');
-  await baskets.setShippingMethod(session.accessToken, basketId, 'me', methodId);
+  await checkout.setShippingMethod(session.accessToken, basketId, 'me', methodId);
 
-  const { instrumentId } = await baskets.setCreditCardPayment(
+  const { instrumentId } = await checkout.setCreditCardPayment(
     session.accessToken,
     basketId,
     options.card,
   );
-  await baskets.setBillingAddress(session.accessToken, basketId, options.billingAddress);
+  await checkout.setBillingAddress(session.accessToken, basketId, options.billingAddress);
   const finalBasket = await baskets.getBasket(session.accessToken, basketId);
-  await baskets.pinPaymentAmount(
+  await checkout.pinPaymentAmount(
     session.accessToken,
     basketId,
     instrumentId,
@@ -123,9 +126,10 @@ export async function placeGuestOrder(
   card: CreditCardInput,
 ): Promise<OrderPlacement> {
   const baskets = new BasketsClient(request);
+  const checkout = new CheckoutClient(request);
   const { basketId } = await getOrCreateBasket(request, session);
   await baskets.addItem(session.accessToken, basketId, item.productId, item.price);
-  await baskets.setCustomerEmail(session.accessToken, basketId, email);
+  await checkout.setCustomerEmail(session.accessToken, basketId, email);
   return completeAndPlace(request, session, basketId, {
     shippingAddress: address,
     billingAddress: address,
@@ -145,6 +149,7 @@ export async function placeSignedInOrder(
   card: CreditCardInput,
 ): Promise<OrderPlacement> {
   const baskets = new BasketsClient(request);
+  const checkout = new CheckoutClient(request);
   const { basketId } = await getOrCreateBasket(request, session);
   await baskets.addItem(session.accessToken, basketId, item.productId, item.price);
   return completeAndPlace(request, session, basketId, {
@@ -165,6 +170,7 @@ export async function placePickupOrder(
   card: CreditCardInput,
 ): Promise<OrderPlacement> {
   const baskets = new BasketsClient(request);
+  const checkout = new CheckoutClient(request);
   const { basketId } = await getOrCreateBasket(request, session);
   await baskets.addItem(
     session.accessToken,
@@ -174,13 +180,13 @@ export async function placePickupOrder(
     1,
     item.inventoryId,
   );
-  await baskets.setPickupShipment(session.accessToken, basketId, store);
-  await baskets.setCustomerEmail(session.accessToken, basketId, email);
+  await checkout.setPickupShipment(session.accessToken, basketId, store);
+  await checkout.setCustomerEmail(session.accessToken, basketId, email);
 
-  const { instrumentId } = await baskets.setCreditCardPayment(session.accessToken, basketId, card);
-  await baskets.setBillingAddress(session.accessToken, basketId, billingAddress);
+  const { instrumentId } = await checkout.setCreditCardPayment(session.accessToken, basketId, card);
+  await checkout.setBillingAddress(session.accessToken, basketId, billingAddress);
   const finalBasket = await baskets.getBasket(session.accessToken, basketId);
-  await baskets.pinPaymentAmount(
+  await checkout.pinPaymentAmount(
     session.accessToken,
     basketId,
     instrumentId,
@@ -202,6 +208,7 @@ export async function placeMultiShipOrder(
   card: CreditCardInput,
 ): Promise<OrderPlacement> {
   const baskets = new BasketsClient(request);
+  const checkout = new CheckoutClient(request);
   const { basketId } = await getOrCreateBasket(request, session);
   const afterFirst = await baskets.addItem(
     session.accessToken,
@@ -218,12 +225,12 @@ export async function placeMultiShipOrder(
   const secondItemId = requiredItemId(afterBoth, secondItem.productId);
   expect(afterFirst.productItems).toHaveLength(1);
 
-  await baskets.setCustomerEmail(session.accessToken, basketId, email);
-  await baskets.setShippingAddress(session.accessToken, basketId, firstAddress);
+  await checkout.setCustomerEmail(session.accessToken, basketId, email);
+  await checkout.setShippingAddress(session.accessToken, basketId, firstAddress);
   // The storefront mints the second shipment's id client-side; mirror that.
   const shipmentId = `shipment_${crypto.randomUUID().replace(/-/g, '').slice(0, 22)}`;
-  await baskets.createShipment(session.accessToken, basketId, shipmentId, secondAddress);
-  await baskets.moveItemToShipment(
+  await checkout.createShipment(session.accessToken, basketId, shipmentId, secondAddress);
+  await checkout.moveItemToShipment(
     session.accessToken,
     basketId,
     secondItemId,
@@ -231,12 +238,12 @@ export async function placeMultiShipOrder(
     shipmentId,
   );
 
-  await setShippingMethods(baskets, session.accessToken, basketId, ['me', shipmentId]);
+  await setShippingMethods(checkout, session.accessToken, basketId, ['me', shipmentId]);
 
-  const { instrumentId } = await baskets.setCreditCardPayment(session.accessToken, basketId, card);
-  await baskets.setBillingAddress(session.accessToken, basketId, firstAddress);
+  const { instrumentId } = await checkout.setCreditCardPayment(session.accessToken, basketId, card);
+  await checkout.setBillingAddress(session.accessToken, basketId, firstAddress);
   const finalBasket = await baskets.getBasket(session.accessToken, basketId);
-  await baskets.pinPaymentAmount(
+  await checkout.pinPaymentAmount(
     session.accessToken,
     basketId,
     instrumentId,
@@ -251,7 +258,10 @@ export async function nearestStore(
   request: APIRequestContext,
   accessToken: string,
 ): Promise<PickupStore> {
-  const stores = await new StoresClient(request).searchByPostalCode(accessToken, '94103');
+  const stores = await new StoresClient(request).searchByPostalCode(
+    accessToken,
+    STORE_LOCATOR_ZIP,
+  );
   const first = stores[0];
   if (!first) {
     throw new Error('store-search returned no stores');

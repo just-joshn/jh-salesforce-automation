@@ -1,0 +1,10 @@
+import { z } from 'zod';
+import { loose, nullableString } from './primitives';
+export const customerRegistrationSchema = loose({ customerId: z.string().min(1), authType: z.string().min(1) });
+export const customerAddressSchema = loose({ addressId: z.string().min(1), preferred: z.boolean(), address1: z.string().min(1), city: z.string().min(1), stateCode: z.string().min(1), postalCode: z.string().min(1) });
+export const customerSchema = loose({ customerId: z.string().optional(), phoneHome: nullableString, addresses: z.array(customerAddressSchema).optional() });
+export const customerProductListItemSchema = loose({ id: z.string().min(1), productId: z.string().min(1), quantity: z.number() });
+export const customerProductListSchema = loose({ id: z.string().min(1), type: z.string().min(1), customerProductListItems: z.array(customerProductListItemSchema).optional() });
+export const customerProductListsResponseSchema = loose({ data: z.array(customerProductListSchema).optional() });
+export const customerAddressesResponseSchema = loose({ data: z.array(customerAddressSchema).optional() });
+export const customerOrdersResponseSchema = loose({ data: z.array(loose({ orderNo: z.string().min(1) })) });

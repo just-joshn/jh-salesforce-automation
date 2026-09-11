@@ -16,7 +16,7 @@ import {
   customerProductListSchema,
   customerProductListsResponseSchema,
   customerSchema,
-} from './schemas';
+} from './schemas/customers';
 
 const FAMILY = 'customer/shopper-customers/v1';
 

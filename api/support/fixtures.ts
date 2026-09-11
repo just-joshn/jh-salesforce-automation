@@ -3,8 +3,11 @@ import { env } from './env';
 import { readAppConfig } from './app-config';
 import { SlasClient } from './auth.client';
 import { BasketsClient } from './baskets.client';
+import { CheckoutClient } from './checkout.client';
+import { CustomerBasketsClient } from './customer-baskets.client';
 import { CustomersClient } from './customers.client';
 import { OrdersClient } from './orders.client';
+import { ProductsClient } from './products.client';
 import { SearchClient } from './search.client';
 import { StoresClient } from './stores.client';
 import { uniqueEmail, VALID_PASSWORD } from './test-data';
@@ -106,9 +109,12 @@ export const clients = {
   slas: (request: APIRequestContext) => new SlasClient(request),
   customers: (request: APIRequestContext) => new CustomersClient(request),
   baskets: (request: APIRequestContext) => new BasketsClient(request),
+  checkout: (request: APIRequestContext) => new CheckoutClient(request),
+  customerBaskets: (request: APIRequestContext) => new CustomerBasketsClient(request),
   orders: (request: APIRequestContext) => new OrdersClient(request),
   search: (request: APIRequestContext) => new SearchClient(request),
   stores: (request: APIRequestContext) => new StoresClient(request),
+  products: (request: APIRequestContext) => new ProductsClient(request),
 };
 
 /** H1: probes an SFRA controller route on the storefront host — expect 404 (no SFRA here). */

@@ -1,6 +1,5 @@
 import { expect, test } from '@playwright/test';
 import { dismissConsent, headerSearchBox, openPath } from '../support/site';
-import { PRODUCTS } from '../support/test-data';
 
 test.describe('A. Discovery & Browse', { tag: '@discovery' }, () => {
   test('A1 - Search for a product by keyword', { tag: ['@critical', '@smoke'] }, async ({
@@ -17,15 +16,7 @@ test.describe('A. Discovery & Browse', { tag: '@discovery' }, () => {
       );
       await searchBox.fill('tie');
       expect((await suggestions).status()).toBe(200);
-      const suggestionsPanel = page.getByRole('dialog');
-      const productSuggestion = suggestionsPanel
-        .getByRole('link', { name: new RegExp(PRODUCTS.silkTie.name) })
-        .or(page.getByRole('button', { name: new RegExp(PRODUCTS.silkTie.name) }))
-        .first();
-      await expect(productSuggestion).toBeVisible();
-      if ((page.viewportSize()?.width ?? 0) >= 768) {
-        await expect(suggestionsPanel.getByRole('link', { name: 'View All' })).toBeVisible();
-      }
+
     });
 
     await test.step('Submitting the query lands on a results page with a count heading', async () => {

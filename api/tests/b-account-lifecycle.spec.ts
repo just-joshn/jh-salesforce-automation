@@ -121,7 +121,7 @@ test.describe('B. Account Lifecycle', { tag: '@account' }, () => {
         type: 'boundary',
         description:
           'Success path (a real configured-length emailed code) needs live inbox access this ' +
-          'automated pass does not have — see docs/cross-service-critical-user-journeys.md B3.',
+          'automated pass does not have — see docs/cross-service-b-evidence.md B3.',
       });
     },
   );

@@ -93,7 +93,7 @@ test.describe('B. Account Lifecycle', () => {
     'B3 - Passwordless (email one-time code) login',
     { tag: ['@boundary', '@nightly'] },
     async ({ page, loginPage }, testInfo) => {
-      await page.goto('/');
+      await openPath(page, '');
       const config = await readAppConfig(page);
       expect(config.login.passwordless.enabled).toBe(true);
       expect(config.login.passwordless.mode).toBe('email');
@@ -120,7 +120,7 @@ test.describe('B. Account Lifecycle', () => {
         type: 'boundary',
         description:
           'Success path (a real emailed code matching the rendered input count) needs live inbox access ' +
-          'pass does not have — see docs/cross-service-critical-user-journeys.md B3.',
+          'pass does not have — see docs/cross-service-b-evidence.md B3.',
       });
     },
   );
@@ -129,7 +129,7 @@ test.describe('B. Account Lifecycle', () => {
     'B4 - Social login (Google / Apple)',
     { tag: ['@boundary', '@nightly'] },
     async ({ page, loginPage }, testInfo) => {
-      await page.goto('/');
+      await openPath(page, '');
       const config = await readAppConfig(page);
       expect(config.login.social.enabled).toBe(true);
       expect(config.login.social.idps).toEqual(expect.arrayContaining(['google', 'apple']));
@@ -157,7 +157,7 @@ test.describe('B. Account Lifecycle', () => {
     'B5 - Reset a forgotten password (email callback)',
     { tag: ['@boundary', '@nightly'] },
     async ({ page, loginPage, workerAccount }, testInfo) => {
-      await page.goto('/');
+      await openPath(page, '');
       const config = await readAppConfig(page);
       expect(config.login.resetPassword.mode).toBe('email');
 

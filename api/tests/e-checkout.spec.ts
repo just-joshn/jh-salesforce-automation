@@ -7,6 +7,7 @@ import {
   PRODUCTS,
   rejectedEmail,
   SECONDARY_ADDRESS,
+  STORE_LOCATOR_ZIP,
   STORES,
   TEST_VISA,
   uniqueEmail,
@@ -23,6 +24,7 @@ test.describe('E. Checkout', { tag: '@checkout' }, () => {
     tag: ['@critical', '@destructive', '@nightly'],
   }, async ({ request, guestSession }) => {
     const baskets = clients.baskets(request);
+    const checkout = clients.checkout(request);
     const orders = clients.orders(request);
     const session = {
       accessToken: guestSession.accessToken,
@@ -33,18 +35,18 @@ test.describe('E. Checkout', { tag: '@checkout' }, () => {
     // deliverable contact email.
     const { basketId } = await getOrCreateBasket(request, session);
     await baskets.addItem(session.accessToken, basketId, PRODUCTS.silkTie.variantId, 29.99);
-    await baskets.setShippingAddress(session.accessToken, basketId, PRIMARY_ADDRESS);
-    const methods = await baskets.getShippingMethods(session.accessToken, basketId, 'me');
+    await checkout.setShippingAddress(session.accessToken, basketId, PRIMARY_ADDRESS);
+    const methods = await checkout.getShippingMethods(session.accessToken, basketId, 'me');
     const methodId = requireShippingMethodId(methods);
-    await baskets.setShippingMethod(session.accessToken, basketId, 'me', methodId);
-    const { instrumentId } = await baskets.setCreditCardPayment(
+    await checkout.setShippingMethod(session.accessToken, basketId, 'me', methodId);
+    const { instrumentId } = await checkout.setCreditCardPayment(
       session.accessToken,
       basketId,
       TEST_VISA,
     );
-    await baskets.setBillingAddress(session.accessToken, basketId, PRIMARY_ADDRESS);
+    await checkout.setBillingAddress(session.accessToken, basketId, PRIMARY_ADDRESS);
     const prepared = await baskets.getBasket(session.accessToken, basketId);
-    await baskets.pinPaymentAmount(
+    await checkout.pinPaymentAmount(
       session.accessToken,
       basketId,
       instrumentId,
@@ -52,14 +54,14 @@ test.describe('E. Checkout', { tag: '@checkout' }, () => {
     );
 
     await test.step('A platform-rejected email fails at order placement with a real fault', async () => {
-      await baskets.setCustomerEmail(session.accessToken, basketId, rejectedEmail('checkout'));
+      await checkout.setCustomerEmail(session.accessToken, basketId, rejectedEmail('checkout'));
       const refused = await orders.placeOrderRaw(session.accessToken, basketId);
       expect(refused.status()).toBeGreaterThanOrEqual(400);
     });
 
     await test.step('Editing to a deliverable email preserves the rest of the order and succeeds', async () => {
       const email = uniqueEmail('checkout');
-      await baskets.setCustomerEmail(session.accessToken, basketId, email);
+      await checkout.setCustomerEmail(session.accessToken, basketId, email);
 
       const placed = await orders.placeOrder(session.accessToken, basketId);
       expect(placed).toMatchObject({
@@ -83,7 +85,7 @@ test.describe('E. Checkout', { tag: '@checkout' }, () => {
   }, async ({ request, guestSession }) => {
     const stores = await clients
       .stores(request)
-      .searchByPostalCode(guestSession.accessToken, '94103');
+      .searchByPostalCode(guestSession.accessToken, STORE_LOCATOR_ZIP);
     const store = stores[0];
     if (!store) {
       throw new Error('store-search returned no stores');

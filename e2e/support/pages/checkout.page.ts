@@ -175,6 +175,7 @@ export class CheckoutPage {
     card: CreditCardInput,
   ): Promise<PlacedOrder> {
     await this.fillShippingAddress(address);
+    await this.continueToPaymentIfPrompted();
     await this.fillPayment(card);
     return this.placeOrder();
   }

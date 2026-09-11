@@ -1,4 +1,5 @@
 import { resolveTarget, storefrontUrl } from '../support/targets.ts';
+import { STORE_FACTS } from '../support/test-data.ts';
 
 const target = resolveTarget();
 const fail = (message) => {
@@ -71,7 +72,7 @@ if (typeof token !== 'string' || token.length === 0) {
 
 const storeSearch = new URL(apiUrl('store/shopper-stores/v1', 'store-search'));
 storeSearch.search = new URLSearchParams({
-  postalCode: '94103',
+  postalCode: STORE_FACTS.locatorPostalCode,
   countryCode: 'US',
   distanceUnit: 'km',
   maxDistance: '100',

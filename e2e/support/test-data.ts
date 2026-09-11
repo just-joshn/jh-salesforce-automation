@@ -1,21 +1,13 @@
 import { test } from '@playwright/test';
+import { ADDRESS_FACTS, EMAIL_DOMAINS, PAYMENT_FACTS, PRODUCT_FACTS, STORE_FACTS } from '../../support/test-data';
 
 export const PRODUCTS = {
-  hoopEarring: {
-    id: '25720033M',
-    name: 'Turquoise and Gold Hoop Earring',
-    color: 'Gold',
-    unitPrice: '$30.00',
-  },
-  silkTie: {
-    id: '25752235M',
-    name: 'Checked Silk Tie',
-    color: 'Cobalt',
-  },
+  hoopEarring: { ...PRODUCT_FACTS.hoopEarring, unitPrice: '$30.00' },
+  silkTie: { ...PRODUCT_FACTS.silkTie },
 } as const;
 
-export const ACCEPTED_EMAIL_DOMAIN = 'outlook.com';
-export const REJECTED_EMAIL_DOMAIN = 'example.com';
+export const ACCEPTED_EMAIL_DOMAIN = EMAIL_DOMAINS.accepted;
+export const REJECTED_EMAIL_DOMAIN = EMAIL_DOMAINS.rejected;
 
 export const VALID_PASSWORD = process.env.E2E_TEST_PASSWORD ?? 'CujAutomation!2026';
 export const ALTERNATE_PASSWORD = process.env.E2E_TEST_PASSWORD_ALTERNATE ?? 'CujAutomation!2027';
@@ -31,34 +23,19 @@ export interface AddressInput {
 }
 
 export const PRIMARY_ADDRESS: AddressInput = {
-  firstName: 'Test',
-  lastName: 'Shopper',
-  phone: '4155550142',
-  address: '1 Market Street',
-  city: 'San Francisco',
-  state: 'California',
-  zip: '94105',
+  ...ADDRESS_FACTS.primary,
+  state: ADDRESS_FACTS.primary.stateName,
 };
 
 export const SECONDARY_ADDRESS: AddressInput = {
-  firstName: 'Second',
-  lastName: 'Address',
-  phone: '6175550111',
-  address: '2 Atlantic Avenue',
-  city: 'Boston',
-  state: 'Massachusetts',
-  zip: '02108',
+  ...ADDRESS_FACTS.secondary,
+  state: ADDRESS_FACTS.secondary.stateName,
 };
 
 /** Billing address for BOPIS checkout (E2), where there is no shipping address to copy. */
 export const PICKUP_BILLING_ADDRESS: AddressInput = {
-  firstName: 'Test',
-  lastName: 'Pickup',
-  phone: '4155550142',
-  address: '151 3rd St',
-  city: 'San Francisco',
-  state: 'California',
-  zip: '94103',
+  ...ADDRESS_FACTS.pickupBilling,
+  state: ADDRESS_FACTS.pickupBilling.stateName,
 };
 
 export interface CreditCardInput {
@@ -69,21 +46,21 @@ export interface CreditCardInput {
 }
 
 export const TEST_VISA: CreditCardInput = {
-  number: '4111111111111111',
-  name: 'Test Shopper',
-  expiration: '12/30',
-  cvv: '123',
+  number: PAYMENT_FACTS.visa.number,
+  name: PAYMENT_FACTS.visa.name,
+  expiration: `${PAYMENT_FACTS.visa.expirationMonth}/${String(PAYMENT_FACTS.visa.expirationYear).slice(-2)}`,
+  cvv: PAYMENT_FACTS.visa.cvv,
 };
 
-export const STORE_LOCATOR_ZIP = '94103';
+export const STORE_LOCATOR_ZIP = STORE_FACTS.locatorPostalCode;
 
 // Results are always distance-sorted by the store-search API (nearest first), so a
 // fixed index is a stable, reliable way to target a row whose own radio input carries
 // no accessible name (see components/store-locator-dialog.component.ts).
 export const STORES = {
-  nearest: { name: 'San Francisco Retail Store', index: 0 },
-  inRange: { name: 'San Mateo Retail Store', index: 1 },
-  outOfRange: { name: 'Palo Alto Retail Store', index: 2 },
+  nearest: { name: STORE_FACTS.nearest, index: 0 },
+  inRange: { name: STORE_FACTS.inRange, index: 1 },
+  outOfRange: { name: STORE_FACTS.outOfRange, index: 2 },
 } as const;
 
 /**

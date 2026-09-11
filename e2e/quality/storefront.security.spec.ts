@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { headerSearchBox, openPath } from '../support/site';
+import { buildPath, headerSearchBox, openPath } from '../support/site';
 
 type WindowWithXssFlag = Window & { __xssTriggered?: boolean };
 
@@ -33,7 +33,7 @@ async function assertSearchDoesNotExecuteXss(page: Page, payload: string): Promi
 
 test.describe('Storefront security boundaries', { tag: ['@nightly', '@security'] }, () => {
   test('root response carries the required security headers', async ({ page }) => {
-    const response = await page.goto('/');
+    const response = await page.goto(buildPath());
     expect(response, 'root response').not.toBeNull();
     const headers = response?.headers() ?? {};
 

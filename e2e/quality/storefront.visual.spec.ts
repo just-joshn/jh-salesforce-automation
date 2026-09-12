@@ -38,8 +38,6 @@ test.describe('Storefront visual regression', { tag: ['@nightly', '@visual'] }, 
       .getByRole('heading', { level: 2, name: PRODUCTS.hoopEarring.name, exact: true })
       .filter({ visible: true });
     await expect(heading).toBeVisible();
-    // Full-page/main shots flake on live inventory and recommendation rails; the title is the
-    // stable layout contract this test can enforce.
     await expect(heading).toHaveScreenshot('product-detail-title.png', {
       animations: 'disabled',
       maxDiffPixelRatio: 0.01,

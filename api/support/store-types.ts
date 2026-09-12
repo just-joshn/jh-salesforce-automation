@@ -1,4 +1,3 @@
-/** Store data shared by store lookup and pickup checkout workflows. */
 export interface PickupStore {
   id: string;
   name: string;
@@ -7,6 +6,5 @@ export interface PickupStore {
   city: string;
   stateCode: string;
   postalCode: string;
-  /** km from the search origin, as returned by store-search. */
   distance?: number;
 }

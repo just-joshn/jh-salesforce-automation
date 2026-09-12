@@ -29,9 +29,6 @@ test.describe('G. Localization', { tag: '@localization' }, () => {
         productId: expect.any(String),
         productName: expect.any(String),
       });
-      // Currency is deliberately not asserted here: the live site's SCAPI response keeps
-      // GBP for both locale requests, while the HTML storefront config advertises EUR for
-      // de-DE. The e2e journey owns translated UI/URL assertions.
     });
 
     await test.step('Switching back to English is a clean, reversible round trip', async () => {

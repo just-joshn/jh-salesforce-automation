@@ -7,16 +7,13 @@ import { orderSchema } from './schemas';
 
 const FAMILY = 'checkout/shopper-orders/v1';
 
-/** The Shopper Orders family: placing orders and reading them back. */
 export class OrdersClient extends ScapiClient {
-  /** E1-E4: converts a fully-prepared basket into an order — the "Place Order" click. */
   async placeOrder(accessToken: string, basketId: string): Promise<Order> {
     const response = await this.placeOrderRaw(accessToken, basketId);
     expect(response.status(), 'place order').toBe(200);
     return parseJson<Order>(response, orderSchema, 'place order');
   }
 
-  /** E1's rejected-email branch needs the raw verdict, not the happy-path expect. */
   async placeOrderRaw(accessToken: string, basketId: string): Promise<APIResponse> {
     return this.request.post(this.apiUrl(FAMILY, 'orders'), {
       headers: this.json(accessToken),
@@ -25,10 +22,6 @@ export class OrdersClient extends ScapiClient {
     });
   }
 
-  /**
-   * B9/H2: the order detail the /account/orders/{no} page loads, with the same OMS
-   * expansions the storefront requests.
-   */
   async getOrder(accessToken: string, orderNo: string): Promise<Order> {
     const response = await this.request.get(this.apiUrl(FAMILY, `orders/${orderNo}`), {
       headers: this.authed(accessToken),
@@ -38,10 +31,6 @@ export class OrdersClient extends ScapiClient {
     return parseJson<Order>(response, orderSchema, 'get order');
   }
 
-  /**
-   * H2: the OMS metadata probe. Staging has answered both 409 (oms-not-active) and 200
-   * (metadata payload) depending on org linkage; callers assert the live status.
-   */
   async getOmsMetadata(accessToken: string) {
     const response = await this.request.get(this.apiUrl(FAMILY, 'orders/oms-meta-data'), {
       headers: this.authed(accessToken),

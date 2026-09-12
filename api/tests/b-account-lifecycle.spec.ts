@@ -71,8 +71,6 @@ test.describe('B. Account Lifecycle', { tag: '@account' }, () => {
     expect(registration.status()).toBe(200);
 
     await test.step('Wrong credentials answer 401 without any token', async () => {
-      // SLAS throttles repeated logins for the same user to one per second, answering
-      // 409 while throttled — toPass retries until the real verdict (401) arrives.
       let status = 0;
       await expect(async () => {
         const attempt = await slas.loginWithPassword(email, 'DefinitelyWrongPassword!1');
@@ -162,9 +160,6 @@ test.describe('B. Account Lifecycle', { tag: '@account' }, () => {
       const config = await readAppConfig(request);
       expect(config.login.resetPassword.mode).toBe('email');
 
-      // A registered address is used, mirroring the e2e flow. The public canary accepts the
-      // request, while the staging proxy has no configured sender email and returns its
-      // explicit service boundary instead.
       const resetResponse = await clients.slas(request).requestPasswordReset(workerAccount.email);
       const resetStatus = resetResponse.status();
       const resetBody = await resetResponse.text();
@@ -214,7 +209,6 @@ test.describe('B. Account Lifecycle', { tag: '@account' }, () => {
         expect(login).toMatchObject({ status: 303 });
       });
     } finally {
-      // Revert even when the verification step fails so the worker account stays usable.
       if (passwordChanged) {
         await test.step('Revert the password, proving the flow is repeatable', async () => {
           const response = await customers.changePassword(

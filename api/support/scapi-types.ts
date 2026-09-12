@@ -1,6 +1,3 @@
-// Response/request shapes only live here; request bodies for a specific call are built
-// where that call is made. Sourced from the vendored, officially-generated SCAPI types
-// in api/generated/ (see scripts/fetch-api-specs.mjs, scripts/generate-api-types.mjs).
 import type { components as AuthComponents } from '../generated/auth';
 import type { components as BasketComponents } from '../generated/shopper-baskets';
 import type { components as CustomerComponents } from '../generated/shopper-customers';

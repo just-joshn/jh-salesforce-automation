@@ -1,5 +1,3 @@
-// Verifies that every E2E test title is represented in the corresponding API
-// spec. API-only files and titles are allowed.
 
 import fs from 'node:fs';
 import path from 'node:path';

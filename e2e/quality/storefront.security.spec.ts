@@ -24,8 +24,6 @@ async function assertSearchDoesNotExecuteXss(page: Page, payload: string): Promi
   const executed = await page.evaluate(() => (window as WindowWithXssFlag).__xssTriggered === true);
   expect(executed).toBe(false);
 
-  // Only assert raw-tag injection for HTML payloads. A javascript: query will legitimately
-  // appear in the URL and search box; the execution flag above is the signal that matters.
   if (payload.includes('<')) {
     expect(await page.content()).not.toContain(payload);
   }

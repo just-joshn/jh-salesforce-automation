@@ -49,7 +49,6 @@ test.describe('D. Cart', { tag: '@cart' }, () => {
     const slas = clients.slas(request);
     const customers = clients.customers(request);
 
-    // Session A registers the returning shopper; session B is the guest who shops first.
     const sessionA = await slas.guestToken();
     const email = uniqueEmail('cart-merge');
     const registration = await customers.register(sessionA.access_token, {

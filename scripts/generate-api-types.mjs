@@ -1,11 +1,3 @@
-// Generates TypeScript types from the vendored SCAPI specs in api/specs/.
-//
-// The output is committed. That keeps `bun test` a single step with no codegen
-// in front of it. It also makes an upstream shape change arrive as a reviewable
-// diff, and gives the nightly drift check something to compare against.
-//
-// Plain .ts, not .d.ts, so the files import like any other module and
-// tsc checks them with everything else.
 
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';

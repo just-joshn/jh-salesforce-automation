@@ -1,11 +1,6 @@
 import type { APIResponse } from '@playwright/test';
 import type { ZodType } from 'zod';
 
-/**
- * Parses a successful API body at the HTTP boundary. Generated OpenAPI types describe
- * what TypeScript expects; this check proves the live response has the fields the test
- * relies on before it is cast to that generated type.
- */
 export async function parseJson<T>(
   response: APIResponse,
   schema: ZodType,
@@ -26,8 +21,5 @@ export async function parseJson<T>(
       .join('; ');
     throw new Error(`${operation} response contract failed: ${details}`);
   }
-  // The schema is intentionally focused on fields this workflow reads, while T is the
-  // generated full response type. Runtime validation happens above; this is the typed
-  // handoff between the focused contract and the generated OpenAPI surface.
   return result.data as T;
 }

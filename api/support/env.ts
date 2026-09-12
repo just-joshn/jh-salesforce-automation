@@ -1,14 +1,3 @@
-/**
- * Every request in this suite is built from the storefront's own origin, not the bare
- * SCAPI host — because that's what the browser actually calls. Confirmed live: the
- * storefront proxies ordinary Shopper API calls through its own
- * `/mobify/proxy/api/{family}/{version}/organizations/{org}/...`, and routes every
- * SLAS call that needs the storefront's private client (password login, social login,
- * passwordless) through `/mobify/slas/private/shopper/auth/v1/organizations/{org}/...`
- * instead of hitting SLAS directly. Guest-session bootstrapping also uses the storefront's
- * private client_credentials proxy call: it is the exact request shape the storefront SDK
- * uses when it refreshes an anonymous token, while avoiding any private secret in this repo.
- */
 
 import { resolveTarget, storefrontPath, storefrontUrl } from '../../support/targets';
 
@@ -35,25 +24,20 @@ export const storefrontRequestUrl = (path = ''): string => storefrontUrl(target,
 const organizationPath = (resourcePath: string): string =>
   `organizations/${env.SFCC_ORG_ID}/${resourcePath.replace(/^\/+/, '')}`;
 
-/** A regular Shopper API call, exactly as the storefront's own client proxies it. */
 export const proxyApiUrl = (apiFamily: string, resourcePath: string): string =>
   `${env.E2E_BASE_URL}/mobify/proxy/api/${apiFamily}/${organizationPath(resourcePath)}`;
 
-/** A SLAS call that needs the storefront's private client, proxied the same way. */
 export const slasPrivateUrl = (resourcePath: string): string =>
   `${env.E2E_BASE_URL}/mobify/slas/private/shopper/auth/v1/${organizationPath(resourcePath)}`;
 
-/** Direct SCAPI URL retained for diagnostics; normal calls use the storefront proxy. */
 export const slasPublicUrl = (resourcePath: string): string =>
   `https://${env.SFCC_SHORT_CODE}.api.commercecloud.salesforce.com/shopper/auth/v1/${organizationPath(resourcePath)}`;
 
-/** Query parameters accepted by endpoints that do not expose localization. */
 export const withSite = (params: Record<string, string> = {}): Record<string, string> => ({
   ...params,
   siteId: env.SFCC_SITE_ID,
 });
 
-/** Query parameters for Shopper API endpoints that explicitly support locale. */
 export const withLocale = (params: Record<string, string> = {}): Record<string, string> => ({
   ...params,
   siteId: env.SFCC_SITE_ID,

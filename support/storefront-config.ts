@@ -3,7 +3,6 @@ export interface SupportedLocale {
   preferredCurrency: string;
 }
 
-/** Live `#mobify-data` app config. Shared by the e2e page reader and the API HTML reader. */
 export interface StorefrontAppConfig {
   multishipEnabled: boolean;
   commerceAgent: {

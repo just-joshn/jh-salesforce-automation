@@ -13,9 +13,6 @@ import {
 
 const target = resolveTarget();
 
-// A guest customer session can bootstrap its own POST /customers on page load, ahead of
-// the registration form's own submission — match on the submitted email specifically so
-// this doesn't resolve on that unrelated request.
 function customersEndpointResponse(page: Page, email: string) {
   return page.waitForResponse((res) => {
     if (!res.url().includes('/customers') || res.request().method() !== 'POST') {
@@ -135,8 +132,6 @@ test.describe('B. Account Lifecycle', () => {
       expect(config.login.social.idps).toEqual(expect.arrayContaining(['google', 'apple']));
 
       for (const idp of ['Google', 'Apple'] as const) {
-        // The button navigates the whole page to the authorize URL, whose response body
-        // is itself the 403 — not an XHR fired from a page that stays on /login.
         const authorizeResponse = page.waitForResponse((res) =>
           res.url().includes('oauth2/authorize'),
         );
@@ -161,9 +156,6 @@ test.describe('B. Account Lifecycle', () => {
       const config = await readAppConfig(page);
       expect(config.login.resetPassword.mode).toBe('email');
 
-      // A registered address is required here: unlike registration/checkout's domain-only
-      // validation, an address with no matching customer surfaces a generic error instead
-      // of the anti-enumeration confirmation copy — so this reuses the worker's own account.
       await loginPage.goToForgotPassword(uniqueEmail('reset-entry'));
       await expect(page.getByRole('heading', { name: 'Reset Password' })).toBeVisible();
 

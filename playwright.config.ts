@@ -2,7 +2,6 @@ import { defineConfig, devices, type ReporterDescription } from '@playwright/tes
 import dotenv from 'dotenv';
 import { resolveTarget } from './support/targets';
 
-// Loads .env from the current working directory (the repo root for every pnpm script).
 dotenv.config();
 
 const target = resolveTarget();
@@ -26,8 +25,6 @@ export default defineConfig({
 
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  // Retries are a CI safety net, not a local crutch: 0 locally so real flakiness is seen
-  // and fixed, not masked; 2 in CI to absorb live-site jitter without failing the pipeline.
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? '50%' : undefined,
 
@@ -123,8 +120,6 @@ export default defineConfig({
       use: { ...devices['iPhone 13'] },
     },
     {
-      // API-only project: no browser or device emulation. It covers every E2E declaration
-      // and may add API-only contract/state assertions; parity is intentionally directional.
       name: 'api',
       testDir: './api/tests',
     },

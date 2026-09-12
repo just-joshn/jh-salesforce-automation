@@ -5,14 +5,7 @@ import { type ProductRef, ProductPage } from './pages/product.page';
 import { PRIMARY_ADDRESS, PRODUCTS, TEST_VISA } from './test-data';
 import { proceedToCheckoutFromCartDialog } from './ui/added-to-cart';
 
-/**
- * Scenario helpers that compose several page/component objects into one multi-page flow.
- * These don't belong to any single page — they describe a *scenario*, not a screen — so
- * they stay as plain functions rather than being forced onto one class (composition, not
- * a "God object" that owns every page it happens to pass through).
- */
 
-/** PDP -> select a color -> add to cart -> "Proceed to Checkout" from the dialog. */
 export async function addProductAndProceedToCheckout(
   page: Page,
   product: ProductRef,
@@ -24,11 +17,6 @@ export async function addProductAndProceedToCheckout(
   await proceedToCheckoutFromCartDialog(page);
 }
 
-/**
- * Places a minimal order for an already-signed-in shopper (no guest contact-info step).
- * Shared by B9 (order history) and H2 (OMS tracking boundary), which both just need a
- * real, freshly-placed order to inspect rather than exercising checkout itself.
- */
 export async function placeSignedInOrder(
   page: Page,
   product: ProductRef = PRODUCTS.hoopEarring,

@@ -41,12 +41,7 @@ const productSearchQuery = (options: ProductSearchOptions): URLSearchParams => {
   return query;
 };
 
-/** The Shopper Search family: keyword search, suggestions, and faceted category browse. */
 export class SearchClient extends ScapiClient {
-  /**
-   * A1: the suggestion lookup the header search box issues as the shopper types —
-   * including the Einstein-phrases flag the storefront always sends.
-   */
   async searchSuggestions(accessToken: string, query: string): Promise<SearchSuggestionResult> {
     const response = await this.request.get(this.apiUrl(FAMILY, 'search-suggestions'), {
       headers: this.authed(accessToken),
@@ -60,12 +55,6 @@ export class SearchClient extends ScapiClient {
     );
   }
 
-  /**
-   * A1/A2/G1/G2: product search, optionally refined and/or in a specific locale (G1's
-   * language switch re-issues these calls under the new locale). `refine` entries must
-   * land as repeated `refine=` query pairs (the spec's explode-style array — and exactly
-   * how the category and facet UIs issue them), so the query string is built explicitly.
-   */
   async productSearch(
     accessToken: string,
     options: ProductSearchOptions = {},

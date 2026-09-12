@@ -31,8 +31,6 @@ test.describe('E. Checkout', { tag: '@checkout' }, () => {
       customerId: guestSession.customerId,
     };
 
-    // Prepare the full order once: item, shipping, payment, billing — everything but a
-    // deliverable contact email.
     const { basketId } = await getOrCreateBasket(request, session);
     await baskets.addItem(session.accessToken, basketId, PRODUCTS.silkTie.variantId, 29.99);
     await checkout.setShippingAddress(session.accessToken, basketId, PRIMARY_ADDRESS);
@@ -160,7 +158,6 @@ test.describe('E. Checkout', { tag: '@checkout' }, () => {
           }),
         ]),
       );
-      // Line items carry their shipmentId at order level in this API version.
       const tieLine = order.productItems?.find((i) => i.productId === PRODUCTS.silkTie.variantId);
       const tieShipment = order.shipments?.find((s) => s.shipmentId === tieLine?.shipmentId);
       expect(tieShipment?.shippingAddress?.address1).toBe(SECONDARY_ADDRESS.address);
@@ -208,10 +205,6 @@ test.describe('E. Checkout', { tag: '@checkout' }, () => {
       });
 
       await test.step('PayPal radio cannot be selected by pointer — tracked as a live defect', () => {
-        // The defect is browser-only: a sibling label intercepts every pointer event on the
-        // PayPal radio, so no PayPal request can even be issued from this storefront — the
-        // API-level signature of the defect is precisely that no such request exists to
-        // replay. Evidenced in the e2e suite (E5); recorded here, not papered over.
         testInfo.annotations.push({
           type: 'known-defect',
           description:

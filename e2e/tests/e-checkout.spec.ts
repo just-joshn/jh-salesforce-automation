@@ -115,8 +115,6 @@ test.describe('E. Checkout', () => {
     const order = await checkoutPage.placeOrder();
     expect(order.status).toBe(200);
 
-    // The multi-delivery confirmation summary can render a beat after the "Thank you"
-    // heading placeOrder() already waited for, so give it its own generous timeout.
     const confirmationTimeout = 30_000;
     await expect(page.getByRole('heading', { name: 'Delivery 1' })).toBeVisible({
       timeout: confirmationTimeout,

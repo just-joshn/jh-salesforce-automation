@@ -27,7 +27,6 @@ export class RegisterPage {
     await openPath(this.page, '/registration');
   }
 
-  /** B1: fills and submits the create-account form. Assumes /registration is already open. */
   async submit(details: RegistrationDetails): Promise<void> {
     await this.firstName.fill(details.firstName);
     await this.lastName.fill(details.lastName);
@@ -36,13 +35,11 @@ export class RegisterPage {
     await this.createAccount.click();
   }
 
-  /** B1: navigates to /registration and submits the form in one step. */
   async register(details: RegistrationDetails): Promise<void> {
     await this.goto();
     await this.submit(details);
   }
 
-  /** An email the platform rejects keeps the shopper on this same form with an inline error. */
   async expectRejected(): Promise<void> {
     await expect(this.page.getByRole('alert')).toBeVisible();
     await expect(this.firstName).toBeVisible();

@@ -23,10 +23,6 @@ function normalizeAppConfig(config: StorefrontAppConfig): StorefrontAppConfig {
   };
 }
 
-/**
- * Reads the storefront's own shipped config from the `#mobify-data` script tag —
- * the live source of truth for every feature gate in this suite, never assumed.
- */
 export async function readAppConfig(page: Page): Promise<StorefrontAppConfig> {
   const app = await page.evaluate(() => {
     const el = document.getElementById('mobify-data');

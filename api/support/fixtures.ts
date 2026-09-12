@@ -24,7 +24,6 @@ export interface WorkerAccount {
 }
 
 interface TestFixtures {
-  /** A fresh anonymous session — the API equivalent of a brand-new browser context. */
   guestSession: GuestSession;
 }
 
@@ -35,24 +34,12 @@ export interface GuestSession {
 }
 
 interface WorkerFixtures {
-  /**
-   * One registered shopper per worker (registered and signed in via the same API calls
-   * B1/B2 make), its token kept alive for the worker's signed-in journeys — the same
-   * per-worker authentication shape e2e/support/fixtures.ts uses, minus the browser.
-   */
   workerAccount: WorkerAccount;
 }
 
-/**
- * Domain clients are constructed per test from Playwright's own `request` fixture —
- * APIRequestContext is the API suite's "page": the thing every client operates on.
- */
 export const test = base.extend<TestFixtures, WorkerFixtures>({
   workerAccount: [
     async ({ playwright }, use, workerInfo) => {
-      // `request` is test-scoped; the worker scope offers `playwright` instead, whose
-      // newContext() is the documented way to build an API-only context — the same
-      // per-worker pattern the e2e suite uses for its browser context, minus the browser.
       const request = await playwright.request.newContext({ baseURL: env.E2E_BASE_URL });
       try {
         const slas = new SlasClient(request);
@@ -104,7 +91,6 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
 
 export { expect };
 
-/** The domain clients, bound to whichever request context a test is using. */
 export const clients = {
   slas: (request: APIRequestContext) => new SlasClient(request),
   customers: (request: APIRequestContext) => new CustomersClient(request),
@@ -117,7 +103,6 @@ export const clients = {
   products: (request: APIRequestContext) => new ProductsClient(request),
 };
 
-/** H1: probes an SFRA controller route on the storefront host — expect 404 (no SFRA here). */
 export async function probeSfraRoute(request: APIRequestContext, route: string): Promise<number> {
   const url = new URL(
     `/on/demandware.store/Sites-${env.SFCC_SITE_ID}-Site/en_US/${route}`,

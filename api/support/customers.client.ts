@@ -20,13 +20,11 @@ import {
 
 const FAMILY = 'customer/shopper-customers/v1';
 
-/** The Shopper Customers family: registration, profile, address book, wishlist. */
 export class CustomersClient extends ScapiClient {
   private url(path: string): string {
     return this.apiUrl(FAMILY, path);
   }
 
-  /** B1: creates a registered customer, exactly as the registration form submits it. */
   async register(accessToken: string, details: RegistrationDetails): Promise<APIResponse> {
     return this.request.post(this.url('customers'), {
       headers: { ...this.authed(accessToken), 'Content-Type': 'application/json' },
@@ -52,7 +50,6 @@ export class CustomersClient extends ScapiClient {
     return parseJson<Customer>(response, customerSchema, 'get customer');
   }
 
-  /** B7: updates profile details (phone) via PATCH, as the account profile editor does. */
   async updatePhone(accessToken: string, customerId: string, phone: string): Promise<Customer> {
     const response = await this.request.patch(this.url(`customers/${customerId}`), {
       headers: { ...this.authed(accessToken), 'Content-Type': 'application/json' },
@@ -63,7 +60,6 @@ export class CustomersClient extends ScapiClient {
     return parseJson<Customer>(response, customerSchema, 'update customer phone');
   }
 
-  /** B6: changes the signed-in shopper's password. 204 on success. */
   async changePassword(
     accessToken: string,
     customerId: string,
@@ -79,7 +75,6 @@ export class CustomersClient extends ScapiClient {
     return response;
   }
 
-  /** B8: saves an address to the address book, optionally as the default. */
   async addAddress(
     accessToken: string,
     customerId: string,
@@ -106,7 +101,6 @@ export class CustomersClient extends ScapiClient {
     return parseJson<CustomerAddress>(response, customerAddressSchema, 'add address');
   }
 
-  /** B8: removes a saved address by the id the add returned. 204 on success. */
   async removeAddress(
     accessToken: string,
     customerId: string,
@@ -124,13 +118,10 @@ export class CustomersClient extends ScapiClient {
   }
 
   async listAddresses(accessToken: string, customerId: string): Promise<CustomerAddress[]> {
-    // The Customers API exposes address collection data on GET /customers/{id}; the
-    // /addresses collection path is POST-only and correctly answers 405 to a list call.
     const customer = await this.getCustomer(accessToken, customerId);
     return customer.addresses ?? [];
   }
 
-  /** Test isolation: removes all saved addresses from the worker account. */
   async clearAddresses(accessToken: string, customerId: string): Promise<void> {
     const addresses = await this.listAddresses(accessToken, customerId);
     for (const address of addresses) {
@@ -141,12 +132,7 @@ export class CustomersClient extends ScapiClient {
     }
   }
 
-  // --- Wishlist (product lists) ---------------------------------------------------
 
-  /**
-   * C1: resolves the shopper's wish_list, creating it on first use — the same implicit
-   * default-list creation the storefront performs behind "Add to Wishlist".
-   */
   async getOrCreateWishlist(accessToken: string, customerId: string): Promise<CustomerProductList> {
     const listsResponse = await this.request.get(
       this.url(`customers/${customerId}/product-lists`),
@@ -192,7 +178,6 @@ export class CustomersClient extends ScapiClient {
     return parseJson<CustomerProductList>(response, customerProductListSchema, 'get product list');
   }
 
-  /** Test isolation: removes every wishlist item so a test starts from a known-empty list. */
   async clearWishlistItems(accessToken: string, customerId: string): Promise<void> {
     const list = await this.getOrCreateWishlist(accessToken, customerId);
     const listId = list.id;
@@ -207,7 +192,6 @@ export class CustomersClient extends ScapiClient {
     }
   }
 
-  /** C1: adds a product to the wishlist. Duplicate adds return the same item (idempotent). */
   async addWishlistItem(
     accessToken: string,
     customerId: string,
@@ -230,7 +214,6 @@ export class CustomersClient extends ScapiClient {
     );
   }
 
-  /** C2: removes a wishlist item. 204 on success. */
   async removeWishlistItem(
     accessToken: string,
     customerId: string,
@@ -245,7 +228,6 @@ export class CustomersClient extends ScapiClient {
     return response;
   }
 
-  /** B9: the order-history list the /account/orders page loads (expand=oms). */
   async listOrders(accessToken: string, customerId: string): Promise<CustomerOrderResult> {
     const response = await this.request.get(this.url(`customers/${customerId}/orders`), {
       headers: this.authed(accessToken),

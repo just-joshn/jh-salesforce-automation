@@ -1,4 +1,3 @@
-/** Neutral business facts shared by the browser and API suites. */
 export const PRODUCT_FACTS = {
   hoopEarring: { id: '25720033M', name: 'Turquoise and Gold Hoop Earring', color: 'Gold' },
   silkTie: { id: '25752235M', name: 'Checked Silk Tie', color: 'Cobalt' },

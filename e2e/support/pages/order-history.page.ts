@@ -1,7 +1,6 @@
 import { expect, type Page, type Response } from '@playwright/test';
 import { openPath } from '../site';
 
-/** /account/orders (list) and /account/orders/{orderNumber} (detail) — one order-history area. */
 export class OrderHistoryPage {
   constructor(private readonly page: Page) {}
 
@@ -28,10 +27,6 @@ export class OrderHistoryPage {
     await expect(this.page.getByText(`Order Number: ${orderNumber}`)).toBeVisible();
   }
 
-  /**
-   * The order-history card's link is literally named "View Details"; the order number
-   * renders as a sibling paragraph, not inside the link itself.
-   */
   async viewDetails(): Promise<void> {
     await this.page.getByRole('link', { name: 'View Details' }).click();
   }
@@ -40,9 +35,7 @@ export class OrderHistoryPage {
     await expect(this.page).toHaveURL(new RegExp(`/account/orders/${orderNumber}`));
   }
 
-  /** The tracking copy can render a beat after its own data response settles. */
   async expectNotShipped(): Promise<void> {
-    // "Not shipped" also appears on the order summary; the tracking card is the unique region.
     await expect(
       this.page.getByTestId('order-tracking-card').getByText(/not shipped/i),
     ).toBeVisible({ timeout: 15_000 });

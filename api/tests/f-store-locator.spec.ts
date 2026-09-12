@@ -24,8 +24,6 @@ test.describe('F. Store Locator', { tag: '@store-locator' }, () => {
     });
 
     await test.step('The out-of-range store is returned, not silently omitted', () => {
-      // The UI renders Palo Alto's radio as disabled beyond its own selection threshold;
-      // the API's job is to return it — the shopper still sees the store exists.
       expect(stores.map((store) => store.name)).toContain(STORES.outOfRange.name);
     });
   });
@@ -34,9 +32,6 @@ test.describe('F. Store Locator', { tag: '@store-locator' }, () => {
     request,
     guestSession,
   }) => {
-    // The denied-permission branch is browser-only (it renders fallback copy and issues no
-    // request at all). This is the granted branch's API footprint: the same store-search
-    // with lat/long instead of a postal code.
     const stores = await clients
       .stores(request)
       .searchByCoordinates(

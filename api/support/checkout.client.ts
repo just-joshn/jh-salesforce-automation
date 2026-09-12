@@ -37,7 +37,6 @@ export class CheckoutClient extends ScapiClient {
     }>(response, shippingMethodsSchema, 'get shipping methods');
   }
 
-  /** E1: single-address checkout — sets the shipping address on shipment "me". */
   async setShippingAddress(
     accessToken: string,
     basketId: string,
@@ -52,7 +51,6 @@ export class CheckoutClient extends ScapiClient {
     return response;
   }
 
-  /** E1: selects a shipping method (001 = Ground on this site) for a shipment. */
   async setShippingMethod(
     accessToken: string,
     basketId: string,
@@ -71,13 +69,7 @@ export class CheckoutClient extends ScapiClient {
     return response;
   }
 
-  // --- E2: Buy Online Pick Up In Store --------------------------------------------------
 
-  /**
-   * E2: converts the "me" shipment to store pickup, exactly as the storefront does —
-   * the advertised Store Pickup method, `c_fromStoreId` naming the store, and the store's
-   * own address standing in as the shipment address.
-   */
   async setPickupShipment(
     accessToken: string,
     basketId: string,
@@ -113,12 +105,7 @@ export class CheckoutClient extends ScapiClient {
     return response;
   }
 
-  // --- E3: multi-shipment ----------------------------------------------------------------
 
-  /**
-   * E3: creates the second delivery group. The storefront generates the shipmentId
-   * client-side; mirroring that keeps the two groups distinguishable in the order.
-   */
   async createShipment(
     accessToken: string,
     basketId: string,
@@ -134,7 +121,6 @@ export class CheckoutClient extends ScapiClient {
     return parseJson<Shipment>(response, shipmentSchema, 'create shipment');
   }
 
-  /** E3: moves a line item to its delivery group (array-form PATCH on the items root). */
   async moveItemToShipment(
     accessToken: string,
     basketId: string,
@@ -151,14 +137,7 @@ export class CheckoutClient extends ScapiClient {
     return response;
   }
 
-  // --- Payment ---------------------------------------------------------------------------
 
-  /**
-   * E1-E4: registers the credit-card payment instrument. The storefront posts the masked
-   * number it produced client-side (never the PAN on this proxied path). Pin the concrete
-   * amount afterwards via pinPaymentAmount, once totals are settled — that's the exact
-   * order the browser issues these calls in.
-   */
   async setCreditCardPayment(
     accessToken: string,
     basketId: string,
@@ -210,7 +189,6 @@ export class CheckoutClient extends ScapiClient {
     return response;
   }
 
-  /** E2: the billing address for pickup checkout, where no shipping address exists to copy. */
   async setBillingAddress(
     accessToken: string,
     basketId: string,

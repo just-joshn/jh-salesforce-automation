@@ -33,11 +33,6 @@ export interface RegisteredLoginResult {
   readonly token?: TokenResponse;
 }
 
-/**
- * The SLAS flows behind the auth UI — every call goes through the storefront's own
- * `/mobify/slas/private/...` proxy, exactly as the browser issues it, including the
- * placeholder secret the storefront's server swaps for the real one before forwarding.
- */
 export class SlasClient {
   constructor(private readonly request: APIRequestContext) {}
 
@@ -47,12 +42,6 @@ export class SlasClient {
     return { verifier, challenge };
   }
 
-  /**
-   * A fresh anonymous session token. The storefront mints this same token server-side
-   * during SSR (never as a client-visible request); this is the closest faithful
-   * equivalent, using the exact client_credentials call the storefront's own SDK makes
-   * on the same proxy when it needs to refresh one mid-session.
-   */
   async guestToken(): Promise<TokenResponse> {
     const response = await this.request.post(slasPrivateUrl('oauth2/token'), {
       form: { grant_type: 'client_credentials', channel_id: env.SFCC_SITE_ID, dnt: 'true' },
@@ -66,12 +55,6 @@ export class SlasClient {
     return basicAuth(env.SFCC_PRIVATE_CLIENT_ID, env.SFCC_PRIVATE_CLIENT_SECRET_PLACEHOLDER);
   }
 
-  /**
-   * B2's "Sign In": the browser POSTs Basic(email:password) plus PKCE + the current
-   * session's usid, follows the 303 to /callback?code=..., and exchanges the code for a
-   * token. Passing the guest session's `usid` is what links the anonymous identity —
-   * D2's basket merge depends on it.
-   */
   async loginWithPassword(
     email: string,
     password: string,
@@ -110,10 +93,6 @@ export class SlasClient {
     };
   }
 
-  /**
-   * B3: requesting the emailed one-time code. The browser POSTs the user_id in form
-   * mode=email; the proxy holds the private client this call requires.
-   */
   async requestPasswordlessCode(email: string, usid: string): Promise<APIResponse> {
     return this.request.post(slasPrivateUrl('oauth2/passwordless/login'), {
       form: {
@@ -126,11 +105,6 @@ export class SlasClient {
     });
   }
 
-  /**
-   * B3's verify step: the browser submits the configured-length code with a fresh
-   * code_verifier and client_credentials. A wrong code answers 401 — the verifiable boundary of this
-   * journey, since the real code lands in an inbox this suite cannot read.
-   */
   async verifyPasswordlessCode(code: string): Promise<APIResponse> {
     const { verifier } = this.pkce;
     return this.request.post(slasPrivateUrl('oauth2/passwordless/token'), {
@@ -144,11 +118,6 @@ export class SlasClient {
     });
   }
 
-  /**
-   * B4: the exact GET the Google/Apple buttons navigate to. The proxy answers 403 for
-   * both IdPs before any IdP is reached — the documented live defect this journey
-   * evidences.
-   */
   async socialAuthorize(idp: 'google' | 'apple', usid: string): Promise<APIResponse> {
     return this.request.get(slasPrivateUrl('oauth2/authorize'), {
       params: {
@@ -164,12 +133,6 @@ export class SlasClient {
     });
   }
 
-  /**
-   * B5: the forgot-password request. Requires PKCE like every SLAS auth call. On this
-   * demo every freshly-registered account is unverified (there is no inbox to verify
-   * with), and SLAS refuses to email a reset link for an unverified address — the live
-   * contract the UI masks with its anti-enumeration confirmation copy.
-   */
   async requestPasswordReset(email: string): Promise<APIResponse> {
     const { challenge } = this.pkce;
     return this.request.post(slasPrivateUrl('oauth2/password/reset'), {

@@ -8,22 +8,11 @@ import type { Order } from './scapi-types';
 import { StoresClient } from './stores.client';
 import { STORE_LOCATOR_ZIP, type AddressInput, type CreditCardInput } from './test-data';
 
-/**
- * Scenario helpers composing several clients into one multi-call flow — the API-suite
- * counterparts of e2e/support/workflows.ts, mirroring the exact call order the checkout
- * UI issues (email -> shipping address -> shipping method -> payment instrument ->
- * billing address -> amount pin -> place order).
- */
 export interface Session {
   accessToken: string;
   customerId: string;
 }
 
-/**
- * Resolves the shopper's open basket, creating one only when none exists — the same
- * GET-then-create dance the storefront performs on every session bootstrap (a customer
- * may hold only one open basket, so blind creation answers 400 quota-exceeded).
- */
 export async function getOrCreateBasket(
   request: APIRequestContext,
   session: Session,
@@ -83,7 +72,6 @@ async function setShippingMethods(
   }
 }
 
-/** Shared tail of every checkout: shipping method -> payment -> place. */
 async function completeAndPlace(
   request: APIRequestContext,
   session: Session,
@@ -116,7 +104,6 @@ async function completeAndPlace(
   return { order, instrumentId };
 }
 
-/** Guest checkout: contact email first, then the shared tail. */
 export async function placeGuestOrder(
   request: APIRequestContext,
   session: Session,
@@ -137,10 +124,6 @@ export async function placeGuestOrder(
   });
 }
 
-/**
- * B9/H2's setup — a real, freshly-placed order for an already-authenticated shopper
- * (no guest contact step), mirroring e2e's placeSignedInOrder.
- */
 export async function placeSignedInOrder(
   request: APIRequestContext,
   session: Session,
@@ -159,7 +142,6 @@ export async function placeSignedInOrder(
   });
 }
 
-/** E2's BOPIS variant: pickup shipment instead of a shipping address, plus billing. */
 export async function placePickupOrder(
   request: APIRequestContext,
   session: Session,
@@ -196,7 +178,6 @@ export async function placePickupOrder(
   return { order, instrumentId };
 }
 
-/** E3's multi-ship variant: two delivery groups, one order, one payment. */
 export async function placeMultiShipOrder(
   request: APIRequestContext,
   session: Session,
@@ -227,7 +208,6 @@ export async function placeMultiShipOrder(
 
   await checkout.setCustomerEmail(session.accessToken, basketId, email);
   await checkout.setShippingAddress(session.accessToken, basketId, firstAddress);
-  // The storefront mints the second shipment's id client-side; mirror that.
   const shipmentId = `shipment_${crypto.randomUUID().replace(/-/g, '').slice(0, 22)}`;
   await checkout.createShipment(session.accessToken, basketId, shipmentId, secondAddress);
   await checkout.moveItemToShipment(
@@ -253,7 +233,6 @@ export async function placeMultiShipOrder(
   return { order, instrumentId };
 }
 
-/** F1/E2 helper: resolves the nearest store exactly as the locator does. */
 export async function nearestStore(
   request: APIRequestContext,
   accessToken: string,

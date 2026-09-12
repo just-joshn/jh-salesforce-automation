@@ -5,11 +5,6 @@ import { appConfigSchema, mobifyDataSchema } from './schemas';
 
 export type { StorefrontAppConfig };
 
-/**
- * Reads the storefront's own shipped config from the `#mobify-data` script tag — the
- * same live source of truth e2e/support/app-config.ts reads from the page, fetched here
- * as the raw SSR HTML document the browser itself loads.
- */
 export async function readAppConfig(request: APIRequestContext): Promise<StorefrontAppConfig> {
   const response = await request.get(storefrontRequestUrl());
   expect(response.status(), 'storefront config document').toBe(200);

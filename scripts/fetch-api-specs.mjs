@@ -1,16 +1,3 @@
-// Vendors the SCAPI OpenAPI specs this repo tests against into api/specs/.
-//
-// Where they come from: Salesforce's own SDK repo. The docs portal download
-// needs a browser, and the Schemas API needs OAuth with the sfcc.scapi-schemas
-// scope. The SDK repo is public, so this runs in CI with no secrets.
-//
-// Why the version is not pinned here: each version is published as its own
-// directory (shopper-baskets-oas-1.11.0), and the newest one is resolved at
-// fetch time. That is what makes the drift check work. A new upstream version
-// changes the fetched bytes, then the generated types, then turns the nightly
-// `git diff --exit-code` red.
-//
-// The committed spec is the pin. Nothing fetches at test time.
 
 import { createHash } from 'node:crypto';
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -21,8 +8,6 @@ const REPO = 'SalesforceCommerceCloud/commerce-sdk-isomorphic';
 const REF = 'main';
 const SPEC_DIR = join(dirname(fileURLToPath(import.meta.url)), '..', 'api', 'specs');
 
-// The API families this repo actually calls, with the major version it calls.
-// Adding a family here is the only change needed to cover a new surface.
 const FAMILIES = [
   { name: 'shopper-baskets', major: 1, callAs: 'checkout/shopper-baskets/v1' },
   { name: 'shopper-orders', major: 1, callAs: 'checkout/shopper-orders/v1' },
@@ -34,8 +19,6 @@ const FAMILIES = [
   { name: 'auth', major: 1, callAs: 'shopper/auth/v1' },
 ];
 
-// GitHub allows 60 unauthenticated calls an hour per IP, and this makes one.
-// A token is used when present, so a busy CI runner cannot be rate limited.
 function githubHeaders() {
   const headers = { Accept: 'application/vnd.github+json' };
   const token = process.env.GITHUB_TOKEN ?? '';
@@ -51,7 +34,6 @@ async function fetchOk(url, options = {}) {
   return response;
 }
 
-// Directory names present under apis/ on the tracked ref.
 async function listApiDirectories() {
   const response = await fetchOk(`https://api.github.com/repos/${REPO}/contents/apis?ref=${REF}`, {
     headers: githubHeaders(),
@@ -65,8 +47,6 @@ function parseVersion(text) {
   return parts.length === 3 && parts.every(Number.isInteger) ? parts : null;
 }
 
-// Highest published version of one family, within the major version we call.
-// Sorting on the numeric triple avoids 1.9.0 beating 1.11.0.
 function newestDirectory(directories, family) {
   const prefix = `${family.name}-oas-`;
   const candidates = directories
@@ -116,8 +96,6 @@ async function main() {
   await mkdir(SPEC_DIR, { recursive: true });
   const directories = await listApiDirectories();
 
-  // Sequential on purpose. Eight small files, and one clear failure line beats a
-  // pile of rejected promises when Salesforce moves something.
   const manifest = [];
   for (const family of FAMILIES) {
     const entry = await vendorFamily(directories, family);
@@ -125,8 +103,6 @@ async function main() {
     console.log(`  ${entry.family.padEnd(24)} ${entry.version.padEnd(9)} ${entry.bytes} bytes`);
   }
 
-  // The manifest makes a drift failure readable. The yaml diff runs to tens of
-  // thousands of lines. This is one line per family.
   await writeFile(
     join(SPEC_DIR, 'MANIFEST.json'),
     `${JSON.stringify({ repo: REPO, ref: REF, specs: manifest }, null, 2)}\n`,

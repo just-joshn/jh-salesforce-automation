@@ -7,9 +7,7 @@ import { categorySchema, productSchema } from './schemas';
 
 const PRODUCTS_FAMILY = 'product/shopper-products/v1';
 
-/** Shopper Products (category metadata and product operations). */
 export class ProductsClient extends ScapiClient {
-  /** G2: the category metadata the gift-certificates landing page loads. */
   async getCategory(accessToken: string, categoryId: string) {
     const response = await this.request.get(
       this.apiUrl(PRODUCTS_FAMILY, `categories/${categoryId}`),
@@ -19,7 +17,6 @@ export class ProductsClient extends ScapiClient {
     return parseJson<{ id: string; name: string }>(response, categorySchema, 'get category');
   }
 
-  /** Resolves a master product's concrete orderable variant (SCAPI rejects masters in baskets). */
   async firstOrderableVariant(accessToken: string, productId: string): Promise<Product> {
     const response = await this.request.get(this.apiUrl(PRODUCTS_FAMILY, `products/${productId}`), {
       headers: this.authed(accessToken),

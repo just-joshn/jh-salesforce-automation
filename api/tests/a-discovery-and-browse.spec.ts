@@ -12,7 +12,6 @@ test.describe('A. Discovery & Browse', { tag: '@discovery' }, () => {
     await test.step('A matching query returns Einstein-backed suggestions the shopper can pick', async () => {
       const suggestions = await search.searchSuggestions(guestSession.accessToken, 'tie');
 
-      // The suggestion contract the UI renders: product cards plus a category chip.
       const products = suggestions.productSuggestions?.products ?? [];
       expect(products.length).toBeGreaterThan(0);
       expect(products.map((p) => p.productName)).toContain(PRODUCTS.silkTie.name);
@@ -65,7 +64,6 @@ test.describe('A. Discovery & Browse', { tag: '@discovery' }, () => {
   }, async ({ request, guestSession }) => {
     const config = await readAppConfig(request);
 
-    // Compared exactly, never by truthiness — the demo ships this as the *string* "false".
     expect(config.commerceAgent.enabled).toBe('false');
     expect(config.commerceAgent.enableAgentFromHeader).toBe('false');
     expect(config.commerceAgent.enableAgentFromFloatingButton).toBe('false');
